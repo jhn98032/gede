@@ -45,6 +45,9 @@ Ini& Ini::operator=(const Ini &src)
 }
 
 
+/**
+  * @brief Replaces the entries in this ini with another one.
+  */
 void Ini::copy(const Ini &src)
 {
     removeAll();
