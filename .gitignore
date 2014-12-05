@@ -1,0 +1,5 @@
+*.o
+
+src/gd
+src/gede_gdb_log.txt
+

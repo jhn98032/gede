@@ -1,0 +1,52 @@
+QT += gui core
+
+TEMPLATE = app
+
+SOURCES+=gd.cpp
+
+SOURCES+=mainwindow.cpp
+HEADERS+=mainwindow.h
+
+SOURCES+=codeview.cpp
+HEADERS+=codeview.h
+
+SOURCES+=core.cpp
+HEADERS+=core.h
+
+SOURCES+=com.cpp
+HEADERS+=com.h
+
+SOURCES+=log.cpp
+HEADERS+=log.h
+
+SOURCES+=util.cpp
+HEADERS+=util.h
+
+SOURCES+=tree.cpp
+HEADERS+=tree.h
+
+SOURCES+=aboutdialog.cpp
+HEADERS+=aboutdialog.h
+
+SOURCES+=syntaxhighlighter.cpp
+HEADERS+=syntaxhighlighter.h
+
+SOURCES+=ini.cpp
+HEADERS+=ini.h
+
+SOURCES+= opendialog.cpp
+HEADERS+=opendialog.h
+
+FORMS += mainwindow.ui
+FORMS += aboutdialog.ui
+FORMS += opendialog.ui
+
+RESOURCES += resource.qrc
+
+QMAKE_CXXFLAGS += -I./  -g
+
+
+TARGET=gd
+
+
+

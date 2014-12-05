@@ -1,0 +1,13 @@
+<RCC>
+  <qresource prefix="/images">
+    <file>res/next.png</file>
+    <file>res/stop.png</file>
+    <file>res/quit.png</file>
+    <file>res/restart.png</file>
+    <file>res/step_over.png</file>
+    <file>res/step_into.png</file>
+    <file>res/continue.png</file>
+    <file>res/file.png</file>
+    <file>res/folder.png</file>
+ </qresource>
+</RCC>
