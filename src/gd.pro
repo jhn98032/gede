@@ -46,7 +46,7 @@ RESOURCES += resource.qrc
 QMAKE_CXXFLAGS += -I./  -g
 
 
-TARGET=gd
+TARGET=gede
 
 
 
