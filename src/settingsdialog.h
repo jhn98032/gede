@@ -20,6 +20,7 @@ public:
 private:    
     void saveConfig();
     void loadConfig();
+    void updateGui();
     
 
 private slots:

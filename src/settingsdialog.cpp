@@ -18,12 +18,17 @@ SettingsDialog::SettingsDialog(QWidget *parent, Ini *ini)
 
     loadConfig();
     
-
-    QString labelText;
-    labelText.sprintf("%s %d", stringToCStr(m_settingsFontFamily), m_settingsFontSize);
-    m_ui.label_font->setText(labelText);
+    updateGui();
+    
 }
 
+void SettingsDialog::updateGui()
+{
+    QString labelText;
+    labelText.sprintf("%s  %d", stringToCStr(m_settingsFontFamily), m_settingsFontSize);
+    m_ui.pushButton_selectFont->setText(labelText);
+
+}    
 
 void SettingsDialog::loadConfig()
 {
@@ -47,7 +52,6 @@ void SettingsDialog::getConfig(Ini *ini)
     
 void SettingsDialog::onSelectFont()
 {
-    QString labelText;
         
     bool ok;
     QFont font = QFontDialog::getFont(
@@ -56,10 +60,9 @@ void SettingsDialog::onSelectFont()
     {
         m_settingsFontFamily = font.family();
         m_settingsFontSize = font.pointSize();
-        labelText.sprintf("%s %d", stringToCStr(m_settingsFontFamily), m_settingsFontSize);
 
-        m_ui.label_font->setText(labelText);
-   
+        updateGui();
+    
     } else
     {
     }
