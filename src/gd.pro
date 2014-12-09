@@ -37,6 +37,10 @@ HEADERS+=ini.h
 SOURCES+= opendialog.cpp
 HEADERS+=opendialog.h
 
+SOURCES+=settingsdialog.cpp
+HEADERS+=settingsdialog.h
+FORMS += settingsdialog.ui
+
 FORMS += mainwindow.ui
 FORMS += aboutdialog.ui
 FORMS += opendialog.ui

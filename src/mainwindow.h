@@ -63,6 +63,7 @@ public slots:
     void onRun();
     void onContinue();
     void onCodeViewContextMenuItemPressed();
+    void onSettings();
 
     
 private:

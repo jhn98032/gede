@@ -5,6 +5,7 @@
 #include "core.h"
 #include <assert.h>
 #include "aboutdialog.h"
+#include "settingsdialog.h"
 
 
 
@@ -128,6 +129,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ui.actionRun, SIGNAL(triggered()), SLOT(onRun()));
     connect(m_ui.actionContinue, SIGNAL(triggered()), SLOT(onContinue()));
 
+
+    connect(m_ui.actionSettings, SIGNAL(triggered()), SLOT(onSettings()));
 
 
     fillInVars();
@@ -925,10 +928,20 @@ void MainWindow::onCodeViewContextMenuItemPressed()
     
 }
 
+void MainWindow::onSettings()
+{
+    SettingsDialog dlg(this, &m_ini);
+    if(dlg.exec() == QDialog::Accepted)
+    {
+        dlg.getConfig(&m_ini);
 
-    
+        m_ui.codeView->setConfig(&m_ini);
 
-    
+        m_ini.save(CONFIG_FILENAME);
+    }
+   
+}
+
 
 
     
