@@ -336,6 +336,8 @@ ICore::StopReason Core::parseReasonString(QString reasonString)
         return ICore::END_STEPPING_RANGE;
     if(reasonString == "signal-received" || reasonString == "exited-signalled")
         return ICore::SIGNAL_RECEIVED;
+    if(reasonString == "exited-normally")
+        return ICore::EXITED_NORMALLY;
     
     debugMsg("Received unknown reason (\"%s\").", stringToCStr(reasonString));
     assert(0);
@@ -369,6 +371,10 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
 
         // Get the reason
         ICore::StopReason  reason = parseReasonString(tree.getString("reason"));
+
+        if(reason == ICore::EXITED_NORMALLY)
+            m_targetState = TARGET_FINISHED;
+        
         if(m_inf)
         {
             if(reason == ICore::SIGNAL_RECEIVED)

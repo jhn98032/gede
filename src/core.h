@@ -69,7 +69,8 @@ class ICore
         UNKNOWN,
         END_STEPPING_RANGE,
         BREAKPOINT_HIT,
-        SIGNAL_RECEIVED
+        SIGNAL_RECEIVED,
+        EXITED_NORMALLY
     };
 
     enum SignalType

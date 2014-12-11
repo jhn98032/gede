@@ -209,6 +209,13 @@ void MainWindow::ICore_onStopped(ICore::StopReason reason, QString path, int lin
 {
     Q_UNUSED(reason);
 
+    if(reason == ICore::EXITED_NORMALLY)
+    {
+        QString title = "Program exited";
+        QString text = "Program exited normally";
+        QMessageBox::information (this, title, text); 
+    }
+    
     m_currentFile = path;
     m_currentLine = lineno;
     if(!path.isEmpty())
