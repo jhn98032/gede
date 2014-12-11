@@ -835,6 +835,19 @@ void MainWindow::ICore_onStackFrameChange(QList<StackFrameEntry> stackFrameList)
         // Add the item to the widget
         stackWidget->insertTopLevelItem(0, item);
 
+        // Update the sourceview (with the current row).
+        if(idx+1 == stackFrameList.size())
+        {
+            m_currentFile = entry.m_sourcePath;
+            m_currentLine = entry.m_line;
+            if(!m_currentFile.isEmpty())
+            {
+                open(m_currentFile);
+            }
+            else
+                m_ui.codeView->disableCurrentLine();
+        }
+
     }
     
 }
