@@ -962,11 +962,10 @@ void MainWindow::ICore_onSignalReceived(QString signalName)
     if(signalName != "SIGINT")
     {
         //
-        QMessageBox msgBox;
         QString msgText;
-        msgText.sprintf("Program received signal %s", stringToCStr(signalName));
-        msgBox.setText(msgText);
-        msgBox.exec();
+        msgText.sprintf("Program received signal %s.", stringToCStr(signalName));
+        QString title = "Signal received";
+        QMessageBox::warning(this, title, msgText);
     }
     
     m_ui.codeView->disableCurrentLine();
