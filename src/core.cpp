@@ -302,7 +302,7 @@ void Core::gdbRemoveVarWatch(int watchId)
 
 void Core::onNotifyAsyncOut(Tree &tree, AsyncClass ac)
 {
-    infoMsg("NotifyAsyncOut> %s", Com::asyncClassToString(ac));
+    debugMsg("NotifyAsyncOut> %s", Com::asyncClassToString(ac));
 
      if(ac == ComListener::AC_BREAKPOINT_MODIFIED)
     {
@@ -349,7 +349,7 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
 {
     Com& com = Com::getInstance();
 
-    infoMsg("ExecAsyncOut> %s", Com::asyncClassToString(ac));
+    debugMsg("ExecAsyncOut> %s", Com::asyncClassToString(ac));
     
     tree.dump();
 
