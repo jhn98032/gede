@@ -25,7 +25,7 @@ public:
     void insertSourceFiles();
     
 public:
-    void ICore_onStopped(QString path, int lineno);
+    void ICore_onStopped(ICore::StopReason reason, QString path, int lineno);
     void ICore_onLocalVarReset();
     void ICore_onLocalVarChanged(QString name, QString data);
     void ICore_onWatchVarChanged(int watchId, QString name, QString value);
@@ -38,6 +38,7 @@ public:
     void ICore_onFrameVarChanged(QString name, QString value);
     void ICore_onMessage(QString message);
     void ICore_onCurrentFrameChanged(int frameIdx);
+    void ICore_onSignalReceived(QString sigtype);
     
     void ICodeView_onRowDoubleClick(int rowIdx);
     void ICodeView_onContextMenu(QPoint pos, QStringList text);

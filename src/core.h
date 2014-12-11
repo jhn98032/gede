@@ -64,7 +64,23 @@ class ICore
 {
     public:
 
-    virtual void ICore_onStopped(QString path, int lineno) = 0;
+    enum StopReason
+    {
+        UNKNOWN,
+        END_STEPPING_RANGE,
+        BREAKPOINT_HIT,
+        SIGNAL_RECEIVED
+    };
+
+    enum SignalType
+    {
+        SIGINT,
+        SIGTERM,
+        SIGKILL,
+        SIGUNKNOWN
+    };
+    virtual void ICore_onStopped(StopReason reason, QString path, int lineno) = 0;
+    virtual void ICore_onSignalReceived(QString signalName) = 0;
     virtual void ICore_onLocalVarReset() = 0;
     virtual void ICore_onLocalVarChanged(QString name, QString value) = 0;
     virtual void ICore_onFrameVarReset() = 0;
@@ -112,6 +128,7 @@ private:
      void onLogStreamOutput(QString str);
 
     void dispatchBreakpointTree(Tree &tree);
+    static ICore::StopReason parseReasonString(QString string);
     
 public:
     void gdbInsertBreakPoint(QString func);

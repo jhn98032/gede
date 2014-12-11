@@ -6,7 +6,7 @@
 #include <assert.h>
 #include "aboutdialog.h"
 #include "settingsdialog.h"
-
+#include <QMessageBox>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -205,7 +205,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
  * @brief Execution has stopped.
  * @param lineno   The line which is about to execute (1=first).
  */
-void MainWindow::ICore_onStopped(QString path, int lineno)
+void MainWindow::ICore_onStopped(ICore::StopReason reason, QString path, int lineno)
 {
     m_currentFile = path;
     m_currentLine = lineno;
@@ -940,6 +940,24 @@ void MainWindow::onSettings()
         m_ini.save(CONFIG_FILENAME);
     }
    
+}
+
+void MainWindow::ICore_onSignalReceived(QString signalName)
+{
+    if(signalName != "SIGINT")
+    {
+        //
+        QMessageBox msgBox;
+        QString msgText;
+        msgText.sprintf("Program received signal %s", stringToCStr(signalName));
+        msgBox.setText(msgText);
+        msgBox.exec();
+    }
+    
+    m_ui.codeView->disableCurrentLine();
+
+    fillInStack();
+
 }
 
 

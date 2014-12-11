@@ -328,6 +328,21 @@ void Core::onNotifyAsyncOut(Tree &tree, AsyncClass ac)
     tree.dump();
 }
 
+ICore::StopReason Core::parseReasonString(QString reasonString)
+{
+    if( reasonString == "breakpoint-hit")
+        return ICore::BREAKPOINT_HIT;
+    if(reasonString == "end-stepping-range")
+        return ICore::END_STEPPING_RANGE;
+    if(reasonString == "signal-received")
+        return ICore::SIGNAL_RECEIVED;
+    
+    debugMsg("Received unknown reason (\"%s\").", stringToCStr(reasonString));
+    assert(0);
+
+    return ICore::UNKNOWN;
+}
+    
 void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
 {
     Com& com = Com::getInstance();
@@ -352,10 +367,18 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
         QString p = tree.getString("frame/fullname");
         int lineno = tree.getInt("frame/line");
 
-        
+        // Get the reason
+        ICore::StopReason  reason = parseReasonString(tree.getString("reason"));
+
         if(m_inf)
         {
-            m_inf->ICore_onStopped(p, lineno);
+            if(reason == ICore::SIGNAL_RECEIVED)
+            {
+                QString signalName = tree.getString("signal-name");
+                m_inf->ICore_onSignalReceived(signalName);  
+            }
+            else
+                m_inf->ICore_onStopped(reason, p, lineno);
 
             m_inf->ICore_onFrameVarReset();
 
@@ -568,11 +591,14 @@ void Core::onResult(Tree &tree)
             QString p = tree.getString("frame/fullname");
             int lineno = tree.getInt("frame/line");
             int frameIdx = tree.getInt("frame/level");
+            ICore::StopReason  reason = ICore::UNKNOWN;
+             
             m_currentFrameIdx = frameIdx;
 
             if(m_inf)
             {
-                m_inf->ICore_onStopped(p, lineno);
+
+                m_inf->ICore_onStopped(reason, p, lineno);
 
                 m_inf->ICore_onFrameVarReset();
 
