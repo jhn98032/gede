@@ -713,6 +713,8 @@ void MainWindow::onContinue()
     Core &core = Core::getInstance();
     core.gdbContinue();
 
+    m_ui.codeView->disableCurrentLine();
+
 }
 
 void MainWindow::onStepIn()
