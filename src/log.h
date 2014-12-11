@@ -3,7 +3,7 @@
 
 #include <QDebug>
 
-#ifdef NO_DEBUGMSG
+#ifndef ENABLE_DEBUGMSG
 #define debugMsg(fmt...)  do{}while(0)
 #else
 void debugMsg_(const char *file, int lineno, const char *fmt,...);
