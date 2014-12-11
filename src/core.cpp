@@ -187,10 +187,10 @@ void Core::gdbNext()
     Com& com = Com::getInstance();
     Tree resultData;
 
-    if(m_targetState == TARGET_RUNNING)
+    if(m_targetState != TARGET_STOPPED)
     {
         if(m_inf)
-            m_inf->ICore_onMessage("Program is currently running");
+            m_inf->ICore_onMessage("Program is not stopped");
         return;
     }
 
@@ -214,10 +214,10 @@ void Core::gdbStepIn()
     Com& com = Com::getInstance();
     Tree resultData;
 
-    if(m_targetState == TARGET_RUNNING)
+    if(m_targetState != TARGET_STOPPED)
     {
         if(m_inf)
-            m_inf->ICore_onMessage("Program is currently running");
+            m_inf->ICore_onMessage("Program is not stopped");
         return;
     }
 
@@ -334,7 +334,7 @@ ICore::StopReason Core::parseReasonString(QString reasonString)
         return ICore::BREAKPOINT_HIT;
     if(reasonString == "end-stepping-range")
         return ICore::END_STEPPING_RANGE;
-    if(reasonString == "signal-received")
+    if(reasonString == "signal-received" || reasonString == "exited-signalled")
         return ICore::SIGNAL_RECEIVED;
     
     debugMsg("Received unknown reason (\"%s\").", stringToCStr(reasonString));
@@ -369,12 +369,15 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
 
         // Get the reason
         ICore::StopReason  reason = parseReasonString(tree.getString("reason"));
-
         if(m_inf)
         {
             if(reason == ICore::SIGNAL_RECEIVED)
             {
                 QString signalName = tree.getString("signal-name");
+                if(signalName == "SIGSEGV")
+                {
+                    m_targetState = TARGET_FINISHED;
+                }
                 m_inf->ICore_onSignalReceived(signalName);  
             }
             else

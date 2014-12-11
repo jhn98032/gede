@@ -164,7 +164,7 @@ private:
     QVector <SourceFile*> m_sourceFiles;
     QMap <int, ThreadInfo> m_threadList;
     int m_selectedThreadId;
-    enum {TARGET_STOPPED, TARGET_RUNNING } m_targetState;
+    enum {TARGET_STOPPED, TARGET_RUNNING,TARGET_FINISHED } m_targetState;
     int m_pid;
     int m_currentFrameIdx;
     QMap <int, VarWatch> m_watchList;
