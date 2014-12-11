@@ -14,13 +14,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>About GD</string>
+   <string>About Gede</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
-      <string>GD Johan Henriksson Copyright 2014</string>
+      <string>Gede Johan Henriksson Copyright 2014</string>
      </property>
     </widget>
    </item>
