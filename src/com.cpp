@@ -96,7 +96,13 @@ Com::Com()
 
 Com::~Com()
 {
-    m_process.kill();
+    // Send the command to gdb to exit cleanly
+    QString text = "-gdb-exit\n";
+    m_process.write((const char*)text.toAscii());
+    
+    
+    m_process.terminate();
+
     m_process.waitForFinished();
     
     // Free tokens
