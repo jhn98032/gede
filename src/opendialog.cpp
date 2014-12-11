@@ -34,6 +34,12 @@ void OpenDialog::setProgram(QString program)
 }
     
 
+void OpenDialog::setArguments(QString arguments)
+{
+    m_ui.lineEdit_arguments->setText(arguments);
+
+}
+
 void OpenDialog::onSelectProgram()
 {
 

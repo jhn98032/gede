@@ -29,11 +29,13 @@ public:
     
     void setInt(QString name, int value);
     void setString(QString name, QString value);
+    void setStringList(QString name, QStringList value);
     int getInt(QString name, int defaultValue = -1);
     QColor getColor(QString name, QColor defaultValue);
     QString getString(QString name, QString defaultValue = "");
+    QStringList getStringList(QString name, QStringList defaultValue);
     void setColor(QString name, QColor value);
-
+    
     int appendLoad(QString filename);
     int save(QString filename);
     void dump();

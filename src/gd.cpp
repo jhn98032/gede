@@ -59,9 +59,20 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
+    // Load config
+    Ini tmpIni;
+    tmpIni.appendLoad(CONFIG_FILENAME);
+    
+    // Got a program to debug?
     if(argumentList.size() < 1)
     {
+        // Ask user for program
         OpenDialog dlg(NULL);
+
+        dlg.setProgram(tmpIni.getString("LastProgram", ""));
+        QStringList defList;
+        dlg.setArguments(tmpIni.getStringList("LastProgramArguments", defList).join(" "));
+    
         if(dlg.exec() != QDialog::Accepted)
             return 1;
         argumentList.clear();
@@ -69,6 +80,15 @@ int main(int argc, char *argv[])
         argumentList += dlg.getArguments().split(' ');
     }
 
+    // Save config
+    tmpIni.setString("LastProgram", argumentList[0]);
+    QStringList tmpArgs;
+    tmpArgs = argumentList;
+    tmpArgs.pop_front();
+    tmpIni.setStringList("LastProgramArguments", tmpArgs);
+    tmpIni.save(CONFIG_FILENAME);
+
+    
     Core &core = Core::getInstance();
 
     

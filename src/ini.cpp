@@ -109,6 +109,12 @@ void Ini::setString(QString name, QString value)
     entry->value = value;
 }
 
+void Ini::setStringList(QString name, QStringList value)
+{
+    Entry *entry = addEntry(name);
+    entry->value = value.join(";");
+}
+
 int Ini::getInt(QString name, int defaultValue)
 {
     Entry *entry = findEntry(name);
@@ -130,6 +136,12 @@ QString Ini::getString(QString name, QString defaultValue)
     }
         
     return entry->value;
+}
+
+QStringList Ini::getStringList(QString name, QStringList defaultValue)
+{
+    QString list = getString(name, defaultValue.join(";"));
+    return list.split(";");
 }
 
 QColor Ini::getColor(QString name, QColor defaultValue)
