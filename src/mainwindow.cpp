@@ -207,6 +207,8 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
  */
 void MainWindow::ICore_onStopped(ICore::StopReason reason, QString path, int lineno)
 {
+    Q_UNUSED(reason);
+
     m_currentFile = path;
     m_currentLine = lineno;
     if(!path.isEmpty())
