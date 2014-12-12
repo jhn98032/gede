@@ -1011,18 +1011,6 @@ void MainWindow::ICore_onStackFrameChange(QList<StackFrameEntry> stackFrameList)
         // Add the item to the widget
         stackWidget->insertTopLevelItem(0, item);
 
-        // Update the sourceview (with the current row).
-        if(idx == 0)
-        {
-            m_currentFile = entry.m_sourcePath;
-            m_currentLine = entry.m_line;
-            if(!m_currentFile.isEmpty())
-            {
-                open(m_currentFile);
-            }
-            else
-                m_ui.codeView->disableCurrentLine();
-        }
 
     }
     
@@ -1038,6 +1026,22 @@ void MainWindow::ICore_onCurrentFrameChanged(int frameIdx)
 {
     QTreeWidget *threadWidget = m_ui.treeWidget_stack;
     QTreeWidgetItem *rootItem = threadWidget->invisibleRootItem();
+
+    // Update the sourceview (with the current row).
+    if(frameIdx < m_stackFrameList.size())
+    {
+        StackFrameEntry &entry = m_stackFrameList[m_stackFrameList.size()-frameIdx-1];
+
+        m_currentFile = entry.m_sourcePath;
+        m_currentLine = entry.m_line;
+        if(!m_currentFile.isEmpty())
+        {
+            open(m_currentFile);
+        }
+        else
+            m_ui.codeView->disableCurrentLine();
+    }
+
 
     for(int i = 0;i < rootItem->childCount();i++)
     {
