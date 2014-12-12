@@ -422,9 +422,9 @@ void MainWindow::ICore_onWatchVarChanged(int watchId, QString name, QString valu
         //debugMsg("%s=%s", stringToCStr(name), stringToCStr(itemKey));
         if(watchId == itemKey)
         {
-            if(m_disp.contains(watchId))
+            if(m_disp.contains(name))
             {
-                DispInfo &dispInfo = m_disp[watchId];
+                DispInfo &dispInfo = m_disp[name];
                 dispInfo.orgValue = valueString;
 
                 // Update the variable value
@@ -579,7 +579,7 @@ MainWindow::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int colu
 
         core.gdbRemoveVarWatch(oldKey);
 
-        m_disp.remove(oldKey);
+        m_disp.remove(oldName);
     }
     // Add a new variable?
     else if(oldName == "")
@@ -598,7 +598,7 @@ MainWindow::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int colu
             dispInfo.orgValue = value;
             dispInfo.orgFormat = findVarType(value);
             dispInfo.dispFormat = dispInfo.orgFormat;
-            m_disp[watchId] = dispInfo;
+            m_disp[newName] = dispInfo;
 
             // Create a new dummy item
             QTreeWidgetItem *item;
@@ -624,6 +624,8 @@ MainWindow::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int colu
         // Remove old watch
         core.gdbRemoveVarWatch(oldKey);
 
+        m_disp.remove(oldName);
+
         QString value;
         int watchId;
         QString varType;
@@ -638,7 +640,7 @@ MainWindow::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int colu
             dispInfo.orgValue = value;
             dispInfo.orgFormat = findVarType(value);
             dispInfo.dispFormat = dispInfo.orgFormat;
-            m_disp[watchId] = dispInfo;
+            m_disp[newName] = dispInfo;
             
         }
         else
@@ -650,6 +652,10 @@ MainWindow::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int colu
 
 }
 
+
+/**
+ * @brief Formats a string (Eg: 0x2) that represents a decimal value.
+ */
 QString MainWindow::valueDisplay(long long val, DispFormat format)
 {
     QString valueText;
@@ -678,6 +684,13 @@ QString MainWindow::valueDisplay(long long val, DispFormat format)
     {
         QString text;
         text.sprintf("%llx", val);
+
+        // Prefix the string with suitable number of zeroes
+        while(text.length()%4 != 0 && text.length() > 4)
+            text = "0" + text;
+        if(text.length()%2 != 0)
+            text = "0" + text;
+            
         for(int i = 0;i < text.length();i++)
         {
             valueText = valueText + text[i];
@@ -712,10 +725,10 @@ void MainWindow::onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int colum
         varWidget->editItem(item,column);
     else if(column == 1)
     {
-        int watchId = item->data(0, Qt::UserRole).toInt();
-        if(m_disp.contains(watchId))
+        QString varName = item->text(0);
+        if(m_disp.contains(varName))
         {
-            DispInfo &dispInfo = m_disp[watchId];
+            DispInfo &dispInfo = m_disp[varName];
             if(dispInfo.orgFormat == DISP_DEC)
             {
                 long long val = dispInfo.orgValue.toLongLong();

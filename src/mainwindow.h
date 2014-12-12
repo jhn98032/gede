@@ -95,7 +95,7 @@ private:
     int m_currentLine; //!< The linenumber (first=1) which the program counter points to.
     QList<StackFrameEntry> m_stackFrameList;
     QMenu m_popupMenu;
-    QMap<int, DispInfo> m_disp;
+    QMap<QString, DispInfo> m_disp;
 
     Ini m_ini;
 
