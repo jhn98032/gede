@@ -71,6 +71,9 @@
         <enum>Qt::Vertical</enum>
        </property>
        <widget class="QTreeWidget" name="autoWidget">
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
+        </property>
         <column>
          <property name="text">
           <string notr="true">1</string>
@@ -89,6 +92,9 @@
           <width>80</width>
           <height>1</height>
          </size>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::NoEditTriggers</set>
         </property>
         <property name="selectionMode">
          <enum>QAbstractItemView::ExtendedSelection</enum>
