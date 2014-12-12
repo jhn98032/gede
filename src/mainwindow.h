@@ -65,6 +65,7 @@ public slots:
     void onContinue();
     void onCodeViewContextMenuItemPressed();
     void onSettings();
+    void onVarWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
 
     
 private:

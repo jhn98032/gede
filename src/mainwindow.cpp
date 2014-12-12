@@ -29,6 +29,8 @@ MainWindow::MainWindow(QWidget *parent)
     names += "Type";
     m_ui.varWidget->setHeaderLabels(names);
     connect(m_ui.varWidget, SIGNAL(itemChanged(QTreeWidgetItem * ,int)), this, SLOT(onVarWidgetCurrentItemChanged(QTreeWidgetItem * ,int)));
+    connect(m_ui.varWidget, SIGNAL(itemDoubleClicked ( QTreeWidgetItem * , int  )), this, SLOT(onVarWidgetItemDoubleClicked(QTreeWidgetItem *, int )));
+    
 
 
     //
@@ -400,7 +402,7 @@ void MainWindow::ICore_onLocalVarChanged(QString name, QString value)
     names += name;
     names += value;
     item = new QTreeWidgetItem(names);
-    item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
+    item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     varWidget->insertTopLevelItem(0, item);
 }
 
@@ -477,14 +479,7 @@ void MainWindow::fillInVars()
     item = new QTreeWidgetItem(names);
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
     varWidget->insertTopLevelItem(0, item);
-    /*
-    names.clear();
-    names += "hej";
-    names += "kalle";
-    item = new QTreeWidgetItem(names);
-    item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
-    varWidget->insertTopLevelItem(0, item);
-*/
+   
 
 }
 
@@ -620,6 +615,16 @@ MainWindow::onVarWidgetCurrentItemChanged( QTreeWidgetItem * current, int column
 
 }
 
+
+
+void MainWindow::onVarWidgetItemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+    QTreeWidget *varWidget = m_ui.varWidget;
+
+    
+    if(column == 0)
+        varWidget->editItem(item,column);
+}
 
 void MainWindow::onFolderViewItemActivated ( QTreeWidgetItem * item, int column )
 {
