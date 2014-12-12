@@ -53,6 +53,8 @@ MainWindow::MainWindow(QWidget *parent)
     names += "Name";
     names += "Value";
     m_ui.autoWidget->setHeaderLabels(names);
+    connect(m_ui.autoWidget, SIGNAL(itemDoubleClicked ( QTreeWidgetItem * , int  )), this,
+                            SLOT(onAutoWidgetItemDoubleClicked(QTreeWidgetItem *, int )));
 
 
 
@@ -393,14 +395,36 @@ item->setData(0, Qt::UserRole, filename);
 
 void MainWindow::ICore_onLocalVarChanged(QString name, QString value)
 {
+    QString displayValue = value;
     QTreeWidget *varWidget = m_ui.autoWidget;
     QTreeWidgetItem *item;
     QStringList names;
-    
-    
+
+    //
+    if(m_autoVarDispInfo.contains(name))
+    {
+        DispInfo &dispInfo = m_autoVarDispInfo[name];
+        dispInfo.orgValue = value;
+
+        // Update the variable value
+        if(dispInfo.orgFormat == DISP_DEC)
+        {
+            displayValue = valueDisplay(value.toLongLong(), dispInfo.dispFormat);
+        }
+    }
+    else
+    {
+        DispInfo dispInfo;
+        dispInfo.orgValue = value;
+        dispInfo.orgFormat = findVarType(value);
+        dispInfo.dispFormat = dispInfo.orgFormat;
+        m_autoVarDispInfo[name] = dispInfo;
+    }
+
+    //
     names.clear();
     names += name;
-    names += value;
+    names += displayValue;
     item = new QTreeWidgetItem(names);
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
     varWidget->insertTopLevelItem(0, item);
@@ -757,6 +781,50 @@ void MainWindow::onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int colum
         }
     }
 }
+
+
+void MainWindow::onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column)
+{
+    QTreeWidget *varWidget = m_ui.varWidget;
+
+    
+    if(column == 0)
+        varWidget->editItem(item,column);
+    else if(column == 1)
+    {
+        QString varName = item->text(0);
+        if(m_autoVarDispInfo.contains(varName))
+        {
+            DispInfo &dispInfo = m_autoVarDispInfo[varName];
+            if(dispInfo.orgFormat == DISP_DEC)
+            {
+                long long val = dispInfo.orgValue.toLongLong();
+
+                if(dispInfo.dispFormat == DISP_DEC)
+                {
+                    dispInfo.dispFormat = DISP_BIN;
+                }
+                else if(dispInfo.dispFormat == DISP_BIN)
+                {
+                    dispInfo.dispFormat = DISP_HEX;
+                }
+                else if(dispInfo.dispFormat == DISP_HEX)
+                {
+                    dispInfo.dispFormat = DISP_CHAR;
+                }
+                else if(dispInfo.dispFormat == DISP_CHAR)
+                {
+                    dispInfo.dispFormat = DISP_DEC;
+                }
+
+                QString valueText = valueDisplay(val, dispInfo.dispFormat);
+
+                item->setText(1, valueText);
+            }
+        }
+    }
+}
+
 
 void MainWindow::onFolderViewItemActivated ( QTreeWidgetItem * item, int column )
 {

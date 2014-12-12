@@ -84,6 +84,7 @@ public slots:
     void onCodeViewContextMenuItemPressed();
     void onSettings();
     void onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
+    void onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
 
     
 private:
@@ -96,6 +97,7 @@ private:
     QList<StackFrameEntry> m_stackFrameList;
     QMenu m_popupMenu;
     QMap<QString, DispInfo> m_watchVarDispInfo;
+    QMap<QString, DispInfo> m_autoVarDispInfo;
 
     Ini m_ini;
 
