@@ -1,5 +1,6 @@
 #!/bin/bash
 
 make
-./gede --args ../testapp/test
+cd ../testapp
+../src/gede --args ./test
 
