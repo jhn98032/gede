@@ -719,13 +719,13 @@ void MainWindow::onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int colum
 
                 if(dispInfo.dispFormat == DISP_DEC)
                 {
-                    dispInfo.dispFormat = DISP_BIN;
-                }
-                else if(dispInfo.dispFormat == DISP_BIN)
-                {
                     dispInfo.dispFormat = DISP_HEX;
                 }
                 else if(dispInfo.dispFormat == DISP_HEX)
+                {
+                    dispInfo.dispFormat = DISP_BIN;
+                }
+                else if(dispInfo.dispFormat == DISP_BIN)
                 {
                     dispInfo.dispFormat = DISP_CHAR;
                 }
@@ -762,13 +762,13 @@ void MainWindow::onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column
 
                 if(dispInfo.dispFormat == DISP_DEC)
                 {
-                    dispInfo.dispFormat = DISP_BIN;
-                }
-                else if(dispInfo.dispFormat == DISP_BIN)
-                {
                     dispInfo.dispFormat = DISP_HEX;
                 }
                 else if(dispInfo.dispFormat == DISP_HEX)
+                {
+                    dispInfo.dispFormat = DISP_BIN;
+                }
+                else if(dispInfo.dispFormat == DISP_BIN)
                 {
                     dispInfo.dispFormat = DISP_CHAR;
                 }
