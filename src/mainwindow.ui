@@ -187,7 +187,7 @@
     <property name="title">
      <string>Execution</string>
     </property>
-    <addaction name="actionNext_2"/>
+    <addaction name="actionNext"/>
     <addaction name="actionStep_In"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -234,11 +234,6 @@
     <iconset resource="resource.qrc">
      <normaloff>:/images/res/step_over.png</normaloff>:/images/res/step_over.png</iconset>
    </property>
-   <property name="text">
-    <string>Next</string>
-   </property>
-  </action>
-  <action name="actionNext_2">
    <property name="text">
     <string>Next</string>
    </property>
