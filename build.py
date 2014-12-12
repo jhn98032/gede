@@ -1,5 +1,7 @@
 #!/usr/bin/env python
-
+#
+# Written by Johan Henriksson. Copyright (C) 2014.
+#
 import sys
 import os
 import subprocess
