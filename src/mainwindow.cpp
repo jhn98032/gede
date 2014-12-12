@@ -235,9 +235,9 @@ void MainWindow::ICore_onStopped(ICore::StopReason reason, QString path, int lin
 
 void MainWindow::ICore_onLocalVarReset()
 {
-    QTreeWidget *varWidget = m_ui.autoWidget;
+    QTreeWidget *autoWidget = m_ui.autoWidget;
 
-    varWidget->clear();
+    autoWidget->clear();
 }
 
 
@@ -356,7 +356,7 @@ void MainWindow::insertSourceFiles()
 void MainWindow::ICore_onLocalVarChanged(QString name, QString value)
 {
     QString displayValue = value;
-    QTreeWidget *varWidget = m_ui.autoWidget;
+    QTreeWidget *autoWidget = m_ui.autoWidget;
     QTreeWidgetItem *item;
     QStringList names;
 
@@ -387,7 +387,7 @@ void MainWindow::ICore_onLocalVarChanged(QString name, QString value)
     names += displayValue;
     item = new QTreeWidgetItem(names);
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-    varWidget->insertTopLevelItem(0, item);
+    autoWidget->insertTopLevelItem(0, item);
 }
 
 
