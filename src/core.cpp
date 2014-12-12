@@ -778,6 +778,8 @@ void Core::selectFrame(int selectedFrameIdx)
 
 
         com.commandF(&resultData, "-stack-info-frame");
+
+        com.commandF(NULL, "-stack-list-locals 1");
     }
 
 }
