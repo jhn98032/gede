@@ -422,9 +422,9 @@ void MainWindow::ICore_onWatchVarChanged(int watchId, QString name, QString valu
         //debugMsg("%s=%s", stringToCStr(name), stringToCStr(itemKey));
         if(watchId == itemKey)
         {
-            if(m_disp.contains(name))
+            if(m_watchVarDispInfo.contains(name))
             {
-                DispInfo &dispInfo = m_disp[name];
+                DispInfo &dispInfo = m_watchVarDispInfo[name];
                 dispInfo.orgValue = valueString;
 
                 // Update the variable value
@@ -579,7 +579,7 @@ MainWindow::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int colu
 
         core.gdbRemoveVarWatch(oldKey);
 
-        m_disp.remove(oldName);
+        m_watchVarDispInfo.remove(oldName);
     }
     // Add a new variable?
     else if(oldName == "")
@@ -598,7 +598,7 @@ MainWindow::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int colu
             dispInfo.orgValue = value;
             dispInfo.orgFormat = findVarType(value);
             dispInfo.dispFormat = dispInfo.orgFormat;
-            m_disp[newName] = dispInfo;
+            m_watchVarDispInfo[newName] = dispInfo;
 
             // Create a new dummy item
             QTreeWidgetItem *item;
@@ -624,7 +624,7 @@ MainWindow::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int colu
         // Remove old watch
         core.gdbRemoveVarWatch(oldKey);
 
-        m_disp.remove(oldName);
+        m_watchVarDispInfo.remove(oldName);
 
         QString value;
         int watchId;
@@ -640,7 +640,7 @@ MainWindow::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int colu
             dispInfo.orgValue = value;
             dispInfo.orgFormat = findVarType(value);
             dispInfo.dispFormat = dispInfo.orgFormat;
-            m_disp[newName] = dispInfo;
+            m_watchVarDispInfo[newName] = dispInfo;
             
         }
         else
@@ -726,9 +726,9 @@ void MainWindow::onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int colum
     else if(column == 1)
     {
         QString varName = item->text(0);
-        if(m_disp.contains(varName))
+        if(m_watchVarDispInfo.contains(varName))
         {
-            DispInfo &dispInfo = m_disp[varName];
+            DispInfo &dispInfo = m_watchVarDispInfo[varName];
             if(dispInfo.orgFormat == DISP_DEC)
             {
                 long long val = dispInfo.orgValue.toLongLong();
