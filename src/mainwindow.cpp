@@ -348,46 +348,6 @@ void MainWindow::insertSourceFiles()
         }
     }
 
-
-/*
-  QTreeWidgetItem *root = new QTreeWidgetItem;
-   root->setText(0, "/"); 
-root->setIcon(0, m_folderIcon);
-   treeWidget->insertTopLevelItem(0, root);
-
-   QTreeWidgetItem *child = new QTreeWidgetItem;
-   child->setText(0, "dir");
-    root->addChild(child);
-*/
-    
-
-  /*  
- 
-
-//
-    QDirIterator it("./", QDirIterator::Subdirectories);
-    while (it.hasNext())
-    {
-        QFileInfo info = it.fileInfo();
-QString sf = info.suffix();
-
-        if(sf == "cpp" || sf == "h")
-        {
-            QString filename = info.fileName();
-QTreeWidgetItem *item = new QTreeWidgetItem((QTreeWidget*)0, QStringList(filename));
-
-item->setData(0, Qt::UserRole, filename);
-
-
-        root->addChild(item);
-
-        }
-        
-        it.next();
-    }
-*/
-
-
 }
 
 
