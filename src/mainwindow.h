@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QApplication>
+#include <QMap>
 
 #include "ui_mainwindow.h"
 #include "core.h"
@@ -43,16 +44,33 @@ public:
     void ICodeView_onRowDoubleClick(int rowIdx);
     void ICodeView_onContextMenu(QPoint pos, QStringList text);
 private:
+    enum DispFormat
+    {
+        DISP_NATIVE,
+        DISP_DEC,
+        DISP_BIN,
+        DISP_HEX,
+        DISP_CHAR,
+    };
+    typedef struct
+    {
+        QString orgValue;
+        DispFormat orgFormat;
+        DispFormat dispFormat;
+    }DispInfo;
+
 
     QTreeWidgetItem *addTreeWidgetPath(QTreeWidget *treeWidget, QTreeWidgetItem *parent, QString path);
     void fillInStack();
 
     bool eventFilter(QObject *obj, QEvent *event);
     void loadConfig();
+    DispFormat findVarType(QString dataString);
+    QString valueDisplay(long long value, DispFormat format);
     
 public slots:
     void onFolderViewItemActivated ( QTreeWidgetItem * item, int column );
-    void onVarWidgetCurrentItemChanged ( QTreeWidgetItem * current, int column );
+    void onWatchWidgetCurrentItemChanged ( QTreeWidgetItem * current, int column );
     void onThreadWidgetSelectionChanged( );
     void onStackWidgetSelectionChanged();
     void onQuit();
@@ -65,7 +83,7 @@ public slots:
     void onContinue();
     void onCodeViewContextMenuItemPressed();
     void onSettings();
-    void onVarWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
+    void onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
 
     
 private:
@@ -77,6 +95,7 @@ private:
     int m_currentLine; //!< The linenumber (first=1) which the program counter points to.
     QList<StackFrameEntry> m_stackFrameList;
     QMenu m_popupMenu;
+    QMap<int, DispInfo> m_disp;
 
     Ini m_ini;
 

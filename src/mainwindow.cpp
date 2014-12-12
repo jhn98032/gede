@@ -28,8 +28,8 @@ MainWindow::MainWindow(QWidget *parent)
     names += "Value";
     names += "Type";
     m_ui.varWidget->setHeaderLabels(names);
-    connect(m_ui.varWidget, SIGNAL(itemChanged(QTreeWidgetItem * ,int)), this, SLOT(onVarWidgetCurrentItemChanged(QTreeWidgetItem * ,int)));
-    connect(m_ui.varWidget, SIGNAL(itemDoubleClicked ( QTreeWidgetItem * , int  )), this, SLOT(onVarWidgetItemDoubleClicked(QTreeWidgetItem *, int )));
+    connect(m_ui.varWidget, SIGNAL(itemChanged(QTreeWidgetItem * ,int)), this, SLOT(onWatchWidgetCurrentItemChanged(QTreeWidgetItem * ,int)));
+    connect(m_ui.varWidget, SIGNAL(itemDoubleClicked ( QTreeWidgetItem * , int  )), this, SLOT(onWatchWidgetItemDoubleClicked(QTreeWidgetItem *, int )));
     
 
 
@@ -408,7 +408,7 @@ void MainWindow::ICore_onLocalVarChanged(QString name, QString value)
 
 
 
-void MainWindow::ICore_onWatchVarChanged(int watchId, QString name, QString value)
+void MainWindow::ICore_onWatchVarChanged(int watchId, QString name, QString valueString)
 {
     QTreeWidget *varWidget = m_ui.varWidget;
     QStringList names;
@@ -422,8 +422,19 @@ void MainWindow::ICore_onWatchVarChanged(int watchId, QString name, QString valu
         //debugMsg("%s=%s", stringToCStr(name), stringToCStr(itemKey));
         if(watchId == itemKey)
         {
-            // Update the variable value
-            item->setText(1, value);
+            if(m_disp.contains(watchId))
+            {
+                DispInfo &dispInfo = m_disp[watchId];
+                dispInfo.orgValue = valueString;
+
+                // Update the variable value
+                if(dispInfo.orgFormat == DISP_DEC)
+                {
+                    valueString = valueDisplay(valueString.toLongLong(), dispInfo.dispFormat);
+                }
+            }
+
+            item->setText(1, valueString);
         }
     }
 
@@ -521,9 +532,18 @@ void MainWindow::onStackWidgetSelectionChanged()
 }
 
 
+MainWindow::DispFormat MainWindow::findVarType(QString dataString)
+{
+    if(dataString.indexOf("\"") != -1 ||
+        dataString.indexOf("'") != -1 ||
+        dataString.indexOf(".") != -1)
+        return DISP_NATIVE;
+    return DISP_DEC;
+ }
+
 
 void 
-MainWindow::onVarWidgetCurrentItemChanged( QTreeWidgetItem * current, int column )
+MainWindow::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int column )
 {
     QTreeWidget *varWidget = m_ui.varWidget;
     Core &core = Core::getInstance();
@@ -558,7 +578,8 @@ MainWindow::onVarWidgetCurrentItemChanged( QTreeWidgetItem * current, int column
         item->removeChild(current);
 
         core.gdbRemoveVarWatch(oldKey);
-        
+
+        m_disp.remove(oldKey);
     }
     // Add a new variable?
     else if(oldName == "")
@@ -572,7 +593,13 @@ MainWindow::onVarWidgetCurrentItemChanged( QTreeWidgetItem * current, int column
             current->setData(0, Qt::UserRole, watchId);
             current->setText(1, value);
             current->setText(2, varType);
-            
+
+            DispInfo dispInfo;
+            dispInfo.orgValue = value;
+            dispInfo.orgFormat = findVarType(value);
+            dispInfo.dispFormat = dispInfo.orgFormat;
+            m_disp[watchId] = dispInfo;
+
             // Create a new dummy item
             QTreeWidgetItem *item;
             QStringList names;
@@ -605,6 +632,14 @@ MainWindow::onVarWidgetCurrentItemChanged( QTreeWidgetItem * current, int column
             current->setData(0, Qt::UserRole, watchId);
             current->setText(1, value);
             current->setText(2, varType);
+
+            // Add display information
+            DispInfo dispInfo;
+            dispInfo.orgValue = value;
+            dispInfo.orgFormat = findVarType(value);
+            dispInfo.dispFormat = dispInfo.orgFormat;
+            m_disp[watchId] = dispInfo;
+            
         }
         else
         {
@@ -615,15 +650,99 @@ MainWindow::onVarWidgetCurrentItemChanged( QTreeWidgetItem * current, int column
 
 }
 
+QString MainWindow::valueDisplay(long long val, DispFormat format)
+{
+    QString valueText;
+    if(format == DISP_BIN)
+    {
+        QString subText;
+        QString reverseText;
+        do
+        {
+            subText.sprintf("%d", (int)(val & 0x1));
+            reverseText = subText + reverseText;
+            val = val>>1;
+        }
+        while(val > 0 || reverseText.length()%8 != 0);
+        for(int i = 0;i < reverseText.length();i++)
+        {
+            valueText += reverseText[i];
+            if(i%4 == 3 && i+1 != reverseText.length())
+                valueText += "_";
+        }
+        
+        valueText = "0b" + valueText;
+        
+    }
+    else if(format == DISP_HEX)
+    {
+        QString text;
+        text.sprintf("%llx", val);
+        for(int i = 0;i < text.length();i++)
+        {
+            valueText = valueText + text[i];
+            if(i%4 == 3 && i+1 != text.length())
+                valueText += "_";
+        }
+        valueText = "0x" + valueText;        
+    }
+    else if(format == DISP_CHAR)
+    {
+        QChar c = QChar((int)val);
+        if(c.isPrint())
+            valueText.sprintf("'%c'", c.toAscii());
+        else
+            valueText.sprintf("' '");
+        
+    }
+    else if(format == DISP_DEC)
+    {
+        valueText.sprintf("%lld", val);
+    }
+    return valueText;
+}
 
 
-void MainWindow::onVarWidgetItemDoubleClicked(QTreeWidgetItem *item, int column)
+void MainWindow::onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int column)
 {
     QTreeWidget *varWidget = m_ui.varWidget;
 
     
     if(column == 0)
         varWidget->editItem(item,column);
+    else if(column == 1)
+    {
+        int watchId = item->data(0, Qt::UserRole).toInt();
+        if(m_disp.contains(watchId))
+        {
+            DispInfo &dispInfo = m_disp[watchId];
+            if(dispInfo.orgFormat == DISP_DEC)
+            {
+                long long val = dispInfo.orgValue.toLongLong();
+
+                if(dispInfo.dispFormat == DISP_DEC)
+                {
+                    dispInfo.dispFormat = DISP_BIN;
+                }
+                else if(dispInfo.dispFormat == DISP_BIN)
+                {
+                    dispInfo.dispFormat = DISP_HEX;
+                }
+                else if(dispInfo.dispFormat == DISP_HEX)
+                {
+                    dispInfo.dispFormat = DISP_CHAR;
+                }
+                else if(dispInfo.dispFormat == DISP_CHAR)
+                {
+                    dispInfo.dispFormat = DISP_DEC;
+                }
+
+                QString valueText = valueDisplay(val, dispInfo.dispFormat);
+
+                item->setText(1, valueText);
+            }
+        }
+    }
 }
 
 void MainWindow::onFolderViewItemActivated ( QTreeWidgetItem * item, int column )
