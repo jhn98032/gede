@@ -15,11 +15,11 @@ class MainWindow : public QMainWindow, public ICore, public ICodeView
 {
   Q_OBJECT
 public:
-      MainWindow(QWidget *parent);
+    MainWindow(QWidget *parent);
 
-void open(QString filename);
-void fillInVars();
-void ensureLineIsVisible(int lineIdx);
+    void open(QString filename);
+    void fillInVars();
+    void ensureLineIsVisible(int lineIdx);
 
 
 public:

@@ -8,29 +8,6 @@
 #include <assert.h>
 #include <signal.h>
 
-template <class T>
-T &Table<T>::addEntry(int key)
-{
-    T entry;
-    entry.number = key;
-    entries.push_back(entry);
-    return entries.last(); 
-};
-
-
-template <class T>
-T *Table<T>::findEntry(int key)
-{
-    T entry;
-    for(int i = 0;i < entries.size();i++)
-    {
-        T *entry = &entries[i];
-        if(entry->number == key)
-            return entry;
-    }
-    return NULL;
-};
-
 
 
 Core::Core()

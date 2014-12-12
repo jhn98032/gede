@@ -46,18 +46,6 @@ public:
 private:
     BreakPoint(){};
 };
-    
-template <class T> class Table
-{
-    public:
-    Table() {};
-
-    T &addEntry(int key);
-    T *findEntry(int key);
-
-
-    QVector<T> entries;
-};
 
 
 class ICore
