@@ -1012,7 +1012,7 @@ void MainWindow::ICore_onStackFrameChange(QList<StackFrameEntry> stackFrameList)
         stackWidget->insertTopLevelItem(0, item);
 
         // Update the sourceview (with the current row).
-        if(idx+1 == stackFrameList.size())
+        if(idx == 0)
         {
             m_currentFile = entry.m_sourcePath;
             m_currentLine = entry.m_line;
