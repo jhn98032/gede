@@ -54,8 +54,9 @@ void OpenDialog::onSelectProgram()
         
     // Open dialog
     QString fileName = QFileDialog::getOpenFileName(this,
-        tr("Select Program"), startPath, tr("All Files (*.*)"));
+        tr("Select Program"), startPath, tr("All Files (*)"));
 
     // Fill in the selected path
-    m_ui.lineEdit_program->setText(fileName);
+    if(!fileName.isEmpty())
+        m_ui.lineEdit_program->setText(fileName);
 }
