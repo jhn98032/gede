@@ -65,38 +65,47 @@ void Core::gdbGetFiles()
 {
     Com& com = Com::getInstance();
     Tree resultData;
-
+    QMap<QString, bool> fileLookup;
+    
     com.command(&resultData, "-file-list-exec-source-files");
 
 
-    for(int i = 0;i < m_sourceFiles.size();i++)
+    for(int m = 0;m < m_sourceFiles.size();m++)
     {
-        SourceFile *sourceFile = m_sourceFiles[i];
+        SourceFile *sourceFile = m_sourceFiles[m];
         delete sourceFile;
     }
     m_sourceFiles.clear();
 
 
-    for(int i = 0;i < resultData.getRootChildCount();i++)
+    for(int k = 0;k < resultData.getRootChildCount();k++)
     {
-        TreeNode *rootNode = resultData.getChildAt(i);
+        TreeNode *rootNode = resultData.getChildAt(k);
         QString rootName = rootNode->getName();
 
         if(rootName == "files")
         {
             QStringList childList = resultData.getChildList("files");
-            for(int i = 0;i < childList.size();i++)
+            for(int j = 0;j < childList.size();j++)
             {
-                QString treePath = "files/" + childList[i];
+                QString treePath = "files/" + childList[j];
                 QString name = resultData.getString(treePath + "/file");
                 QString fullname = resultData.getString(treePath + "/fullname");
 
-                SourceFile *sourceFile = new SourceFile; 
 
-                sourceFile->name =name;
-                sourceFile->fullName = fullname;
+                SourceFile *sourceFile = NULL;
+                // Already added this file?
+                if(!fileLookup.contains(fullname) && name != "<built-in>")
+                {
+                    fileLookup[fullname] = true;
+                    
+                    sourceFile = new SourceFile; 
 
-                m_sourceFiles.append(sourceFile);
+                    sourceFile->name =name;
+                    sourceFile->fullName = fullname;
+
+                    m_sourceFiles.append(sourceFile);
+                }
             }
         }
     }
