@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include "ini.h"
+#include "core.h"
 #include "ui_opendialog.h"
 
 
@@ -19,8 +21,20 @@ public:
     QString getProgram();
     QString getArguments();
     
-
+    void setTcpRemoteHost(QString host);
+    QString getTcpRemoteHost();
+    
+    void setTcpRemotePort(int port);
+    int getTcpRemotePort();
+    
+    
+    void setMode(ConnectionMode mode);
+    ConnectionMode getMode();
+    
 private slots:
+    void onConnectionTypeLocal(bool checked);
+    void onConnectionTypeTcp(bool checked);
+
 
     void onSelectProgram();
 

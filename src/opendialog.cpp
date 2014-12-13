@@ -12,9 +12,38 @@ OpenDialog::OpenDialog(QWidget *parent)
     m_ui.setupUi(this);
 
     connect(m_ui.pushButton_selectFile, SIGNAL(clicked()), SLOT(onSelectProgram()));
+    connect(m_ui.radioButton_localProgram, SIGNAL(toggled(bool)), SLOT(onConnectionTypeLocal(bool)));
+    connect(m_ui.radioButton_gdbServerTcp, SIGNAL(toggled(bool)), SLOT(onConnectionTypeTcp(bool)));
+
 }
 
+void OpenDialog::setMode(ConnectionMode mode)
+{
+    m_ui.radioButton_localProgram->setChecked(false);
+    m_ui.radioButton_gdbServerTcp->setChecked(false);
+    onConnectionTypeLocal(false);
+    onConnectionTypeTcp(false);
+    
+    if(mode == MODE_TCP)
+    {
+        m_ui.radioButton_gdbServerTcp->setChecked(true);
+        onConnectionTypeTcp(true);        
+    }
+    else // if(mode == MODE_LOCAL)
+    {
+        m_ui.radioButton_localProgram->setChecked(true);
+        onConnectionTypeLocal(true);
+    }
+    
+}
 
+ConnectionMode OpenDialog::getMode()
+{
+    if(m_ui.radioButton_gdbServerTcp->isChecked())    
+        return MODE_TCP;
+    else
+        return MODE_LOCAL;
+}
 
 QString OpenDialog::getProgram()
 {
@@ -59,3 +88,47 @@ void OpenDialog::onSelectProgram()
     // Fill in the selected path
     m_ui.lineEdit_program->setText(fileName);
 }
+
+void OpenDialog::onConnectionTypeLocal(bool checked)
+{
+    m_ui.lineEdit_program->setEnabled(checked);
+    m_ui.pushButton_selectFile->setEnabled(checked);
+    m_ui.lineEdit_arguments->setEnabled(checked);
+   
+}
+
+void OpenDialog::onConnectionTypeTcp(bool checked)
+{
+    m_ui.lineEdit_tcpHost->setEnabled(checked);
+    m_ui.lineEdit_tcpPort->setEnabled(checked);
+   
+}
+
+void OpenDialog::setTcpRemoteHost(QString host)
+{
+    m_ui.lineEdit_tcpHost->setText(host);
+}
+
+QString OpenDialog::getTcpRemoteHost()
+{
+    return m_ui.lineEdit_tcpHost->text();
+}
+
+    
+void OpenDialog::setTcpRemotePort(int port)
+{
+    QString portStr;
+    portStr.sprintf("%d", port);
+    m_ui.lineEdit_tcpPort->setText(portStr);
+}
+
+int OpenDialog::getTcpRemotePort()
+{
+    return m_ui.lineEdit_tcpPort->text().toInt();
+}
+
+    
+
+
+
+

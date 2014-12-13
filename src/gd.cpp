@@ -27,20 +27,19 @@ static int dumpUsage()
  */
 int main(int argc, char *argv[])
 {
-    /*
-    Tree tree;
-    tree.fromString("^done,bkpt={number=\"1\",type=\"breakpoint\",disp=\"keep\",enabled=\"y\","
-        "addr=\"0x000000000040051b\",func=\"main\",file=\"test.c\","
-        "fullname=\"/work2/priv/gd_wip/testapp/test.c\",line=\"5\",times=\"0\",original-location=\"main\"}");
-    tree.dump();
-
-
-    const char *path = "/bkpt/number";
-    infoMsg("%s='%s'\n", path, stringToCStr(tree.getString(path)));
-    return 0;
-
-*/
     QStringList argumentList;
+    ConnectionMode connectionMode = MODE_LOCAL;
+    int tcpPort = 0;
+    QString tcpHost;
+        
+        
+    // Load default config
+    Ini tmpIni;
+    tmpIni.appendLoad(CONFIG_FILENAME);
+    connectionMode = tmpIni.getInt("Mode") == MODE_LOCAL ? MODE_LOCAL : MODE_TCP;
+    tcpPort = tmpIni.getInt("TcpPort", 2000);
+    tcpHost = tmpIni.getString("TcpHost", "localhost");
+    
     
     for(int i = 1;i < argc;i++)
     {
@@ -59,16 +58,19 @@ int main(int argc, char *argv[])
 
     QApplication a(argc, argv);
 
-    // Load config
-    Ini tmpIni;
-    tmpIni.appendLoad(CONFIG_FILENAME);
     
     // Got a program to debug?
     if(argumentList.size() < 1)
     {
         // Ask user for program
         OpenDialog dlg(NULL);
+        
 
+        dlg.setMode(connectionMode);
+
+        dlg.setTcpRemotePort(tcpPort);
+        dlg.setTcpRemoteHost(tcpHost);
+        
         dlg.setProgram(tmpIni.getString("LastProgram", ""));
         QStringList defList;
         dlg.setArguments(tmpIni.getStringList("LastProgramArguments", defList).join(" "));
@@ -78,9 +80,15 @@ int main(int argc, char *argv[])
         argumentList.clear();
         argumentList += dlg.getProgram();
         argumentList += dlg.getArguments().split(' ');
+        connectionMode = dlg.getMode();
+        tcpPort = dlg.getTcpRemotePort();
+        tcpHost = dlg.getTcpRemoteHost();
     }
 
     // Save config
+    tmpIni.setInt("TcpPort", tcpPort);
+    tmpIni.setString("TcpHost", tcpHost);
+    tmpIni.setInt("Mode", (int)connectionMode);
     tmpIni.setString("LastProgram", argumentList[0]);
     QStringList tmpArgs;
     tmpArgs = argumentList;

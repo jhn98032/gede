@@ -92,6 +92,13 @@ struct VarWatch
     int id;
 };
     
+enum ConnectionMode
+{
+    MODE_LOCAL = 0,
+    MODE_TCP
+    
+};
+
 
 class Core : public ComListener
 {
