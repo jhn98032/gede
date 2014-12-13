@@ -1,8 +1,10 @@
 #include "opendialog.h"
 #include "version.h"
-#include <QFileDialog>
 #include "log.h"
 #include "util.h"
+
+#include <QFileDialog>
+#include <QDir>
 
 
 OpenDialog::OpenDialog(QWidget *parent)
@@ -12,6 +14,7 @@ OpenDialog::OpenDialog(QWidget *parent)
     m_ui.setupUi(this);
 
     connect(m_ui.pushButton_selectFile, SIGNAL(clicked()), SLOT(onSelectProgram()));
+    connect(m_ui.pushButton_selectTcpProgram, SIGNAL(clicked()), SLOT(onSelectTcpProgram()));
     connect(m_ui.radioButton_localProgram, SIGNAL(toggled(bool)), SLOT(onConnectionTypeLocal(bool)));
     connect(m_ui.radioButton_gdbServerTcp, SIGNAL(toggled(bool)), SLOT(onConnectionTypeTcp(bool)));
 
@@ -69,24 +72,42 @@ void OpenDialog::setArguments(QString arguments)
 
 }
 
-void OpenDialog::onSelectProgram()
+void OpenDialog::onBrowseForProgram(QString *path)
 {
-
     // Get start dir
-    QString startPath = m_ui.lineEdit_program->text();
+    QString startPath = *path;
     if(!startPath.isEmpty())
     {
         dividePath(startPath, NULL, &startPath);
     }
     else
-        startPath = "/";
+        startPath = QDir::currentPath();
         
     // Open dialog
     QString fileName = QFileDialog::getOpenFileName(this,
-        tr("Select Program"), startPath, tr("All Files (*.*)"));
+        tr("Select Program"), startPath, tr("All Files (*)"));
+    if(!fileName.isEmpty())
+        *path = fileName;
+}
 
+void OpenDialog::onSelectTcpProgram()
+{
+    QString path = m_ui.lineEdit_tcpProgram->text();
+
+    onBrowseForProgram(&path);
+    
     // Fill in the selected path
-    m_ui.lineEdit_program->setText(fileName);
+    m_ui.lineEdit_tcpProgram->setText(path);
+}
+
+void OpenDialog::onSelectProgram()
+{
+    QString path = m_ui.lineEdit_program->text();
+
+    onBrowseForProgram(&path);
+    
+    // Fill in the selected path
+    m_ui.lineEdit_program->setText(path);
 }
 
 void OpenDialog::onConnectionTypeLocal(bool checked)
@@ -112,6 +133,17 @@ void OpenDialog::setTcpRemoteHost(QString host)
 QString OpenDialog::getTcpRemoteHost()
 {
     return m_ui.lineEdit_tcpHost->text();
+}
+
+
+void OpenDialog::setTcpRemoteProgram(QString path)
+{
+    m_ui.lineEdit_tcpProgram->setText(path);
+}
+
+QString OpenDialog::getTcpRemoteProgram()
+{
+    return m_ui.lineEdit_tcpProgram->text();
 }
 
     

@@ -27,15 +27,21 @@ public:
     void setTcpRemotePort(int port);
     int getTcpRemotePort();
     
+
+    void setTcpRemoteProgram(QString path);
+    QString getTcpRemoteProgram();
     
     void setMode(ConnectionMode mode);
     ConnectionMode getMode();
+
+private:
+    void onBrowseForProgram(QString *path);
     
 private slots:
     void onConnectionTypeLocal(bool checked);
     void onConnectionTypeTcp(bool checked);
-
-
+    
+    void onSelectTcpProgram();
     void onSelectProgram();
 
 private:
