@@ -348,6 +348,8 @@ void MainWindow::insertSourceFiles()
         }
     }
 
+    treeWidget->sortItems(0, Qt::AscendingOrder);
+
 }
 
 
