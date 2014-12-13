@@ -803,6 +803,8 @@ void MainWindow::open(QString filename)
 {
     //qDebug() << filename;
 
+    m_ui.scrollArea_codeView->setWidgetResizable(true);
+
     setWindowTitle(getFilenamePart(filename));
 
     QString text;
