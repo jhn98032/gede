@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     ConnectionMode connectionMode = MODE_LOCAL;
     int tcpPort = 0;
     QString tcpHost;
-        
+    QString tcpProgram;
         
     // Load default config
     Ini tmpIni;
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     connectionMode = tmpIni.getInt("Mode") == MODE_LOCAL ? MODE_LOCAL : MODE_TCP;
     tcpPort = tmpIni.getInt("TcpPort", 2000);
     tcpHost = tmpIni.getString("TcpHost", "localhost");
-    
+    tcpProgram = tmpIni.getString("TcpProgram", "");
     
     for(int i = 1;i < argc;i++)
     {
@@ -70,6 +70,7 @@ int main(int argc, char *argv[])
 
         dlg.setTcpRemotePort(tcpPort);
         dlg.setTcpRemoteHost(tcpHost);
+        dlg.setTcpRemoteProgram(tcpProgram);
         
         dlg.setProgram(tmpIni.getString("LastProgram", ""));
         QStringList defList;
@@ -83,6 +84,7 @@ int main(int argc, char *argv[])
         connectionMode = dlg.getMode();
         tcpPort = dlg.getTcpRemotePort();
         tcpHost = dlg.getTcpRemoteHost();
+        tcpProgram = dlg.getTcpRemoteProgram();
     }
 
     // Save config
@@ -90,6 +92,7 @@ int main(int argc, char *argv[])
     tmpIni.setString("TcpHost", tcpHost);
     tmpIni.setInt("Mode", (int)connectionMode);
     tmpIni.setString("LastProgram", argumentList[0]);
+    tmpIni.setString("TcpProgram", tcpProgram);
     QStringList tmpArgs;
     tmpArgs = argumentList;
     tmpArgs.pop_front();
@@ -102,7 +105,11 @@ int main(int argc, char *argv[])
     
     MainWindow w(NULL);
 
-    core.init(argumentList);
+    if(connectionMode == MODE_LOCAL)
+        core.initLocal(argumentList);
+    else
+        core.initRemote(tcpProgram, tcpHost, tcpPort);
+    
     w.insertSourceFiles();
     
     w.show();

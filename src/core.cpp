@@ -30,7 +30,7 @@ Core::~Core()
 }
 
 
-int Core::init(QStringList argumentList)
+int Core::initLocal(QStringList argumentList)
 {
     Com& com = Com::getInstance();
     Tree resultData;
@@ -57,6 +57,26 @@ int Core::init(QStringList argumentList)
 
     //com.command("run");
     
+    return 0;
+}
+
+int Core::initRemote(QString programPath, QString tcpHost, int tcpPort)
+{
+    Com& com = Com::getInstance();
+    Tree resultData;
+    
+    com.init();
+
+    com.commandF(&resultData, "-target-select remote %s:%d", stringToCStr(tcpHost), tcpPort); 
+
+    if(!programPath.isEmpty())
+        com.commandF(&resultData, "-file-symbol-file  %s", stringToCStr(programPath));
+
+    gdbInsertBreakPoint("main");
+    gdbContinue();
+
+    gdbGetFiles();
+
     return 0;
 }
 

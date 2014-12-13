@@ -108,10 +108,12 @@ private:
     ~Core();
 
 public:
+    
 
     static Core& getInstance();
-    int init(QStringList argumentList);
-
+    int initLocal(QStringList argumentList);
+    int initRemote(QString programPath, QString tcpHost, int tcpPort);
+    
     void setListener(ICore *inf) { m_inf = inf; };
 
 private:
