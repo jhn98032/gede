@@ -88,7 +88,7 @@ Com::Com()
 
 
 #ifdef ENABLE_GDB_LOG
-     m_logFile.open(QIODevice::WriteOnly | QIODevice::Text);
+     m_logFile.open(QIODevice::Truncate | QIODevice::WriteOnly | QIODevice::Text);
 #endif
 
     connect(&m_process, SIGNAL(readyReadStandardOutput ()), this, SLOT(onReadyReadStandardOutput()));
