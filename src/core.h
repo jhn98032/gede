@@ -58,7 +58,8 @@ class ICore
         END_STEPPING_RANGE,
         BREAKPOINT_HIT,
         SIGNAL_RECEIVED,
-        EXITED_NORMALLY
+        EXITED_NORMALLY,
+        EXITED
     };
 
     enum SignalType

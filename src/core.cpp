@@ -315,8 +315,10 @@ ICore::StopReason Core::parseReasonString(QString reasonString)
         return ICore::SIGNAL_RECEIVED;
     if(reasonString == "exited-normally")
         return ICore::EXITED_NORMALLY;
+    if(reasonString == "exited")
+        return ICore::EXITED;
     
-    debugMsg("Received unknown reason (\"%s\").", stringToCStr(reasonString));
+    errorMsg("Received unknown reason (\"%s\").", stringToCStr(reasonString));
     assert(0);
 
     return ICore::UNKNOWN;
