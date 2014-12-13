@@ -182,7 +182,7 @@ void Ini::dump()
 int Ini::save(QString filename)
 {
     QFile file(filename);
-    if (!file.open(QIODevice::ReadWrite | QIODevice::Text))
+    if (!file.open(QIODevice::Truncate | QIODevice::ReadWrite | QIODevice::Text))
         return 1;
     for(int i = 0;i < m_entries.size();i++)
     {
