@@ -349,7 +349,12 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
         int lineno = tree.getInt("frame/line");
 
         // Get the reason
-        ICore::StopReason  reason = parseReasonString(tree.getString("reason"));
+        QString reasonString = tree.getString("reason");
+        ICore::StopReason  reason;
+        if(reasonString.isEmpty())
+            reason = ICore::UNKNOWN;
+        else
+            reason = parseReasonString(reasonString);
 
         if(reason == ICore::EXITED_NORMALLY)
             m_targetState = TARGET_FINISHED;
