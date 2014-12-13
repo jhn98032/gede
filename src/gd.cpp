@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
         const char *curArg = argv[i];
         if(strcmp(curArg, "--args") == 0)
         {
+            connectionMode = MODE_LOCAL;
             for(int u = i+1;u < argc;u++)
                 argumentList.push_back(argv[u]);
             argc = i;
