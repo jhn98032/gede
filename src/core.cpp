@@ -26,7 +26,8 @@ Core::Core()
 
 Core::~Core()
 {
-    
+    Com& com = Com::getInstance();
+    com.setListener(NULL);
 }
 
 
