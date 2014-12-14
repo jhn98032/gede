@@ -56,7 +56,13 @@ int main(int argc, char*argv[])
 
     local_struct.a = 3;
 
-    printf("Hej\n");
+    printf("Hej1\n");
+    printf("Hej2\n");
+    printf("Hej3\n");
+    printf("Hej4\n");
+
+
+
 
 
     pthread_create(&th, NULL, thread_func, 0);

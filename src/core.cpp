@@ -22,12 +22,27 @@ Core::Core()
     Com& com = Com::getInstance();
     com.setListener(this);
 
+    m_ptsFd = getpt();
+   
+    if(grantpt(m_ptsFd))
+        errorMsg("Failed to grantpt");
+    if(unlockpt(m_ptsFd))
+        errorMsg("Failed to unlock pt");
+    infoMsg("Using: %s\n", ptsname(m_ptsFd));
+    
+    m_ptsListener = new QSocketNotifier(m_ptsFd, QSocketNotifier::Read);
+    connect(m_ptsListener, SIGNAL(activated(int)), this, SLOT(onGdbOutput(int)));
+
 }
 
 Core::~Core()
 {
+    delete m_ptsListener;
+    
     Com& com = Com::getInstance();
     com.setListener(NULL);
+
+    close(m_ptsFd);
 }
 
 
@@ -37,6 +52,11 @@ int Core::init(QStringList argumentList)
     Tree resultData;
     
     com.init();
+    
+    QString ptsDevPath = ptsname(m_ptsFd);
+    
+    com.commandF(&resultData, "-inferior-tty-set %s", stringToCStr(ptsDevPath));
+    
     com.commandF(&resultData, "-file-exec-and-symbols %s", stringToCStr(argumentList[0]));
 
 
@@ -61,6 +81,17 @@ int Core::init(QStringList argumentList)
     return 0;
 }
 
+
+void Core::onGdbOutput(int socketFd)
+{
+    char buff[128];
+    int n =  read(m_ptsFd, buff, sizeof(buff)-1);
+    if(n > 0)
+    {
+        buff[n] = '\0';
+    }
+    m_inf->ICore_onTargetOutput(buff);
+}
 
 void Core::gdbGetFiles()
 {

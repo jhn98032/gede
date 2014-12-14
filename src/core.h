@@ -4,7 +4,8 @@
 #include "com.h"
 #include <QList>
 #include <QMap>
-
+#include <QSocketNotifier>
+#include <QObject>
 
 struct ThreadInfo
 {
@@ -82,6 +83,7 @@ class ICore
     virtual void ICore_onCurrentThreadChanged(int threadId) = 0;
     virtual void ICore_onStackFrameChange(QList<StackFrameEntry> stackFrameList) = 0;
     virtual void ICore_onMessage(QString message) = 0;
+    virtual void ICore_onTargetOutput(QString message) = 0;
     virtual void ICore_onCurrentFrameChanged(int frameIdx) = 0;
     
 };
@@ -95,6 +97,9 @@ struct VarWatch
 
 class Core : public ComListener
 {
+private:
+    Q_OBJECT;
+    
 private:
 
     Core();
@@ -148,6 +153,11 @@ public:
     
 
     QVector <SourceFile*> getSourceFiles() { return m_sourceFiles; };
+
+
+private slots:
+        void onGdbOutput(int socketNr);
+
 private:
     ICore *m_inf;
     QList<BreakPoint*> m_breakpoints;
@@ -159,6 +169,10 @@ private:
     int m_currentFrameIdx;
     QMap <int, VarWatch> m_watchList;
     int m_varWatchLastId;
+
+    int m_ptsFd;
+    QSocketNotifier  *m_ptsListener;
+
 };
 
 

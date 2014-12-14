@@ -45,25 +45,49 @@
             <x>0</x>
             <y>0</y>
             <width>82</width>
-            <height>290</height>
+            <height>254</height>
            </rect>
           </property>
          </widget>
         </widget>
        </widget>
-       <widget class="QPlainTextEdit" name="logView">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+       <widget class="QTabWidget" name="tabWidget_2">
+        <property name="currentIndex">
+         <number>1</number>
         </property>
-        <property name="baseSize">
-         <size>
-          <width>0</width>
-          <height>40</height>
-         </size>
-        </property>
+        <widget class="QWidget" name="tab_4">
+         <attribute name="title">
+          <string>GDB Output</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QPlainTextEdit" name="logView">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="baseSize">
+             <size>
+              <width>0</width>
+              <height>40</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_5">
+         <attribute name="title">
+          <string>Target Output</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_6">
+          <item>
+           <widget class="QPlainTextEdit" name="targetOutputView"/>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </widget>
       <widget class="QSplitter" name="splitter_3">
