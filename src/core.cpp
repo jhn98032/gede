@@ -186,6 +186,7 @@ void Core::gdbRun()
         return;
     }
 
+    m_pid = 0;
     com.commandF(&resultData, "-exec-run");
 
 }
@@ -757,7 +758,9 @@ void Core::onResult(Tree &tree)
         else if(rootName == "groups")
         {
             if(m_pid == 0)
+            {
                 m_pid = tree.getInt("groups/1/pid");
+            }
         }
         
      }
