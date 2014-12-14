@@ -84,6 +84,7 @@ int Core::init(QStringList argumentList)
 
 void Core::onGdbOutput(int socketFd)
 {
+    Q_UNUSED(socketFd);
     char buff[128];
     int n =  read(m_ptsFd, buff, sizeof(buff)-1);
     if(n > 0)
