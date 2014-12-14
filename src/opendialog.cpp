@@ -64,7 +64,19 @@ void OpenDialog::setProgram(QString program)
     m_ui.lineEdit_program->setText(program);
 
 }
-    
+
+void OpenDialog::setInitCommands(QStringList commandList)
+{
+    QString str;
+    str = commandList.join("\n");
+    m_ui.plainTextEdit_initCommands->setPlainText(str);
+}
+
+
+QStringList OpenDialog::getInitCommands()
+{
+    return m_ui.plainTextEdit_initCommands->toPlainText().split("\n");
+}    
 
 void OpenDialog::setArguments(QString arguments)
 {
@@ -159,7 +171,17 @@ int OpenDialog::getTcpRemotePort()
     return m_ui.lineEdit_tcpPort->text().toInt();
 }
 
-    
+
+QString OpenDialog::getGdbPath()
+{
+    return m_ui.lineEdit_gdbCommand->text();
+}
+
+
+void OpenDialog::setGdbPath(QString path)
+{
+    return m_ui.lineEdit_gdbCommand->setText(path);
+}
 
 
 

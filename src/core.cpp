@@ -47,12 +47,12 @@ Core::~Core()
 }
 
 
-int Core::initLocal(QStringList argumentList)
+int Core::initLocal(QString gdbPath, QStringList argumentList)
 {
     Com& com = Com::getInstance();
     Tree resultData;
     
-    com.init();
+    com.init(gdbPath);
     
     QString ptsDevPath = ptsname(m_ptsFd);
     
@@ -82,17 +82,21 @@ int Core::initLocal(QStringList argumentList)
     return 0;
 }
 
-int Core::initRemote(QString programPath, QString tcpHost, int tcpPort)
+int Core::initRemote(QString gdbPath, QString programPath, QString tcpHost, int tcpPort)
 {
     Com& com = Com::getInstance();
     Tree resultData;
     
-    com.init();
+    com.init(gdbPath);
 
     com.commandF(&resultData, "-target-select remote %s:%d", stringToCStr(tcpHost), tcpPort); 
 
     if(!programPath.isEmpty())
-        com.commandF(&resultData, "-file-symbol-file  %s", stringToCStr(programPath));
+    {
+        com.commandF(&resultData, "-file-symbol-file %s", stringToCStr(programPath));
+
+      //  com.commandF(&resultData, "-file-exec-file %s", stringToCStr(programPath));
+    }
 
     gdbInsertBreakPoint("main");
     gdbContinue();

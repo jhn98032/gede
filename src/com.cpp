@@ -973,9 +973,12 @@ GdbResult Com::command(Tree *resultData, QString text)
 }
 
 
-int Com::init()
+int Com::init(QString gdbPath)
 {
-    m_process.start("gdb --interpreter=mi2");//gdb ./testapp/test");
+    QString commandLine;
+    commandLine.sprintf("%s --interpreter=mi2", stringToCStr(gdbPath));
+    
+    m_process.start(commandLine);//gdb ./testapp/test");
     m_process.waitForStarted();
 
     return 0;

@@ -34,6 +34,12 @@ public:
     void setMode(ConnectionMode mode);
     ConnectionMode getMode();
 
+    void setInitCommands(QStringList commandList);
+    QStringList getInitCommands();
+
+    void setGdbPath(QString path);
+    QString getGdbPath();
+    
 private:
     void onBrowseForProgram(QString *path);
     

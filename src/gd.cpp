@@ -32,6 +32,8 @@ int main(int argc, char *argv[])
     int tcpPort = 0;
     QString tcpHost;
     QString tcpProgram;
+    QStringList initCommands;
+    QString gdbPath;
         
     // Load default config
     Ini tmpIni;
@@ -40,6 +42,8 @@ int main(int argc, char *argv[])
     tcpPort = tmpIni.getInt("TcpPort", 2000);
     tcpHost = tmpIni.getString("TcpHost", "localhost");
     tcpProgram = tmpIni.getString("TcpProgram", "");
+    initCommands = tmpIni.getStringList("InitCommands", initCommands);
+    gdbPath = tmpIni.getString("GdpPath", "gdb");
     
     for(int i = 1;i < argc;i++)
     {
@@ -73,7 +77,9 @@ int main(int argc, char *argv[])
         dlg.setTcpRemotePort(tcpPort);
         dlg.setTcpRemoteHost(tcpHost);
         dlg.setTcpRemoteProgram(tcpProgram);
-        
+        dlg.setInitCommands(initCommands);
+        dlg.setGdbPath(gdbPath);
+    
         dlg.setProgram(tmpIni.getString("LastProgram", ""));
         QStringList defList;
         dlg.setArguments(tmpIni.getStringList("LastProgramArguments", defList).join(" "));
@@ -87,6 +93,8 @@ int main(int argc, char *argv[])
         tcpPort = dlg.getTcpRemotePort();
         tcpHost = dlg.getTcpRemoteHost();
         tcpProgram = dlg.getTcpRemoteProgram();
+        initCommands = dlg.getInitCommands();
+        gdbPath = dlg.getGdbPath();
     }
 
     // Save config
@@ -95,6 +103,8 @@ int main(int argc, char *argv[])
     tmpIni.setInt("Mode", (int)connectionMode);
     tmpIni.setString("LastProgram", argumentList[0]);
     tmpIni.setString("TcpProgram", tcpProgram);
+    tmpIni.setStringList("InitCommands", initCommands);
+    tmpIni.setString("GdpPath", gdbPath);
     QStringList tmpArgs;
     tmpArgs = argumentList;
     tmpArgs.pop_front();
@@ -108,9 +118,9 @@ int main(int argc, char *argv[])
     MainWindow w(NULL);
 
     if(connectionMode == MODE_LOCAL)
-        core.initLocal(argumentList);
+        core.initLocal(gdbPath, argumentList);
     else
-        core.initRemote(tcpProgram, tcpHost, tcpPort);
+        core.initRemote(gdbPath, tcpProgram, tcpHost, tcpPort);
     
     w.insertSourceFiles();
     

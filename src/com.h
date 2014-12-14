@@ -156,7 +156,7 @@ class Com : public QObject
         static const char* asyncClassToString(ComListener::AsyncClass ac);
 
         static Com& getInstance();
-        int init();
+        int init(QString gdbPath);
 
         void setListener(ComListener *listener) { m_listener = listener; };
 

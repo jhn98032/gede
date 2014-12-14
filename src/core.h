@@ -125,8 +125,8 @@ public:
     
 
     static Core& getInstance();
-    int initLocal(QStringList argumentList);
-    int initRemote(QString programPath, QString tcpHost, int tcpPort);
+    int initLocal(QString gdbPath, QStringList argumentList);
+    int initRemote(QString gdbPath, QString programPath, QString tcpHost, int tcpPort);
     
     void setListener(ICore *inf) { m_inf = inf; };
 
