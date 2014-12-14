@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include "tree.h"
 #include "opendialog.h"
+#include "settings.h"
 
 
 static int dumpUsage()
@@ -27,32 +28,18 @@ static int dumpUsage()
  */
 int main(int argc, char *argv[])
 {
-    QStringList argumentList;
-    ConnectionMode connectionMode = MODE_LOCAL;
-    int tcpPort = 0;
-    QString tcpHost;
-    QString tcpProgram;
-    QStringList initCommands;
-    QString gdbPath;
-        
-    // Load default config
-    Ini tmpIni;
-    tmpIni.appendLoad(CONFIG_FILENAME);
-    connectionMode = tmpIni.getInt("Mode") == MODE_LOCAL ? MODE_LOCAL : MODE_TCP;
-    tcpPort = tmpIni.getInt("TcpPort", 2000);
-    tcpHost = tmpIni.getString("TcpHost", "localhost");
-    tcpProgram = tmpIni.getString("TcpProgram", "");
-    initCommands = tmpIni.getStringList("InitCommands", initCommands);
-    gdbPath = tmpIni.getString("GdpPath", "gdb");
+    Settings cfg;
     
+    // Load default config
+    cfg.load(CONFIG_FILENAME);
     for(int i = 1;i < argc;i++)
     {
         const char *curArg = argv[i];
         if(strcmp(curArg, "--args") == 0)
         {
-            connectionMode = MODE_LOCAL;
+            cfg.connectionMode = MODE_LOCAL;
             for(int u = i+1;u < argc;u++)
-                argumentList.push_back(argv[u]);
+                cfg.argumentList.push_back(argv[u]);
             argc = i;
         }
         else if(strcmp(curArg, "--help") == 0)
@@ -66,50 +53,21 @@ int main(int argc, char *argv[])
 
     
     // Got a program to debug?
-    if(argumentList.size() < 1)
+    if(cfg.argumentList.size() < 1)
     {
         // Ask user for program
         OpenDialog dlg(NULL);
         
+        dlg.loadConfig(cfg);
 
-        dlg.setMode(connectionMode);
-
-        dlg.setTcpRemotePort(tcpPort);
-        dlg.setTcpRemoteHost(tcpHost);
-        dlg.setTcpRemoteProgram(tcpProgram);
-        dlg.setInitCommands(initCommands);
-        dlg.setGdbPath(gdbPath);
-    
-        dlg.setProgram(tmpIni.getString("LastProgram", ""));
-        QStringList defList;
-        dlg.setArguments(tmpIni.getStringList("LastProgramArguments", defList).join(" "));
-    
         if(dlg.exec() != QDialog::Accepted)
             return 1;
-        argumentList.clear();
-        argumentList += dlg.getProgram();
-        argumentList += dlg.getArguments().split(' ');
-        connectionMode = dlg.getMode();
-        tcpPort = dlg.getTcpRemotePort();
-        tcpHost = dlg.getTcpRemoteHost();
-        tcpProgram = dlg.getTcpRemoteProgram();
-        initCommands = dlg.getInitCommands();
-        gdbPath = dlg.getGdbPath();
+
+        dlg.saveConfig(&cfg);
     }
 
     // Save config
-    tmpIni.setInt("TcpPort", tcpPort);
-    tmpIni.setString("TcpHost", tcpHost);
-    tmpIni.setInt("Mode", (int)connectionMode);
-    tmpIni.setString("LastProgram", argumentList[0]);
-    tmpIni.setString("TcpProgram", tcpProgram);
-    tmpIni.setStringList("InitCommands", initCommands);
-    tmpIni.setString("GdpPath", gdbPath);
-    QStringList tmpArgs;
-    tmpArgs = argumentList;
-    tmpArgs.pop_front();
-    tmpIni.setStringList("LastProgramArguments", tmpArgs);
-    tmpIni.save(CONFIG_FILENAME);
+    cfg.save(CONFIG_FILENAME);
 
     
     Core &core = Core::getInstance();
@@ -117,10 +75,10 @@ int main(int argc, char *argv[])
     
     MainWindow w(NULL);
 
-    if(connectionMode == MODE_LOCAL)
-        core.initLocal(gdbPath, argumentList);
+    if(cfg.connectionMode == MODE_LOCAL)
+        core.initLocal(cfg.gdbPath, cfg.argumentList);
     else
-        core.initRemote(gdbPath, tcpProgram, tcpHost, tcpPort);
+        core.initRemote(cfg.gdbPath, cfg.tcpProgram, cfg.tcpHost, cfg.tcpPort);
     
     w.insertSourceFiles();
     

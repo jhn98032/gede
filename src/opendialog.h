@@ -3,7 +3,7 @@
 
 #include <QDialog>
 
-#include "ini.h"
+#include "settings.h"
 #include "core.h"
 #include "ui_opendialog.h"
 
@@ -39,6 +39,10 @@ public:
 
     void setGdbPath(QString path);
     QString getGdbPath();
+
+    void loadConfig(Settings &cfg);
+    void saveConfig(Settings *cfg);
+    
     
 private:
     void onBrowseForProgram(QString *path);

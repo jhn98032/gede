@@ -183,6 +183,37 @@ void OpenDialog::setGdbPath(QString path)
     return m_ui.lineEdit_gdbCommand->setText(path);
 }
 
+void OpenDialog::saveConfig(Settings *cfg)
+{
+    OpenDialog &dlg = *this;
+    cfg->argumentList.clear();
+    cfg->argumentList += dlg.getProgram();
+    cfg->argumentList += dlg.getArguments().split(' ');
+    cfg->connectionMode = dlg.getMode();
+    cfg->tcpPort = dlg.getTcpRemotePort();
+    cfg->tcpHost = dlg.getTcpRemoteHost();
+    cfg->tcpProgram = dlg.getTcpRemoteProgram();
+    cfg->initCommands = dlg.getInitCommands();
+    cfg->gdbPath = dlg.getGdbPath();
+
+}
+
+void OpenDialog::loadConfig(Settings &cfg)
+{
+    OpenDialog &dlg = *this;
+    dlg.setMode(cfg.connectionMode);
+
+    dlg.setTcpRemotePort(cfg.tcpPort);
+    dlg.setTcpRemoteHost(cfg.tcpHost);
+    dlg.setTcpRemoteProgram(cfg.tcpProgram);
+    dlg.setInitCommands(cfg.initCommands);
+    dlg.setGdbPath(cfg.gdbPath);
+
+    dlg.setProgram(cfg.lastProgram);
+    QStringList defList;
+    dlg.setArguments(cfg.argumentList.join(" "));
+
+}
 
 
 
