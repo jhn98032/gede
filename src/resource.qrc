@@ -9,5 +9,6 @@
     <file>res/continue.png</file>
     <file>res/file.png</file>
     <file>res/folder.png</file>
+    <file>res/step_out.png</file>
  </qresource>
 </RCC>

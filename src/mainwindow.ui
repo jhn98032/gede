@@ -242,6 +242,7 @@
    <addaction name="separator"/>
    <addaction name="actionNext"/>
    <addaction name="actionStep_In"/>
+   <addaction name="actionStep_Out"/>
    <addaction name="actionContinue"/>
   </widget>
   <action name="actionQuit">
@@ -306,6 +307,15 @@
   <action name="actionSettings">
    <property name="text">
     <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionStep_Out">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/images/res/step_out.png</normaloff>:/images/res/step_out.png</iconset>
+   </property>
+   <property name="text">
+    <string>Step Out</string>
    </property>
   </action>
  </widget>

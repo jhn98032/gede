@@ -67,6 +67,7 @@ class ICore
         BREAKPOINT_HIT,
         SIGNAL_RECEIVED,
         EXITED_NORMALLY,
+        FUNCTION_FINISHED,
         EXITED
     };
 
@@ -137,6 +138,7 @@ public:
     void gdbInsertBreakPoint(QString func);
     void gdbNext();
     void gdbStepIn();
+    void gdbStepOut();
     void gdbContinue();
     void gdbRun();
     void gdbGetFiles();

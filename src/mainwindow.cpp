@@ -130,6 +130,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ui.actionNext, SIGNAL(triggered()), SLOT(onNext()));
     connect(m_ui.actionAbout, SIGNAL(triggered()), SLOT(onAbout()));
     connect(m_ui.actionStep_In, SIGNAL(triggered()), SLOT(onStepIn()));
+    connect(m_ui.actionStep_Out, SIGNAL(triggered()), SLOT(onStepOut()));
     connect(m_ui.actionRun, SIGNAL(triggered()), SLOT(onRun()));
     connect(m_ui.actionContinue, SIGNAL(triggered()), SLOT(onContinue()));
 
@@ -893,6 +894,13 @@ void MainWindow::onStepIn()
     
 }
 
+void MainWindow::onStepOut()
+{
+    Core &core = Core::getInstance();
+    core.gdbStepOut();
+    
+}
+
 
 void MainWindow::ICore_onThreadListChanged()
 {
@@ -1175,6 +1183,7 @@ void MainWindow::ICore_onStateChanged(TargetState state)
 {
     m_ui.actionNext->setEnabled(state == TARGET_STOPPED ? true : false);
     m_ui.actionStep_In->setEnabled(state == TARGET_STOPPED ? true : false);
+    m_ui.actionStep_Out->setEnabled(state == TARGET_STOPPED ? true : false);
     m_ui.actionStop->setEnabled(state == TARGET_STOPPED ? false : true);
     m_ui.actionContinue->setEnabled(state == TARGET_STOPPED ? true : false);
     m_ui.actionRun->setEnabled(state == TARGET_STOPPED ? true : false);

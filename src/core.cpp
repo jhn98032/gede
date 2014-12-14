@@ -246,7 +246,26 @@ void Core::gdbStepIn()
     com.commandF(&resultData, "-var-update --all-values *");
 
 }
-    
+
+
+void Core::gdbStepOut()
+{
+    Com& com = Com::getInstance();
+    Tree resultData;
+
+    if(m_targetState != ICore::TARGET_STOPPED)
+    {
+        if(m_inf)
+            m_inf->ICore_onMessage("Program is not stopped");
+        return;
+    }
+
+        
+    com.commandF(&resultData, "-exec-finish");
+    com.commandF(&resultData, "-var-update --all-values *");
+
+}
+
 Core& Core::getInstance()
 {
     static Core core;
@@ -358,6 +377,8 @@ ICore::StopReason Core::parseReasonString(QString reasonString)
         return ICore::SIGNAL_RECEIVED;
     if(reasonString == "exited-normally")
         return ICore::EXITED_NORMALLY;
+    if(reasonString == "function-finished")
+        return ICore::FUNCTION_FINISHED;
     if(reasonString == "exited")
         return ICore::EXITED;
     
