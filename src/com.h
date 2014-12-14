@@ -107,7 +107,7 @@ class Resp
         Resp() : m_type(UNKNOWN) {};
 
         typedef enum {
-            UNKNOWN,
+            UNKNOWN = 0,
             RESULT,
             CONSOLE_STREAM_OUTPUT,
             TARGET_STREAM_OUTPUT,
