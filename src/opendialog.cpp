@@ -115,14 +115,14 @@ void OpenDialog::onConnectionTypeLocal(bool checked)
     m_ui.lineEdit_program->setEnabled(checked);
     m_ui.pushButton_selectFile->setEnabled(checked);
     m_ui.lineEdit_arguments->setEnabled(checked);
-   
 }
 
 void OpenDialog::onConnectionTypeTcp(bool checked)
 {
+    m_ui.pushButton_selectTcpProgram->setEnabled(checked);
     m_ui.lineEdit_tcpHost->setEnabled(checked);
     m_ui.lineEdit_tcpPort->setEnabled(checked);
-   
+    m_ui.lineEdit_tcpProgram->setEnabled(checked);
 }
 
 void OpenDialog::setTcpRemoteHost(QString host)
