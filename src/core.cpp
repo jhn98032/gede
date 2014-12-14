@@ -220,7 +220,10 @@ void Core::stop()
             m_inf->ICore_onMessage("Program is not running");
         return;
     }
-    kill(m_pid, SIGINT);
+    if(m_pid != 0)
+        kill(m_pid, SIGINT);
+    else
+        errorMsg("Failed to stop since PID not known");
 }
 
 void Core::gdbNext()
