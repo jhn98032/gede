@@ -739,7 +739,7 @@ void Core::onConsoleStreamOutput(QString str)
         if(text.isEmpty() && i+1 == list.size())
             continue;
             
-        infoMsg("GDB | Console-stream | %s", stringToCStr(text));
+        debugMsg("GDB | Console-stream | %s", stringToCStr(text));
 
         if(m_inf)
             m_inf->ICore_onConsoleStream(text);
