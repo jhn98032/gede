@@ -7,28 +7,28 @@
 #include "core.h"
 
 class Settings
- {
-     public:
-         Settings();
+{
+    public:
+        Settings();
 
-         void load(QString filepath);
-         void save(QString filepath);
+        void load(QString filepath);
+        void save(QString filepath);
 
 
-public:
-     QStringList argumentList;
-    ConnectionMode connectionMode;
-    int tcpPort;
-    QString tcpHost;
-    QString tcpProgram;
-    QStringList initCommands;
-    QString gdbPath;
-    QString lastProgram;
-    QStringList arguments;
+    public:
+        QStringList argumentList;
+        ConnectionMode connectionMode;
+        int tcpPort;
+        QString tcpHost;
+        QString tcpProgram;
+        QStringList initCommands;
+        QString gdbPath;
+        QString lastProgram;
+        QStringList arguments;
 
-    
-    
- };
+
+
+};
 
 #endif // FILE_SETTINGS_H
 
