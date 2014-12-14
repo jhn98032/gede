@@ -53,6 +53,13 @@ class ICore
 {
     public:
 
+    enum TargetState 
+    {
+        TARGET_STOPPED, 
+        TARGET_RUNNING,
+        TARGET_FINISHED 
+    }; 
+    
     enum StopReason
     {
         UNKNOWN,
@@ -71,6 +78,7 @@ class ICore
         SIGUNKNOWN
     };
     virtual void ICore_onStopped(StopReason reason, QString path, int lineno) = 0;
+    virtual void ICore_onStateChanged(TargetState state) = 0;
     virtual void ICore_onSignalReceived(QString signalName) = 0;
     virtual void ICore_onLocalVarReset() = 0;
     virtual void ICore_onLocalVarChanged(QString name, QString value) = 0;
@@ -164,7 +172,8 @@ private:
     QVector <SourceFile*> m_sourceFiles;
     QMap <int, ThreadInfo> m_threadList;
     int m_selectedThreadId;
-    enum {TARGET_STOPPED, TARGET_RUNNING,TARGET_FINISHED } m_targetState;
+    ICore::TargetState m_targetState;
+    ICore::TargetState m_lastTargetState;
     int m_pid;
     int m_currentFrameIdx;
     QMap <int, VarWatch> m_watchList;

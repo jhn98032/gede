@@ -1171,4 +1171,19 @@ void MainWindow::ICore_onTargetOutput(QString message)
 
 
 
+void MainWindow::ICore_onStateChanged(TargetState state)
+{
+    m_ui.actionNext->setEnabled(state == TARGET_STOPPED ? true : false);
+    m_ui.actionStep_In->setEnabled(state == TARGET_STOPPED ? true : false);
+    m_ui.actionStop->setEnabled(state == TARGET_STOPPED ? false : true);
+    m_ui.actionContinue->setEnabled(state == TARGET_STOPPED ? true : false);
+    m_ui.actionRun->setEnabled(state == TARGET_STOPPED ? true : false);
+    
+    if(state == TARGET_RUNNING)
+    {
+        m_ui.treeWidget_stack->clear();
+        m_ui.autoWidget->clear();
+    }
+}
+
     

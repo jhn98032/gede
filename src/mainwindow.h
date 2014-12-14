@@ -41,6 +41,7 @@ public:
     void ICore_onCurrentFrameChanged(int frameIdx);
     void ICore_onSignalReceived(QString sigtype);
     void ICore_onTargetOutput(QString msg);
+    void ICore_onStateChanged(TargetState state);
     
     void ICodeView_onRowDoubleClick(int rowIdx);
     void ICodeView_onContextMenu(QPoint pos, QStringList text);

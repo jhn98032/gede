@@ -13,7 +13,8 @@
 Core::Core()
  : m_inf(NULL)
     ,m_selectedThreadId(0)
-    ,m_targetState(TARGET_STOPPED)
+    ,m_targetState(ICore::TARGET_STOPPED)
+    ,m_lastTargetState(ICore::TARGET_FINISHED)
     ,m_pid(0)
     ,m_currentFrameIdx(-1)
     ,m_varWatchLastId(10)
@@ -28,7 +29,7 @@ Core::Core()
         errorMsg("Failed to grantpt");
     if(unlockpt(m_ptsFd))
         errorMsg("Failed to unlock pt");
-    infoMsg("Using: %s\n", ptsname(m_ptsFd));
+    infoMsg("Using: %s", ptsname(m_ptsFd));
     
     m_ptsListener = new QSocketNotifier(m_ptsFd, QSocketNotifier::Read);
     connect(m_ptsListener, SIGNAL(activated(int)), this, SLOT(onGdbOutput(int)));
@@ -158,7 +159,7 @@ void Core::gdbRun()
     Com& com = Com::getInstance();
     Tree resultData;
 
-    if(m_targetState == TARGET_RUNNING)
+    if(m_targetState == ICore::TARGET_RUNNING)
     {
         if(m_inf)
             m_inf->ICore_onMessage("Program is currently running");
@@ -178,7 +179,7 @@ void Core::gdbContinue()
     Com& com = Com::getInstance();
     Tree resultData;
 
-    if(m_targetState == TARGET_RUNNING)
+    if(m_targetState == ICore::TARGET_RUNNING)
     {
         if(m_inf)
             m_inf->ICore_onMessage("Program is currently running");
@@ -192,7 +193,7 @@ void Core::gdbContinue()
 void Core::stop()
 {
 
-    if(m_targetState != TARGET_RUNNING)
+    if(m_targetState != ICore::TARGET_RUNNING)
     {
         if(m_inf)
             m_inf->ICore_onMessage("Program is not running");
@@ -206,7 +207,7 @@ void Core::gdbNext()
     Com& com = Com::getInstance();
     Tree resultData;
 
-    if(m_targetState != TARGET_STOPPED)
+    if(m_targetState != ICore::TARGET_STOPPED)
     {
         if(m_inf)
             m_inf->ICore_onMessage("Program is not stopped");
@@ -233,7 +234,7 @@ void Core::gdbStepIn()
     Com& com = Com::getInstance();
     Tree resultData;
 
-    if(m_targetState != TARGET_STOPPED)
+    if(m_targetState != ICore::TARGET_STOPPED)
     {
         if(m_inf)
             m_inf->ICore_onMessage("Program is not stopped");
@@ -377,7 +378,7 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
     // The program has stopped
     if(ac == ComListener::AC_STOPPED)
     {
-        m_targetState = TARGET_STOPPED;
+        m_targetState = ICore::TARGET_STOPPED;
 
         if(m_pid == 0)
             com.command(NULL, "-list-thread-groups");
@@ -399,7 +400,9 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
             reason = parseReasonString(reasonString);
 
         if(reason == ICore::EXITED_NORMALLY)
-            m_targetState = TARGET_FINISHED;
+        {
+            m_targetState = ICore::TARGET_FINISHED;
+        }
         
         if(m_inf)
         {
@@ -408,7 +411,7 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
                 QString signalName = tree.getString("signal-name");
                 if(signalName == "SIGSEGV")
                 {
-                    m_targetState = TARGET_FINISHED;
+                    m_targetState = ICore::TARGET_FINISHED;
                 }
                 m_inf->ICore_onSignalReceived(signalName);  
             }
@@ -435,7 +438,7 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
     }
     else if(ac == ComListener::AC_RUNNING)
     {
-        m_targetState = TARGET_RUNNING;
+        m_targetState = ICore::TARGET_RUNNING;
 
         debugMsg("is running\n");
     }
@@ -449,6 +452,13 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
             m_inf->ICore_onCurrentThreadChanged(threadId);
     }
 
+    // State changed?
+    if(m_inf && m_lastTargetState != m_targetState)
+    {
+        m_inf->ICore_onStateChanged(m_targetState);
+        m_lastTargetState = m_targetState;
+    
+    }
 }
 
 
@@ -474,7 +484,7 @@ void Core::gdbGetThreadList()
     Com& com = Com::getInstance();
     Tree resultData;
 
-    if(m_targetState == TARGET_RUNNING)
+    if(m_targetState == ICore::TARGET_RUNNING)
     {
         if(m_inf)
             m_inf->ICore_onMessage("Program is currently running");
@@ -794,7 +804,7 @@ void Core::selectFrame(int selectedFrameIdx)
     Com& com = Com::getInstance();
     Tree resultData;
 
-    if(m_targetState == TARGET_RUNNING)
+    if(m_targetState == ICore::TARGET_RUNNING)
     {
         return;
     }
