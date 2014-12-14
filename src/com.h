@@ -46,8 +46,12 @@ struct Token
 
 
 
-class ComListener
+class ComListener : public QObject
 {
+    
+private:
+    Q_OBJECT;
+    
     public:
 
         enum AsyncClass

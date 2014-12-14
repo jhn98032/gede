@@ -348,6 +348,8 @@ void MainWindow::insertSourceFiles()
         }
     }
 
+    treeWidget->sortItems(0, Qt::AscendingOrder);
+
 }
 
 
@@ -803,6 +805,8 @@ void MainWindow::open(QString filename)
 {
     //qDebug() << filename;
 
+    m_ui.scrollArea_codeView->setWidgetResizable(true);
+
     setWindowTitle(getFilenamePart(filename));
 
     QString text;
@@ -1150,6 +1154,19 @@ void MainWindow::ICore_onSignalReceived(QString signalName)
 
     fillInStack();
 
+}
+
+void MainWindow::ICore_onTargetOutput(QString message)
+{
+    if(message.endsWith("\n"))
+    {
+        message = message.left(message.length()-1);
+    }
+    if(message.endsWith("\r"))
+    {
+        message = message.left(message.length()-1);
+    }
+    m_ui.targetOutputView->appendPlainText(message);    
 }
 
 

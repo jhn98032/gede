@@ -775,9 +775,23 @@ void Com::readTokens()
 #endif
 
                 QList<Token*> list;
-                list = tokenize(row);
-                m_list += list;
-                
+                char firstChar = row[0].toAscii();
+                if(firstChar == '(' ||
+                    firstChar == '^' ||
+                    firstChar == '*' ||
+                    firstChar == '+' ||
+                    firstChar == '~' ||
+                    firstChar == '@' ||
+                    firstChar == '&' ||
+                    firstChar == '=')
+                {
+                    list = tokenize(row);
+                    m_list += list;
+                }
+                else if(m_listener)
+                {
+                    m_listener->onTargetStreamOutput(row);
+                }
             }
         }
 
