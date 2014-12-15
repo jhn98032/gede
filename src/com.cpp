@@ -662,15 +662,15 @@ Resp *Com::parseResultRecord()
     QString resultClass = tok->getString();
     GdbResult res;
     if(resultClass == "done")
-        res = DONE;
+        res = GDB_DONE;
     else if(resultClass == "running")
-        res = RUNNING;
+        res = GDB_RUNNING;
     else if(resultClass == "connected")
-        res = CONNECTED;
+        res = GDB_CONNECTED;
     else if(resultClass == "error")
-        res = ERROR;
+        res = GDB_ERROR;
     else if(resultClass == "exit")
-        res = EXIT;
+        res = GDB_EXIT;
     else
     {
         delete resp;

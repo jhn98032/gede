@@ -65,8 +65,10 @@ int Core::initLocal(QString gdbPath, QString programPath, QStringList argumentLi
     
     com.commandF(&resultData, "-inferior-tty-set %s", stringToCStr(ptsDevPath));
     
-    com.commandF(&resultData, "-file-exec-and-symbols %s", stringToCStr(programPath));
-
+    if(com.commandF(&resultData, "-file-exec-and-symbols %s", stringToCStr(programPath)) == GDB_ERROR)
+    {
+        errorMsg("Failed to load '%s'", stringToCStr(programPath));
+    }
 
     QString commandStr;
     if(argumentList.size() > 0)
@@ -323,7 +325,7 @@ int Core::gdbAddVarWatch(QString varName, QString *varType, QString *value, int 
     assert(varName.isEmpty() == false);
     
     res = com.commandF(&resultData, "-var-create w%d * %s", watchId, stringToCStr(varName));
-    if(res == ERROR)
+    if(res == GDB_ERROR)
     {
         rc = -1;
     }

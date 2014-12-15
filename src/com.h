@@ -82,11 +82,11 @@ private:
 
 enum GdbResult
 {
-    DONE = 0,
-    RUNNING,
-    CONNECTED,
-    ERROR,
-    EXIT
+    GDB_DONE = 0,
+    GDB_RUNNING,
+    GDB_CONNECTED,
+    GDB_ERROR,
+    GDB_EXIT
 };
 
 
