@@ -55,7 +55,11 @@ int Core::initLocal(QString gdbPath, QString programPath, QStringList argumentLi
     Com& com = Com::getInstance();
     Tree resultData;
     
-    com.init(gdbPath);
+    if(com.init(gdbPath))
+    {
+        errorMsg("Failed to start gdb");
+        return -1;
+    }
     
     QString ptsDevPath = ptsname(m_ptsFd);
     
@@ -90,7 +94,11 @@ int Core::initRemote(QString gdbPath, QString programPath, QString tcpHost, int 
     Com& com = Com::getInstance();
     Tree resultData;
     
-    com.init(gdbPath);
+    if(com.init(gdbPath))
+    {
+        errorMsg("Failed to start gdb");
+        return -1;
+    }
 
     com.commandF(&resultData, "-target-select remote %s:%d", stringToCStr(tcpHost), tcpPort); 
 

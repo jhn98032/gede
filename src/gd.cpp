@@ -28,6 +28,7 @@ static int dumpUsage()
  */
 int main(int argc, char *argv[])
 {
+    int rc = 0;
     Settings cfg;
     bool showConfigDialog = true;
     
@@ -83,15 +84,18 @@ int main(int argc, char *argv[])
     MainWindow w(NULL);
 
     if(cfg.m_connectionMode == MODE_LOCAL)
-        core.initLocal(cfg.m_gdbPath, cfg.m_lastProgram, cfg.m_argumentList);
+        rc = core.initLocal(cfg.m_gdbPath, cfg.m_lastProgram, cfg.m_argumentList);
     else
-        core.initRemote(cfg.m_gdbPath, cfg.m_tcpProgram, cfg.m_tcpHost, cfg.m_tcpPort);
+        rc = core.initRemote(cfg.m_gdbPath, cfg.m_tcpProgram, cfg.m_tcpHost, cfg.m_tcpPort);
+
+    if(rc)
+        return rc;
+        
     
     w.insertSourceFiles();
     
     w.show();
 
     return app.exec();
-
 }
 

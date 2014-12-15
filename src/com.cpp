@@ -981,6 +981,11 @@ int Com::init(QString gdbPath)
     m_process.start(commandLine);//gdb ./testapp/test");
     m_process.waitForStarted();
 
+    if(m_process.state() == QProcess::NotRunning)
+    {
+        return 1;
+    }
+
     return 0;
 }
 
