@@ -227,12 +227,13 @@ void CodeView::setBreakpoints(QVector<int> numList)
     update();
 }   
 
-void CodeView::setConfig(Ini *ini)
+void CodeView::setConfig(Settings *ini)
 {
     m_ini = ini;
 
+    assert(ini != NULL);
 
-    m_font = QFont(m_ini->getString("Font","Monospace"), m_ini->getInt("FontSize", 8));
+    m_font = QFont(m_ini->m_fontFamily, m_ini->m_fontSize);
     delete m_fontInfo;
     m_fontInfo = new QFontMetrics(m_font);
     repaint();

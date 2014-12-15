@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QStringList>
 #include "syntaxhighlighter.h"
-#include "ini.h"
+#include "settings.h"
 
 class ICodeView
 {
@@ -29,7 +29,7 @@ public:
     
     void setPlainText(QString text);
 
-    void setConfig(Ini *ini);
+    void setConfig(Settings *ini);
     void paintEvent ( QPaintEvent * event );
 
     void setCurrentLine(int lineno);
@@ -53,7 +53,7 @@ public:
     ICodeView *m_inf;
     QVector<int> m_breakpointList;
     SyntaxHighlighter m_highlighter;
-    Ini *m_ini;
+    Settings *m_ini;
 };
 
 

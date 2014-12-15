@@ -50,7 +50,7 @@ Core::~Core()
 }
 
 
-int Core::initLocal(QString gdbPath, QStringList argumentList)
+int Core::initLocal(QString gdbPath, QString programPath, QStringList argumentList)
 {
     Com& com = Com::getInstance();
     Tree resultData;
@@ -61,14 +61,14 @@ int Core::initLocal(QString gdbPath, QStringList argumentList)
     
     com.commandF(&resultData, "-inferior-tty-set %s", stringToCStr(ptsDevPath));
     
-    com.commandF(&resultData, "-file-exec-and-symbols %s", stringToCStr(argumentList[0]));
+    com.commandF(&resultData, "-file-exec-and-symbols %s", stringToCStr(programPath));
 
 
     QString commandStr;
-    if(argumentList.size() > 1)
+    if(argumentList.size() > 0)
     {
         commandStr = "-exec-arguments ";
-        for(int i = 1;i < argumentList.size();i++)
+        for(int i = 0;i < argumentList.size();i++)
             commandStr += argumentList[i];
         com.command(NULL, commandStr);
     }

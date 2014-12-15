@@ -3,7 +3,7 @@
 
 #include <QDialog>
 
-#include "ini.h"
+#include "settings.h"
 #include "ui_settingsdialog.h"
 
 
@@ -13,9 +13,9 @@ class SettingsDialog : public QDialog
 
 public:
 
-    SettingsDialog(QWidget *parent, Ini *ini);
+    SettingsDialog(QWidget *parent, Settings *ini);
 
-    void getConfig(Ini *ini);
+    void getConfig(Settings *ini);
     
 private:    
     void saveConfig();
@@ -29,7 +29,7 @@ private slots:
 
 private:
     Ui_SettingsDialog m_ui;
-    Ini *m_ini;
+    Settings *m_ini;
 
     QString m_settingsFontFamily;    
     int m_settingsFontSize;

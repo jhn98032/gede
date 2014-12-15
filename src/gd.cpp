@@ -29,6 +29,7 @@ static int dumpUsage()
 int main(int argc, char *argv[])
 {
     Settings cfg;
+    bool showConfigDialog = true;
     
     // Load default config
     cfg.load(CONFIG_FILENAME);
@@ -38,8 +39,14 @@ int main(int argc, char *argv[])
         if(strcmp(curArg, "--args") == 0)
         {
             cfg.connectionMode = MODE_LOCAL;
+            showConfigDialog = false;
             for(int u = i+1;u < argc;u++)
-                cfg.argumentList.push_back(argv[u]);
+            {
+                if(u == i+1)
+                    cfg.lastProgram = argv[u];
+                else
+                    cfg.argumentList.push_back(argv[u]);
+            }
             argc = i;
         }
         else if(strcmp(curArg, "--help") == 0)
@@ -53,7 +60,7 @@ int main(int argc, char *argv[])
 
     
     // Got a program to debug?
-    if(cfg.argumentList.size() < 1)
+    if(showConfigDialog)
     {
         // Ask user for program
         OpenDialog dlg(NULL);
@@ -76,7 +83,7 @@ int main(int argc, char *argv[])
     MainWindow w(NULL);
 
     if(cfg.connectionMode == MODE_LOCAL)
-        core.initLocal(cfg.gdbPath, cfg.argumentList);
+        core.initLocal(cfg.gdbPath, cfg.lastProgram, cfg.argumentList);
     else
         core.initRemote(cfg.gdbPath, cfg.tcpProgram, cfg.tcpHost, cfg.tcpPort);
     

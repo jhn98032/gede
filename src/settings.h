@@ -24,9 +24,9 @@ class Settings
         QStringList initCommands;
         QString gdbPath;
         QString lastProgram;
-        QStringList arguments;
-
-
+        QString m_fontFamily;
+        int m_fontSize;
+    
 
 };
 

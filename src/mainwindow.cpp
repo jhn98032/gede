@@ -161,7 +161,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::loadConfig()
 {
-    m_ini.appendLoad(CONFIG_FILENAME);
+    m_ini.load(CONFIG_FILENAME);
 
     m_ui.codeView->setConfig(&m_ini);
 

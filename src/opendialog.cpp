@@ -186,9 +186,8 @@ void OpenDialog::setGdbPath(QString path)
 void OpenDialog::saveConfig(Settings *cfg)
 {
     OpenDialog &dlg = *this;
-    cfg->argumentList.clear();
-    cfg->argumentList += dlg.getProgram();
-    cfg->argumentList += dlg.getArguments().split(' ');
+    cfg->lastProgram = dlg.getProgram();
+    cfg->argumentList = dlg.getArguments().split(' ');
     cfg->connectionMode = dlg.getMode();
     cfg->tcpPort = dlg.getTcpRemotePort();
     cfg->tcpHost = dlg.getTcpRemoteHost();
