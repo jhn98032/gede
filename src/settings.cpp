@@ -3,8 +3,8 @@
 #include "ini.h"
 
 Settings::Settings()
-: connectionMode(MODE_LOCAL)
-    ,tcpPort(0)
+: m_connectionMode(MODE_LOCAL)
+    ,m_tcpPort(0)
 {
 
 }
@@ -13,15 +13,14 @@ void Settings::load(QString filepath)
 {
     Ini tmpIni;
     tmpIni.appendLoad(filepath);
-    connectionMode = tmpIni.getInt("Mode") == MODE_LOCAL ? MODE_LOCAL : MODE_TCP;
-    tcpPort = tmpIni.getInt("TcpPort", 2000);
-    tcpHost = tmpIni.getString("TcpHost", "localhost");
-    tcpProgram = tmpIni.getString("TcpProgram", "");
-    initCommands = tmpIni.getStringList("InitCommands", initCommands);
-    gdbPath = tmpIni.getString("GdpPath", "gdb");
-    lastProgram = tmpIni.getString("LastProgram", "");
-    QStringList defList;
-    argumentList = tmpIni.getStringList("LastProgramArguments", defList);
+    m_connectionMode = tmpIni.getInt("Mode") == MODE_LOCAL ? MODE_LOCAL : MODE_TCP;
+    m_tcpPort = tmpIni.getInt("TcpPort", 2000);
+    m_tcpHost = tmpIni.getString("TcpHost", "localhost");
+    m_tcpProgram = tmpIni.getString("TcpProgram", "");
+    m_initCommands = tmpIni.getStringList("InitCommands", m_initCommands);
+    m_gdbPath = tmpIni.getString("GdpPath", "gdb");
+    m_lastProgram = tmpIni.getString("LastProgram", "");
+    m_argumentList = tmpIni.getStringList("LastProgramArguments", m_argumentList);
 
     m_fontFamily = tmpIni.getString("Font","Monospace");
     m_fontSize = tmpIni.getInt("FontSize", 8);
@@ -30,19 +29,18 @@ void Settings::load(QString filepath)
  
 void Settings::save(QString filepath)
 {
-     Settings &cfg = *this;
 
     Ini tmpIni;
     tmpIni.appendLoad(filepath);
-    tmpIni.setInt("TcpPort", cfg.tcpPort);
-    tmpIni.setString("TcpHost", cfg.tcpHost);
-    tmpIni.setInt("Mode", (int)cfg.connectionMode);
-    tmpIni.setString("LastProgram", lastProgram);
-    tmpIni.setString("TcpProgram", cfg.tcpProgram);
-    tmpIni.setStringList("InitCommands", cfg.initCommands);
-    tmpIni.setString("GdpPath", cfg.gdbPath);
+    tmpIni.setInt("TcpPort", m_tcpPort);
+    tmpIni.setString("TcpHost", m_tcpHost);
+    tmpIni.setInt("Mode", (int)m_connectionMode);
+    tmpIni.setString("LastProgram", m_lastProgram);
+    tmpIni.setString("TcpProgram", m_tcpProgram);
+    tmpIni.setStringList("InitCommands", m_initCommands);
+    tmpIni.setString("GdpPath", m_gdbPath);
     QStringList tmpArgs;
-    tmpArgs = cfg.argumentList;
+    tmpArgs = m_argumentList;
     tmpIni.setStringList("LastProgramArguments", tmpArgs);
     
     tmpIni.setString("Font", m_fontFamily);

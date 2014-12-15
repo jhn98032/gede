@@ -186,31 +186,31 @@ void OpenDialog::setGdbPath(QString path)
 void OpenDialog::saveConfig(Settings *cfg)
 {
     OpenDialog &dlg = *this;
-    cfg->lastProgram = dlg.getProgram();
-    cfg->argumentList = dlg.getArguments().split(' ');
-    cfg->connectionMode = dlg.getMode();
-    cfg->tcpPort = dlg.getTcpRemotePort();
-    cfg->tcpHost = dlg.getTcpRemoteHost();
-    cfg->tcpProgram = dlg.getTcpRemoteProgram();
-    cfg->initCommands = dlg.getInitCommands();
-    cfg->gdbPath = dlg.getGdbPath();
+    cfg->m_lastProgram = dlg.getProgram();
+    cfg->m_argumentList = dlg.getArguments().split(' ');
+    cfg->m_connectionMode = dlg.getMode();
+    cfg->m_tcpPort = dlg.getTcpRemotePort();
+    cfg->m_tcpHost = dlg.getTcpRemoteHost();
+    cfg->m_tcpProgram = dlg.getTcpRemoteProgram();
+    cfg->m_initCommands = dlg.getInitCommands();
+    cfg->m_gdbPath = dlg.getGdbPath();
 
 }
 
 void OpenDialog::loadConfig(Settings &cfg)
 {
     OpenDialog &dlg = *this;
-    dlg.setMode(cfg.connectionMode);
+    dlg.setMode(cfg.m_connectionMode);
 
-    dlg.setTcpRemotePort(cfg.tcpPort);
-    dlg.setTcpRemoteHost(cfg.tcpHost);
-    dlg.setTcpRemoteProgram(cfg.tcpProgram);
-    dlg.setInitCommands(cfg.initCommands);
-    dlg.setGdbPath(cfg.gdbPath);
+    dlg.setTcpRemotePort(cfg.m_tcpPort);
+    dlg.setTcpRemoteHost(cfg.m_tcpHost);
+    dlg.setTcpRemoteProgram(cfg.m_tcpProgram);
+    dlg.setInitCommands(cfg.m_initCommands);
+    dlg.setGdbPath(cfg.m_gdbPath);
 
-    dlg.setProgram(cfg.lastProgram);
+    dlg.setProgram(cfg.m_lastProgram);
     QStringList defList;
-    dlg.setArguments(cfg.argumentList.join(" "));
+    dlg.setArguments(cfg.m_argumentList.join(" "));
 
 }
 

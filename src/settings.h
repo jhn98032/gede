@@ -16,14 +16,14 @@ class Settings
 
 
     public:
-        QStringList argumentList;
-        ConnectionMode connectionMode;
-        int tcpPort;
-        QString tcpHost;
-        QString tcpProgram;
-        QStringList initCommands;
-        QString gdbPath;
-        QString lastProgram;
+        QStringList m_argumentList;
+        ConnectionMode m_connectionMode;
+        int m_tcpPort;
+        QString m_tcpHost;
+        QString m_tcpProgram;
+        QStringList m_initCommands;
+        QString m_gdbPath;
+        QString m_lastProgram;
         QString m_fontFamily;
         int m_fontSize;
     

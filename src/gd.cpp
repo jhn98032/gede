@@ -38,14 +38,14 @@ int main(int argc, char *argv[])
         const char *curArg = argv[i];
         if(strcmp(curArg, "--args") == 0)
         {
-            cfg.connectionMode = MODE_LOCAL;
+            cfg.m_connectionMode = MODE_LOCAL;
             showConfigDialog = false;
             for(int u = i+1;u < argc;u++)
             {
                 if(u == i+1)
-                    cfg.lastProgram = argv[u];
+                    cfg.m_lastProgram = argv[u];
                 else
-                    cfg.argumentList.push_back(argv[u]);
+                    cfg.m_argumentList.push_back(argv[u]);
             }
             argc = i;
         }
@@ -82,10 +82,10 @@ int main(int argc, char *argv[])
     
     MainWindow w(NULL);
 
-    if(cfg.connectionMode == MODE_LOCAL)
-        core.initLocal(cfg.gdbPath, cfg.lastProgram, cfg.argumentList);
+    if(cfg.m_connectionMode == MODE_LOCAL)
+        core.initLocal(cfg.m_gdbPath, cfg.m_lastProgram, cfg.m_argumentList);
     else
-        core.initRemote(cfg.gdbPath, cfg.tcpProgram, cfg.tcpHost, cfg.tcpPort);
+        core.initRemote(cfg.m_gdbPath, cfg.m_tcpProgram, cfg.m_tcpHost, cfg.m_tcpPort);
     
     w.insertSourceFiles();
     
