@@ -7,7 +7,7 @@
 #include <QFontDialog>
 
 
-SettingsDialog::SettingsDialog(QWidget *parent, Ini *ini)
+SettingsDialog::SettingsDialog(QWidget *parent, Settings *ini)
     : QDialog(parent)
     ,m_ini(ini)
 {
@@ -32,8 +32,8 @@ void SettingsDialog::updateGui()
 
 void SettingsDialog::loadConfig()
 {
-    m_settingsFontFamily = m_ini->getString("Font", "");
-    m_settingsFontSize = m_ini->getInt("FontSize", 11);
+    m_settingsFontFamily = m_ini->m_fontFamily;
+    m_settingsFontSize = m_ini->m_fontSize;
 }
 
 void SettingsDialog::saveConfig()
@@ -41,10 +41,10 @@ void SettingsDialog::saveConfig()
     getConfig(m_ini);
 }
 
-void SettingsDialog::getConfig(Ini *ini)
+void SettingsDialog::getConfig(Settings *ini)
 {
-    ini->setString("Font", m_settingsFontFamily);
-    ini->setInt("FontSize", m_settingsFontSize);
+    ini->m_fontFamily = m_settingsFontFamily;
+    ini->m_fontSize = m_settingsFontSize;
 
 }
 

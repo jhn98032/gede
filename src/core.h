@@ -103,6 +103,13 @@ struct VarWatch
     int id;
 };
     
+enum ConnectionMode
+{
+    MODE_LOCAL = 0,
+    MODE_TCP
+    
+};
+
 
 class Core : public ComListener
 {
@@ -115,10 +122,12 @@ private:
     ~Core();
 
 public:
+    
 
     static Core& getInstance();
-    int init(QStringList argumentList);
-
+    int initLocal(QString gdbPath, QString programPath, QStringList argumentList);
+    int initRemote(QString gdbPath, QString programPath, QString tcpHost, int tcpPort);
+    
     void setListener(ICore *inf) { m_inf = inf; };
 
 private:

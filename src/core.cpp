@@ -1,12 +1,15 @@
 #include "core.h"
 
+#include "ini.h"
+#include "util.h"
+#include "log.h"
+
 #include <QByteArray>
 #include <QDebug>
 #include <unistd.h>
-#include "util.h"
-#include "log.h"
 #include <assert.h>
 #include <signal.h>
+
 
 
 
@@ -47,25 +50,31 @@ Core::~Core()
 }
 
 
-int Core::init(QStringList argumentList)
+int Core::initLocal(QString gdbPath, QString programPath, QStringList argumentList)
 {
     Com& com = Com::getInstance();
     Tree resultData;
     
-    com.init();
+    if(com.init(gdbPath))
+    {
+        errorMsg("Failed to start gdb ('%s')", stringToCStr(gdbPath));
+        return -1;
+    }
     
     QString ptsDevPath = ptsname(m_ptsFd);
     
     com.commandF(&resultData, "-inferior-tty-set %s", stringToCStr(ptsDevPath));
-    
-    com.commandF(&resultData, "-file-exec-and-symbols %s", stringToCStr(argumentList[0]));
 
+    if(com.commandF(&resultData, "-file-exec-and-symbols %s", stringToCStr(programPath)) == GDB_ERROR)
+    {
+        errorMsg("Failed to load '%s'", stringToCStr(programPath));
+    }
 
     QString commandStr;
-    if(argumentList.size() > 1)
+    if(argumentList.size() > 0)
     {
         commandStr = "-exec-arguments ";
-        for(int i = 1;i < argumentList.size();i++)
+        for(int i = 0;i < argumentList.size();i++)
             commandStr += argumentList[i];
         com.command(NULL, commandStr);
     }
@@ -79,6 +88,34 @@ int Core::init(QStringList argumentList)
 
     //com.command("run");
     
+    return 0;
+}
+
+int Core::initRemote(QString gdbPath, QString programPath, QString tcpHost, int tcpPort)
+{
+    Com& com = Com::getInstance();
+    Tree resultData;
+    
+    if(com.init(gdbPath))
+    {
+        errorMsg("Failed to start gdb");
+        return -1;
+    }
+
+    com.commandF(&resultData, "-target-select remote %s:%d", stringToCStr(tcpHost), tcpPort); 
+
+    if(!programPath.isEmpty())
+    {
+        com.commandF(&resultData, "-file-symbol-file %s", stringToCStr(programPath));
+
+      //  com.commandF(&resultData, "-file-exec-file %s", stringToCStr(programPath));
+    }
+
+    gdbInsertBreakPoint("main");
+    gdbContinue();
+
+    gdbGetFiles();
+
     return 0;
 }
 
@@ -200,7 +237,10 @@ void Core::stop()
             m_inf->ICore_onMessage("Program is not running");
         return;
     }
-    kill(m_pid, SIGINT);
+    if(m_pid != 0)
+        kill(m_pid, SIGINT);
+    else
+        errorMsg("Failed to stop since PID not known");
 }
 
 void Core::gdbNext()
@@ -285,7 +325,7 @@ int Core::gdbAddVarWatch(QString varName, QString *varType, QString *value, int 
     assert(varName.isEmpty() == false);
     
     res = com.commandF(&resultData, "-var-create w%d * %s", watchId, stringToCStr(varName));
-    if(res == ERROR)
+    if(res == GDB_ERROR)
     {
         rc = -1;
     }

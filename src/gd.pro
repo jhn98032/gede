@@ -37,6 +37,9 @@ HEADERS+=ini.h
 SOURCES+= opendialog.cpp
 HEADERS+=opendialog.h
 
+SOURCES+=settings.cpp
+HEADERS+=settings.h
+
 HEADERS+=config.h
 
 SOURCES+=settingsdialog.cpp

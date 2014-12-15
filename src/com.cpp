@@ -662,15 +662,15 @@ Resp *Com::parseResultRecord()
     QString resultClass = tok->getString();
     GdbResult res;
     if(resultClass == "done")
-        res = DONE;
+        res = GDB_DONE;
     else if(resultClass == "running")
-        res = RUNNING;
+        res = GDB_RUNNING;
     else if(resultClass == "connected")
-        res = CONNECTED;
+        res = GDB_CONNECTED;
     else if(resultClass == "error")
-        res = ERROR;
+        res = GDB_ERROR;
     else if(resultClass == "exit")
-        res = EXIT;
+        res = GDB_EXIT;
     else
     {
         delete resp;
@@ -821,6 +821,36 @@ void Com::readFromGdb(GdbResult *m_result, Tree *m_resultData)
     Resp *resp = NULL;
 
     
+    if(m_result == NULL)
+    {
+        
+        // Parse any data received from GDB
+        resp = parseOutput();
+        if(resp == NULL)
+            m_process.waitForReadyRead(100);
+       
+        
+        while(!m_freeTokens.isEmpty())
+        {
+            Token *token = m_freeTokens.takeFirst();
+            delete token;
+        }
+
+        if(resp)
+        {
+            m_respQueue.push_back(resp);
+
+            if(resp->getType() == Resp::RESULT)
+            {
+                assert(m_resultData != NULL);
+            
+                m_resultData->copy(resp->tree);
+            }
+        }
+
+    }
+    else
+    {
     do
     {
         
@@ -853,7 +883,7 @@ void Com::readFromGdb(GdbResult *m_result, Tree *m_resultData)
         }
 
     }while(m_result != NULL && resp->getType() != Resp::TERMINATION);
-
+}
 
     //  debugMsg("# ---<< \n");
 
@@ -884,6 +914,8 @@ GdbResult Com::command(Tree *resultData, QString text)
 {
     Tree resultDataNull;
 
+    assert(m_busy == 0);
+    
     m_busy++;
     
     if(resultData == NULL)
@@ -941,10 +973,18 @@ GdbResult Com::command(Tree *resultData, QString text)
 }
 
 
-int Com::init()
+int Com::init(QString gdbPath)
 {
-    m_process.start("gdb --interpreter=mi2");//gdb ./testapp/test");
+    QString commandLine;
+    commandLine.sprintf("%s --interpreter=mi2", stringToCStr(gdbPath));
+    
+    m_process.start(commandLine);//gdb ./testapp/test");
     m_process.waitForStarted();
+
+    if(m_process.state() == QProcess::NotRunning)
+    {
+        return 1;
+    }
 
     return 0;
 }
@@ -989,7 +1029,7 @@ void Com::dispatchResp()
     while(!m_respQueue.isEmpty())
     {
         Resp *resp = m_respQueue.takeFirst();
-        
+        assert(resp != NULL);
         // Dispatch the response
         if(m_listener)
         {

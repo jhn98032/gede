@@ -82,11 +82,11 @@ private:
 
 enum GdbResult
 {
-    DONE = 0,
-    RUNNING,
-    CONNECTED,
-    ERROR,
-    EXIT
+    GDB_DONE = 0,
+    GDB_RUNNING,
+    GDB_CONNECTED,
+    GDB_ERROR,
+    GDB_EXIT
 };
 
 
@@ -107,7 +107,7 @@ class Resp
         Resp() : m_type(UNKNOWN) {};
 
         typedef enum {
-            UNKNOWN,
+            UNKNOWN = 0,
             RESULT,
             CONSOLE_STREAM_OUTPUT,
             TARGET_STREAM_OUTPUT,
@@ -156,7 +156,7 @@ class Com : public QObject
         static const char* asyncClassToString(ComListener::AsyncClass ac);
 
         static Com& getInstance();
-        int init();
+        int init(QString gdbPath);
 
         void setListener(ComListener *listener) { m_listener = listener; };
 

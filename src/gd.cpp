@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include "tree.h"
 #include "opendialog.h"
+#include "settings.h"
 
 
 static int dumpUsage()
@@ -27,28 +28,26 @@ static int dumpUsage()
  */
 int main(int argc, char *argv[])
 {
-    /*
-    Tree tree;
-    tree.fromString("^done,bkpt={number=\"1\",type=\"breakpoint\",disp=\"keep\",enabled=\"y\","
-        "addr=\"0x000000000040051b\",func=\"main\",file=\"test.c\","
-        "fullname=\"/work2/priv/gd_wip/testapp/test.c\",line=\"5\",times=\"0\",original-location=\"main\"}");
-    tree.dump();
-
-
-    const char *path = "/bkpt/number";
-    infoMsg("%s='%s'\n", path, stringToCStr(tree.getString(path)));
-    return 0;
-
-*/
-    QStringList argumentList;
+    int rc = 0;
+    Settings cfg;
+    bool showConfigDialog = true;
     
+    // Load default config
+    cfg.load(CONFIG_FILENAME);
     for(int i = 1;i < argc;i++)
     {
         const char *curArg = argv[i];
         if(strcmp(curArg, "--args") == 0)
         {
+            cfg.m_connectionMode = MODE_LOCAL;
+            showConfigDialog = false;
             for(int u = i+1;u < argc;u++)
-                argumentList.push_back(argv[u]);
+            {
+                if(u == i+1)
+                    cfg.m_lastProgram = argv[u];
+                else
+                    cfg.m_argumentList.push_back(argv[u]);
+            }
             argc = i;
         }
         else if(strcmp(curArg, "--help") == 0)
@@ -60,47 +59,51 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setStyle("cleanlooks");
 
-    // Load config
-    Ini tmpIni;
-    tmpIni.appendLoad(CONFIG_FILENAME);
-    
+    if(cfg.m_lastProgram.isEmpty())
+        showConfigDialog = true;
+        
     // Got a program to debug?
-    if(argumentList.size() < 1)
+    if(showConfigDialog)
     {
         // Ask user for program
         OpenDialog dlg(NULL);
+        
+        dlg.loadConfig(cfg);
 
-        dlg.setProgram(tmpIni.getString("LastProgram", ""));
-        QStringList defList;
-        dlg.setArguments(tmpIni.getStringList("LastProgramArguments", defList).join(" "));
-    
         if(dlg.exec() != QDialog::Accepted)
             return 1;
-        argumentList.clear();
-        argumentList += dlg.getProgram();
-        argumentList += dlg.getArguments().split(' ');
+
+        dlg.saveConfig(&cfg);
     }
 
     // Save config
-    tmpIni.setString("LastProgram", argumentList[0]);
-    QStringList tmpArgs;
-    tmpArgs = argumentList;
-    tmpArgs.pop_front();
-    tmpIni.setStringList("LastProgramArguments", tmpArgs);
-    tmpIni.save(CONFIG_FILENAME);
+    cfg.save(CONFIG_FILENAME);
 
+    //
+    if(cfg.m_lastProgram.isEmpty())
+    {
+        errorMsg("No program to debug");
+        return 1;
+    }
     
     Core &core = Core::getInstance();
 
     
     MainWindow w(NULL);
 
-    core.init(argumentList);
+    if(cfg.m_connectionMode == MODE_LOCAL)
+        rc = core.initLocal(cfg.m_gdbPath, cfg.m_lastProgram, cfg.m_argumentList);
+    else
+        rc = core.initRemote(cfg.m_gdbPath, cfg.m_tcpProgram, cfg.m_tcpHost, cfg.m_tcpPort);
+
+    if(rc)
+        return rc;
+        
+    
     w.insertSourceFiles();
     
     w.show();
 
     return app.exec();
-
 }
 

@@ -8,7 +8,7 @@
 #include "ui_mainwindow.h"
 #include "core.h"
 #include "codeview.h"
-
+#include "settings.h"
  
 
 class MainWindow : public QMainWindow, public ICore, public ICodeView
@@ -102,7 +102,7 @@ private:
     QMap<QString, DispInfo> m_watchVarDispInfo;
     QMap<QString, DispInfo> m_autoVarDispInfo;
 
-    Ini m_ini;
+    Settings m_ini;
 
 };
 
