@@ -57,14 +57,14 @@ int Core::initLocal(QString gdbPath, QString programPath, QStringList argumentLi
     
     if(com.init(gdbPath))
     {
-        errorMsg("Failed to start gdb");
+        errorMsg("Failed to start gdb ('%s')", stringToCStr(gdbPath));
         return -1;
     }
     
     QString ptsDevPath = ptsname(m_ptsFd);
     
     com.commandF(&resultData, "-inferior-tty-set %s", stringToCStr(ptsDevPath));
-    
+
     if(com.commandF(&resultData, "-file-exec-and-symbols %s", stringToCStr(programPath)) == GDB_ERROR)
     {
         errorMsg("Failed to load '%s'", stringToCStr(programPath));

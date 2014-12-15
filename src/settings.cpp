@@ -13,7 +13,7 @@ void Settings::load(QString filepath)
 {
     Ini tmpIni;
     tmpIni.appendLoad(filepath);
-    m_connectionMode = tmpIni.getInt("Mode") == MODE_LOCAL ? MODE_LOCAL : MODE_TCP;
+    m_connectionMode = tmpIni.getInt("Mode", MODE_LOCAL) == MODE_LOCAL ? MODE_LOCAL : MODE_TCP;
     m_tcpPort = tmpIni.getInt("TcpPort", 2000);
     m_tcpHost = tmpIni.getString("TcpHost", "localhost");
     m_tcpProgram = tmpIni.getString("TcpProgram", "");

@@ -59,7 +59,9 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     app.setStyle("cleanlooks");
 
-    
+    if(cfg.m_lastProgram.isEmpty())
+        showConfigDialog = true;
+        
     // Got a program to debug?
     if(showConfigDialog)
     {
@@ -77,6 +79,12 @@ int main(int argc, char *argv[])
     // Save config
     cfg.save(CONFIG_FILENAME);
 
+    //
+    if(cfg.m_lastProgram.isEmpty())
+    {
+        errorMsg("No program to debug");
+        return 1;
+    }
     
     Core &core = Core::getInstance();
 
