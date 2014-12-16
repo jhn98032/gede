@@ -472,7 +472,7 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
 
     debugMsg("ExecAsyncOut> %s", Com::asyncClassToString(ac));
     
-    tree.dump();
+    //tree.dump();
 
     // The program has stopped
     if(ac == ComListener::AC_STOPPED)
@@ -482,6 +482,8 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
         if(m_pid == 0)
             com.command(NULL, "-list-thread-groups");
          
+        // Any new or destroyed thread?
+        com.commandF(NULL, "-thread-info");
 
         com.commandF(NULL, "-var-update --all-values *");
         com.commandF(NULL, "-stack-list-locals 1");
