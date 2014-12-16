@@ -131,9 +131,10 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
     
 
     gdbInsertBreakPoint("main");
-    gdbContinue();
-
+    
     gdbGetFiles();
+
+    gdbContinue();
 
     return 0;
 }
