@@ -7,6 +7,8 @@
 #include <QSocketNotifier>
 #include <QObject>
 
+#include "settings.h"
+
 struct ThreadInfo
 {
     int id;
@@ -103,12 +105,6 @@ struct VarWatch
     int id;
 };
     
-enum ConnectionMode
-{
-    MODE_LOCAL = 0,
-    MODE_TCP
-    
-};
 
 
 class Core : public ComListener
@@ -125,8 +121,8 @@ public:
     
 
     static Core& getInstance();
-    int initLocal(QString gdbPath, QString programPath, QStringList argumentList);
-    int initRemote(QString gdbPath, QString programPath, QString tcpHost, int tcpPort);
+    int initLocal(Settings *cfg, QString gdbPath, QString programPath, QStringList argumentList);
+    int initRemote(Settings *cfg, QString gdbPath, QString programPath, QString tcpHost, int tcpPort);
     
     void setListener(ICore *inf) { m_inf = inf; };
 

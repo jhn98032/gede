@@ -92,9 +92,9 @@ int main(int argc, char *argv[])
     MainWindow w(NULL);
 
     if(cfg.m_connectionMode == MODE_LOCAL)
-        rc = core.initLocal(cfg.m_gdbPath, cfg.m_lastProgram, cfg.m_argumentList);
+        rc = core.initLocal(&cfg, cfg.m_gdbPath, cfg.m_lastProgram, cfg.m_argumentList);
     else
-        rc = core.initRemote(cfg.m_gdbPath, cfg.m_tcpProgram, cfg.m_tcpHost, cfg.m_tcpPort);
+        rc = core.initRemote(&cfg, cfg.m_gdbPath, cfg.m_tcpProgram, cfg.m_tcpHost, cfg.m_tcpPort);
 
     if(rc)
         return rc;

@@ -4,7 +4,12 @@
 #include <QString>
 #include <QStringList>
 
-#include "core.h"
+enum ConnectionMode
+{
+    MODE_LOCAL = 0,
+    MODE_TCP
+    
+};
 
 class Settings
 {
