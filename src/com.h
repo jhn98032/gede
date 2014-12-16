@@ -66,7 +66,8 @@ private:
             AC_THREAD_EXITED,
             AC_THREAD_GROUP_EXITED,
             AC_LIBRARY_UNLOADED,
-            AC_THREAD_SELECTED
+            AC_THREAD_SELECTED,
+            AC_DOWNLOAD
         };
 
 

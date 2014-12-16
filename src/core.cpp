@@ -142,6 +142,8 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
     if(!programPath.isEmpty())
     {
       com.commandF(&resultData, "-file-exec-file %s", stringToCStr(programPath));
+
+        com.commandF(&resultData, "-target-download");
     }
     
 

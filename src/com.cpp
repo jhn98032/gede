@@ -25,6 +25,7 @@ const char* Com::asyncClassToString(ComListener::AsyncClass ac)
         case ComListener::AC_THREAD_GROUP_EXITED: return "thread_group_exited";break;
         case ComListener::AC_LIBRARY_UNLOADED: return "library_unloaded";break;
         case ComListener::AC_THREAD_SELECTED: return "thread_selected";break;
+        case ComListener::AC_DOWNLOAD: return "download";break;
 
     };
     return "?";
@@ -350,6 +351,10 @@ int Com::parseAsyncOutput(Resp *resp, ComListener::AsyncClass *ac)
     {
         *ac = ComListener::AC_THREAD_SELECTED;
     }
+    else if(acString == "download")
+    {
+        *ac = ComListener::AC_DOWNLOAD;
+    }
     else
     {
         errorMsg("Unexpected response '%s'", stringToCStr(acString));
@@ -524,7 +529,10 @@ bool Com::isTokenPending()
 }
 
 
-
+/**
+ * @brief Checks and pops a token if the kind is as expected.
+ * @return The found token or NULL if no hit.
+ */
 Token* Com::checkToken(Token::Type type)
 {
     Token *tok = peek_token();
@@ -606,7 +614,7 @@ int Com::parseValue(TreeNode *item)
         
     }
     else
-        errorMsg("Unexpected token: '%s'\n", stringToCStr(tok->getString()));
+        errorMsg("Unexpected token: '%s'", stringToCStr(tok->getString()));
     return 0;
 }
 
@@ -620,17 +628,27 @@ int Com::parseResult(TreeNode *parent)
     TreeNode *item = new TreeNode;
     parent->addChild(item);
 
-    //
-    Token *tokVar = eatToken(Token::VAR);
-    if(tokVar == NULL)
-        return -1;
-    item->setName(tokVar->getString());
-    
-    //
-    if(eatToken(Token::KEY_EQUAL) == NULL)
-        return -1;
 
-    parseValue(item);
+    Token *tok = peek_token();
+    if(tok != NULL && tok->getType() == Token::KEY_LEFT_BRACE)
+    {
+        parseValue(item);
+    
+    }
+    else
+    {
+        //
+        Token *tokVar = eatToken(Token::VAR);
+        if(tokVar == NULL)
+            return -1;
+        item->setName(tokVar->getString());
+        
+        //
+        if(eatToken(Token::KEY_EQUAL) == NULL)
+            return -1;
+
+        parseValue(item);
+    }
     return 0;
 }
 
