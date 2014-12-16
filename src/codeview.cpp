@@ -14,7 +14,7 @@ static const int BORDER_WIDTH = 50;
 
 
 CodeView::CodeView()
-  : m_ini(0)
+  : m_cfg(0)
  {
     m_font = QFont("Monospace", 8);
     m_fontInfo = new QFontMetrics(m_font);
@@ -227,13 +227,13 @@ void CodeView::setBreakpoints(QVector<int> numList)
     update();
 }   
 
-void CodeView::setConfig(Settings *ini)
+void CodeView::setConfig(Settings *cfg)
 {
-    m_ini = ini;
+    m_cfg = cfg;
 
-    assert(ini != NULL);
+    assert(cfg != NULL);
 
-    m_font = QFont(m_ini->m_fontFamily, m_ini->m_fontSize);
+    m_font = QFont(m_cfg->m_fontFamily, m_cfg->m_fontSize);
     delete m_fontInfo;
     m_fontInfo = new QFontMetrics(m_font);
     repaint();

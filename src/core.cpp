@@ -50,7 +50,7 @@ Core::~Core()
 }
 
 
-int Core::initLocal(Settings *conf, QString gdbPath, QString programPath, QStringList argumentList)
+int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QStringList argumentList)
 {
     Com& com = Com::getInstance();
     Tree resultData;
@@ -110,6 +110,7 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
 
     }
 
+    // Run the initializing commands
     for(int i = 0;i < cfg->m_initCommands.size();i++)
     {
         QString cmd = cfg->m_initCommands[i];

@@ -102,7 +102,7 @@ private:
     QMap<QString, DispInfo> m_watchVarDispInfo;
     QMap<QString, DispInfo> m_autoVarDispInfo;
 
-    Settings m_ini;
+    Settings m_cfg;
 
 };
 

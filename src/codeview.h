@@ -29,7 +29,7 @@ public:
     
     void setPlainText(QString text);
 
-    void setConfig(Settings *ini);
+    void setConfig(Settings *cfg);
     void paintEvent ( QPaintEvent * event );
 
     void setCurrentLine(int lineno);
@@ -53,7 +53,7 @@ public:
     ICodeView *m_inf;
     QVector<int> m_breakpointList;
     SyntaxHighlighter m_highlighter;
-    Settings *m_ini;
+    Settings *m_cfg;
 };
 
 

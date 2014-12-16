@@ -13,9 +13,9 @@ class SettingsDialog : public QDialog
 
 public:
 
-    SettingsDialog(QWidget *parent, Settings *ini);
+    SettingsDialog(QWidget *parent, Settings *cfg);
 
-    void getConfig(Settings *ini);
+    void getConfig(Settings *cfg);
     
 private:    
     void saveConfig();
@@ -29,7 +29,7 @@ private slots:
 
 private:
     Ui_SettingsDialog m_ui;
-    Settings *m_ini;
+    Settings *m_cfg;
 
     QString m_settingsFontFamily;    
     int m_settingsFontSize;

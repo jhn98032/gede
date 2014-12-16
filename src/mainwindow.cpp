@@ -161,12 +161,12 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::loadConfig()
 {
-    m_ini.load(CONFIG_FILENAME);
+    m_cfg.load(CONFIG_FILENAME);
 
-    m_ui.codeView->setConfig(&m_ini);
+    m_ui.codeView->setConfig(&m_cfg);
 
 
-    m_ini.save(CONFIG_FILENAME);
+    m_cfg.save(CONFIG_FILENAME);
 
 }
 
@@ -1135,14 +1135,14 @@ void MainWindow::onCodeViewContextMenuItemPressed()
 
 void MainWindow::onSettings()
 {
-    SettingsDialog dlg(this, &m_ini);
+    SettingsDialog dlg(this, &m_cfg);
     if(dlg.exec() == QDialog::Accepted)
     {
-        dlg.getConfig(&m_ini);
+        dlg.getConfig(&m_cfg);
 
-        m_ui.codeView->setConfig(&m_ini);
+        m_ui.codeView->setConfig(&m_cfg);
 
-        m_ini.save(CONFIG_FILENAME);
+        m_cfg.save(CONFIG_FILENAME);
     }
    
 }
