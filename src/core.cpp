@@ -80,13 +80,27 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
     }
     
     gdbInsertBreakPoint("main");
-    gdbRun();
-
-    //gdbNext();
 
     gdbGetFiles();
 
-    //com.command("run");
+    // Run the initializing commands
+    for(int i = 0;i < cfg->m_initCommands.size();i++)
+    {
+        QString cmd = cfg->m_initCommands[i];
+
+        // Remove comments
+        if(cmd.indexOf('#') != -1)
+            cmd = cmd.left(cmd.indexOf('#'));
+        cmd = cmd.trimmed();
+
+        if(!cmd.isEmpty())
+            com.commandF(NULL, "%s", stringToCStr(cmd));
+
+    }
+
+
+    gdbRun();
+
     
     return 0;
 }
