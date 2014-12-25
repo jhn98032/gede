@@ -140,7 +140,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     fillInVars();
 
-    open("mainwindow.h");
 
 
     Core &core = Core::getInstance();
