@@ -48,6 +48,8 @@ bool SyntaxHighlighter::isKeyword(QString text) const
        text == "while" ||
         text == "switch" ||
         text == "case" ||
+        text == "else" ||
+        text == "do" ||
 
         text == "false" ||
         text == "true" ||
@@ -114,9 +116,12 @@ void SyntaxHighlighter::colorize(QString text)
     enum {IDLE,
         MULTI_COMMENT,
         SPACES,
-        WORD, GLOBAL_INCLUDE_FILE, COMMENT1,COMMENT, STRING
+        WORD, GLOBAL_INCLUDE_FILE, COMMENT1,COMMENT,
+        STRING,
+        ESCAPED_CHAR
     } state = IDLE;
     char c = '\n';
+    char prevC = ' ';
     
     reset();
 
@@ -149,7 +154,15 @@ void SyntaxHighlighter::colorize(QString text)
                     currentRow->fields.push_back(field);
                     field->m_text = c;
                 }
-                else if(c == '"' || c == '\'')
+                else if(c == '\'')
+                {
+                    state = ESCAPED_CHAR;
+                    field = new TextField;
+                    field->m_type = TextField::STRING;
+                    currentRow->fields.push_back(field);
+                    field->m_text = c;
+                }
+                else if(c == '"')
                 {
                     state = STRING;
                     field = new TextField;
@@ -259,10 +272,19 @@ void SyntaxHighlighter::colorize(QString text)
                 }
                 
             };break;
+            case ESCAPED_CHAR:
+            {
+                field->m_text += c;
+                if(prevC != '\\' && c == '\'')
+                {
+                    field = NULL;
+                    state = IDLE;
+                }
+            };break;
             case STRING:
             {
                 field->m_text += c;
-                if(c == '\'' || c == '"')
+                if(prevC != '\\' && c == '"')
                 {
                     field = NULL;
                     state = IDLE;
@@ -286,6 +308,7 @@ void SyntaxHighlighter::colorize(QString text)
                 
             };break;
         }
+        prevC = c;
     }
 
     for(int r = 0;r < m_rows.size();r++)
