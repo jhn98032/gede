@@ -200,7 +200,7 @@ void CodeView::mousePressEvent( QMouseEvent * event )
                 list  += cols[foundPos]->m_text;
                 
                 if(m_inf)
-                    m_inf->ICodeView_onContextMenu(pos, list);
+                    m_inf->ICodeView_onContextMenu(pos, rowIdx, list);
             }
         }
     }

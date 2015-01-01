@@ -1175,12 +1175,19 @@ void MainWindow::ensureLineIsVisible(int lineIdx)
     }
 }
 
-void MainWindow::ICodeView_onContextMenu(QPoint pos, QStringList text)
+
+/**
+ * @brief User right clicked in the codeview.
+ * @param rowIdx    The row (0=first row).
+ *
+ */
+void MainWindow::ICodeView_onContextMenu(QPoint pos, int rowIdx, QStringList text)
 {
+    QAction *action;
+
     m_popupMenu.clear();
     for(int i = 0;i < text.size();i++)
     {
-        QAction *action;
         action = m_popupMenu.addAction("Watch '" + text[i] + "'");
         action->setData(text[i]);
         connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuAddWatch()));
@@ -1189,7 +1196,6 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, QStringList text)
 
     for(int i = 0;i < text.size();i++)
     {
-        QAction *action;
         QString tagName = text[i];
         int pos = tagName.lastIndexOf('.');
         if(pos != -1)
@@ -1199,8 +1205,33 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, QStringList text)
         connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuShowDefinition()));
 
     }
+
+    // Add 'toggle breakpoint'
+    QString title;
+    title.sprintf("Toggle breakpoint at L%d", rowIdx+1);
+    action = m_popupMenu.addAction(title);
+    action->setData(rowIdx);
+    connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuToggleBreakpoint()));
+    
+
     
     m_popupMenu.popup(pos);
+}
+
+
+void MainWindow::onCodeViewContextMenuToggleBreakpoint()
+{
+    QAction *action = static_cast<QAction *>(sender ());
+    int rowIdx = action->data().toInt();
+    Core &core = Core::getInstance();
+    int lineno = rowIdx+1;
+
+    BreakPoint* bkpt = core.findBreakPoint(m_filename, lineno);
+    if(bkpt)
+        core.gdbRemoveBreakpoint(bkpt);
+    else
+        core.gdbSetBreakpoint(m_filename, lineno);
+
 }
 
 

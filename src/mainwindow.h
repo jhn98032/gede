@@ -53,7 +53,7 @@ public:
     void ICore_onStateChanged(TargetState state);
     
     void ICodeView_onRowDoubleClick(int rowIdx);
-    void ICodeView_onContextMenu(QPoint pos, QStringList text);
+    void ICodeView_onContextMenu(QPoint pos, int rowIdx, QStringList text);
 private:
     enum DispFormat
     {
@@ -99,6 +99,7 @@ public slots:
     void onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
     void onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
     void onFuncListItemActivated(int index);
+    void onCodeViewContextMenuToggleBreakpoint();
     
     
 private:
