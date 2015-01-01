@@ -57,9 +57,12 @@ bool SyntaxHighlighter::isKeyword(QString text) const
         text == "unsigned" ||
         text == "bool" ||
         text == "int" ||
+        text == "short" ||
         text == "long" ||
         text == "float" ||
+        text == "double" ||
         text == "void" ||
+        text == "char" ||
         text == "struct" ||
         text == "class" ||
         
