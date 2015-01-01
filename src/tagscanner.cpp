@@ -188,7 +188,7 @@ int TagScanner::parseOutput(QByteArray output, QList<Tag> *taglist)
                 else
                 {
                     tag.type = Tag::TAG_VARIABLE;
-                    errorMsg("Unknown type returned from ctags");
+                    //debugMsg("Unknown type (%s) returned from ctags", stringToCStr(type));
                 }    
                 for(int colIdx = 4;colIdx < colList.size();colIdx++)
                 {
