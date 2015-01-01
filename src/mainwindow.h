@@ -9,7 +9,9 @@
 #include "core.h"
 #include "codeview.h"
 #include "settings.h"
- 
+#include "tagscanner.h"
+
+
 
 class MainWindow : public QMainWindow, public ICore, public ICodeView
 {
@@ -88,7 +90,8 @@ public slots:
     void onSettings();
     void onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
     void onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
-
+    void onFuncListItemActivated(int index);
+    
     
 private:
     Ui_MainWindow m_ui;
@@ -103,7 +106,7 @@ private:
     QMap<QString, DispInfo> m_autoVarDispInfo;
 
     Settings m_cfg;
-
+    TagScanner m_tagScanner;
 };
 
 

@@ -1,12 +1,15 @@
 #include "mainwindow.h"
-#include <QDirIterator>
 #include "util.h"
 #include "log.h"
 #include "core.h"
 #include <assert.h>
 #include "aboutdialog.h"
 #include "settingsdialog.h"
+#include "tagscanner.h"
+
+#include <QDirIterator>
 #include <QMessageBox>
+#include <QScrollBar>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -137,6 +140,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_ui.actionSettings, SIGNAL(triggered()), SLOT(onSettings()));
 
+    connect(m_ui.comboBox_funcList, SIGNAL(activated(int)), SLOT(onFuncListItemActivated(int)));
+
+    m_tagScanner.init();
 
     fillInVars();
 
@@ -824,6 +830,28 @@ void MainWindow::open(QString filename)
     m_filename = filename;
     m_ui.codeView->setPlainText(text);
 
+    // Fill in the functions
+    m_ui.comboBox_funcList->clear();
+    QList<Tag> tagList;
+    m_tagScanner.scan(filename, &tagList);
+    for(int tagIdx = 0;tagIdx < tagList.size();tagIdx++)
+    {
+        Tag &tag = tagList[tagIdx];
+        QString name;
+        if(tag.type == Tag::TAG_FUNC)
+        {
+            if(tag.className.isEmpty())
+                name = tag.name;
+            else
+                name = tag.className + "::" + tag.name;
+            name += tag.signature;
+
+            m_ui.comboBox_funcList->addItem(name, QVariant(tag.lineno));
+        }
+        
+    }
+
+
     // Update the current line view
     if(m_currentFile == filename)
     {
@@ -1101,6 +1129,34 @@ void MainWindow::ensureLineIsVisible(int lineIdx)
 {
     m_ui.scrollArea_codeView->ensureVisible(0, m_ui.codeView->getRowHeight()*lineIdx-1);
 
+    // Select the function in the function combobox
+    int bestFitIdx = -1;
+    int bestFitDist = -1;
+    for(int u = 0;u < m_ui.comboBox_funcList->count();u++)
+    {
+        int funcLineNo = m_ui.comboBox_funcList->itemData(u).toInt();
+        int dist = lineIdx-funcLineNo;
+        if((bestFitDist > dist || bestFitIdx == -1) && dist >= 0)
+        {
+            bestFitDist = dist;
+            bestFitIdx = u;
+        }
+    }
+
+    if(m_ui.comboBox_funcList->count() > 0)
+    {
+
+        if(bestFitIdx == -1)
+        {
+            m_ui.comboBox_funcList->hide();
+        }
+        else
+        {
+            m_ui.comboBox_funcList->show();
+            m_ui.comboBox_funcList->setCurrentIndex(bestFitIdx);
+        }
+
+    }
 }
 
 void MainWindow::ICodeView_onContextMenu(QPoint pos, QStringList text)
@@ -1193,5 +1249,16 @@ void MainWindow::ICore_onStateChanged(TargetState state)
         m_ui.autoWidget->clear();
     }
 }
+
+
+void MainWindow::onFuncListItemActivated(int index)
+{
+    int funcLineNo = m_ui.comboBox_funcList->itemData(index).toInt();
+    int lineIdx = funcLineNo-2;
+    if(lineIdx < 0)
+        lineIdx = 0;
+    m_ui.scrollArea_codeView->verticalScrollBar()->setValue(m_ui.codeView->getRowHeight()*lineIdx);
+}
+
 
     

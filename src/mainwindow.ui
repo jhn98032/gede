@@ -35,20 +35,29 @@
           </property>
          </column>
         </widget>
-        <widget class="QScrollArea" name="scrollArea_codeView">
-         <property name="widgetResizable">
-          <bool>true</bool>
-         </property>
-         <widget class="CodeView" name="codeView">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>82</width>
-            <height>254</height>
-           </rect>
-          </property>
-         </widget>
+        <widget class="QWidget" name="verticalLayoutWidget_2">
+         <layout class="QVBoxLayout" name="verticalLayout_9">
+          <item>
+           <widget class="QComboBox" name="comboBox_funcList"/>
+          </item>
+          <item>
+           <widget class="QScrollArea" name="scrollArea_codeView">
+            <property name="widgetResizable">
+             <bool>true</bool>
+            </property>
+            <widget class="CodeView" name="codeView">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>113</width>
+               <height>217</height>
+              </rect>
+             </property>
+            </widget>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </widget>
        <widget class="QTabWidget" name="tabWidget_2">

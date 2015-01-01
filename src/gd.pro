@@ -40,6 +40,9 @@ HEADERS+=opendialog.h
 SOURCES+=settings.cpp
 HEADERS+=settings.h
 
+SOURCES+=tagscanner.cpp
+HEADERS+=tagscanner.h
+
 HEADERS+=config.h
 
 SOURCES+=settingsdialog.cpp
