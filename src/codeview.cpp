@@ -194,14 +194,14 @@ void CodeView::mousePressEvent( QMouseEvent * event )
                 }
             }
             
+            QStringList list;
             if(foundPos != -1)
             {
-                QStringList list;
                 list  += cols[foundPos]->m_text;
-                
-                if(m_inf)
-                    m_inf->ICodeView_onContextMenu(pos, rowIdx, list);
             }
+            if(m_inf)
+                m_inf->ICodeView_onContextMenu(pos, rowIdx, list);
+            
         }
     }
 }
