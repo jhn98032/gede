@@ -59,7 +59,6 @@ int TagScanner::execProgram(QString name, QStringList argList,
     int n = -1;
     QProcess proc;
 
-    //qDebug() << argList;
     proc.start(name, argList, QProcess::ReadWrite);
 
     if(!proc.waitForStarted())
