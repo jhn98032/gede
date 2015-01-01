@@ -65,7 +65,10 @@ bool SyntaxHighlighter::isKeyword(QString text) const
         text == "char" ||
         text == "struct" ||
         text == "class" ||
-        
+
+        text == "static" ||
+        text == "volatile" ||
+
         text == "return" ||
         text == "new")
     {
