@@ -40,6 +40,7 @@ int main(int argc, char *argv[])
         if(strcmp(curArg, "--args") == 0)
         {
             cfg.m_connectionMode = MODE_LOCAL;
+            cfg.m_argumentList.clear();
             showConfigDialog = false;
             for(int u = i+1;u < argc;u++)
             {
