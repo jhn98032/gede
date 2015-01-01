@@ -8,18 +8,16 @@
 struct Tag
 {
     public:
-        void dump();
+        void dump() const;
 
+        QString className;
         QString name;
         QString filepath;
         enum { TAG_FUNC, TAG_VARIABLE} type;
         QString signature;
         int lineno;
-
-
-
-
 };
+
 
 class TagScanner
 {
@@ -28,14 +26,21 @@ class TagScanner
         TagScanner();
         ~TagScanner();
 
-        int scan(QString filepath);
-        void dump();
+        void init();
+
+        int scan(QString filepath, QList<Tag> *taglist);
+        void dump(const QList<Tag> &taglist);
 
     private:
-        int parseOutput(QByteArray output);
+        int parseOutput(QByteArray output, QList<Tag> *taglist);
 
 
-        QList <Tag> m_list;
+    static int execProgram(QString name, QStringList argList,
+                            QByteArray *stdoutContent,
+                            QByteArray *stderrContent);
+
+
+        bool m_ctagsExist;
 };
 
 

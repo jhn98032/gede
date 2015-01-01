@@ -3,6 +3,7 @@
 #include "log.h"
 #include "util.h"
 
+#include <QMessageBox>
 #include <QProcess>
 #include <QDebug>
 
@@ -11,10 +12,11 @@ static const char ETAGS_CMD[] = "ctags";
 static const char ETAGS_ARGS[] = "  -f - --excmd=number --fields=+nmsSk";
 
 
-void Tag::dump()
+void Tag::dump() const
 {
     qDebug() << "/------------";
     qDebug() << "Name: " << name;
+    qDebug() << "Class: " << className;
     qDebug() << "Filepath: " << filepath;
     if(TAG_VARIABLE == type)
         qDebug() << "Type: " << " variable";
@@ -49,11 +51,74 @@ TagScanner::~TagScanner()
 
 }
 
-
-int TagScanner::scan(QString filepath)
+int TagScanner::execProgram(QString name, QStringList argList,
+                            QByteArray *stdoutContent,
+                            QByteArray *stderrContent)
 {
+
     int n = -1;
     QProcess proc;
+
+    //qDebug() << argList;
+    proc.start(name, argList, QProcess::ReadWrite);
+
+    if(!proc.waitForStarted())
+    {
+        return -1;
+    }
+    proc.waitForFinished();
+
+    if(stdoutContent)
+        *stdoutContent =  proc.readAllStandardOutput();
+
+    // Get standard output
+    if(stderrContent)
+        *stderrContent = proc.readAllStandardError();
+    
+    n = proc.exitCode();
+    return n;
+
+
+}
+
+
+void TagScanner::init()
+{
+
+    // Check if ctags exists?
+    QStringList argList;
+    argList.push_back("--version");
+    QByteArray stdoutContent;
+    int n = execProgram(ETAGS_CMD, argList, &stdoutContent, NULL);
+    QStringList outputList = QString(stdoutContent).split('\n');
+    for(int u = 0;u < outputList.size();u++)
+    {
+        debugMsg("ETAGS: %s", stringToCStr(outputList[u]));
+    }
+    if(n)
+    {
+        QString msg;
+
+        msg.sprintf("Failed to start program '%s'\n", ETAGS_CMD);
+        msg += "ctags can be installed on ubuntu/debian using command:\n";
+        msg +  "\n";
+        msg += " apt-get install exuberant-ctags";
+
+        QMessageBox::warning(NULL,
+                    "Failed to start ctags",
+                    msg);
+        m_ctagsExist = false;
+    }
+    else
+        m_ctagsExist = true;
+}
+ 
+
+int TagScanner::scan(QString filepath, QList<Tag> *taglist)
+{
+    if(!m_ctagsExist)
+        return 0;
+
     QString etagsCmd;
     etagsCmd = ETAGS_ARGS;
     etagsCmd += " ";
@@ -62,26 +127,16 @@ int TagScanner::scan(QString filepath)
     QStringList argList;
     argList = etagsCmd.split(' ',  QString::SkipEmptyParts);
 
-    //qDebug() << argList;
-    proc.start(name, argList, QProcess::ReadWrite);
+    QByteArray stdoutContent;
+    QByteArray stderrContent;
+    int rc = execProgram(ETAGS_CMD, argList,
+                            &stdoutContent,
+                            &stderrContent);
 
-    if(!proc.waitForStarted())
-    {
-        errorMsg("Failed to start program '%s'", ETAGS_CMD);
-        infoMsg("ctags can be installed on ubuntu/debian using command:");
-        infoMsg("# apt-get install exuberant-ctags");
-        return -1;
-    }
-    proc.waitForFinished();
+    parseOutput(stdoutContent, taglist);
 
-
-    QByteArray output = proc.readAllStandardOutput();
-    parseOutput(output);
-
-
-    // Get standard output
-    output = proc.readAllStandardError();
-    QString all = output;
+    // Display stderr
+    QString all = stderrContent;
     if(!all.isEmpty())
     {
         QStringList outputList = all.split('\n', QString::SkipEmptyParts);
@@ -91,11 +146,10 @@ int TagScanner::scan(QString filepath)
         } 
     }
 
-    n = proc.exitCode();
-    return n;
+    return rc;
 }
 
-int TagScanner::parseOutput(QByteArray output)
+int TagScanner::parseOutput(QByteArray output, QList<Tag> *taglist)
 {
     int n = 0;
     QList<QByteArray> rowList = output.split('\n');
@@ -113,10 +167,6 @@ int TagScanner::parseOutput(QByteArray output)
         if(!row.isEmpty())
         {
             QList<QByteArray> colList = row.split('\t');
-
-
-            qDebug() << "=";
-
 
             if(colList.size() < 5)
             {
@@ -150,8 +200,10 @@ int TagScanner::parseOutput(QByteArray output)
                     {
                         QString fieldName = field.left(div);
                         QString fieldData = field.mid(div+1);
-                        qDebug() << '|' << fieldName << '|' << fieldData << '|';
+                        // qDebug() << '|' << fieldName << '|' << fieldData << '|';
 
+                        if(fieldName == "class")
+                            tag.className = fieldData;
                         if(fieldName == "signature")
                             tag.signature = fieldData;
                         else if(fieldName == "line")
@@ -159,7 +211,7 @@ int TagScanner::parseOutput(QByteArray output)
                     }
                 }
 
-                m_list.push_back(tag);
+                taglist->push_back(tag);
             }
         }
     }
@@ -168,11 +220,11 @@ int TagScanner::parseOutput(QByteArray output)
 }
 
 
-void TagScanner::dump()
+void TagScanner::dump(const QList<Tag> &taglist)
 {
-    for(int i = 0;i < m_list.size();i++)
+    for(int i = 0;i < taglist.size();i++)
     {
-        Tag &tag =   m_list[i];
+        const Tag &tag = taglist[i];
         tag.dump();
     }
 }
