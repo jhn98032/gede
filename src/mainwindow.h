@@ -11,6 +11,13 @@
 #include "settings.h"
 #include "tagscanner.h"
 
+class FileInfo
+{
+public:
+    QString name;
+    QString fullName;
+    QList<Tag> m_tagList;
+};
 
 
 class MainWindow : public QMainWindow, public ICore, public ICodeView
@@ -86,7 +93,8 @@ public slots:
     void onBreakpointsWidgetItemDoubleClicked(QTreeWidgetItem * item,int column);
     void onRun();
     void onContinue();
-    void onCodeViewContextMenuItemPressed();
+    void onCodeViewContextMenuAddWatch();
+    void onCodeViewContextMenuShowDefinition();
     void onSettings();
     void onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
     void onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
@@ -107,6 +115,7 @@ private:
 
     Settings m_cfg;
     TagScanner m_tagScanner;
+    QList<FileInfo> m_sourceFiles;
 };
 
 

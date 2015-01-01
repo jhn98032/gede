@@ -324,12 +324,28 @@ void MainWindow::insertSourceFiles()
     QTreeWidget *treeWidget = m_ui.treeWidget_file;
     Core &core = Core::getInstance();
 
+    // Get source files
     QVector <SourceFile*> sourceFiles = core.getSourceFiles();
-
+    m_sourceFiles.clear();
     for(int i = 0;i < sourceFiles.size();i++)
     {
         SourceFile* source = sourceFiles[i];
 
+        FileInfo info;
+        info.name = source->name;
+        info.fullName = source->fullName;
+        
+        m_sourceFiles.push_back(info);
+    }
+
+    
+
+    for(int i = 0;i < m_sourceFiles.size();i++)
+    {
+        FileInfo &info = m_sourceFiles[i];
+
+        m_tagScanner.scan(info.fullName, &info.m_tagList);
+        
 
         QTreeWidgetItem *item = new QTreeWidgetItem;
         QTreeWidgetItem *parentNode  = NULL;
@@ -337,13 +353,13 @@ void MainWindow::insertSourceFiles()
         // Get parent path
         QString folderPath;
         QString filename;
-        dividePath(source->name, &filename, &folderPath);
+        dividePath(info.name, &filename, &folderPath);
 
         if(!folderPath.isEmpty())
             parentNode = addTreeWidgetPath(treeWidget, NULL, folderPath);
             
         item->setText(0, filename);
-        item->setData(0, Qt::UserRole, source->fullName);
+        item->setData(0, Qt::UserRole, info.fullName);
         item->setIcon(0, m_fileIcon);
         
         if(parentNode == NULL)
@@ -1165,16 +1181,79 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, QStringList text)
     for(int i = 0;i < text.size();i++)
     {
         QAction *action;
-        action = m_popupMenu.addAction("Add '" + text[i] + "'");
+        action = m_popupMenu.addAction("Watch '" + text[i] + "'");
         action->setData(text[i]);
-        connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuItemPressed()));
+        connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuAddWatch()));
+
+    }
+
+    for(int i = 0;i < text.size();i++)
+    {
+        QAction *action;
+        QString tagName = text[i];
+        int pos = tagName.lastIndexOf('.');
+        if(pos != -1)
+            tagName = tagName.mid(pos+1);
+        action = m_popupMenu.addAction("Show definition of '" + tagName + "'");
+        action->setData(tagName);
+        connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuShowDefinition()));
 
     }
     
     m_popupMenu.popup(pos);
 }
 
-void MainWindow::onCodeViewContextMenuItemPressed()
+
+void MainWindow::onCodeViewContextMenuShowDefinition()
+{
+    Tag *foundTag = NULL;
+    QString foundFilepath;
+    
+    // Get the selected function name
+    QAction *action = static_cast<QAction *>(sender ());
+    QString funcName = action->data().toString();
+
+    // Loop through all the source files
+    for(int i = 0;i < m_sourceFiles.size();i++)
+    {
+        FileInfo& fileInfo = m_sourceFiles[i];
+
+        // Loop through all the tags
+        for(int j = 0;j < fileInfo.m_tagList.size();j++)
+        {
+            Tag &tagInfo = fileInfo.m_tagList[j];
+            QString tagName = tagInfo.name;
+            
+            // Tag match?
+            if(tagName == funcName)
+            {
+                foundTag = &tagInfo;
+                foundFilepath = fileInfo.fullName;
+            }
+        }
+    }
+
+    //
+    if(foundTag)
+    {
+        // Open file
+        open(foundFilepath);            
+
+        // Scroll to the function
+        int lineIdx = foundTag->lineno-2;
+        if(lineIdx < 0)
+            lineIdx = 0;
+        m_ui.scrollArea_codeView->verticalScrollBar()->setValue(m_ui.codeView->getRowHeight()*lineIdx);
+
+
+        // Select the function in the function combobox
+        int idx = m_ui.comboBox_funcList->findData(QVariant(foundTag->lineno));
+        m_ui.comboBox_funcList->setCurrentIndex(idx);
+    }
+}
+
+
+void MainWindow::onCodeViewContextMenuAddWatch()
 {
     // Get the selected variable name
     QAction *action = static_cast<QAction *>(sender ());
