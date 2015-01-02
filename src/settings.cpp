@@ -25,6 +25,25 @@ void Settings::load(QString filepath)
     m_fontFamily = tmpIni.getString("Font","Monospace");
     m_fontSize = tmpIni.getInt("FontSize", 8);
 
+    m_reloadBreakpoints = tmpIni.getBool("ReuseBreakpoints", false);
+
+    //
+    QStringList breakpointStringList;
+    breakpointStringList = tmpIni.getStringList("Breakpoints", breakpointStringList);
+    for(int i = 0;i < breakpointStringList.size();i++)
+    {
+        QString str = breakpointStringList[i];
+        if(str.indexOf(':') != -1)
+        {
+            SettingsBreakpoint bkptCfg;
+            bkptCfg.filename = str.left(str.indexOf(':'));
+            bkptCfg.lineno = str.mid(str.indexOf(':')+1).toInt();
+            
+            m_breakpoints.push_back(bkptCfg);
+        }
+    }
+
+
 }
  
 void Settings::save(QString filepath)
@@ -45,6 +64,25 @@ void Settings::save(QString filepath)
     
     tmpIni.setString("Font", m_fontFamily);
     tmpIni.setInt("FontSize", m_fontSize);
+
+    tmpIni.setBool("ReuseBreakpoints", m_reloadBreakpoints);
+
+
+    //
+    QStringList breakpointStringList;
+    for(int i = 0;i < m_breakpoints.size();i++)
+    {
+        SettingsBreakpoint bkptCfg = m_breakpoints[i];
+        QString field;
+        field = bkptCfg.filename;
+        field += ":";
+        QString linenoStr;
+        linenoStr.sprintf("%d", bkptCfg.lineno);
+        field += linenoStr;
+        breakpointStringList.push_back(field);
+    }
+    tmpIni.setStringList("Breakpoints", breakpointStringList);
+
 
     tmpIni.save(filepath);
 

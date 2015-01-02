@@ -992,12 +992,27 @@ void MainWindow::ICore_onCurrentThreadChanged(int threadId)
 }
 
 
+
+
 void MainWindow::ICore_onBreakpointsChanged()
 {
     Core &core = Core::getInstance();
     QList<BreakPoint*>  bklist = core.getBreakPoints();
     QVector<int> numList;
 
+
+    // Update the settings
+    m_cfg.m_breakpoints.clear();
+    for(int u = 0;u < bklist.size();u++)
+    {
+        BreakPoint* bkpt = bklist[u];
+        SettingsBreakpoint bkptCfg;
+        bkptCfg.filename = bkpt->fullname;
+        bkptCfg.lineno = bkpt->lineno;
+        m_cfg.m_breakpoints.push_back(bkptCfg);
+    }
+    m_cfg.save(CONFIG_FILENAME);
+    
 
     // Update the breakpoint list widget
     m_ui.treeWidget_breakpoints->clear();

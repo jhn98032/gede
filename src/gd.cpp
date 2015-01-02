@@ -16,12 +16,28 @@ static int dumpUsage()
                     "Usage: gd --args PROGRAM_NAME",
                     QMessageBox::Ok, QMessageBox::Ok);
       */
-    printf("Usage: gd --args PROGRAM_NAME [PROGRAM_ARGUMENTS...]\n"
+    printf("Usage: gd [OPTIONS] [--args PROGRAM_NAME [PROGRAM_ARGUMENTS...]]\n"
+                "--no-show-config / --show-config   Shows the configuration window at startup."
            "\n"
            );
     
     return -1;  
 }
+
+
+/**
+ * @brief Loads the breakpoints from the settings file and set the breakpoints.
+ */
+void loadBreakpoints(Settings &cfg, Core &core)
+{
+    for(int i = 0;i < cfg.m_breakpoints.size();i++)
+    {
+        SettingsBreakpoint bkptCfg = cfg.m_breakpoints[i];
+        core.gdbSetBreakpoint(bkptCfg.filename, bkptCfg.lineno);
+    }
+}
+
+    
 
 /**
  * @brief Main program entry.
@@ -41,7 +57,6 @@ int main(int argc, char *argv[])
         {
             cfg.m_connectionMode = MODE_LOCAL;
             cfg.m_argumentList.clear();
-            showConfigDialog = false;
             for(int u = i+1;u < argc;u++)
             {
                 if(u == i+1)
@@ -51,6 +66,10 @@ int main(int argc, char *argv[])
             }
             argc = i;
         }
+        else if(strcmp(curArg, "--show-config") == 0)
+            showConfigDialog = true;
+        else if(strcmp(curArg, "--no-show-config") == 0)
+            showConfigDialog = false;
         else if(strcmp(curArg, "--help") == 0)
         {
             return dumpUsage();
@@ -99,10 +118,12 @@ int main(int argc, char *argv[])
 
     if(rc)
         return rc;
-        
-    
+
     w.insertSourceFiles();
-    
+
+    if(cfg.m_reloadBreakpoints)
+        loadBreakpoints(cfg, core);
+
     w.show();
 
     return app.exec();

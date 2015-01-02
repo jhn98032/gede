@@ -11,6 +11,15 @@ enum ConnectionMode
     
 };
 
+class SettingsBreakpoint
+{
+public:
+    
+    QString filename;
+    int lineno;
+};
+
+
 class Settings
 {
     public:
@@ -31,8 +40,9 @@ class Settings
         QString m_lastProgram;
         QString m_fontFamily;
         int m_fontSize;
-    
+        bool m_reloadBreakpoints;
 
+        QList<SettingsBreakpoint> m_breakpoints;
 };
 
 #endif // FILE_SETTINGS_H

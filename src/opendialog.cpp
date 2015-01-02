@@ -195,6 +195,13 @@ void OpenDialog::saveConfig(Settings *cfg)
     cfg->m_initCommands = dlg.getInitCommands();
     cfg->m_gdbPath = dlg.getGdbPath();
 
+    if(dlg.m_ui.checkBox_reloadBreakpoints->checkState() == Qt::Checked)
+        cfg->m_reloadBreakpoints = true;
+    else
+        cfg->m_reloadBreakpoints = false;
+    
+    
+
 }
 
 void OpenDialog::loadConfig(Settings &cfg)
@@ -207,6 +214,8 @@ void OpenDialog::loadConfig(Settings &cfg)
     dlg.setTcpRemoteProgram(cfg.m_tcpProgram);
     dlg.setInitCommands(cfg.m_initCommands);
     dlg.setGdbPath(cfg.m_gdbPath);
+
+    dlg.m_ui.checkBox_reloadBreakpoints->setChecked(cfg.m_reloadBreakpoints);
 
     dlg.setProgram(cfg.m_lastProgram);
     QStringList defList;
