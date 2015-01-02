@@ -103,6 +103,12 @@ void Ini::setInt(QString name, int value)
     entry->value.sprintf("%d", value);
 }
 
+void Ini::setBool(QString name, bool value)
+{
+    Entry *entry = addEntry(name);
+    entry->value.sprintf("%d", (int)value);
+}
+
 void Ini::setString(QString name, QString value)
 {
     Entry *entry = addEntry(name);
@@ -121,6 +127,18 @@ int Ini::getInt(QString name, int defaultValue)
     if(!entry)
     {
         setInt(name, defaultValue);
+        entry = findEntry(name);
+    }
+    return entry->value.toInt();
+}
+
+
+bool Ini::getBool(QString name, bool defaultValue)
+{
+    Entry *entry = findEntry(name);
+    if(!entry)
+    {
+        setBool(name, defaultValue);
         entry = findEntry(name);
     }
     return entry->value.toInt();

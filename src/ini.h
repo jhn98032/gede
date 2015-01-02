@@ -30,6 +30,9 @@ public:
     void setInt(QString name, int value);
     void setString(QString name, QString value);
     void setStringList(QString name, QStringList value);
+    void setBool(QString name, bool value);
+    
+    bool getBool(QString name, bool defaultValue = false);
     int getInt(QString name, int defaultValue = -1);
     QColor getColor(QString name, QColor defaultValue);
     QString getString(QString name, QString defaultValue = "");
