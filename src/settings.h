@@ -28,7 +28,8 @@ class Settings
         void load(QString filepath);
         void save(QString filepath);
 
-
+        static QStringList getDefaultKeywordList();
+        
     public:
         QStringList m_argumentList;
         ConnectionMode m_connectionMode;

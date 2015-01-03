@@ -4,6 +4,7 @@
 #include <QVector>
 #include <QString>
 #include <QColor>
+#include <QHash>
 
 struct TextField
 {
@@ -18,8 +19,8 @@ struct TextField
 class SyntaxHighlighter
 {
 public:
-    SyntaxHighlighter() {};
-    ~SyntaxHighlighter();
+    SyntaxHighlighter();
+    virtual ~SyntaxHighlighter();
     
     void colorize(QString rowText);
 
@@ -41,7 +42,7 @@ private:
 
 private:
     QVector <Row*> m_rows;
-    
+    QHash <QString, bool> m_keywords;
 };
 
 #endif // #ifndef FILE__SYNTAXHIGHLIGHTER

@@ -4,8 +4,19 @@
 #include <assert.h>
 #include <QStringList>
 #include "util.h"
+#include "settings.h"
 
 #include <stdio.h>
+
+
+SyntaxHighlighter::SyntaxHighlighter()
+{
+    QStringList keywordList = Settings::getDefaultKeywordList();
+    for(int u = 0;u < keywordList.size();u++)
+    {
+        m_keywords[keywordList[u]] = true;
+    }
+}
 
 SyntaxHighlighter::~SyntaxHighlighter()
 {
@@ -43,34 +54,7 @@ bool SyntaxHighlighter::isKeyword(QString text) const
 {
     if(text.size() == 0)
         return false;
-    if(text == "if" ||
-       text == "for" ||
-       text == "while" ||
-        text == "switch" ||
-        text == "case" ||
-        text == "else" ||
-        text == "do" ||
-
-        text == "false" ||
-        text == "true" ||
-
-        text == "unsigned" ||
-        text == "bool" ||
-        text == "int" ||
-        text == "short" ||
-        text == "long" ||
-        text == "float" ||
-        text == "double" ||
-        text == "void" ||
-        text == "char" ||
-        text == "struct" ||
-        text == "class" ||
-
-        text == "static" ||
-        text == "volatile" ||
-
-        text == "return" ||
-        text == "new")
+    if(m_keywords.contains(text))
     {
         return true;
     }

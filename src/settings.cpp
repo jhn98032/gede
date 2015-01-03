@@ -88,4 +88,34 @@ void Settings::save(QString filepath)
 
 }
          
-        
+
+QStringList Settings::getDefaultKeywordList()
+{
+    QStringList keywordList;
+    keywordList += "if";
+    keywordList += "for";
+    keywordList += "while";
+    keywordList += "switch";
+    keywordList += "case";
+    keywordList += "else";
+    keywordList += "do";
+    keywordList += "false";
+    keywordList += "true";
+    keywordList += "unsigned";
+    keywordList += "bool";
+    keywordList += "int";
+    keywordList += "short";
+    keywordList += "long";
+    keywordList += "float";
+    keywordList += "double";
+    keywordList += "void";
+    keywordList += "char";
+    keywordList += "struct";
+    keywordList += "class";
+    keywordList += "static";
+    keywordList += "volatile";
+    keywordList += "return";
+    keywordList += "new";
+    return keywordList;
+}
+
