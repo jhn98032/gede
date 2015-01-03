@@ -3,6 +3,9 @@
 
 #include <QString>
 
+#define MIN(a,b) ((a)<(b))
+#define MAX(a,b) ((a)>(b))
+
 //#define stringToCStr(str) str.toAscii().constData()
 #define stringToCStr(str) qPrintable(str)
 
