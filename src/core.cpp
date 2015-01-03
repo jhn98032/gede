@@ -79,7 +79,7 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
         com.command(NULL, commandStr);
     }
     
-    gdbInsertBreakPoint("main");
+    gdbSetBreakpointAtFunc("main");
 
     gdbGetFiles();
 
@@ -147,7 +147,7 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
     }
     
 
-    gdbInsertBreakPoint("main");
+    gdbSetBreakpointAtFunc("main");
     
     gdbGetFiles();
 
@@ -220,7 +220,7 @@ void Core::gdbGetFiles()
 }
 
 
-void Core::gdbInsertBreakPoint(QString func)
+void Core::gdbSetBreakpointAtFunc(QString func)
 {
     Com& com = Com::getInstance();
     Tree resultData;
