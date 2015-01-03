@@ -1203,13 +1203,22 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int rowIdx, QStringList tex
     m_popupMenu.clear();
     for(int i = 0;i < text.size();i++)
     {
-        action = m_popupMenu.addAction("Watch '" + text[i] + "'");
+        action = m_popupMenu.addAction("Add '" + text[i] + "' to watch list");
         action->setData(text[i]);
         connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuAddWatch()));
 
     }
 
-    for(int i = 0;i < text.size();i++)
+    // Add 'toggle breakpoint'
+    QString title;
+    title.sprintf("Toggle breakpoint at L%d", rowIdx+1);
+    action = m_popupMenu.addAction(title);
+    action->setData(rowIdx);
+    connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuToggleBreakpoint()));
+
+    action = m_popupMenu.addSeparator();
+    
+    for(int i = 0;i < MIN(text.size(),20);i++)
     {
         QString tagName = text[i];
         int pos = tagName.lastIndexOf('.');
@@ -1221,13 +1230,11 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int rowIdx, QStringList tex
 
     }
 
-    // Add 'toggle breakpoint'
-    QString title;
-    title.sprintf("Toggle breakpoint at L%d", rowIdx+1);
-    action = m_popupMenu.addAction(title);
-    action->setData(rowIdx);
-    connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuToggleBreakpoint()));
     
+    // Add 'Show current PC location'
+    title = "Show current PC location";
+    action = m_popupMenu.addAction(title);
+    connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuShowCurrentLocation()));
 
     
     m_popupMenu.popup(pos);
@@ -1247,6 +1254,15 @@ void MainWindow::onCodeViewContextMenuToggleBreakpoint()
     else
         core.gdbSetBreakpoint(m_filename, lineno);
 
+}
+
+
+void MainWindow::onCodeViewContextMenuShowCurrentLocation()
+{
+    // Open file
+    open(m_currentFile);
+
+    ensureLineIsVisible(m_currentLine);    
 }
 
 

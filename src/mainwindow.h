@@ -95,6 +95,7 @@ public slots:
     void onContinue();
     void onCodeViewContextMenuAddWatch();
     void onCodeViewContextMenuShowDefinition();
+    void onCodeViewContextMenuShowCurrentLocation();
     void onSettings();
     void onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
     void onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
