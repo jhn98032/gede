@@ -101,6 +101,7 @@ QStringList Settings::getDefaultKeywordList()
     keywordList += "do";
     keywordList += "false";
     keywordList += "true";
+    
     keywordList += "unsigned";
     keywordList += "bool";
     keywordList += "int";
@@ -111,6 +112,7 @@ QStringList Settings::getDefaultKeywordList()
     keywordList += "void";
     keywordList += "char";
     keywordList += "struct";
+
     keywordList += "class";
     keywordList += "static";
     keywordList += "volatile";
