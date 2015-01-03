@@ -118,6 +118,8 @@ QStringList Settings::getDefaultKeywordList()
     keywordList += "volatile";
     keywordList += "return";
     keywordList += "new";
+    keywordList += "const";
+    
 
     keywordList += "uint32_t";
     keywordList += "uint16_t";
