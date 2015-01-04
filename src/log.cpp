@@ -4,7 +4,7 @@
 
 
 
-void debugMsg_(const char *filename, int lineno, const char *fmt, ...)
+void debugMsg_(const char *filename, int lineNo, const char *fmt, ...)
 {
     va_list ap;
     char buffer[1024];
@@ -19,7 +19,7 @@ void debugMsg_(const char *filename, int lineno, const char *fmt, ...)
 
     printf("%2d.%03d| DEBUG | %s:%d| %s\n",
         curTime.second()%100, curTime.msec(),
-        filename, lineno, buffer);
+        filename, lineNo, buffer);
 }
 
 

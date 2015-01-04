@@ -42,7 +42,7 @@ void Tag::dump() const
 
 
     qDebug() << "Sig: " << m_signature;
-    qDebug() << "Line: " <<lineno;
+    qDebug() << "Line: " <<lineNo;
     qDebug() << "\\------------";
 
 }
@@ -225,7 +225,7 @@ int TagScanner::parseOutput(QByteArray output, QList<Tag> *taglist)
                             tag.m_signature = fieldData;
                         }
                         else if(fieldName == "line")
-                            tag.lineno = fieldData.toInt();
+                            tag.lineNo = fieldData.toInt();
                     }
                 }
 

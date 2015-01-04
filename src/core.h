@@ -42,7 +42,7 @@ public:
 
     int m_number;
     QString fullname;
-    int lineno;
+    int lineNo;
     QString m_funcName;
     unsigned long long m_addr;
     
@@ -80,7 +80,7 @@ class ICore
         SIGKILL,
         SIGUNKNOWN
     };
-    virtual void ICore_onStopped(StopReason reason, QString path, int lineno) = 0;
+    virtual void ICore_onStopped(StopReason reason, QString path, int lineNo) = 0;
     virtual void ICore_onStateChanged(TargetState state) = 0;
     virtual void ICore_onSignalReceived(QString signalName) = 0;
     virtual void ICore_onLocalVarReset() = 0;
@@ -150,7 +150,7 @@ public:
     int gdbAddVarWatch(QString varName, QString *varType, QString *value, int *watchId);
     void gdbRemoveVarWatch(int vatchId);
     QString gdbGetVarWatchName(int vatchId);
-    void gdbSetBreakpoint(QString filename, int lineno);
+    void gdbSetBreakpoint(QString filename, int lineNo);
     void gdbGetThreadList();
     void getStackFrames();
     void stop();
@@ -160,7 +160,7 @@ public:
 
     // Breakpoints
     QList<BreakPoint*> getBreakPoints() { return m_breakpoints; };
-    BreakPoint* findBreakPoint(QString fullPath, int lineno);
+    BreakPoint* findBreakPoint(QString fullPath, int lineNo);
     BreakPoint* findBreakPointByNumber(int number);
     void gdbRemoveBreakpoint(BreakPoint* bkpt);
 

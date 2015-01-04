@@ -219,7 +219,7 @@ int Ini::save(QString filename)
  */
 int Ini::appendLoad(QString filename)
 {
-    int lineNr = 1;
+    int lineNo = 1;
     QString str;
     QString name;
     QString value;
@@ -244,12 +244,12 @@ int Ini::appendLoad(QString filename)
             {
                 if(c == QChar('='))
                 {
-                    errorMsg("Empty key at L%d", lineNr);
+                    errorMsg("Empty key at L%d", lineNo);
                     state = SKIP_LINE;
                 }
                 else if(c == QChar('\n') || c == QChar('\r'))
                 {
-                    lineNr++;
+                    lineNo++;
                 }
                 else if(c.isSpace())
                 {
@@ -270,8 +270,8 @@ int Ini::appendLoad(QString filename)
             {
                 if(c == QChar('\n') || c == QChar('\r'))
                 {
-                    errorMsg("Parse error at L%d", lineNr);
-                    lineNr++;
+                    errorMsg("Parse error at L%d", lineNo);
+                    lineNo++;
                     state = IDLE;
                 }
                 else if(c == QChar('='))
@@ -288,7 +288,7 @@ int Ini::appendLoad(QString filename)
             {
                 if(c == QChar('\n') || c == QChar('\r'))
                 {
-                    lineNr++;
+                    lineNo++;
 
                     Entry *entry = addEntry(name.trimmed());
                     entry->value = value.trimmed();
@@ -312,7 +312,7 @@ int Ini::appendLoad(QString filename)
             {
                 if(c == QChar('"'))
                 {
-                    lineNr++;
+                    lineNo++;
 
                     Entry *entry = addEntry(name.trimmed());
                     entry->value = value.trimmed();
@@ -327,7 +327,7 @@ int Ini::appendLoad(QString filename)
             {
                 if(c == QChar('\n') || c == QChar('\r'))
                 {
-                    lineNr++;
+                    lineNo++;
                     state = IDLE;
                 }
             };break;

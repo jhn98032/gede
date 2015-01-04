@@ -37,7 +37,7 @@ void Settings::load(QString filepath)
         {
             SettingsBreakpoint bkptCfg;
             bkptCfg.filename = str.left(str.indexOf(':'));
-            bkptCfg.lineno = str.mid(str.indexOf(':')+1).toInt();
+            bkptCfg.lineNo = str.mid(str.indexOf(':')+1).toInt();
             
             m_breakpoints.push_back(bkptCfg);
         }
@@ -76,9 +76,9 @@ void Settings::save(QString filepath)
         QString field;
         field = bkptCfg.filename;
         field += ":";
-        QString linenoStr;
-        linenoStr.sprintf("%d", bkptCfg.lineno);
-        field += linenoStr;
+        QString lineNoStr;
+        lineNoStr.sprintf("%d", bkptCfg.lineNo);
+        field += lineNoStr;
         breakpointStringList.push_back(field);
     }
     tmpIni.setStringList("Breakpoints", breakpointStringList);

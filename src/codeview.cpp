@@ -75,8 +75,8 @@ void CodeView::paintEvent ( QPaintEvent * event )
     // Show breakpoints
     for(int j = 0;j < m_breakpointList.size();j++)
     {
-        int lineno = m_breakpointList[j];
-        int rowIdx = lineno-1;
+        int lineNo = m_breakpointList[j];
+        int rowIdx = lineNo-1;
         int y = rowHeight*rowIdx;
         QRect rect2(5,y,BORDER_WIDTH-10,rowHeight);
         painter.fillRect(rect2, Qt::blue);
@@ -131,11 +131,11 @@ void CodeView::disableCurrentLine()
 
 /**
  * @brief Sets the current line.
- * @param lineno   The line (1=first).
+ * @param lineNo   The line (1=first).
  */
-void CodeView::setCurrentLine(int lineno)
+void CodeView::setCurrentLine(int lineNo)
 {
-    m_cursorY = lineno;
+    m_cursorY = lineNo;
     update();
 }
 
@@ -157,7 +157,7 @@ void CodeView::mousePressEvent( QMouseEvent * event )
         QPoint pos = event->globalPos();
         int rowHeight = getRowHeight();
         int rowIdx = event->pos().y() / rowHeight;
-        int lineno = rowIdx+1;
+        int lineNo = rowIdx+1;
         if(rowIdx >= 0 && rowIdx < (int)m_highlighter.getRowCount())
         {
             // Get the words in the line
@@ -201,7 +201,7 @@ void CodeView::mousePressEvent( QMouseEvent * event )
                 list  += cols[foundPos]->m_text;
             }
             if(m_inf)
-                m_inf->ICodeView_onContextMenu(pos, lineno, list);
+                m_inf->ICodeView_onContextMenu(pos, lineNo, list);
             
         }
     }
@@ -214,10 +214,10 @@ void CodeView::mouseDoubleClickEvent( QMouseEvent * event )
 
     if(event->x() < BORDER_WIDTH)
     {
-        int lineno = (event->y()/rowHeight)+1;
+        int lineNo = (event->y()/rowHeight)+1;
 
         if(m_inf)
-            m_inf->ICodeView_onRowDoubleClick(lineno);
+            m_inf->ICodeView_onRowDoubleClick(lineNo);
     }
 }
 

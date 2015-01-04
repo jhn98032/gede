@@ -20,7 +20,7 @@ class Tag
         QString filepath;
         enum { TAG_FUNC, TAG_VARIABLE} type;
         QString m_signature;
-        int lineno;
+        int lineNo;
 };
 
 

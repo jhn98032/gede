@@ -11,8 +11,8 @@ class ICodeView
     public:
     ICodeView(){};
 
-    virtual void ICodeView_onRowDoubleClick(int lineno) = 0;
-    virtual void ICodeView_onContextMenu(QPoint pos, int lineno, QStringList text) = 0;
+    virtual void ICodeView_onRowDoubleClick(int lineNo) = 0;
+    virtual void ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList text) = 0;
     
 
 };
@@ -32,7 +32,7 @@ public:
     void setConfig(Settings *cfg);
     void paintEvent ( QPaintEvent * event );
 
-    void setCurrentLine(int lineno);
+    void setCurrentLine(int lineNo);
     void disableCurrentLine();
     
     void setInterface(ICodeView *inf) { m_inf = inf; };

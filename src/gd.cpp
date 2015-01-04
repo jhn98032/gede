@@ -33,7 +33,7 @@ void loadBreakpoints(Settings &cfg, Core &core)
     for(int i = 0;i < cfg.m_breakpoints.size();i++)
     {
         SettingsBreakpoint bkptCfg = cfg.m_breakpoints[i];
-        core.gdbSetBreakpoint(bkptCfg.filename, bkptCfg.lineno);
+        core.gdbSetBreakpoint(bkptCfg.filename, bkptCfg.lineNo);
     }
 }
 

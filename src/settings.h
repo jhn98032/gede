@@ -16,7 +16,7 @@ class SettingsBreakpoint
 public:
     
     QString filename;
-    int lineno;
+    int lineNo;
 };
 
 

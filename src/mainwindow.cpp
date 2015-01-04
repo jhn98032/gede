@@ -213,9 +213,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 /**
  * @brief Execution has stopped.
- * @param lineno   The line which is about to execute (1=first).
+ * @param lineNo   The line which is about to execute (1=first).
  */
-void MainWindow::ICore_onStopped(ICore::StopReason reason, QString path, int lineno)
+void MainWindow::ICore_onStopped(ICore::StopReason reason, QString path, int lineNo)
 {
     Q_UNUSED(reason);
 
@@ -227,7 +227,7 @@ void MainWindow::ICore_onStopped(ICore::StopReason reason, QString path, int lin
     }
     
     m_currentFile = path;
-    m_currentLine = lineno;
+    m_currentLine = lineNo;
     if(!path.isEmpty())
     {
         open(path);
@@ -451,17 +451,17 @@ void MainWindow::ICore_onWatchVarChanged(int watchId, QString name, QString valu
 
 /**
  * @brief User doubleclicked on the border
- * @param lineno    The line pressed (1=first row).
+ * @param lineNo    The line pressed (1=first row).
  */
-void MainWindow::ICodeView_onRowDoubleClick(int lineno)
+void MainWindow::ICodeView_onRowDoubleClick(int lineNo)
 {
     Core &core = Core::getInstance();
 
-    BreakPoint* bkpt = core.findBreakPoint(m_filename, lineno);
+    BreakPoint* bkpt = core.findBreakPoint(m_filename, lineNo);
     if(bkpt)
         core.gdbRemoveBreakpoint(bkpt);
     else
-        core.gdbSetBreakpoint(m_filename, lineno);
+        core.gdbSetBreakpoint(m_filename, lineNo);
 }
 
     
@@ -859,7 +859,7 @@ void MainWindow::open(QString filename)
         Tag &tag = tagList[tagIdx];
         if(tag.type == Tag::TAG_FUNC)
         {
-            m_ui.comboBox_funcList->addItem(tag.getLongName(), QVariant(tag.lineno));
+            m_ui.comboBox_funcList->addItem(tag.getLongName(), QVariant(tag.lineNo));
         }
         
     }
@@ -1005,7 +1005,7 @@ void MainWindow::ICore_onBreakpointsChanged()
         BreakPoint* bkpt = bklist[u];
         SettingsBreakpoint bkptCfg;
         bkptCfg.filename = bkpt->fullname;
-        bkptCfg.lineno = bkpt->lineno;
+        bkptCfg.lineNo = bkpt->lineNo;
         m_cfg.m_breakpoints.push_back(bkptCfg);
     }
     m_cfg.save(CONFIG_FILENAME);
@@ -1021,7 +1021,7 @@ void MainWindow::ICore_onBreakpointsChanged()
         QString name;
         nameList.append(getFilenamePart(bk->fullname));
         nameList.append(bk->m_funcName);
-        name.sprintf("%d", bk->lineno);
+        name.sprintf("%d", bk->lineNo);
         nameList.append(name);
         nameList.append(longLongToHexString(bk->m_addr));
         
@@ -1042,7 +1042,7 @@ void MainWindow::ICore_onBreakpointsChanged()
         BreakPoint* bk = bklist[i];
 
         if(bk->fullname == m_filename)
-            numList.push_back(bk->lineno);
+            numList.push_back(bk->lineNo);
     }
     m_ui.codeView->setBreakpoints(numList);
     m_ui.codeView->update();
@@ -1148,7 +1148,7 @@ void MainWindow::onBreakpointsWidgetItemDoubleClicked(QTreeWidgetItem * item,int
 
     open(bk->fullname);
     
-    ensureLineIsVisible(bk->lineno);
+    ensureLineIsVisible(bk->lineNo);
     
 }
     
@@ -1190,10 +1190,10 @@ void MainWindow::ensureLineIsVisible(int lineIdx)
 
 /**
  * @brief User right clicked in the codeview.
- * @param lineno    The row (1=first row).
+ * @param lineNo    The row (1=first row).
  *
  */
-void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineno, QStringList text)
+void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList text)
 {
     QAction *action;
     int totalItemCount = 0;
@@ -1209,9 +1209,9 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineno, QStringList tex
 
     // Add 'toggle breakpoint'
     QString title;
-    title.sprintf("Toggle breakpoint at L%d", lineno);
+    title.sprintf("Toggle breakpoint at L%d", lineNo);
     action = m_popupMenu.addAction(title);
-    action->setData(lineno);
+    action->setData(lineNo);
     connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuToggleBreakpoint()));
 
     action = m_popupMenu.addSeparator();
@@ -1242,11 +1242,11 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineno, QStringList tex
 
                     if(totalItemCount++ < 20)
                     {
-                        // Get filename and lineno
+                        // Get filename and lineNo
                         QStringList defList;
                         defList.push_back(fileInfo.fullName);
                         QString lineNoStr;
-                        lineNoStr.sprintf("%d", tagInfo.lineno);
+                        lineNoStr.sprintf("%d", tagInfo.lineNo);
                         defList.push_back(lineNoStr);
 
                         // Add to popupmenu
@@ -1273,14 +1273,14 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineno, QStringList tex
 void MainWindow::onCodeViewContextMenuToggleBreakpoint()
 {
     QAction *action = static_cast<QAction *>(sender ());
-    int lineno = action->data().toInt();
+    int lineNo = action->data().toInt();
     Core &core = Core::getInstance();
 
-    BreakPoint* bkpt = core.findBreakPoint(m_filename, lineno);
+    BreakPoint* bkpt = core.findBreakPoint(m_filename, lineNo);
     if(bkpt)
         core.gdbRemoveBreakpoint(bkpt);
     else
-        core.gdbSetBreakpoint(m_filename, lineno);
+        core.gdbSetBreakpoint(m_filename, lineNo);
 
 }
 
@@ -1300,7 +1300,7 @@ void MainWindow::onCodeViewContextMenuShowDefinition()
     QAction *action = static_cast<QAction *>(sender ());
     QStringList list = action->data().toStringList();
 
-    // Get filepath and lineno
+    // Get filepath and lineNo
     if(list.size() != 2)
         return;
     QString foundFilepath = list[0];

@@ -490,7 +490,7 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
 
 
         QString p = tree.getString("frame/fullname");
-        int lineno = tree.getInt("frame/line");
+        int lineNo = tree.getInt("frame/line");
 
         // Get the reason
         QString reasonString = tree.getString("reason");
@@ -517,7 +517,7 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
                 m_inf->ICore_onSignalReceived(signalName);  
             }
             else
-                m_inf->ICore_onStopped(reason, p, lineno);
+                m_inf->ICore_onStopped(reason, p, lineNo);
 
             m_inf->ICore_onFrameVarReset();
 
@@ -599,14 +599,14 @@ void Core::gdbGetThreadList()
 }
 
 
-BreakPoint* Core::findBreakPoint(QString fullPath, int lineno)
+BreakPoint* Core::findBreakPoint(QString fullPath, int lineNo)
 {
     for(int i = 0;i < m_breakpoints.size();i++)
     {
         BreakPoint *bkpt = m_breakpoints[i];
 
     
-        if(bkpt->lineno == lineno && fullPath == bkpt->fullname)
+        if(bkpt->lineNo == lineNo && fullPath == bkpt->fullname)
         {
             return bkpt;
         }
@@ -634,7 +634,7 @@ BreakPoint* Core::findBreakPointByNumber(int number)
 
 void Core::dispatchBreakpointTree(Tree &tree)
 {
-    int lineno = tree.getInt("bkpt/line");
+    int lineNo = tree.getInt("bkpt/line");
     int number = tree.getInt("bkpt/number");
                 
 
@@ -644,7 +644,7 @@ void Core::dispatchBreakpointTree(Tree &tree)
         bkpt = new BreakPoint(number);
         m_breakpoints.push_back(bkpt);
     }
-    bkpt->lineno = lineno;
+    bkpt->lineNo = lineNo;
     bkpt->fullname = tree.getString("bkpt/fullname");
     bkpt->m_funcName = tree.getString("bkpt/func");
     bkpt->m_addr = tree.getLongLong("bkpt/addr");
@@ -735,7 +735,7 @@ void Core::onResult(Tree &tree)
         else if(rootName == "frame")
         {
             QString p = tree.getString("frame/fullname");
-            int lineno = tree.getInt("frame/line");
+            int lineNo = tree.getInt("frame/line");
             int frameIdx = tree.getInt("frame/level");
             ICore::StopReason  reason = ICore::UNKNOWN;
              
@@ -744,7 +744,7 @@ void Core::onResult(Tree &tree)
             if(m_inf)
             {
 
-                m_inf->ICore_onStopped(reason, p, lineno);
+                m_inf->ICore_onStopped(reason, p, lineNo);
 
                 m_inf->ICore_onFrameVarReset();
 
@@ -865,14 +865,14 @@ void Core::onLogStreamOutput(QString str)
         infoMsg("GDB | Log-stream | %s", stringToCStr(list[i]));
 }
 
-void Core::gdbSetBreakpoint(QString filename, int lineno)
+void Core::gdbSetBreakpoint(QString filename, int lineNo)
 {
     Com& com = Com::getInstance();
     Tree resultData;
     
     assert(filename != "");
     
-    com.commandF(&resultData, "-break-insert %s:%d", stringToCStr(filename), lineno);
+    com.commandF(&resultData, "-break-insert %s:%d", stringToCStr(filename), lineNo);
 
 }
 

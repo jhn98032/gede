@@ -35,7 +35,7 @@ public:
     void insertSourceFiles();
     
 public:
-    void ICore_onStopped(ICore::StopReason reason, QString path, int lineno);
+    void ICore_onStopped(ICore::StopReason reason, QString path, int lineNo);
     void ICore_onLocalVarReset();
     void ICore_onLocalVarChanged(QString name, QString data);
     void ICore_onWatchVarChanged(int watchId, QString name, QString value);
@@ -52,8 +52,8 @@ public:
     void ICore_onTargetOutput(QString msg);
     void ICore_onStateChanged(TargetState state);
     
-    void ICodeView_onRowDoubleClick(int lineno);
-    void ICodeView_onContextMenu(QPoint pos, int lineno, QStringList text);
+    void ICodeView_onRowDoubleClick(int lineNo);
+    void ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList text);
 private:
     enum DispFormat
     {
