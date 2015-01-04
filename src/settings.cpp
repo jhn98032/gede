@@ -1,6 +1,8 @@
 #include "settings.h"
-
+#include "util.h"
+#include "log.h"
 #include "ini.h"
+
 
 Settings::Settings()
 : m_connectionMode(MODE_LOCAL)
@@ -12,7 +14,9 @@ Settings::Settings()
 void Settings::load(QString filepath)
 {
     Ini tmpIni;
-    tmpIni.appendLoad(filepath);
+    if(tmpIni.appendLoad(filepath))
+        infoMsg("Failed to load '%s'. File will be created.", stringToCStr(filepath));
+
     m_connectionMode = tmpIni.getInt("Mode", MODE_LOCAL) == MODE_LOCAL ? MODE_LOCAL : MODE_TCP;
     m_tcpPort = tmpIni.getInt("TcpPort", 2000);
     m_tcpHost = tmpIni.getString("TcpHost", "localhost");
@@ -84,7 +88,8 @@ void Settings::save(QString filepath)
     tmpIni.setStringList("Breakpoints", breakpointStringList);
 
 
-    tmpIni.save(filepath);
+    if(tmpIni.save(filepath))
+        infoMsg("Failed to save '%s'", stringToCStr(filepath));
 
 }
          
