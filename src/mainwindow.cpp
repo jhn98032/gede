@@ -829,23 +829,27 @@ void MainWindow::onFolderViewItemActivated ( QTreeWidgetItem * item, int column 
 
 void MainWindow::open(QString filename)
 {
-    //qDebug() << filename;
-
-    m_ui.scrollArea_codeView->setWidgetResizable(true);
-
-    setWindowTitle(getFilenamePart(filename));
+    if(filename.isEmpty())
+        return;
 
     QString text;
 
     // Read file content
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-         return;
+    {
+        errorMsg("Failed to open '%s'", stringToCStr(filename));
+        return;
+    }
     while (!file.atEnd())
     {
          QByteArray line = file.readLine();
          text += line;
      }
+
+    m_ui.scrollArea_codeView->setWidgetResizable(true);
+
+    setWindowTitle(getFilenamePart(filename));
 
     m_filename = filename;
     m_ui.codeView->setPlainText(text);
