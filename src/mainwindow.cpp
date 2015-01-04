@@ -853,16 +853,9 @@ void MainWindow::open(QString filename)
     for(int tagIdx = 0;tagIdx < tagList.size();tagIdx++)
     {
         Tag &tag = tagList[tagIdx];
-        QString name;
         if(tag.type == Tag::TAG_FUNC)
         {
-            if(tag.className.isEmpty())
-                name = tag.name;
-            else
-                name = tag.className + "::" + tag.name;
-            name += tag.signature;
-
-            m_ui.comboBox_funcList->addItem(name, QVariant(tag.lineno));
+            m_ui.comboBox_funcList->addItem(tag.getLongName(), QVariant(tag.lineno));
         }
         
     }
@@ -1199,6 +1192,7 @@ void MainWindow::ensureLineIsVisible(int lineIdx)
 void MainWindow::ICodeView_onContextMenu(QPoint pos, int rowIdx, QStringList text)
 {
     QAction *action;
+    int totalItemCount = 0;
 
     m_popupMenu.clear();
     for(int i = 0;i < text.size();i++)
@@ -1218,16 +1212,47 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int rowIdx, QStringList tex
 
     action = m_popupMenu.addSeparator();
     
-    for(int i = 0;i < MIN(text.size(),20);i++)
-    {
-        QString tagName = text[i];
-        int pos = tagName.lastIndexOf('.');
-        if(pos != -1)
-            tagName = tagName.mid(pos+1);
-        action = m_popupMenu.addAction("Show definition of '" + tagName + "'");
-        action->setData(tagName);
-        connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuShowDefinition()));
 
+    for(int k = 0;k < text.size();k++)
+    {
+        // Get the tag to look for
+        QString wantedTag = text[k];
+        if(wantedTag.lastIndexOf('.') != -1)
+            wantedTag = wantedTag.mid(wantedTag.lastIndexOf('.')+1);
+
+        
+        // Loop through all the source files
+        for(int i = 0;i < m_sourceFiles.size();i++)
+        {
+            FileInfo& fileInfo = m_sourceFiles[i];
+
+            // Loop through all the tags
+            for(int j = 0;j < fileInfo.m_tagList.size();j++)
+            {
+                Tag &tagInfo = fileInfo.m_tagList[j];
+                QString tagName = tagInfo.m_name;
+                
+                // Tag match?
+                if(tagName == wantedTag)
+                {
+
+                    if(totalItemCount++ < 20)
+                    {
+                        // Get filename and lineno
+                        QStringList defList;
+                        defList.push_back(fileInfo.fullName);
+                        QString lineNoStr;
+                        lineNoStr.sprintf("%d", tagInfo.lineno);
+                        defList.push_back(lineNoStr);
+
+                        // Add to popupmenu
+                        action = m_popupMenu.addAction("Show definition of '" + tagInfo.getLongName() + "'");
+                        action->setData(defList);
+                        connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuShowDefinition()));
+                    }
+                }
+            }
+        }
     }
 
     
@@ -1268,50 +1293,31 @@ void MainWindow::onCodeViewContextMenuShowCurrentLocation()
 
 void MainWindow::onCodeViewContextMenuShowDefinition()
 {
-    Tag *foundTag = NULL;
-    QString foundFilepath;
-    
     // Get the selected function name
     QAction *action = static_cast<QAction *>(sender ());
-    QString funcName = action->data().toString();
+    QStringList list = action->data().toStringList();
 
-    // Loop through all the source files
-    for(int i = 0;i < m_sourceFiles.size();i++)
-    {
-        FileInfo& fileInfo = m_sourceFiles[i];
+    // Get filepath and lineno
+    if(list.size() != 2)
+        return;
+    QString foundFilepath = list[0];
+    int lineNo = list[1].toInt();
 
-        // Loop through all the tags
-        for(int j = 0;j < fileInfo.m_tagList.size();j++)
-        {
-            Tag &tagInfo = fileInfo.m_tagList[j];
-            QString tagName = tagInfo.name;
-            
-            // Tag match?
-            if(tagName == funcName)
-            {
-                foundTag = &tagInfo;
-                foundFilepath = fileInfo.fullName;
-            }
-        }
-    }
+    // Open file
+    open(foundFilepath);            
 
-    //
-    if(foundTag)
-    {
-        // Open file
-        open(foundFilepath);            
-
-        // Scroll to the function
-        int lineIdx = foundTag->lineno-2;
-        if(lineIdx < 0)
-            lineIdx = 0;
-        m_ui.scrollArea_codeView->verticalScrollBar()->setValue(m_ui.codeView->getRowHeight()*lineIdx);
+    // Scroll to the function
+    int showLineNo = lineNo-1;
+    if(showLineNo < 0)
+        showLineNo = 0;
+    m_ui.scrollArea_codeView->verticalScrollBar()->setValue(m_ui.codeView->getRowHeight()*showLineNo);
 
 
-        // Select the function in the function combobox
-        int idx = m_ui.comboBox_funcList->findData(QVariant(foundTag->lineno));
+    // Select the function in the function combobox
+    int idx = m_ui.comboBox_funcList->findData(QVariant(lineNo));
+    if(idx >= 0)
         m_ui.comboBox_funcList->setCurrentIndex(idx);
-    }
+
 }
 
 

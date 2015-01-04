@@ -11,11 +11,28 @@
 static const char ETAGS_CMD[] = "ctags";
 static const char ETAGS_ARGS[] = "  -f - --excmd=number --fields=+nmsSk";
 
+Tag::Tag()
+: m_signature("()")
+{
+}
+
+
+QString Tag::getLongName() const
+{
+    QString longName;
+    if(this->className.isEmpty())
+        longName = m_name;
+    else
+        longName = this->className + "::" + m_name;
+    longName += this->m_signature;
+    return longName;
+}
+
 
 void Tag::dump() const
 {
     qDebug() << "/------------";
-    qDebug() << "Name: " << name;
+    qDebug() << "Name: " << m_name;
     qDebug() << "Class: " << className;
     qDebug() << "Filepath: " << filepath;
     if(TAG_VARIABLE == type)
@@ -24,7 +41,7 @@ void Tag::dump() const
         qDebug() << "Type: " << " function";
 
 
-    qDebug() << "Sig: " << signature;
+    qDebug() << "Sig: " << m_signature;
     qDebug() << "Line: " <<lineno;
     qDebug() << "\\------------";
 
@@ -177,7 +194,7 @@ int TagScanner::parseOutput(QByteArray output, QList<Tag> *taglist)
 
                 Tag tag;
 
-                tag.name = colList[0];
+                tag.m_name = colList[0];
                 tag.filepath = colList[1];
                 QString type = colList[3];
                 if(type == "v")
@@ -204,7 +221,9 @@ int TagScanner::parseOutput(QByteArray output, QList<Tag> *taglist)
                         if(fieldName == "class")
                             tag.className = fieldData;
                         if(fieldName == "signature")
-                            tag.signature = fieldData;
+                        {
+                            tag.m_signature = fieldData;
+                        }
                         else if(fieldName == "line")
                             tag.lineno = fieldData.toInt();
                     }

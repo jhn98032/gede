@@ -5,16 +5,21 @@
 #include <QList>
 
 
-struct Tag
+
+class Tag
 {
     public:
+        Tag();
         void dump() const;
 
+        QString getLongName() const;
+        QString getSignature() const { return m_signature; };
+        
         QString className;
-        QString name;
+        QString m_name;
         QString filepath;
         enum { TAG_FUNC, TAG_VARIABLE} type;
-        QString signature;
+        QString m_signature;
         int lineno;
 };
 
