@@ -448,10 +448,14 @@ void MainWindow::ICore_onWatchVarChanged(int watchId, QString name, QString valu
 
 }
 
-void MainWindow::ICodeView_onRowDoubleClick(int rowIdx)
+
+/**
+ * @brief User doubleclicked on the border
+ * @param lineno    The line pressed (1=first row).
+ */
+void MainWindow::ICodeView_onRowDoubleClick(int lineno)
 {
     Core &core = Core::getInstance();
-    int lineno = rowIdx+1;
 
     BreakPoint* bkpt = core.findBreakPoint(m_filename, lineno);
     if(bkpt)
@@ -1186,10 +1190,10 @@ void MainWindow::ensureLineIsVisible(int lineIdx)
 
 /**
  * @brief User right clicked in the codeview.
- * @param rowIdx    The row (0=first row).
+ * @param lineno    The row (1=first row).
  *
  */
-void MainWindow::ICodeView_onContextMenu(QPoint pos, int rowIdx, QStringList text)
+void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineno, QStringList text)
 {
     QAction *action;
     int totalItemCount = 0;
@@ -1205,9 +1209,9 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int rowIdx, QStringList tex
 
     // Add 'toggle breakpoint'
     QString title;
-    title.sprintf("Toggle breakpoint at L%d", rowIdx+1);
+    title.sprintf("Toggle breakpoint at L%d", lineno);
     action = m_popupMenu.addAction(title);
-    action->setData(rowIdx);
+    action->setData(lineno);
     connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuToggleBreakpoint()));
 
     action = m_popupMenu.addSeparator();
@@ -1269,9 +1273,8 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int rowIdx, QStringList tex
 void MainWindow::onCodeViewContextMenuToggleBreakpoint()
 {
     QAction *action = static_cast<QAction *>(sender ());
-    int rowIdx = action->data().toInt();
+    int lineno = action->data().toInt();
     Core &core = Core::getInstance();
-    int lineno = rowIdx+1;
 
     BreakPoint* bkpt = core.findBreakPoint(m_filename, lineno);
     if(bkpt)

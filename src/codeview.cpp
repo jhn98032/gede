@@ -157,6 +157,7 @@ void CodeView::mousePressEvent( QMouseEvent * event )
         QPoint pos = event->globalPos();
         int rowHeight = getRowHeight();
         int rowIdx = event->pos().y() / rowHeight;
+        int lineno = rowIdx+1;
         if(rowIdx >= 0 && rowIdx < (int)m_highlighter.getRowCount())
         {
             // Get the words in the line
@@ -200,7 +201,7 @@ void CodeView::mousePressEvent( QMouseEvent * event )
                 list  += cols[foundPos]->m_text;
             }
             if(m_inf)
-                m_inf->ICodeView_onContextMenu(pos, rowIdx, list);
+                m_inf->ICodeView_onContextMenu(pos, lineno, list);
             
         }
     }
@@ -213,10 +214,10 @@ void CodeView::mouseDoubleClickEvent( QMouseEvent * event )
 
     if(event->x() < BORDER_WIDTH)
     {
-        int rowIdx = event->y()/rowHeight;
+        int lineno = (event->y()/rowHeight)+1;
 
         if(m_inf)
-            m_inf->ICodeView_onRowDoubleClick(rowIdx);
+            m_inf->ICodeView_onRowDoubleClick(lineno);
     }
 }
 

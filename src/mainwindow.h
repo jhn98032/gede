@@ -52,8 +52,8 @@ public:
     void ICore_onTargetOutput(QString msg);
     void ICore_onStateChanged(TargetState state);
     
-    void ICodeView_onRowDoubleClick(int rowIdx);
-    void ICodeView_onContextMenu(QPoint pos, int rowIdx, QStringList text);
+    void ICodeView_onRowDoubleClick(int lineno);
+    void ICodeView_onContextMenu(QPoint pos, int lineno, QStringList text);
 private:
     enum DispFormat
     {
