@@ -74,6 +74,54 @@ QString longLongToHexString(long long num)
 }
 
 
+static QString priv_simplifySubPath(QString path)
+{
+    QString out;
+
+    if(path.startsWith('/'))
+        return simplifyPath(path.mid(1));
+    if(path.startsWith("./"))
+        return simplifyPath(path.mid(2));
+
+    QString first;
+    QString rest;
+
+    int piv = path.indexOf('/');
+    if(piv == -1)
+        return path;
+    else
+    {
+        first = path.left(piv);
+        rest = path.mid(piv+1);
+        rest = priv_simplifySubPath(rest);
+        if(rest.isEmpty())
+            path = first;
+        else
+            path = first + "/" + rest;
+    }
+    return path;
+}
+
+
+/**
+ * @brief Simplifies a path by removing unnecessary seperators.
+ *
+ * Eg: simplifyPath("./a///path/") => "./a/path".
+ */
+QString simplifyPath(QString path)
+{
+    QString out;
+    if(path.startsWith("./"))
+        out = "./" + priv_simplifySubPath(path.mid(2));
+    else if(path.startsWith('/'))
+        out = '/' + priv_simplifySubPath(path.mid(1));
+    else
+        out = priv_simplifySubPath(path);
+    return out;
+}
+
+
+
 #ifdef NEVER
 void testFuncs()
 {

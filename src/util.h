@@ -16,6 +16,8 @@ void dividePath(QString fullPath, QString *filename, QString *folderPath);
 long long stringToLongLong(const char* str);
 QString longLongToHexString(long long num);
 
+QString simplifyPath(QString path);
+
 
 #endif // FILE__UTIL_H
 

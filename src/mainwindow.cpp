@@ -267,6 +267,12 @@ QTreeWidgetItem *MainWindow::addTreeWidgetPath(QTreeWidget *treeWidget, QTreeWid
         restPath = path.mid(divPos+1);
     }
 
+    // Handle "../" paths
+    if(firstName == ".." && parent != NULL)
+    {
+        return addTreeWidgetPath(treeWidget, parent->parent(), restPath);
+    }
+    
     // Empty name and only a path?
     if(firstName.isEmpty())
     {
@@ -318,7 +324,9 @@ QTreeWidgetItem *MainWindow::addTreeWidgetPath(QTreeWidget *treeWidget, QTreeWid
 }
 
 
-    
+/**
+ * @brief Fills in the source file treeview.
+ */
 void MainWindow::insertSourceFiles()
 {
     QTreeWidget *treeWidget = m_ui.treeWidget_file;
@@ -354,7 +362,8 @@ void MainWindow::insertSourceFiles()
         QString folderPath;
         QString filename;
         dividePath(info.name, &filename, &folderPath);
-
+        folderPath = simplifyPath(folderPath);
+        
         if(!folderPath.isEmpty())
             parentNode = addTreeWidgetPath(treeWidget, NULL, folderPath);
             
