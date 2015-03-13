@@ -88,6 +88,7 @@ if __name__ == "__main__":
                 exit(1)
             try:
                 shutil.copyfile("gede", g_dest_path + "/bin/gede")
+                os.chmod(g_dest_path + "/bin/gede", 0775);
             except:
                 print("Failed to install files to " + g_dest_path)
                 raise
