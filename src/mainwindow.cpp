@@ -910,7 +910,7 @@ QString MainWindow::valueDisplay(long long val, DispFormat format)
 void MainWindow::onWatchWidgetItemExpanded(QTreeWidgetItem *item )
 {
     Core &core = Core::getInstance();
-    QTreeWidget *varWidget = m_ui.varWidget;
+    //QTreeWidget *varWidget = m_ui.varWidget;
 
     // Get watchid of the item
     QString watchId = item->data(0, Qt::UserRole).toString();
@@ -924,7 +924,8 @@ void MainWindow::onWatchWidgetItemExpanded(QTreeWidgetItem *item )
 
 void MainWindow::onWatchWidgetItemCollapsed(QTreeWidgetItem *item)
 {
-
+    Q_UNUSED(item);
+    
 }
 
 
