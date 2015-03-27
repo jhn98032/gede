@@ -34,6 +34,9 @@ public:
     QString fullName;
 };
 
+/**
+ * @brief A breakpoint.
+ */
 class BreakPoint
 {
 public:
@@ -49,6 +52,22 @@ public:
 private:
     BreakPoint(){};
 };
+
+
+/**
+ * @brief The value of a variable.
+ */
+class CoreVarValue
+{
+public:
+    CoreVarValue(QString str) { m_str = str; };
+
+    QString toString() { return m_str; };
+
+    Tree *toTree();
+    QString m_str;
+};
+
 
 
 class ICore
@@ -84,10 +103,10 @@ class ICore
     virtual void ICore_onStateChanged(TargetState state) = 0;
     virtual void ICore_onSignalReceived(QString signalName) = 0;
     virtual void ICore_onLocalVarReset() = 0;
-    virtual void ICore_onLocalVarChanged(QString name, QString value) = 0;
+    virtual void ICore_onLocalVarChanged(QString name, CoreVarValue value) = 0;
     virtual void ICore_onFrameVarReset() = 0;
     virtual void ICore_onFrameVarChanged(QString name, QString value) = 0;
-    virtual void ICore_onWatchVarChanged(int watchId, QString name, QString value) = 0;
+    virtual void ICore_onWatchVarChanged(QString watchId, QString name, QString value) = 0;
     virtual void ICore_onConsoleStream(QString text) = 0;
     virtual void ICore_onBreakpointsChanged() = 0;
     virtual void ICore_onThreadListChanged() = 0;
@@ -96,13 +115,14 @@ class ICore
     virtual void ICore_onMessage(QString message) = 0;
     virtual void ICore_onTargetOutput(QString message) = 0;
     virtual void ICore_onCurrentFrameChanged(int frameIdx) = 0;
+    virtual void ICore_onWatchVarExpanded(QString watchId, QString name, QString valueString, QString varType) = 0;
     
 };
 
 struct VarWatch
 {
     QString name;
-    int id;
+    QString watchId;
 };
     
 
@@ -147,13 +167,14 @@ public:
     void gdbContinue();
     void gdbRun();
     void gdbGetFiles();
-    int gdbAddVarWatch(QString varName, QString *varType, QString *value, int *watchId);
-    void gdbRemoveVarWatch(int vatchId);
-    QString gdbGetVarWatchName(int vatchId);
+    int gdbAddVarWatch(QString varName, QString *varType, QString *value, QString *watchId);
+    void gdbRemoveVarWatch(QString watchId);
+    QString gdbGetVarWatchName(QString watchId);
     void gdbSetBreakpoint(QString filename, int lineNo);
     void gdbGetThreadList();
     void getStackFrames();
     void stop();
+    void gdbExpandVarWatchChildren(QString watchId);
     
     void selectThread(int threadId);
     void selectFrame(int selectedFrameIdx);
@@ -183,7 +204,7 @@ private:
     ICore::TargetState m_lastTargetState;
     int m_pid;
     int m_currentFrameIdx;
-    QMap <int, VarWatch> m_watchList;
+    QMap <QString, VarWatch> m_watchList;
     int m_varWatchLastId;
 
     int m_ptsFd;

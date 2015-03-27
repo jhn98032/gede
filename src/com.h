@@ -166,6 +166,7 @@ class Com : public QObject
         GdbResult commandF(Tree *resultData, const char *cmd, ...);
         GdbResult command(Tree *resultData, QString cmd);
 
+        static QList<Token*> tokenize(QString str);
 
     private:
         int parseAsyncOutput(Resp *resp, ComListener::AsyncClass *ac);
@@ -189,7 +190,6 @@ class Com : public QObject
     private:
         void readFromGdb(GdbResult *m_result, Tree *m_resultData);
         void decodeGdbResponse();
-        QList<Token*> tokenize(QString str);
         Token* pop_token();
         Token* peek_token();
         Token* checkToken(Token::Type type);

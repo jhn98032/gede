@@ -939,7 +939,7 @@ GdbResult Com::command(Tree *resultData, QString text)
     if(resultData == NULL)
         resultData = &resultDataNull;
     
-    debugMsg("# Cmd: %s", stringToCStr(text));
+    debugMsg("# Cmd: '%s'", stringToCStr(text));
 
     GdbResult result;
     

@@ -37,8 +37,8 @@ public:
 public:
     void ICore_onStopped(ICore::StopReason reason, QString path, int lineNo);
     void ICore_onLocalVarReset();
-    void ICore_onLocalVarChanged(QString name, QString data);
-    void ICore_onWatchVarChanged(int watchId, QString name, QString value);
+    void ICore_onLocalVarChanged(QString name, CoreVarValue varValue);
+    void ICore_onWatchVarChanged(QString watchId, QString name, QString value);
     void ICore_onConsoleStream(QString text);
     void ICore_onBreakpointsChanged();
     void ICore_onThreadListChanged();
@@ -51,9 +51,10 @@ public:
     void ICore_onSignalReceived(QString sigtype);
     void ICore_onTargetOutput(QString msg);
     void ICore_onStateChanged(TargetState state);
-    
     void ICodeView_onRowDoubleClick(int lineNo);
     void ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList text);
+    void ICore_onWatchVarExpanded(QString watchId, QString name, QString valueString, QString varType);
+
 private:
     enum DispFormat
     {
@@ -68,8 +69,12 @@ private:
         QString orgValue;
         DispFormat orgFormat;
         DispFormat dispFormat;
+        bool isExpanded;
     }DispInfo;
 
+    typedef QMap<QString, DispInfo>  DispInfoMap;
+    
+private:
 
     QTreeWidgetItem *addTreeWidgetPath(QTreeWidget *treeWidget, QTreeWidgetItem *parent, QString path);
     void fillInStack();
@@ -78,7 +83,17 @@ private:
     void loadConfig();
     DispFormat findVarType(QString dataString);
     QString valueDisplay(long long value, DispFormat format);
-    
+    QTreeWidgetItem *insertTreeWidgetItem(
+                    DispInfoMap *map,
+                    QString fullPath,
+                    QString name,
+                    QString value);
+    void addVariableDataTree(
+                QTreeWidget *treeWidget,
+                DispInfoMap *map,
+                QTreeWidgetItem *item, TreeNode *rootNode);
+
+
 public slots:
     void onFolderViewItemActivated ( QTreeWidgetItem * item, int column );
     void onWatchWidgetCurrentItemChanged ( QTreeWidgetItem * current, int column );
@@ -99,9 +114,13 @@ public slots:
     void onSettings();
     void onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
     void onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
+    void onAutoWidgetItemCollapsed(QTreeWidgetItem *item);
+    void onAutoWidgetItemExpanded(QTreeWidgetItem *item);
     void onFuncListItemActivated(int index);
     void onCodeViewContextMenuToggleBreakpoint();
-    
+    void onWatchWidgetItemExpanded(QTreeWidgetItem *item );
+    void onWatchWidgetItemCollapsed(QTreeWidgetItem *item);
+
     
 private:
     Ui_MainWindow m_ui;
@@ -112,8 +131,8 @@ private:
     int m_currentLine; //!< The linenumber (first=1) which the program counter points to.
     QList<StackFrameEntry> m_stackFrameList;
     QMenu m_popupMenu;
-    QMap<QString, DispInfo> m_watchVarDispInfo;
-    QMap<QString, DispInfo> m_autoVarDispInfo;
+    DispInfoMap m_watchVarDispInfo;
+    DispInfoMap m_autoVarDispInfo;
 
     Settings m_cfg;
     TagScanner m_tagScanner;

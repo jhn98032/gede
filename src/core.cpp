@@ -11,6 +11,104 @@
 #include <signal.h>
 
 
+void parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
+{
+    Token *token = tokenList->takeFirst();
+    TreeNode *childNode = NULL;
+    
+    if(token->getType() == Token::KEY_LEFT_BRACE)
+    {
+        
+        do
+        {
+
+            // Get name
+            Token *nameTok = tokenList->takeFirst();
+        
+
+            // Get equal sign
+            Token *eqToken = tokenList->takeFirst();
+            if(eqToken->getType() == Token::KEY_EQUAL)
+            {
+
+                // Create treenode
+                childNode = new TreeNode;
+                childNode->setName(nameTok->getString());
+                thisNode->addChild(childNode);
+
+                // Get variable data
+                parseVariableData(childNode, tokenList);
+
+                // End of the data
+                token = tokenList->takeFirst();
+            }
+            else if(eqToken->getType() == Token::KEY_COMMA)
+            {
+                
+            }
+            else
+            {
+                errorMsg("Unknown token. Expected '=', Got:'%s'", stringToCStr(eqToken->getString()));
+
+                // End of the data
+                token = tokenList->takeFirst();
+            }
+            
+        }while(token != NULL && token->getType() == Token::KEY_COMMA);
+
+        //
+        if(token == NULL || token->getType() != Token::KEY_RIGHT_BRACE)
+            errorMsg("Unknown token. Expected '}', Got:'%s'", stringToCStr(token->getString()));
+    }
+    else
+    {
+        thisNode->setData(token->getString());
+    }
+
+    
+}
+
+
+Tree* CoreVarValue::toTree()
+{
+    Tree *tree = NULL;
+    
+    QList<Token*> tokenList = Com::tokenize(m_str);
+
+    QList<Token*> orgList = tokenList;
+    Token* token;
+
+        token = tokenList.front();
+
+    if(tokenList.size() > 1)
+    {
+        if(token->getType() == Token::KEY_LEFT_BRACE)
+        {
+            tree = new Tree;
+
+            parseVariableData(tree->getRoot(), &tokenList);
+
+
+        }
+        else
+        {
+            errorMsg("Unknown token. Expected '{', Got:'%s' ", stringToCStr(token->getString()));
+        }
+        
+    }
+    else
+    {
+        //errorMsg("Unknown token ('%s')", stringToCStr(token->getString()));
+    }
+
+    for(int i = 0;i < orgList.size();i++)
+    {
+        Token *tok = orgList[i];
+        delete tok;
+    }
+    return tree;
+}
+
 
 
 Core::Core()
@@ -351,17 +449,19 @@ Core& Core::getInstance()
 }
 
 
-int Core::gdbAddVarWatch(QString varName, QString *varType, QString *value, int *watchId_)
+int Core::gdbAddVarWatch(QString varName, QString *varType, QString *value, QString *watchId_)
 {
     Com& com = Com::getInstance();
     Tree resultData;
-    int watchId = m_varWatchLastId++;
+    QString watchId;
     GdbResult res;
     int rc = 0;
-    
+
+    watchId.sprintf("w%d", m_varWatchLastId++);
+
     assert(varName.isEmpty() == false);
     
-    res = com.commandF(&resultData, "-var-create w%d * %s", watchId, stringToCStr(varName));
+    res = com.commandF(&resultData, "-var-create %s @ %s", stringToCStr(watchId), stringToCStr(varName));
     if(res == GDB_ERROR)
     {
         rc = -1;
@@ -375,9 +475,11 @@ int Core::gdbAddVarWatch(QString varName, QString *varType, QString *value, int 
     QString varType2 = resultData.getString("type");
 
 
+    // debugMsg("%s = %s = %s\n", stringToCStr(varName2),stringToCStr(varValue2), stringToCStr(varType2));
+
     VarWatch w;
     w.name = varName;
-    w.id = watchId;
+    w.watchId = watchId;
     m_watchList[watchId] = w;
     
     *varType = varType2;
@@ -390,20 +492,55 @@ int Core::gdbAddVarWatch(QString varName, QString *varType, QString *value, int 
 }
 
 
-QString Core::gdbGetVarWatchName(int watchId)
+void Core::gdbExpandVarWatchChildren(QString watchId)
+{
+    int res;
+    Tree resultData;
+    Com& com = Com::getInstance();
+
+    // Get the variable name
+//    QString varName = m_watchList[watchId].name;
+
+    // Request its children
+    res = com.commandF(&resultData, "-var-list-children --all-values %s", stringToCStr(watchId));
+
+    if(res != 0)
+    {
+        return;
+    }
+
+        
+    // Enumerate the children
+    QStringList childList = resultData.getChildList("children");
+    for(int i = 0;i < childList.size();i++)
+    {
+        // Get name and value
+        QString treePath;
+        treePath.sprintf("children/#%d",i+1);
+        QString childName = resultData.getString(treePath + "/name");
+        QString childExp = resultData.getString(treePath + "/exp");
+        QString childValue = resultData.getString(treePath + "/value");
+        QString childType = resultData.getString(treePath + "/type");
+        m_inf->ICore_onWatchVarExpanded(childName, childExp, childValue, childType);
+    }
+    
+}
+
+
+QString Core::gdbGetVarWatchName(QString watchId)
 {
     return m_watchList[watchId].name;
 }
 
-void Core::gdbRemoveVarWatch(int watchId)
+void Core::gdbRemoveVarWatch(QString watchId)
 {
     Com& com = Com::getInstance();
     Tree resultData;
     
-    assert(watchId != -1);
+    assert(watchId != "");
     
     
-    QMap <int, VarWatch>::iterator pos = m_watchList.find(watchId);
+    QMap <QString, VarWatch>::iterator pos = m_watchList.find(watchId);
     if(pos == m_watchList.end())
     {
         assert(0);
@@ -412,7 +549,7 @@ void Core::gdbRemoveVarWatch(int watchId)
     {
         m_watchList.erase(pos);
     
-        com.commandF(&resultData, "-var-delete w%d", watchId);
+        com.commandF(&resultData, "-var-delete %s", stringToCStr(watchId));
     }
 }
 
@@ -541,7 +678,7 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
     {
         m_targetState = ICore::TARGET_RUNNING;
 
-        debugMsg("is running\n");
+        debugMsg("is running");
     }
 
     // Get the current thread
@@ -673,7 +810,7 @@ void Core::onResult(Tree &tree)
             {
                 QString path;
                 path.sprintf("changelist/%d/name", j+1);
-                int watchId = tree.getString(path).mid(1).toInt();
+                QString watchId = tree.getString(path);
                 path.sprintf("changelist/%d/value", j+1);
                 QString varValue = tree.getString(path);
 
@@ -802,7 +939,8 @@ void Core::onResult(Tree &tree)
                     path.sprintf("locals/%d/value", j+1);
                     QString varData = tree.getString(path);
 
-                    m_inf->ICore_onLocalVarChanged(varName, varData);
+                    CoreVarValue val(varData);
+                    m_inf->ICore_onLocalVarChanged(varName, val);
                     
                 }
             }
