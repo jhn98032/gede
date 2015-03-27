@@ -71,7 +71,7 @@ if __name__ == "__main__":
         if do_build:
             if not os.path.exists("Makefile"):
                 print("Generating makefile")
-                if subprocess.call(['qmake']):
+                if subprocess.call(['qmake-qt4']):
                     exit(1)
 
             print("Compiling (please wait)")
