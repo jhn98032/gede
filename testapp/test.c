@@ -11,8 +11,22 @@ struct
     struct 
     {
         int b;
+        struct
+        {
+            int d;
+        }c;
     };
 } glob_struct;
+
+struct
+{
+    int a;
+    struct 
+    {
+        int b;
+    };
+} g;
+
 
 // Single row comment
 
@@ -70,6 +84,10 @@ int main(int argc, char*argv[])
     char *str = "hej";
 
     local_struct.a = 3;
+    local_struct.a++;
+    local_struct.a++;
+
+
 
     printf("Hej1\n");
     printf("Hej2\n");
@@ -79,7 +97,8 @@ int main(int argc, char*argv[])
     glob_struct.a = 1;
     glob_struct.a = 2;
     glob_struct.a = 3;
-    
+    glob_struct.c.d = 3;
+
 
 
 
