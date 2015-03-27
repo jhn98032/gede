@@ -812,6 +812,14 @@ MainWindow::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int colu
     {
         //debugMsg("'%s' -> %s", stringToCStr(current->text(0)), stringToCStr(current->text(0)));
 
+        // Remove any children
+        while(current->childCount())
+        {
+            QTreeWidgetItem *childItem =  current->takeChild(0);
+            delete childItem;
+        }
+        
+
         // Remove old watch
         core.gdbRemoveVarWatch(oldKey);
 
@@ -826,6 +834,12 @@ MainWindow::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int colu
             current->setText(1, value);
             current->setText(2, varType);
 
+            if(varType == "struct {...}")
+            {
+                current->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
+            }
+            core.gdbExpandVarWatchChildren(watchId);
+            
             // Add display information
             DispInfo dispInfo;
             dispInfo.orgValue = value;
