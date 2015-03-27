@@ -4,6 +4,16 @@
 #include "subdir/subfile.h"
 #include <pthread.h>
 
+
+struct
+{
+    int a;
+    struct 
+    {
+        int b;
+    };
+} glob_struct;
+
 // Single row comment
 
 /**
@@ -50,7 +60,12 @@ int main(int argc, char*argv[])
      pthread_t th;
     struct {
         int a;
-        int b;
+        char *b_str;
+        struct
+        {
+            int sub_a;
+            int sub_b;
+        }sub1;
     }local_struct;
     char *str = "hej";
 
@@ -61,6 +76,10 @@ int main(int argc, char*argv[])
     printf("Hej3\n");
     printf("Hej4\n");
 
+    glob_struct.a = 1;
+    glob_struct.a = 2;
+    glob_struct.a = 3;
+    
 
 
 
