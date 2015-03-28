@@ -333,6 +333,36 @@ void WatchVarCtl::fillInVars()
 
 }
 
+void WatchVarCtl::addNewWatch(QString varName)
+{
+    // Add the new variable to the watch list
+    QTreeWidgetItem* rootItem = m_varWidget->invisibleRootItem();
+    QTreeWidgetItem* lastItem = rootItem->child(rootItem->childCount()-1);
+    lastItem->setText(0, varName);
 
+}
+
+void WatchVarCtl::deleteSelected()
+{
+    QList<QTreeWidgetItem *> items = m_varWidget->selectedItems();
+
+    for(int i =0;i < items.size();i++)
+    {
+        QTreeWidgetItem *item = items[i];
+    
+        // Delete the item
+        Core &core = Core::getInstance();
+        QTreeWidgetItem *rootItem = m_varWidget->invisibleRootItem();
+        QString watchId = item->data(0, Qt::UserRole).toString();
+        if(watchId != "")
+        {
+            rootItem->removeChild(item);
+            core.gdbRemoveVarWatch(watchId);
+        }
+    }
+
+}
+
+    
 
     

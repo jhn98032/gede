@@ -18,6 +18,8 @@ public:
     void setWidget(QTreeWidget *varWidget);
 
     void ICore_onWatchVarExpanded(QString watchId_, QString name, QString valueString, QString varType);
+    void addNewWatch(QString varName);
+    void deleteSelected();
 
 public slots:
     void onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);

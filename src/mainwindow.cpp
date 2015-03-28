@@ -170,22 +170,8 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         // 'Delete' key pressed in the var widget 
         if(widget == m_ui.varWidget && keyEvent->key() == Qt::Key_Delete)
         {
-            QList<QTreeWidgetItem *> items = m_ui.varWidget->selectedItems();
-
-            for(int i =0;i < items.size();i++)
-            {
-                QTreeWidgetItem *item = items[i];
+            m_watchVarCtl.deleteSelected();
             
-                // Delete the item
-                Core &core = Core::getInstance();
-                QTreeWidgetItem *rootItem = m_ui.varWidget->invisibleRootItem();
-                QString watchId = item->data(0, Qt::UserRole).toString();
-                if(watchId != "")
-                {
-                    rootItem->removeChild(item);
-                    core.gdbRemoveVarWatch(watchId);
-                }
-            }
         }
         
         //qDebug() << "key " << keyEvent->key() << " from " << obj << "focus " << widget;
@@ -996,11 +982,8 @@ void MainWindow::onCodeViewContextMenuAddWatch()
     QAction *action = static_cast<QAction *>(sender ());
     QString varName = action->data().toString();
 
+    m_watchVarCtl.addNewWatch(varName);
     
-    // Add the new variable to the watch list
-    QTreeWidgetItem* rootItem = m_ui.varWidget->invisibleRootItem();
-    QTreeWidgetItem* lastItem = rootItem->child(rootItem->childCount()-1);
-    lastItem->setText(0, varName);
     
 }
 
