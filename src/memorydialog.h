@@ -5,12 +5,14 @@
 #include <QDialog>
 
 
-class MemoryDialog : public QDialog
+class MemoryDialog : public QDialog, public IMemoryWidget
 {
     Q_OBJECT
 public:
     MemoryDialog(QWidget *parent = NULL);
 
+    virtual QByteArray getMemory(unsigned int startAddress, int count);
+    
 public slots:
     void onVertScroll(int pos);
     

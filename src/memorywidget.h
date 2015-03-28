@@ -5,6 +5,12 @@
 #include <QFont>
 #include <QScrollBar>
 
+class IMemoryWidget
+{
+public:
+    virtual QByteArray getMemory(unsigned int startAddress, int count) = 0;
+
+};
 
 class MemoryWidget : public QWidget
 {
@@ -16,12 +22,13 @@ public:
     virtual ~MemoryWidget();
 
  void paintEvent ( QPaintEvent * event );
-
+    void setInterface(IMemoryWidget *inf);
+    
 private:
     int getRowHeight();
     unsigned int getAddrAtPos(QPoint pos);
     int getHeaderHeight();
-
+    
 public slots:
     void setStartAddress(unsigned int addr);
 
@@ -36,6 +43,7 @@ private:
 
     unsigned int m_startAddress;
     unsigned int m_selectionStart, m_selectionEnd;
+    IMemoryWidget *m_inf;
     
 };
 

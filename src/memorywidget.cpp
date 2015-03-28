@@ -17,6 +17,7 @@ MemoryWidget::MemoryWidget(QWidget *parent)
  : QWidget(parent)
  ,m_selectionStart(0)
  ,m_selectionEnd(0)
+ ,m_inf(0)
 {
     m_font = QFont("Monospace", 8);
     m_fontInfo = new QFontMetrics(m_font);
@@ -30,6 +31,11 @@ MemoryWidget::MemoryWidget(QWidget *parent)
     m_startAddress = 0;
 }
 
+void MemoryWidget::setInterface(IMemoryWidget *inf)
+{
+    m_inf = inf;
+}
+    
 void MemoryWidget::setStartAddress(unsigned int addr)
 {
 
@@ -57,7 +63,9 @@ int MemoryWidget::getHeaderHeight()
 {
     return getRowHeight()+5;
 }
-    
+
+
+
 void MemoryWidget::paintEvent ( QPaintEvent * event )
 {
     QPainter painter(this);
@@ -70,6 +78,11 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
     unsigned int startAddress = m_startAddress;
     
     painter.setFont(m_font);
+
+    QByteArray content;
+    if(m_inf)
+        content = m_inf->getMemory(startAddress, rowCount*16);
+    
 
     //if((0xffffffffU-startAddress) < rowCount*16)
     //    startAddress = 0xffffffffU-((rowCount-2)*16);
@@ -128,7 +141,10 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
         
         for(int off = 0;off < 16;off++)
         {
-            uint8_t d = off;
+            int dataIdx = rowIdx*16+off;
+            if(dataIdx < content.size())
+            {
+            uint8_t d = content[dataIdx];
 
             if(m_selectionStart != 0 || m_selectionEnd != 0)
             {
@@ -140,7 +156,8 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
             
             text.sprintf("%02u", d);
             painter.drawText(x, y, text);
-
+            }
+        
             x += charWidth*text.length()+5;
 
             if(off == 8)
@@ -152,7 +169,10 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
             
         for(int off = 0;off < 16;off++)
         {
-            uint8_t d = off+'a';
+            int dataIdx = rowIdx*16+off;
+            if(dataIdx < content.size())
+            {
+            uint8_t d = content[dataIdx];
             if(isalnum(d))
                 text.sprintf("%c", (char)d);
             else
@@ -167,7 +187,7 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
             }
             
             painter.drawText(x, y, text);
-
+            }
             x += charWidth*text.length();
         }
 
@@ -212,20 +232,20 @@ void MemoryWidget::mouseMoveEvent ( QMouseEvent * event )
 {
     m_selectionEnd = getAddrAtPos(event->pos());
     //printf("%s()\n", __func__);
-    printf("%x\n", getAddrAtPos(event->pos()));
+    //printf("%x\n", getAddrAtPos(event->pos()));
     update();
 }
     
 void MemoryWidget::mouseReleaseEvent(QMouseEvent * event)
 {
-    printf("%s()\n", __func__);
+    //printf("%s()\n", __func__);
     update();
     
 }
 
 void MemoryWidget::mousePressEvent(QMouseEvent * event)
 {
-    printf("%s()\n", __func__);
+    //printf("%s()\n", __func__);
     m_selectionStart = getAddrAtPos(event->pos());
     m_selectionEnd = m_selectionStart;
     update();
