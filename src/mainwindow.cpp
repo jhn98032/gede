@@ -948,11 +948,9 @@ void MainWindow::onAutoWidgetItemExpanded(QTreeWidgetItem *item)
 
 void MainWindow::onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column)
 {
-    QTreeWidget *varWidget = m_ui.varWidget;
-
-
     if(column == 0)
-        varWidget->editItem(item,column);
+    {
+    }
     else if(column == 1)
     {
         QString varName = getTreeWidgetItemPath(item);
