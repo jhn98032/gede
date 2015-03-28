@@ -63,6 +63,9 @@ SOURCES+=codeviewtab.cpp
 HEADERS+=codeviewtab.h
 FORMS += codeviewtab.ui
 
+SOURCES+=memorydialog.cpp memorywidget.cpp
+HEADERS+=memorydialog.h memorywidget.h
+FORMS += memorydialog.ui
 
 FORMS += mainwindow.ui
 FORMS += aboutdialog.ui
