@@ -782,11 +782,9 @@ void MainWindow::onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int colum
 
 void MainWindow::onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column)
 {
-    QTreeWidget *varWidget = m_ui.varWidget;
-
-    
     if(column == 0)
-        varWidget->editItem(item,column);
+    {
+    }
     else if(column == 1)
     {
         QString varName = item->text(0);
