@@ -10,6 +10,7 @@
 #include "codeview.h"
 #include "settings.h"
 #include "tagscanner.h"
+#include "autovarctl.h"
 
 class FileInfo
 {
@@ -56,24 +57,9 @@ public:
     void ICore_onWatchVarExpanded(QString watchId, QString name, QString valueString, QString varType);
 
 private:
-    enum DispFormat
-    {
-        DISP_NATIVE,
-        DISP_DEC,
-        DISP_BIN,
-        DISP_HEX,
-        DISP_CHAR,
-    };
-    typedef struct
-    {
-        QString orgValue;
-        DispFormat orgFormat;
-        DispFormat dispFormat;
-        bool isExpanded;
-    }DispInfo;
 
-    typedef QMap<QString, DispInfo>  DispInfoMap;
-    
+public:
+        
 private:
 
     QTreeWidgetItem *addTreeWidgetPath(QTreeWidget *treeWidget, QTreeWidgetItem *parent, QString path);
@@ -81,16 +67,14 @@ private:
 
     bool eventFilter(QObject *obj, QEvent *event);
     void loadConfig();
-    DispFormat findVarType(QString dataString);
-    QString valueDisplay(long long value, DispFormat format);
     QTreeWidgetItem *insertTreeWidgetItem(
-                    DispInfoMap *map,
+                    VarCtl::DispInfoMap *map,
                     QString fullPath,
                     QString name,
                     QString value);
     void addVariableDataTree(
                 QTreeWidget *treeWidget,
-                DispInfoMap *map,
+                VarCtl::DispInfoMap *map,
                 QTreeWidgetItem *item, TreeNode *rootNode);
 
 
@@ -131,12 +115,14 @@ private:
     int m_currentLine; //!< The linenumber (first=1) which the program counter points to.
     QList<StackFrameEntry> m_stackFrameList;
     QMenu m_popupMenu;
-    DispInfoMap m_watchVarDispInfo;
-    DispInfoMap m_autoVarDispInfo;
+    VarCtl::DispInfoMap m_watchVarDispInfo;
+    VarCtl::DispInfoMap m_autoVarDispInfo;
 
     Settings m_cfg;
     TagScanner m_tagScanner;
     QList<FileInfo> m_sourceFiles;
+
+    AutoVarCtl m_autoVarCtl;
 };
 
 

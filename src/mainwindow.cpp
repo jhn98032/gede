@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_ui.setupUi(this);
 
+    m_autoVarCtl.setWidget(m_ui.autoWidget);
+
     m_ui.codeView->setInterface(this);
 
     m_fileIcon.addFile(QString::fromUtf8(":/images/res/file.png"), QSize(), QIcon::Normal, QIcon::Off);
@@ -401,7 +403,7 @@ QString getTreeWidgetItemPath(QTreeWidgetItem *item)
 
         
 QTreeWidgetItem *MainWindow::insertTreeWidgetItem(
-                    DispInfoMap *map,
+                    VarCtl::DispInfoMap *map,
                     QString fullPath,
                     QString name,
                     QString value)
@@ -411,20 +413,20 @@ QTreeWidgetItem *MainWindow::insertTreeWidgetItem(
     //
     if(map->contains(fullPath))
     {
-        DispInfo &dispInfo = (*map)[fullPath];
+        VarCtl::DispInfo &dispInfo = (*map)[fullPath];
         dispInfo.orgValue = value;
 
         // Update the variable value
-        if(dispInfo.orgFormat == DISP_DEC)
+        if(dispInfo.orgFormat == VarCtl::DISP_DEC)
         {
-            displayValue = valueDisplay(value.toLongLong(), dispInfo.dispFormat);
+            displayValue = VarCtl::valueDisplay(value.toLongLong(), dispInfo.dispFormat);
         }
     }
     else
     {
-        MainWindow::DispInfo dispInfo;
+        VarCtl::DispInfo dispInfo;
         dispInfo.orgValue = value;
-        dispInfo.orgFormat = findVarType(value);
+        dispInfo.orgFormat = VarCtl::findVarType(value);
         dispInfo.dispFormat = dispInfo.orgFormat;
         dispInfo.isExpanded = false;
         (*map)[fullPath] = dispInfo;
@@ -447,7 +449,7 @@ QTreeWidgetItem *MainWindow::insertTreeWidgetItem(
 
 void MainWindow::addVariableDataTree(
                 QTreeWidget *treeWidget,
-                DispInfoMap *map,
+                VarCtl::DispInfoMap *map,
                 QTreeWidgetItem *item, TreeNode *rootNode)
 {
     QList <TreeNode *> m_list;
@@ -487,7 +489,7 @@ void MainWindow::addVariableDataTree(
         // Expand it?
         if(m_autoVarDispInfo.contains(varPath))
         {
-            DispInfo &dispInfo = (*map)[varPath];
+            VarCtl::DispInfo &dispInfo = (*map)[varPath];
 
             if(dispInfo.isExpanded)
             {
@@ -497,7 +499,7 @@ void MainWindow::addVariableDataTree(
         else
         {
             // Add it to the dispinfomap
-            DispInfo dispInfo;
+            VarCtl::DispInfo dispInfo;
             dispInfo.isExpanded = false;
             (*map)[varPath] = dispInfo;
         }
@@ -521,7 +523,7 @@ void MainWindow::ICore_onLocalVarChanged(QString name, CoreVarValue varValue)
     QString varPath = getTreeWidgetItemPath(item);
     if(m_autoVarDispInfo.contains(varPath))
     {
-        DispInfo &dispInfo = m_autoVarDispInfo[varPath];
+        VarCtl::DispInfo &dispInfo = m_autoVarDispInfo[varPath];
         if(dispInfo.isExpanded)
         {
             autoWidget->expandItem(item);
@@ -610,13 +612,13 @@ void MainWindow::ICore_onWatchVarExpanded(QString watchId_, QString name, QStrin
             // Update the text
             if(m_watchVarDispInfo.contains(thisWatchId))
             {
-                DispInfo &dispInfo = m_watchVarDispInfo[thisWatchId];
+                VarCtl::DispInfo &dispInfo = m_watchVarDispInfo[thisWatchId];
                 dispInfo.orgValue = valueString;
 
                 // Update the variable value
-                if(dispInfo.orgFormat == DISP_DEC)
+                if(dispInfo.orgFormat == VarCtl::DISP_DEC)
                 {
-                    valueString = valueDisplay(valueString.toLongLong(), dispInfo.dispFormat);
+                    valueString = VarCtl::valueDisplay(valueString.toLongLong(), dispInfo.dispFormat);
                 }
             }
             item->setText(1, valueString);
@@ -720,15 +722,6 @@ void MainWindow::onStackWidgetSelectionChanged()
 }
 
 
-MainWindow::DispFormat MainWindow::findVarType(QString dataString)
-{
-    if(dataString.indexOf("\"") != -1 ||
-        dataString.indexOf("'") != -1 ||
-        dataString.indexOf(".") != -1)
-        return DISP_NATIVE;
-    return DISP_DEC;
- }
-
 
 void 
 MainWindow::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int column )
@@ -784,9 +777,9 @@ MainWindow::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int colu
             current->setText(1, value);
             current->setText(2, varType);
 
-            DispInfo dispInfo;
+            VarCtl::DispInfo dispInfo;
             dispInfo.orgValue = value;
-            dispInfo.orgFormat = findVarType(value);
+            dispInfo.orgFormat = VarCtl::findVarType(value);
             dispInfo.dispFormat = dispInfo.orgFormat;
             m_watchVarDispInfo[watchId] = dispInfo;
 
@@ -841,9 +834,9 @@ MainWindow::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int colu
             core.gdbExpandVarWatchChildren(watchId);
             
             // Add display information
-            DispInfo dispInfo;
+            VarCtl::DispInfo dispInfo;
             dispInfo.orgValue = value;
-            dispInfo.orgFormat = findVarType(value);
+            dispInfo.orgFormat = VarCtl::findVarType(value);
             dispInfo.dispFormat = dispInfo.orgFormat;
             m_watchVarDispInfo[watchId] = dispInfo;
             
@@ -857,68 +850,6 @@ MainWindow::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int colu
 
 }
 
-
-/**
- * @brief Formats a string (Eg: 0x2) that represents a decimal value.
- */
-QString MainWindow::valueDisplay(long long val, DispFormat format)
-{
-    QString valueText;
-    if(format == DISP_BIN)
-    {
-        QString subText;
-        QString reverseText;
-        do
-        {
-            subText.sprintf("%d", (int)(val & 0x1));
-            reverseText = subText + reverseText;
-            val = val>>1;
-        }
-        while(val > 0 || reverseText.length()%8 != 0);
-        for(int i = 0;i < reverseText.length();i++)
-        {
-            valueText += reverseText[i];
-            if(i%4 == 3 && i+1 != reverseText.length())
-                valueText += "_";
-        }
-        
-        valueText = "0b" + valueText;
-        
-    }
-    else if(format == DISP_HEX)
-    {
-        QString text;
-        text.sprintf("%llx", val);
-
-        // Prefix the string with suitable number of zeroes
-        while(text.length()%4 != 0 && text.length() > 4)
-            text = "0" + text;
-        if(text.length()%2 != 0)
-            text = "0" + text;
-            
-        for(int i = 0;i < text.length();i++)
-        {
-            valueText = valueText + text[i];
-            if(i%4 == 3 && i+1 != text.length())
-                valueText += "_";
-        }
-        valueText = "0x" + valueText;        
-    }
-    else if(format == DISP_CHAR)
-    {
-        QChar c = QChar((int)val);
-        if(c.isPrint())
-            valueText.sprintf("'%c'", c.toAscii());
-        else
-            valueText.sprintf("' '");
-        
-    }
-    else if(format == DISP_DEC)
-    {
-        valueText.sprintf("%lld", val);
-    }
-    return valueText;
-}
 
 
 void MainWindow::onWatchWidgetItemExpanded(QTreeWidgetItem *item )
@@ -958,29 +889,29 @@ void MainWindow::onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int colum
 
         if(m_watchVarDispInfo.contains(watchId))
         {
-            DispInfo &dispInfo = m_watchVarDispInfo[watchId];
-            if(dispInfo.orgFormat == DISP_DEC)
+            VarCtl::DispInfo &dispInfo = m_watchVarDispInfo[watchId];
+            if(dispInfo.orgFormat == VarCtl::DISP_DEC)
             {
                 long long val = dispInfo.orgValue.toLongLong();
 
-                if(dispInfo.dispFormat == DISP_DEC)
+                if(dispInfo.dispFormat == VarCtl::DISP_DEC)
                 {
-                    dispInfo.dispFormat = DISP_HEX;
+                    dispInfo.dispFormat = VarCtl::DISP_HEX;
                 }
-                else if(dispInfo.dispFormat == DISP_HEX)
+                else if(dispInfo.dispFormat == VarCtl::DISP_HEX)
                 {
-                    dispInfo.dispFormat = DISP_BIN;
+                    dispInfo.dispFormat = VarCtl::DISP_BIN;
                 }
-                else if(dispInfo.dispFormat == DISP_BIN)
+                else if(dispInfo.dispFormat == VarCtl::DISP_BIN)
                 {
-                    dispInfo.dispFormat = DISP_CHAR;
+                    dispInfo.dispFormat = VarCtl::DISP_CHAR;
                 }
-                else if(dispInfo.dispFormat == DISP_CHAR)
+                else if(dispInfo.dispFormat == VarCtl::DISP_CHAR)
                 {
-                    dispInfo.dispFormat = DISP_DEC;
+                    dispInfo.dispFormat = VarCtl::DISP_DEC;
                 }
 
-                QString valueText = valueDisplay(val, dispInfo.dispFormat);
+                QString valueText = VarCtl::valueDisplay(val, dispInfo.dispFormat);
 
                 item->setText(1, valueText);
             }
@@ -994,7 +925,7 @@ void MainWindow::onAutoWidgetItemCollapsed(QTreeWidgetItem *item)
     QString varPath = getTreeWidgetItemPath(item);
     if(m_autoVarDispInfo.contains(varPath))
     {
-        DispInfo &dispInfo = m_autoVarDispInfo[varPath];
+        VarCtl::DispInfo &dispInfo = m_autoVarDispInfo[varPath];
         dispInfo.isExpanded = false;
     }
 
@@ -1005,7 +936,7 @@ void MainWindow::onAutoWidgetItemExpanded(QTreeWidgetItem *item)
     QString varPath = getTreeWidgetItemPath(item);
     if(m_autoVarDispInfo.contains(varPath))
     {
-        DispInfo &dispInfo = m_autoVarDispInfo[varPath];
+        VarCtl::DispInfo &dispInfo = m_autoVarDispInfo[varPath];
         dispInfo.isExpanded = true;
 
     }
@@ -1027,29 +958,29 @@ void MainWindow::onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column
         QString varName = getTreeWidgetItemPath(item);
         if(m_autoVarDispInfo.contains(varName))
         {
-            DispInfo &dispInfo = m_autoVarDispInfo[varName];
-            if(dispInfo.orgFormat == DISP_DEC)
+            VarCtl::DispInfo &dispInfo = m_autoVarDispInfo[varName];
+            if(dispInfo.orgFormat == VarCtl::DISP_DEC)
             {
                 long long val = dispInfo.orgValue.toLongLong();
 
-                if(dispInfo.dispFormat == DISP_DEC)
+                if(dispInfo.dispFormat == VarCtl::DISP_DEC)
                 {
-                    dispInfo.dispFormat = DISP_HEX;
+                    dispInfo.dispFormat = VarCtl::DISP_HEX;
                 }
-                else if(dispInfo.dispFormat == DISP_HEX)
+                else if(dispInfo.dispFormat == VarCtl::DISP_HEX)
                 {
-                    dispInfo.dispFormat = DISP_BIN;
+                    dispInfo.dispFormat = VarCtl::DISP_BIN;
                 }
-                else if(dispInfo.dispFormat == DISP_BIN)
+                else if(dispInfo.dispFormat == VarCtl::DISP_BIN)
                 {
-                    dispInfo.dispFormat = DISP_CHAR;
+                    dispInfo.dispFormat = VarCtl::DISP_CHAR;
                 }
-                else if(dispInfo.dispFormat == DISP_CHAR)
+                else if(dispInfo.dispFormat == VarCtl::DISP_CHAR)
                 {
-                    dispInfo.dispFormat = DISP_DEC;
+                    dispInfo.dispFormat = VarCtl::DISP_DEC;
                 }
 
-                QString valueText = valueDisplay(val, dispInfo.dispFormat);
+                QString valueText = VarCtl::valueDisplay(val, dispInfo.dispFormat);
 
                 item->setText(1, valueText);
             }
