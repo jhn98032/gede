@@ -11,6 +11,7 @@
 #include "settings.h"
 #include "tagscanner.h"
 #include "autovarctl.h"
+#include "watchvarctl.h"
 
 class FileInfo
 {
@@ -28,7 +29,6 @@ public:
     MainWindow(QWidget *parent);
 
     void open(QString filename);
-    void fillInVars();
     void ensureLineIsVisible(int lineIdx);
 
 
@@ -80,7 +80,6 @@ private:
 
 public slots:
     void onFolderViewItemActivated ( QTreeWidgetItem * item, int column );
-    void onWatchWidgetCurrentItemChanged ( QTreeWidgetItem * current, int column );
     void onThreadWidgetSelectionChanged( );
     void onStackWidgetSelectionChanged();
     void onQuit();
@@ -96,15 +95,9 @@ public slots:
     void onCodeViewContextMenuShowDefinition();
     void onCodeViewContextMenuShowCurrentLocation();
     void onSettings();
-    void onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
-    void onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
-    void onAutoWidgetItemCollapsed(QTreeWidgetItem *item);
-    void onAutoWidgetItemExpanded(QTreeWidgetItem *item);
     void onFuncListItemActivated(int index);
     void onCodeViewContextMenuToggleBreakpoint();
-    void onWatchWidgetItemExpanded(QTreeWidgetItem *item );
-    void onWatchWidgetItemCollapsed(QTreeWidgetItem *item);
-
+    
     
 private:
     Ui_MainWindow m_ui;
@@ -115,14 +108,13 @@ private:
     int m_currentLine; //!< The linenumber (first=1) which the program counter points to.
     QList<StackFrameEntry> m_stackFrameList;
     QMenu m_popupMenu;
-    VarCtl::DispInfoMap m_watchVarDispInfo;
-    VarCtl::DispInfoMap m_autoVarDispInfo;
-
+    
     Settings m_cfg;
     TagScanner m_tagScanner;
     QList<FileInfo> m_sourceFiles;
 
     AutoVarCtl m_autoVarCtl;
+    WatchVarCtl m_watchVarCtl;
 };
 
 

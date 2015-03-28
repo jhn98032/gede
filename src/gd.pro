@@ -45,6 +45,9 @@ HEADERS+=tagscanner.h
 
 HEADERS+=config.h
 
+SOURCES+=varctl.cpp watchvarctl.cpp autovarctl.cpp
+HEADERS+=varctl.h watchvarctl.h autovarctl.h
+
 SOURCES+=settingsdialog.cpp
 HEADERS+=settingsdialog.h
 FORMS += settingsdialog.ui
