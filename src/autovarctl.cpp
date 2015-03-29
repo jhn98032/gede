@@ -111,14 +111,14 @@ void AutoVarCtl::onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column
 
 void AutoVarCtl::ICore_onLocalVarChanged(QString name, CoreVarValue varValue)
 {
+    Tree *valueTree = varValue.toTree();
     
-    QString value = varValue.toString();
     QTreeWidget *autoWidget = m_autoWidget;
     QTreeWidgetItem *item;
     QStringList names;
 
 
-    item = insertTreeWidgetItem(&m_autoVarDispInfo, name, name, value);
+    item = insertTreeWidgetItem(&m_autoVarDispInfo, name, name, varValue.toString());
     autoWidget->insertTopLevelItem(0, item);
 
     // Expand it?
@@ -133,7 +133,6 @@ void AutoVarCtl::ICore_onLocalVarChanged(QString name, CoreVarValue varValue)
     }
 
     // Insert children
-    Tree *valueTree = varValue.toTree();
     if(valueTree)
     {
         addVariableDataTree(autoWidget, &m_autoVarDispInfo, item, valueTree->getRoot());

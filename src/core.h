@@ -62,8 +62,8 @@ class CoreVarValue
 public:
     CoreVarValue(QString str) { m_str = str; };
 
-    QString toString() { return m_str; };
-
+    QString toString();
+    
     Tree *toTree();
     QString m_str;
 };
@@ -145,6 +145,8 @@ public:
     int initRemote(Settings *cfg, QString gdbPath, QString programPath, QString tcpHost, int tcpPort);
     
     void setListener(ICore *inf) { m_inf = inf; };
+
+    static QList<Token*> tokenizeVarString(QString str);
 
 private:
     

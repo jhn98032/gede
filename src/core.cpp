@@ -18,21 +18,34 @@ void parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
 {
     Token *token = tokenList->takeFirst();
     TreeNode *childNode = NULL;
-    
+
+    assert(token != NULL);
+
     if(token->getType() == Token::KEY_LEFT_BRACE)
     {
         
         do
         {
-
             // Get name
+            QString name;
             Token *nameTok = tokenList->takeFirst();
-        
+            assert(nameTok != NULL);
+            name = nameTok->getString();
 
+            // Is it a "static varType" type?
+            Token *extraNameTok = tokenList->first();
+            if(extraNameTok->getType() == Token::VAR)
+            {
+                extraNameTok = tokenList->takeFirst();
+                name += " " + extraNameTok->getString();
+            }
+        
             // Get equal sign
-            Token *eqToken = tokenList->takeFirst();
+            Token *eqToken = tokenList->first();
+            assert(eqToken != NULL);
             if(eqToken->getType() == Token::KEY_EQUAL)
             {
+                eqToken = tokenList->takeFirst();
 
                 // Create treenode
                 childNode = new TreeNode;
@@ -47,24 +60,45 @@ void parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
             }
             else if(eqToken->getType() == Token::KEY_COMMA)
             {
-                
+                token = tokenList->isEmpty() ? NULL : tokenList->takeFirst();
+            }
+            else if(eqToken->getType() == Token::KEY_RIGHT_BRACE)
+            {
+                // Triggered by for example: "'{','<No data fields>', '}'"
+                token = tokenList->isEmpty() ? NULL : tokenList->takeFirst();
             }
             else
             {
                 errorMsg("Unknown token. Expected '=', Got:'%s'", stringToCStr(eqToken->getString()));
 
                 // End of the data
-                token = tokenList->takeFirst();
+                token = tokenList->isEmpty() ? NULL : tokenList->takeFirst();
             }
             
         }while(token != NULL && token->getType() == Token::KEY_COMMA);
 
         //
-        if(token == NULL || token->getType() != Token::KEY_RIGHT_BRACE)
+        if(token == NULL)
+            errorMsg("Unexpected end of token");
+        else if (token->getType() != Token::KEY_RIGHT_BRACE)
             errorMsg("Unknown token. Expected '}', Got:'%s'", stringToCStr(token->getString()));
     }
     else
     {
+        QString valueStr = token->getString();
+
+        // Was it only a address with data following the address? (Eg: '0x0001 "string"' )
+        Token *nextTok = tokenList->first();
+        if( nextTok->getType() == Token::VAR || nextTok->getType() == Token::C_STRING)
+        {
+            nextTok = tokenList->takeFirst();
+            valueStr += " ";
+            if(nextTok->getType() == Token::C_STRING)
+                valueStr += "\"" + nextTok->getString() + "\"";
+            else
+                valueStr += nextTok->getString();
+        }
+        
         thisNode->setData(token->getString());
     }
 
@@ -72,11 +106,174 @@ void parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
 }
 
 
+QString CoreVarValue::toString()
+{
+    if(m_str.startsWith("{<"))
+    {
+        // Is it a message? Eg: "{<No data fields>}".
+        return m_str.mid(1,m_str.length()-2);
+    }
+    
+    return m_str;
+}
+
+
+
+/**
+ * @brief Creates tokens from a single GDB output row.
+ */
+QList<Token*> Core::tokenizeVarString(QString str)
+{
+    enum { IDLE, BLOCK, BLOCK_COLON, STRING, VAR} state = IDLE;
+    QList<Token*> list;
+    Token *cur = NULL;
+    QChar prevC = ' ';
+    
+    if(str.isEmpty())
+        return list;
+
+    for(int i = 0;i < str.size();i++)
+    {
+        QChar c = str[i];
+        switch(state)
+        {
+            case IDLE:
+            {
+                if(c == '"')
+                {
+                    cur = new Token;
+                    list.push_back(cur);
+                    cur->type = Token::C_STRING;
+                    state = STRING;
+                }
+                else if(c == '<')
+                {
+                    cur = new Token;
+                    list.push_back(cur);
+                    cur->type = Token::VAR;
+                    cur->text += c;
+                    state = BLOCK;
+                }
+                else if(c == '(')
+                {
+                    cur = new Token;
+                    list.push_back(cur);
+                    cur->type = Token::VAR;
+                    cur->text += c;
+                    state = BLOCK_COLON;
+                }
+                else if(c == '=' || c == '{' || c == '}' || c == ',' ||
+                    c == '[' || c == ']' || c == '+' || c == '^' ||
+                    c == '~' || c == '@' || c == '&' || c == '*')
+                {
+                    cur = new Token;
+                    list.push_back(cur);
+                    cur->text += c;
+                    cur->type = Token::UNKNOWN;
+                    if(c == '=')
+                        cur->type = Token::KEY_EQUAL;
+                    if(c == '{')
+                        cur->type = Token::KEY_LEFT_BRACE;
+                    if(c == '}')
+                        cur->type = Token::KEY_RIGHT_BRACE;
+                    if(c == '[')
+                        cur->type = Token::KEY_LEFT_BAR;
+                    if(c == ']')
+                        cur->type = Token::KEY_RIGHT_BAR;
+                    if(c == ',')
+                        cur->type = Token::KEY_COMMA;
+                    if(c == '^')
+                        cur->type = Token::KEY_UP;
+                    if(c == '+')
+                        cur->type = Token::KEY_PLUS;
+                    if(c == '~')
+                        cur->type = Token::KEY_TILDE;
+                    if(c == '@')
+                        cur->type = Token::KEY_SNABEL;
+                    if(c == '&')
+                        cur->type = Token::KEY_AND;
+                    if(c == '*')
+                        cur->type = Token::KEY_STAR;
+                    state = IDLE;
+                }
+                else if( c != ' ')
+                {
+                    cur = new Token;
+                    list.push_back(cur);
+                    cur->type = Token::VAR;
+                    cur->text = c;
+                    state = VAR;
+                }
+                
+            };break;
+            case STRING:
+            {
+                if(prevC != '\\' && c == '\\')
+                {
+                }
+                else if(prevC == '\\')
+                {
+                    if(c == 'n')
+                        cur->text += '\n';
+                    else
+                        cur->text += c;
+                }
+                else if(c == '"')
+                    state = IDLE;
+                else
+                    cur->text += c;
+            };break;
+            case BLOCK_COLON:
+            case BLOCK:
+            {
+                if(prevC != '\\' && c == '\\')
+                {
+                }
+                else if(prevC == '\\')
+                {
+                    if(c == 'n')
+                        cur->text += '\n';
+                    else
+                        cur->text += c;
+                }
+                else if((c == '>' && state == BLOCK) ||
+                        (c == ')' && state == BLOCK_COLON))
+                {
+                    cur->text += c;
+                    state = IDLE;
+                }
+                else
+                    cur->text += c;
+            };break;
+            case VAR:
+            {
+                if(c == ' ' || c == '=' || c == ',' || c == '{' || c == '}')
+                {
+                    i--;
+                    cur->text = cur->text.trimmed();
+                    state = IDLE;
+                }
+                else
+                    cur->text += c;
+            };break;
+            
+        }
+        prevC = c;
+    }
+    if(cur)
+    {
+        if(cur->type == Token::VAR)
+            cur->text = cur->text.trimmed();
+    }
+    return list;
+}
+
+
 Tree* CoreVarValue::toTree()
 {
     Tree *tree = NULL;
     
-    QList<Token*> tokenList = Com::tokenize(m_str);
+    QList<Token*> tokenList = Core::tokenizeVarString(m_str);
 
     QList<Token*> orgList = tokenList;
     Token* token;
@@ -85,17 +282,39 @@ Tree* CoreVarValue::toTree()
 
     if(tokenList.size() > 1)
     {
-        if(token->getType() == Token::KEY_LEFT_BRACE)
+        if(token->getType() == Token::KEY_LEFT_BRACE || token->getType() == Token::KEY_SNABEL)
         {
+            TreeNode *rootNode;
             tree = new Tree;
+            rootNode = tree->getRoot();
 
-            parseVariableData(tree->getRoot(), &tokenList);
+            // Is it a "@0x2202:" type?
+            if(token->getType() == Token::KEY_SNABEL)
+            {
+                QString addrStr;
+                Token *extraNameTok;
+                token = tokenList.takeFirst();
+                
+                extraNameTok = tokenList.takeFirst();
+                if(extraNameTok)
+                    addrStr += " " + extraNameTok->getString();
+
+                TreeNode *childNode = new TreeNode;
+                childNode->setName(addrStr);
+                rootNode->addChild(childNode);
+                rootNode = childNode;
+
+                m_str = addrStr;
+            }
+
+
+            parseVariableData(rootNode, &tokenList);
 
 
         }
         else
         {
-            errorMsg("Unknown token. Expected '{', Got:'%s' ", stringToCStr(token->getString()));
+            errorMsg("Unknown token in beginning of data list. Expected '{', Got:'%s' ", stringToCStr(token->getString()));
         }
         
     }
