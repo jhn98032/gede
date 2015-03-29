@@ -3,11 +3,27 @@
 
 VarCtl::DispFormat VarCtl::findVarType(QString dataString)
 {
-    if(dataString.indexOf("\"") != -1 ||
-        dataString.indexOf("'") != -1 ||
-        dataString.indexOf(".") != -1)
+    dataString = dataString.trimmed();
+    if(dataString.isEmpty())
         return DISP_NATIVE;
-    return DISP_DEC;
+    if(dataString.startsWith("0x") && dataString.indexOf(' ') == -1)
+        return DISP_DEC;
+    if(!dataString.isEmpty())
+    {
+        int u = 0;
+        if(dataString[0] == '-')
+            u++;
+        for(;u < dataString.length();u++)
+        {
+            if(!dataString[u].isDigit())
+            {
+                return DISP_NATIVE;
+            }
+        }
+        return DISP_DEC;
+        
+    }
+    return DISP_NATIVE;
  }
 
 
