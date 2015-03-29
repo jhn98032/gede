@@ -11,6 +11,9 @@
 #include <signal.h>
 
 
+/**
+ * @brief Parses a variable assignment block.
+ */
 void parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
 {
     Token *token = tokenList->takeFirst();
@@ -301,7 +304,7 @@ void Core::gdbGetFiles()
 
                 SourceFile *sourceFile = NULL;
                 // Already added this file?
-                if(!fileLookup.contains(fullname) && name != "<built-in>")
+                if(!fileLookup.contains(fullname) && !name.contains("<built-in>"))
                 {
                     fileLookup[fullname] = true;
                     
