@@ -541,7 +541,7 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
     {
         m_targetState = ICore::TARGET_RUNNING;
 
-        debugMsg("is running\n");
+        debugMsg("is running");
     }
 
     // Get the current thread
