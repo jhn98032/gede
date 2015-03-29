@@ -203,7 +203,7 @@ void Core::gdbGetFiles()
 
                 SourceFile *sourceFile = NULL;
                 // Already added this file?
-                if(!fileLookup.contains(fullname) && name != "<built-in>")
+                if(!fileLookup.contains(fullname) && !name.contains("<built-in>"))
                 {
                     fileLookup[fullname] = true;
                     
