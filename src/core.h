@@ -146,8 +146,7 @@ public:
     
     void setListener(ICore *inf) { m_inf = inf; };
 
-    static QList<Token*> tokenizeVarString(QString str);
-
+    
 private:
     
      void onNotifyAsyncOut(Tree &tree, AsyncClass ac);

@@ -10,8 +10,8 @@ HEADERS+=mainwindow.h
 SOURCES+=codeview.cpp
 HEADERS+=codeview.h
 
-SOURCES+=core.cpp
-HEADERS+=core.h
+SOURCES+=gdbmiparser.cpp core.cpp
+HEADERS+=gdbmiparser.h core.h
 
 SOURCES+=com.cpp
 HEADERS+=com.h
