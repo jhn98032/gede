@@ -26,6 +26,18 @@ void parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
         
         do
         {
+            // Double braces?
+            Token *token2 = tokenList->first();
+            if(token2->getType() == Token::KEY_LEFT_BRACE)
+            {
+                
+                parseVariableData(thisNode, tokenList);
+
+                token = tokenList->takeFirst();
+            }
+            else
+            {
+            
             // Get name
             QString name;
             Token *nameTok = tokenList->takeFirst();
@@ -49,7 +61,7 @@ void parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
 
                 // Create treenode
                 childNode = new TreeNode;
-                childNode->setName(nameTok->getString());
+                childNode->setName(name);
                 thisNode->addChild(childNode);
 
                 // Get variable data
@@ -64,6 +76,8 @@ void parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
             }
             else if(eqToken->getType() == Token::KEY_RIGHT_BRACE)
             {
+                if(thisNode->getChildCount() == 0)
+                    thisNode->setData(nameTok->getString());
                 // Triggered by for example: "'{','<No data fields>', '}'"
                 token = tokenList->isEmpty() ? NULL : tokenList->takeFirst();
             }
@@ -73,6 +87,7 @@ void parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
 
                 // End of the data
                 token = tokenList->isEmpty() ? NULL : tokenList->takeFirst();
+            }
             }
             
         }while(token != NULL && token->getType() == Token::KEY_COMMA);
@@ -92,17 +107,19 @@ void parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
         if( nextTok->getType() == Token::VAR || nextTok->getType() == Token::C_STRING)
         {
             nextTok = tokenList->takeFirst();
-            valueStr += " ";
+
+            QString addrStr = valueStr;
+            thisNode->setAddress(addrStr.toInt(0,0));
             if(nextTok->getType() == Token::C_STRING)
-                valueStr += "\"" + nextTok->getString() + "\"";
+                valueStr = "\"" + nextTok->getString() + "\"";
             else
-                valueStr += nextTok->getString();
+                valueStr = nextTok->getString();
+
         }
         
         thisNode->setData(token->getString());
     }
 
-    
 }
 
 
@@ -291,20 +308,15 @@ Tree* CoreVarValue::toTree()
             // Is it a "@0x2202:" type?
             if(token->getType() == Token::KEY_SNABEL)
             {
-                QString addrStr;
                 Token *extraNameTok;
                 token = tokenList.takeFirst();
                 
                 extraNameTok = tokenList.takeFirst();
                 if(extraNameTok)
-                    addrStr += " " + extraNameTok->getString();
-
-                TreeNode *childNode = new TreeNode;
-                childNode->setName(addrStr);
-                rootNode->addChild(childNode);
-                rootNode = childNode;
-
-                m_str = addrStr;
+                {
+                 
+                    rootNode->setAddress(extraNameTok->getString().toInt(0,0)); 
+                }
             }
 
 

@@ -5,6 +5,7 @@
 #include <QVector>
 #include <QList>
 #include <QStringList>
+#include <stdint.h>
 
 
 class TreeNode
@@ -15,6 +16,9 @@ public:
     
     TreeNode *findChild(QString path) const;
 
+    uint32_t getAddress() const { return m_address; };
+    void setAddress(uint32_t addr) { m_address = addr; };
+    
     QStringList getChildList() const;
     void addChild(TreeNode *child) { m_children.push_back(child); };
     TreeNode *getChild(int i) const { return m_children[i]; };
@@ -38,7 +42,7 @@ public:
     QString m_name;
     QString m_data;
     QVector<TreeNode*> m_children;
-
+    uint32_t m_address;
 
 private:
         TreeNode(const TreeNode &) { };
@@ -58,6 +62,7 @@ public:
 
     void dump() { m_root.dump();};
 
+    
     QString getString(QString path) const;
     int getInt(QString path) const;
     long long getLongLong(QString path) const;
