@@ -326,7 +326,7 @@ Tree* CoreVarValue::toTree()
         }
         else
         {
-            errorMsg("Unknown token in beginning of data list. Expected '{', Got:'%s' ", stringToCStr(token->getString()));
+            //errorMsg("Unknown token in beginning of data list. Expected '{', Got:'%s' ", stringToCStr(token->getString()));
         }
         
     }
