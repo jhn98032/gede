@@ -112,6 +112,8 @@ void SyntaxHighlighter::colorize(QString text)
     } state = IDLE;
     char c = '\n';
     char prevC = ' ';
+    char prevPrevC = ' ';
+    bool isEscaped = false;
     
     reset();
 
@@ -122,6 +124,16 @@ void SyntaxHighlighter::colorize(QString text)
     for(int i = 0;i < text.size();i++)
     {
         c = text[i].toAscii();
+
+        // Was the last c a escape?
+        if(prevC == '\\' && prevPrevC != '\\')
+            isEscaped = true;
+        else
+            isEscaped = false;
+        prevPrevC = prevC;
+        prevC = c;
+        
+        
         switch(state)
         {   
             case IDLE:
@@ -265,7 +277,7 @@ void SyntaxHighlighter::colorize(QString text)
             case ESCAPED_CHAR:
             {
                 field->m_text += c;
-                if(prevC != '\\' && c == '\'')
+                if(!isEscaped && c == '\'')
                 {
                     field = NULL;
                     state = IDLE;
@@ -274,7 +286,7 @@ void SyntaxHighlighter::colorize(QString text)
             case STRING:
             {
                 field->m_text += c;
-                if(prevC != '\\' && c == '"')
+                if(!isEscaped && c == '"')
                 {
                     field = NULL;
                     state = IDLE;
@@ -298,7 +310,6 @@ void SyntaxHighlighter::colorize(QString text)
                 
             };break;
         }
-        prevC = c;
     }
 
     for(int r = 0;r < m_rows.size();r++)
