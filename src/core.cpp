@@ -662,7 +662,7 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
     QString threadIdStr = tree.getString("thread-id");
     if(threadIdStr.isEmpty() == false)
     {
-        int threadId = threadIdStr.toInt();
+        int threadId = threadIdStr.toInt(0,0);
         if(m_inf)
             m_inf->ICore_onCurrentThreadChanged(threadId);
     }
@@ -841,7 +841,7 @@ void Core::onResult(Tree &tree)
             QString threadIdStr = tree.getString("current-thread-id");
             if(threadIdStr.isEmpty() == false)
             {
-                int threadId = threadIdStr.toInt();
+                int threadId = threadIdStr.toInt(0,0);
                 if(m_inf)
                     m_inf->ICore_onCurrentThreadChanged(threadId);
             }

@@ -171,7 +171,7 @@ QString Tree::getString(QString path) const
 int Tree::getInt(QString path) const
 {
     QString str = getString(path);
-    return str.toInt();
+    return str.toInt(0,0);
 }
 
 

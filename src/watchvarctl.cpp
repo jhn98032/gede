@@ -106,7 +106,7 @@ void WatchVarCtl::ICore_onWatchVarExpanded(QString watchId_, QString name, QStri
                 // Update the variable value
                 if(dispInfo.orgFormat == VarCtl::DISP_DEC)
                 {
-                    valueString = VarCtl::valueDisplay(valueString.toLongLong(), dispInfo.dispFormat);
+                    valueString = VarCtl::valueDisplay(valueString.toLongLong(0,0), dispInfo.dispFormat);
                 }
             }
             item->setText(1, valueString);
@@ -285,7 +285,7 @@ void WatchVarCtl::onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int colu
             VarCtl::DispInfo &dispInfo = m_watchVarDispInfo[watchId];
             if(dispInfo.orgFormat == VarCtl::DISP_DEC)
             {
-                long long val = dispInfo.orgValue.toLongLong();
+                long long val = dispInfo.orgValue.toLongLong(0,0);
 
                 if(dispInfo.dispFormat == VarCtl::DISP_DEC)
                 {

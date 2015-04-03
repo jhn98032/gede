@@ -45,7 +45,7 @@ long long stringToLongLong(const char* str)
     unsigned long long num = 0;
     QString str2 = str;
     str2.replace('_', "");
-    num = str2.toLongLong();
+    num = str2.toLongLong(0,0);
 
     return num;
 }

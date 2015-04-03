@@ -81,7 +81,7 @@ void AutoVarCtl::onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column
             VarCtl::DispInfo &dispInfo = m_autoVarDispInfo[varName];
             if(dispInfo.orgFormat == VarCtl::DISP_DEC)
             {
-                long long val = dispInfo.orgValue.toLongLong();
+                long long val = dispInfo.orgValue.toLongLong(0,0);
 
                 if(dispInfo.dispFormat == VarCtl::DISP_DEC)
                 {
@@ -221,7 +221,7 @@ QTreeWidgetItem *AutoVarCtl::insertTreeWidgetItem(
         // Update the variable value
         if(dispInfo.orgFormat == VarCtl::DISP_DEC)
         {
-            displayValue = VarCtl::valueDisplay(value.toLongLong(), dispInfo.dispFormat);
+            displayValue = VarCtl::valueDisplay(value.toLongLong(0,0), dispInfo.dispFormat);
         }
     }
     else

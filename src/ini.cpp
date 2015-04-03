@@ -129,7 +129,7 @@ int Ini::getInt(QString name, int defaultValue)
         setInt(name, defaultValue);
         entry = findEntry(name);
     }
-    return entry->value.toInt();
+    return entry->getValueAsInt();
 }
 
 
@@ -141,7 +141,7 @@ bool Ini::getBool(QString name, bool defaultValue)
         setBool(name, defaultValue);
         entry = findEntry(name);
     }
-    return entry->value.toInt();
+    return entry->getValueAsInt();
 }
 
 QString Ini::getString(QString name, QString defaultValue)
@@ -153,7 +153,7 @@ QString Ini::getString(QString name, QString defaultValue)
         entry = findEntry(name);
     }
         
-    return entry->value;
+    return entry->getValueAsString();
 }
 
 QStringList Ini::getStringList(QString name, QStringList defaultValue)

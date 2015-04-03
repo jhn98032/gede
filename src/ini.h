@@ -10,7 +10,10 @@ class Entry
 public:
     Entry(const Entry &other);
     Entry(QString name_) : name(name_) {};
-     
+    
+    int getValueAsInt() { return value.toInt(0,0); };
+    QString getValueAsString() { return value; };
+
     QString name;
     QString value;
 };
