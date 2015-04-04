@@ -497,7 +497,13 @@ void MainWindow::open(QString filename)
 
     m_ui.scrollArea_codeView->setWidgetResizable(true);
 
-    setWindowTitle(getFilenamePart(filename));
+    // Set window title
+    QString windowTitle;
+    QString filenamePart, folderPathPart;
+    dividePath(filename, &filenamePart, &folderPathPart);
+    windowTitle.sprintf("%s - %s",  stringToCStr(filenamePart), stringToCStr(folderPathPart));
+    setWindowTitle(windowTitle);
+
 
     m_filename = filename;
     m_ui.codeView->setPlainText(text);
