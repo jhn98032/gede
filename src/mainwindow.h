@@ -61,6 +61,7 @@ private:
 public:
         
 private:
+    void wrapSourceTree(QTreeWidget *treeWidget);
 
     QTreeWidgetItem *addTreeWidgetPath(QTreeWidget *treeWidget, QTreeWidgetItem *parent, QString path);
     void fillInStack();

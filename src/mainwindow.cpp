@@ -285,12 +285,49 @@ QTreeWidgetItem *MainWindow::addTreeWidgetPath(QTreeWidget *treeWidget, QTreeWid
     else
     {
         parent->addChild(newItem);
+        if(parent->text(0) != "usr")
+            parent->setExpanded(true);
     }
 
     if(restPath.isEmpty())
         return newItem;
     else
         return addTreeWidgetPath(treeWidget, newItem, restPath);
+}
+
+
+/**
+ * @brief Try to shrink a tree by removing dirs in the tree. Eg: "/usr/include/bits" => "/usr...bits".
+ */ 
+void MainWindow::wrapSourceTree(QTreeWidget *treeWidget)
+{
+    for(int u = 0;u < treeWidget->topLevelItemCount();u++)
+    {
+        QTreeWidgetItem* rootItem = treeWidget->topLevelItem (u);
+        QTreeWidgetItem* childItem = rootItem->child(0);
+        QString newName =  "/" + rootItem->text(0);
+        
+        do
+        {
+            if(childItem->childCount() > 0 && rootItem->childCount() == 1)
+            {
+                newName += "/" + childItem->text(0);
+                QList<QTreeWidgetItem *> subChildren = childItem->takeChildren();
+                childItem = rootItem->takeChild(0);
+                delete childItem;
+                rootItem->addChildren(subChildren);
+
+                childItem = subChildren.first();
+            }
+        }
+        while(childItem->childCount() > 0 && rootItem->childCount() == 1);
+
+        if(rootItem->text(0) != "usr")
+            rootItem->setExpanded(true);
+
+        rootItem->setText(0, newName);
+
+    }
 }
 
 
@@ -331,7 +368,7 @@ void MainWindow::insertSourceFiles()
         // Get parent path
         QString folderPath;
         QString filename;
-        dividePath(info.name, &filename, &folderPath);
+        dividePath(info.fullName, &filename, &folderPath);
         folderPath = simplifyPath(folderPath);
         
         if(!folderPath.isEmpty())
@@ -346,8 +383,11 @@ void MainWindow::insertSourceFiles()
         else
         {
             parentNode->addChild(item);
+            parentNode->setExpanded(true);
         }
     }
+
+    wrapSourceTree(treeWidget);
 
     treeWidget->sortItems(0, Qt::AscendingOrder);
 
