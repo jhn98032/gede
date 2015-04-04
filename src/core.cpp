@@ -253,6 +253,7 @@ void Core::gdbGetFiles()
     com.command(&resultData, "-file-list-exec-source-files");
 
 
+    // Clear the old list
     for(int m = 0;m < m_sourceFiles.size();m++)
     {
         SourceFile *sourceFile = m_sourceFiles[m];
@@ -261,6 +262,7 @@ void Core::gdbGetFiles()
     m_sourceFiles.clear();
 
 
+    // Create the new list
     for(int k = 0;k < resultData.getRootChildCount();k++)
     {
         TreeNode *rootNode = resultData.getChildAt(k);
@@ -284,7 +286,7 @@ void Core::gdbGetFiles()
                     
                     sourceFile = new SourceFile; 
 
-                    sourceFile->name =name;
+                    sourceFile->name = name;
                     sourceFile->fullName = fullname;
 
                     m_sourceFiles.append(sourceFile);
@@ -506,7 +508,14 @@ void Core::gdbExpandVarWatchChildren(QString watchId)
 
 QString Core::gdbGetVarWatchName(QString watchId)
 {
-    return m_watchList[watchId].name;
+    if(m_watchList.contains(watchId))
+        return m_watchList[watchId].name;
+    int divPos = watchId.lastIndexOf(".");
+    assert(divPos != -1);
+    if(divPos == -1)
+        return "";
+    else
+        return watchId.mid(divPos+1);
 }
 
 void Core::gdbRemoveVarWatch(QString watchId)
@@ -791,17 +800,11 @@ void Core::onResult(Tree &tree)
                 path.sprintf("changelist/%d/value", j+1);
                 QString varValue = tree.getString(path);
 
-                if(!m_watchList.contains(watchId))
-                {
-                    assert(!m_watchList.contains(watchId));
-                }
-                else
-                {
-                    VarWatch &w = m_watchList[watchId];
+                QString varName = gdbGetVarWatchName(watchId);
+                    
         
-                    if(m_inf)
-                        m_inf->ICore_onWatchVarChanged(watchId, w.name, varValue);
-                }
+                if(m_inf)
+                    m_inf->ICore_onWatchVarChanged(watchId, varName, varValue);
             }
             
         }

@@ -211,6 +211,7 @@ QTreeWidgetItem *AutoVarCtl::insertTreeWidgetItem(
                     QString value)
 {
     QString displayValue = value;
+    VarCtl::DispFormat orgFormat = VarCtl::findVarType(value);
 
     //
     if(map->contains(fullPath))
@@ -219,7 +220,7 @@ QTreeWidgetItem *AutoVarCtl::insertTreeWidgetItem(
         dispInfo.orgValue = value;
 
         // Update the variable value
-        if(dispInfo.orgFormat == VarCtl::DISP_DEC)
+        if(orgFormat == VarCtl::DISP_DEC)
         {
             displayValue = VarCtl::valueDisplay(value.toLongLong(0,0), dispInfo.dispFormat);
         }
@@ -228,7 +229,7 @@ QTreeWidgetItem *AutoVarCtl::insertTreeWidgetItem(
     {
         VarCtl::DispInfo dispInfo;
         dispInfo.orgValue = value;
-        dispInfo.orgFormat = VarCtl::findVarType(value);
+        dispInfo.orgFormat = orgFormat;
         dispInfo.dispFormat = dispInfo.orgFormat;
         dispInfo.isExpanded = false;
         (*map)[fullPath] = dispInfo;

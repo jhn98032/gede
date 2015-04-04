@@ -95,7 +95,8 @@ void WatchVarCtl::ICore_onWatchVarExpanded(QString watchId_, QString name, QStri
             rootItem = foundItem;
         }
 
-        if(partIdx +1 == watchIdParts.size())
+        // The last part of the id?
+        if(partIdx+1 == watchIdParts.size())
         {
             // Update the text
             if(m_watchVarDispInfo.contains(thisWatchId))
@@ -103,11 +104,24 @@ void WatchVarCtl::ICore_onWatchVarExpanded(QString watchId_, QString name, QStri
                 VarCtl::DispInfo &dispInfo = m_watchVarDispInfo[thisWatchId];
                 dispInfo.orgValue = valueString;
 
+                VarCtl::DispFormat orgFormat = VarCtl::findVarType(valueString);
+
+                dispInfo.orgFormat = orgFormat;
+                
                 // Update the variable value
-                if(dispInfo.orgFormat == VarCtl::DISP_DEC)
+                if(orgFormat == VarCtl::DISP_DEC)
                 {
                     valueString = VarCtl::valueDisplay(valueString.toLongLong(0,0), dispInfo.dispFormat);
                 }
+            }
+            if(item->childCount() != 0)
+            {
+                if(valueString == "")
+                    item->setDisabled(true);
+                else
+                    item->setDisabled(false);
+                
+
             }
             item->setText(1, valueString);
         }
@@ -131,7 +145,7 @@ WatchVarCtl::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int col
     if(oldKey != "" && oldName == newName)
         return;
     
-     debugMsg("oldName:'%s' newName:'%s' ", stringToCStr(oldName), stringToCStr(newName));
+    debugMsg("oldKey:'%s' oldName:'%s' newName:'%s' ", stringToCStr(oldKey), stringToCStr(oldName), stringToCStr(newName));
 
     if(newName == "...")
         newName = "";
