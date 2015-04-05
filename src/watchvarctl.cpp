@@ -119,7 +119,7 @@ void WatchVarCtl::ICore_onWatchVarChildAdded(QString watchId, QString name, QStr
             }
             if(item->childCount() != 0)
             {
-                if(valueString == "")
+                if(!hasChildren)
                     item->setDisabled(true);
                 else
                     item->setDisabled(false);
@@ -368,15 +368,20 @@ void WatchVarCtl::addNewWatch(QString varName)
 
 void WatchVarCtl::deleteSelected()
 {
+    QTreeWidgetItem *rootItem = m_varWidget->invisibleRootItem();
+        
     QList<QTreeWidgetItem *> items = m_varWidget->selectedItems();
 
     for(int i =0;i < items.size();i++)
     {
         QTreeWidgetItem *item = items[i];
-    
+        while(item->parent() != NULL)
+        {
+            item = item->parent();
+        }
+
         // Delete the item
         Core &core = Core::getInstance();
-        QTreeWidgetItem *rootItem = m_varWidget->invisibleRootItem();
         QString watchId = item->data(0, Qt::UserRole).toString();
         if(watchId != "")
         {
