@@ -277,6 +277,8 @@ void Core::gdbGetFiles()
                 QString name = resultData.getString(treePath + "/file");
                 QString fullname = resultData.getString(treePath + "/fullname");
 
+                if(fullname.isEmpty())
+                    continue;
 
                 SourceFile *sourceFile = NULL;
                 // Already added this file?
