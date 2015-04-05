@@ -168,10 +168,13 @@ QString Tree::getString(QString path) const
 }
 
 
-int Tree::getInt(QString path) const
+int Tree::getInt(QString path, int defaultValue) const
 {
     QString str = getString(path);
-    return str.toInt(0,0);
+    if(str.isEmpty())
+        return defaultValue;
+    else
+        return str.toInt(0,0);
 }
 
 

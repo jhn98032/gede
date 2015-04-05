@@ -64,7 +64,7 @@ public:
 
     
     QString getString(QString path) const;
-    int getInt(QString path) const;
+    int getInt(QString path, int defaultValue = 0) const;
     long long getLongLong(QString path) const;
 
     TreeNode *getChildAt(int idx) { return m_root.getChild(idx);};

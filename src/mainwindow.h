@@ -39,7 +39,7 @@ public:
     void ICore_onStopped(ICore::StopReason reason, QString path, int lineNo);
     void ICore_onLocalVarReset();
     void ICore_onLocalVarChanged(QString name, CoreVarValue varValue);
-    void ICore_onWatchVarChanged(QString watchId, QString name, QString value);
+    void ICore_onWatchVarChanged(QString watchId, QString name, QString value, bool hasChildren);
     void ICore_onConsoleStream(QString text);
     void ICore_onBreakpointsChanged();
     void ICore_onThreadListChanged();
@@ -54,7 +54,7 @@ public:
     void ICore_onStateChanged(TargetState state);
     void ICodeView_onRowDoubleClick(int lineNo);
     void ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList text);
-    void ICore_onWatchVarExpanded(QString watchId, QString name, QString valueString, QString varType);
+    void ICore_onWatchVarChildAdded(QString watchId, QString name, QString valueString, QString varType, bool hasChildren);
 
 private:
 

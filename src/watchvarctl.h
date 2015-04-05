@@ -17,7 +17,7 @@ public:
     
     void setWidget(QTreeWidget *varWidget);
 
-    void ICore_onWatchVarExpanded(QString watchId_, QString name, QString valueString, QString varType);
+    void ICore_onWatchVarChildAdded(QString watchId_, QString name, QString valueString, QString varType, bool hasChildren);
     void addNewWatch(QString varName);
     void deleteSelected();
 

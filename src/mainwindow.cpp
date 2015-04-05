@@ -306,6 +306,8 @@ void MainWindow::wrapSourceTree(QTreeWidget *treeWidget)
         QTreeWidgetItem* rootItem = treeWidget->topLevelItem (u);
         QTreeWidgetItem* childItem = rootItem->child(0);
         QString newName =  "/" + rootItem->text(0);
+        if(!childItem)
+            continue;
         
         do
         {
@@ -407,17 +409,17 @@ void MainWindow::ICore_onLocalVarChanged(QString name, CoreVarValue varValue)
 
 
 
-void MainWindow::ICore_onWatchVarChanged(QString watchId, QString name, QString valueString)
+void MainWindow::ICore_onWatchVarChanged(QString watchId, QString name, QString valueString, bool hasChildren)
 {
-    ICore_onWatchVarExpanded( watchId,  name,  valueString, "");
+    ICore_onWatchVarChildAdded( watchId,  name,  valueString, "", hasChildren);
     
 }
 
 
             
-void MainWindow::ICore_onWatchVarExpanded(QString watchId_, QString name, QString valueString, QString varType)
+void MainWindow::ICore_onWatchVarChildAdded(QString watchId_, QString name, QString valueString, QString varType, bool hasChildren)
 {
-    m_watchVarCtl.ICore_onWatchVarExpanded(watchId_, name, valueString, varType);
+    m_watchVarCtl.ICore_onWatchVarChildAdded(watchId_, name, valueString, varType, hasChildren);
 }
 
 

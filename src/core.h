@@ -106,7 +106,7 @@ class ICore
     virtual void ICore_onLocalVarChanged(QString name, CoreVarValue value) = 0;
     virtual void ICore_onFrameVarReset() = 0;
     virtual void ICore_onFrameVarChanged(QString name, QString value) = 0;
-    virtual void ICore_onWatchVarChanged(QString watchId, QString name, QString value) = 0;
+    virtual void ICore_onWatchVarChanged(QString watchId, QString name, QString value, bool hasChildren) = 0;
     virtual void ICore_onConsoleStream(QString text) = 0;
     virtual void ICore_onBreakpointsChanged() = 0;
     virtual void ICore_onThreadListChanged() = 0;
@@ -115,7 +115,13 @@ class ICore
     virtual void ICore_onMessage(QString message) = 0;
     virtual void ICore_onTargetOutput(QString message) = 0;
     virtual void ICore_onCurrentFrameChanged(int frameIdx) = 0;
-    virtual void ICore_onWatchVarExpanded(QString watchId, QString name, QString valueString, QString varType) = 0;
+    /**
+     * @brief Called when a new child item has been added for a watched item.
+     * @param watchId    The watchId of the new child.
+     * @param name       The name of the child.
+     * @param valueString  The value of the child.
+     */
+    virtual void ICore_onWatchVarChildAdded(QString watchId, QString name, QString valueString, QString varType, bool hasChildren) = 0;
     
 };
 
@@ -168,7 +174,7 @@ public:
     void gdbContinue();
     void gdbRun();
     void gdbGetFiles();
-    int gdbAddVarWatch(QString varName, QString *varType, QString *value, QString *watchId);
+    int gdbAddVarWatch(QString varName, QString *varType, QString *value, QString *watchId, bool *hasChildren);
     void gdbRemoveVarWatch(QString watchId);
     QString gdbGetVarWatchName(QString watchId);
     void gdbSetBreakpoint(QString filename, int lineNo);

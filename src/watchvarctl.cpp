@@ -38,7 +38,7 @@ void WatchVarCtl::setWidget(QTreeWidget *varWidget)
 
 
          
-void WatchVarCtl::ICore_onWatchVarExpanded(QString watchId_, QString name, QString valueString, QString varType)
+void WatchVarCtl::ICore_onWatchVarChildAdded(QString watchId_, QString name, QString valueString, QString varType, bool hasChildren)
 {
     QTreeWidget *varWidget = m_varWidget;
     QStringList names;
@@ -76,16 +76,19 @@ void WatchVarCtl::ICore_onWatchVarExpanded(QString watchId_, QString name, QStri
             debugMsg("Adding %s=%s", stringToCStr(name), stringToCStr(valueString));
 
             // Create the item
-            item = new QTreeWidgetItem(QStringList(name));
+            QStringList nameList;
+            nameList += name;
+            nameList += valueString;
+            nameList += varType;
+            item = new QTreeWidgetItem(nameList);
             item->setData(0, Qt::UserRole, thisWatchId);
             item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
             rootItem->addChild(item);
             rootItem = item;
 
-            if(varType == "struct {...}")
+            if(hasChildren)
                 rootItem->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
 
-            rootItem->setText(1, valueString);            
             
         
         }
@@ -176,9 +179,10 @@ WatchVarCtl::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int col
         QString value;
         QString watchId;
         QString varType;
-        if(core.gdbAddVarWatch(newName, &varType, &value, &watchId) == 0)
+        bool hasChildren = false;
+        if(core.gdbAddVarWatch(newName, &varType, &value, &watchId, &hasChildren) == 0)
         {
-            if(varType == "struct {...}")
+            if(hasChildren)
                 current->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
             current->setData(0, Qt::UserRole, watchId);
             current->setText(1, value);
@@ -207,7 +211,7 @@ WatchVarCtl::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int col
         }
     
     }
-    // Change a existing variable
+    // Change a existing variable?
     else
     {
         //debugMsg("'%s' -> %s", stringToCStr(current->text(0)), stringToCStr(current->text(0)));
@@ -228,13 +232,14 @@ WatchVarCtl::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int col
         QString value;
         QString watchId;
         QString varType;
-        if(core.gdbAddVarWatch(newName, &varType, &value, &watchId) == 0)
+        bool hasChildren = false;
+        if(core.gdbAddVarWatch(newName, &varType, &value, &watchId, &hasChildren) == 0)
         {
             current->setData(0, Qt::UserRole, watchId);
             current->setText(1, value);
             current->setText(2, varType);
 
-            if(varType == "struct {...}")
+            if(hasChildren)
             {
                 current->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
             }
@@ -347,6 +352,11 @@ void WatchVarCtl::fillInVars()
 
 }
 
+
+/**
+ * @brief Adds a new watch item
+ * @param varName    The expression to add as a watch.
+ */
 void WatchVarCtl::addNewWatch(QString varName)
 {
     // Add the new variable to the watch list

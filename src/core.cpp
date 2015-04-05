@@ -430,7 +430,7 @@ Core& Core::getInstance()
 }
 
 
-int Core::gdbAddVarWatch(QString varName, QString *varType, QString *value, QString *watchId_)
+int Core::gdbAddVarWatch(QString varName, QString *varType, QString *value, QString *watchId_, bool *hasChildren)
 {
     Com& com = Com::getInstance();
     Tree resultData;
@@ -454,6 +454,7 @@ int Core::gdbAddVarWatch(QString varName, QString *varType, QString *value, QStr
     QString varName2 = resultData.getString("name");
     QString varValue2 = resultData.getString("value");
     QString varType2 = resultData.getString("type");
+    int numChild = resultData.getInt("numchild", 0);
 
 
     // debugMsg("%s = %s = %s\n", stringToCStr(varName2),stringToCStr(varValue2), stringToCStr(varType2));
@@ -463,6 +464,7 @@ int Core::gdbAddVarWatch(QString varName, QString *varType, QString *value, QStr
     w.watchId = watchId;
     m_watchList[watchId] = w;
     
+    *hasChildren = numChild == 0 ? false : true;
     *varType = varType2;
     *value = varValue2;
     }
@@ -502,7 +504,11 @@ void Core::gdbExpandVarWatchChildren(QString watchId)
         QString childExp = resultData.getString(treePath + "/exp");
         QString childValue = resultData.getString(treePath + "/value");
         QString childType = resultData.getString(treePath + "/type");
-        m_inf->ICore_onWatchVarExpanded(childName, childExp, childValue, childType);
+        int numChild = resultData.getInt(treePath + "/numchild", 0);
+        bool hasChildren = false;
+        if(numChild > 0)
+            hasChildren = true;
+        m_inf->ICore_onWatchVarChildAdded(childName, childExp, childValue, childType, hasChildren);
     }
     
 }
@@ -804,9 +810,11 @@ void Core::onResult(Tree &tree)
 
                 QString varName = gdbGetVarWatchName(watchId);
                     
-        
+                bool hasChildren = false;
+                if (varValue == "{...}")
+                    hasChildren = true;
                 if(m_inf)
-                    m_inf->ICore_onWatchVarChanged(watchId, varName, varValue);
+                    m_inf->ICore_onWatchVarChanged(watchId, varName, varValue, hasChildren);
             }
             
         }
