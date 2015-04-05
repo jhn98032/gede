@@ -959,6 +959,7 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList tex
 
     
     // Add 'Show current PC location'
+    action = m_popupMenu.addSeparator();
     title = "Show current PC location";
     action = m_popupMenu.addAction(title);
     connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuShowCurrentLocation()));
