@@ -12,7 +12,7 @@ static const char ETAGS_CMD[] = "ctags";
 static const char ETAGS_ARGS[] = "  -f - --excmd=number --fields=+nmsSk";
 
 Tag::Tag()
-: m_signature("()")
+ : m_lineNo(0)
 {
 }
 
@@ -42,7 +42,7 @@ void Tag::dump() const
 
 
     qDebug() << "Sig: " << m_signature;
-    qDebug() << "Line: " <<lineNo;
+    qDebug() << "Line: " << m_lineNo;
     qDebug() << "\\------------";
 
 }
@@ -197,10 +197,13 @@ int TagScanner::parseOutput(QByteArray output, QList<Tag> *taglist)
                 tag.m_name = colList[0];
                 tag.filepath = colList[1];
                 QString type = colList[3];
-                if(type == "v")
+                if(type == "v") // v = variable
                     tag.type = Tag::TAG_VARIABLE;
-                else if(type == "f")
+                else if(type == "f") // f = function
+                {
                     tag.type = Tag::TAG_FUNC;
+                    tag.setSignature("()");
+                }
                 else
                 {
                     tag.type = Tag::TAG_VARIABLE;
@@ -222,10 +225,10 @@ int TagScanner::parseOutput(QByteArray output, QList<Tag> *taglist)
                             tag.className = fieldData;
                         if(fieldName == "signature")
                         {
-                            tag.m_signature = fieldData;
+                            tag.setSignature(fieldData);
                         }
                         else if(fieldName == "line")
-                            tag.lineNo = fieldData.toInt();
+                            tag.setLineNo(fieldData.toInt());
                     }
                 }
 

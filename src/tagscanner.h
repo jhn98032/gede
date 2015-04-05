@@ -14,13 +14,17 @@ class Tag
 
         QString getLongName() const;
         QString getSignature() const { return m_signature; };
+        void setSignature(QString signature) { m_signature = signature; };
+        void setLineNo(int lineNo) { m_lineNo = lineNo;};
+        int getLineNo() const { return m_lineNo; };
         
         QString className;
         QString m_name;
         QString filepath;
         enum { TAG_FUNC, TAG_VARIABLE} type;
+private:
         QString m_signature;
-        int lineNo;
+        int m_lineNo;
 };
 
 

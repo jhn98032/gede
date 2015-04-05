@@ -559,7 +559,7 @@ void MainWindow::open(QString filename)
         Tag &tag = tagList[tagIdx];
         if(tag.type == Tag::TAG_FUNC)
         {
-            m_ui.comboBox_funcList->addItem(tag.getLongName(), QVariant(tag.lineNo));
+            m_ui.comboBox_funcList->addItem(tag.getLongName(), QVariant(tag.getLineNo()));
         }
         
     }
@@ -946,11 +946,13 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList tex
                         QStringList defList;
                         defList.push_back(fileInfo.fullName);
                         QString lineNoStr;
-                        lineNoStr.sprintf("%d", tagInfo.lineNo);
+                        lineNoStr.sprintf("%d", tagInfo.getLineNo());
                         defList.push_back(lineNoStr);
 
                         // Add to popupmenu
-                        action = m_popupMenu.addAction("Show definition of '" + tagInfo.getLongName() + "'");
+                        QString menuEntryText;
+                        menuEntryText.sprintf("Show definition of '%s' L%d", stringToCStr(tagInfo.getLongName()), tagInfo.getLineNo());
+                        action = m_popupMenu.addAction(menuEntryText);
                         action->setData(defList);
                         connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuShowDefinition()));
                     }
