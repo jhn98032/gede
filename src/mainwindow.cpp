@@ -285,7 +285,7 @@ QTreeWidgetItem *MainWindow::addTreeWidgetPath(QTreeWidget *treeWidget, QTreeWid
     else
     {
         parent->addChild(newItem);
-        if(parent->text(0) != "usr")
+        if(parent->text(0) != "usr" && parent->text(0) != "opt")
             parent->setExpanded(true);
     }
 
