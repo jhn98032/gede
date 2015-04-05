@@ -909,6 +909,7 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList tex
 
     // Add 'toggle breakpoint'
     QString title;
+    m_popupMenu.addSeparator();
     title.sprintf("Toggle breakpoint at L%d", lineNo);
     action = m_popupMenu.addAction(title);
     action->setData(lineNo);
