@@ -177,6 +177,7 @@ void CodeView::mousePressEvent( QMouseEvent * event )
                 x += w;
             }
 
+            // Go backwards as much as possible
             if(foundPos != -1)
             {
                 
@@ -198,7 +199,12 @@ void CodeView::mousePressEvent( QMouseEvent * event )
             QStringList list;
             if(foundPos != -1)
             {
-                list  += cols[foundPos]->m_text;
+                QStringList partList = cols[foundPos]->m_text.split('.');
+                for(int partIdx = 1;partIdx <= partList.size();partIdx++)
+                {
+                    QStringList subList = partList.mid(0, partIdx);
+                    list += subList.join(".");
+                }
             }
             if(m_inf)
                 m_inf->ICodeView_onContextMenu(pos, lineNo, list);
