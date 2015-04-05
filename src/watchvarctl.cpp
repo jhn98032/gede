@@ -38,7 +38,7 @@ void WatchVarCtl::setWidget(QTreeWidget *varWidget)
 
 
          
-void WatchVarCtl::ICore_onWatchVarChildAdded(QString watchId_, QString name, QString valueString, QString varType, bool hasChildren)
+void WatchVarCtl::ICore_onWatchVarChildAdded(QString watchId, QString name, QString valueString, QString varType, bool hasChildren)
 {
     QTreeWidget *varWidget = m_varWidget;
     QStringList names;
@@ -47,7 +47,7 @@ void WatchVarCtl::ICore_onWatchVarChildAdded(QString watchId_, QString name, QSt
 
     //
     QTreeWidgetItem * rootItem = varWidget->invisibleRootItem();
-    QStringList watchIdParts = watchId_.split('.');
+    QStringList watchIdParts = watchId.split('.');
     QString thisWatchId;
     for(int partIdx = 0; partIdx < watchIdParts.size();partIdx++)
     {

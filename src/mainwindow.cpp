@@ -417,9 +417,9 @@ void MainWindow::ICore_onWatchVarChanged(QString watchId, QString name, QString 
 
 
             
-void MainWindow::ICore_onWatchVarChildAdded(QString watchId_, QString name, QString valueString, QString varType, bool hasChildren)
+void MainWindow::ICore_onWatchVarChildAdded(QString watchId, QString name, QString valueString, QString varType, bool hasChildren)
 {
-    m_watchVarCtl.ICore_onWatchVarChildAdded(watchId_, name, valueString, varType, hasChildren);
+    m_watchVarCtl.ICore_onWatchVarChildAdded(watchId, name, valueString, varType, hasChildren);
 }
 
 
