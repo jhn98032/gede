@@ -210,7 +210,8 @@ void CodeView::mousePressEvent( QMouseEvent * event )
                     else
                         incFile = "";
                 }
-                else // or a variable?
+                 // or a variable?
+                else if(cols[foundPos]->m_type == TextField::WORD)
                 {
                     QStringList partList = cols[foundPos]->m_text.split('.');
                     for(int partIdx = 1;partIdx <= partList.size();partIdx++)

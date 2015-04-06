@@ -10,7 +10,7 @@ struct TextField
 {
     QColor m_color;
     QString m_text;
-    enum {COMMENT, WORD, KEYWORD, CPP_KEYWORD, INC_STRING, STRING, SPACES} m_type;
+    enum {COMMENT, WORD, NUMBER, KEYWORD, CPP_KEYWORD, INC_STRING, STRING, SPACES} m_type;
 
     bool isHash() const { return m_text == "#" ? true : false; };
     bool isSpaces() const { return m_type == SPACES ? true : false; };

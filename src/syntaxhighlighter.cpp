@@ -114,7 +114,7 @@ void SyntaxHighlighter::pickColor(TextField *field)
        field->m_color = Qt::yellow;
     else if(field->m_type == TextField::CPP_KEYWORD)
         field->m_color = QColor(240,110,110);
-    else if(field->m_text[0].isDigit())
+    else if(field->m_type == TextField::NUMBER)
         field->m_color = Qt::magenta;
     else
        field->m_color = Qt::white;
@@ -263,7 +263,10 @@ void SyntaxHighlighter::colorize(QString text)
                 {
                     state = WORD;
                     field = new TextField;
-                    field->m_type = TextField::WORD;
+                    if(QChar(c).isDigit())
+                        field->m_type = TextField::NUMBER;
+                    else
+                        field->m_type = TextField::WORD;
                     field->m_color = Qt::white;
                     currentRow->appendField(field);
                     field->m_text = c;
