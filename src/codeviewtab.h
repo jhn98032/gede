@@ -3,6 +3,7 @@
 
 #include "ui_codeviewtab.h"
 
+#include "tagscanner.h"
 #include <QWidget>
 
 class CodeViewTab : public QWidget
@@ -15,11 +16,26 @@ public:
 
     void ensureLineIsVisible(int lineIdx);
     
-
-    QString m_filepath;
+    void setConfig(Settings *cfg);
+    void disableCurrentLine();
     
-//private:
+    void setCurrentLine(int currentLine);
+                    
+
+    int open(QString filename, QList<Tag> tagList);
+
+    void setInterface(ICodeView *inf);
+    
+    void setBreakpoints(const QVector<int> &numList);
+
+    QString getFilePath() { return m_filepath; };
+    
+public slots:
+    void onFuncListItemActivated(int index);
+
+private:
     Ui_CodeViewTab m_ui;
+    QString m_filepath;
    
 };
 

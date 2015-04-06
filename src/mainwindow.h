@@ -103,7 +103,6 @@ public slots:
     void onCodeViewContextMenuShowDefinition();
     void onCodeViewContextMenuShowCurrentLocation();
     void onSettings();
-    void onFuncListItemActivated(int index);
     void onCodeViewContextMenuToggleBreakpoint();
     void onCodeViewTab_tabCloseRequested ( int index );
     void onCodeViewTab_currentChanged( int tabIdx);
