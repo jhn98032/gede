@@ -12,6 +12,8 @@
 #include "tagscanner.h"
 #include "autovarctl.h"
 #include "watchvarctl.h"
+#include "codeviewtab.h"
+
 
 class FileInfo
 {
@@ -28,7 +30,7 @@ class MainWindow : public QMainWindow, public ICore, public ICodeView
 public:
     MainWindow(QWidget *parent);
 
-    void open(QString filename);
+    CodeViewTab* open(QString filename);
     void ensureLineIsVisible(int lineIdx);
 
 
@@ -57,7 +59,7 @@ public:
     void ICodeView_onContextMenuIncFile(QPoint pos, int lineNo, QString incFile);
     
     void ICore_onWatchVarChildAdded(QString watchId, QString name, QString valueString, QString varType, bool hasChildren);
-
+    
 private:
 
 public:
@@ -80,6 +82,9 @@ private:
                 VarCtl::DispInfoMap *map,
                 QTreeWidgetItem *item, TreeNode *rootNode);
 
+    CodeViewTab* createTab(QString filename);
+    CodeViewTab* currentTab();
+    void updateCurrentLine(QString filename, int lineno);
 
 public slots:
     void onFolderViewItemActivated ( QTreeWidgetItem * item, int column );
@@ -101,11 +106,12 @@ public slots:
     void onSettings();
     void onFuncListItemActivated(int index);
     void onCodeViewContextMenuToggleBreakpoint();
+    void onCodeViewTab_tabCloseRequested ( int index );
+    void onCodeViewTab_currentChanged( int tabIdx);
     
     
 private:
     Ui_MainWindow m_ui;
-    QString m_filename; // Currently displayed file
     QIcon m_fileIcon;
     QIcon m_folderIcon;
     QString m_currentFile; //!< The file which the program counter points to.

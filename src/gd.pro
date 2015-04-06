@@ -52,6 +52,11 @@ SOURCES+=settingsdialog.cpp
 HEADERS+=settingsdialog.h
 FORMS += settingsdialog.ui
 
+SOURCES+=codeviewtab.cpp
+HEADERS+=codeviewtab.h
+FORMS += codeviewtab.ui
+
+
 FORMS += mainwindow.ui
 FORMS += aboutdialog.ui
 FORMS += opendialog.ui

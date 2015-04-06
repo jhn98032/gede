@@ -6,6 +6,8 @@
 #include "aboutdialog.h"
 #include "settingsdialog.h"
 #include "tagscanner.h"
+#include "codeview.h"
+
 
 #include <QDirIterator>
 #include <QMessageBox>
@@ -22,7 +24,6 @@ MainWindow::MainWindow(QWidget *parent)
     m_autoVarCtl.setWidget(m_ui.autoWidget);
     m_watchVarCtl.setWidget(m_ui.varWidget);
 
-    m_ui.codeView->setInterface(this);
 
     m_fileIcon.addFile(QString::fromUtf8(":/images/res/file.png"), QSize(), QIcon::Normal, QIcon::Off);
     m_folderIcon.addFile(QString::fromUtf8(":/images/res/folder.png"), QSize(), QIcon::Normal, QIcon::Off);
@@ -125,8 +126,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_ui.actionSettings, SIGNAL(triggered()), SLOT(onSettings()));
 
-    connect(m_ui.comboBox_funcList, SIGNAL(activated(int)), SLOT(onFuncListItemActivated(int)));
-
+    
     m_tagScanner.init();
 
 
@@ -145,15 +145,25 @@ MainWindow::MainWindow(QWidget *parent)
     installEventFilter(this);
 
     loadConfig();
+
+    connect(m_ui.editorTabWidget, SIGNAL(tabCloseRequested(int)), SLOT(onCodeViewTab_tabCloseRequested(int)));
+    connect(m_ui.editorTabWidget, SIGNAL(currentChanged(int)), SLOT(onCodeViewTab_currentChanged(int)));
+    
     
 }
+
 
 void MainWindow::loadConfig()
 {
     m_cfg.load(CONFIG_FILENAME);
 
-    m_ui.codeView->setConfig(&m_cfg);
 
+    for(int tabIdx = 0;tabIdx <  m_ui.editorTabWidget->count();tabIdx++)
+    {
+        CodeViewTab* codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
+        codeViewTab->m_ui.codeView->setConfig(&m_cfg);
+    }
+    
 
     m_cfg.save(CONFIG_FILENAME);
 
@@ -196,14 +206,8 @@ void MainWindow::ICore_onStopped(ICore::StopReason reason, QString path, int lin
         QMessageBox::information (this, title, text); 
     }
     
-    m_currentFile = path;
-    m_currentLine = lineNo;
-    if(!path.isEmpty())
-    {
-        open(path);
-    }
-    else
-        m_ui.codeView->disableCurrentLine();
+    updateCurrentLine(path, lineNo);
+    
 
     fillInStack();
 }
@@ -432,11 +436,16 @@ void MainWindow::ICodeView_onRowDoubleClick(int lineNo)
 {
     Core &core = Core::getInstance();
 
-    BreakPoint* bkpt = core.findBreakPoint(m_filename, lineNo);
+    CodeViewTab* currentCodeViewTab = currentTab();
+    assert(currentCodeViewTab != NULL);
+    if(!currentCodeViewTab)
+        return;
+        
+    BreakPoint* bkpt = core.findBreakPoint(currentCodeViewTab->m_filepath, lineNo);
     if(bkpt)
         core.gdbRemoveBreakpoint(bkpt);
     else
-        core.gdbSetBreakpoint(m_filename, lineNo);
+        core.gdbSetBreakpoint(currentCodeViewTab->m_filepath, lineNo);
 }
 
     
@@ -516,28 +525,88 @@ void MainWindow::onFolderViewItemActivated ( QTreeWidgetItem * item, int column 
     }
 }
 
+CodeViewTab* MainWindow::currentTab()
+{
+    return (CodeViewTab*)m_ui.editorTabWidget->currentWidget();
+}
 
-void MainWindow::open(QString filename)
+
+CodeViewTab* MainWindow::createTab(QString filepath)
+{
+    CodeViewTab *newTab = new CodeViewTab(this);
+    connect(newTab->m_ui.comboBox_funcList, SIGNAL(activated(int)), SLOT(onFuncListItemActivated(int)));
+
+    newTab->m_filepath = filepath;
+    newTab->m_ui.codeView->setInterface(this);
+
+    newTab->m_ui.codeView->setConfig(&m_cfg);
+    
+    m_ui.editorTabWidget->addTab(newTab, getFilenamePart(filepath));
+
+    m_ui.editorTabWidget->setCurrentIndex(m_ui.editorTabWidget->count()-1);
+            
+
+    return newTab;
+}
+
+
+void MainWindow::onCodeViewTab_currentChanged( int tabIdx)
+{
+    Q_UNUSED(tabIdx);
+}
+
+
+void MainWindow::onCodeViewTab_tabCloseRequested ( int tabIdx)
+{
+    CodeViewTab *codeViewTab = (CodeViewTab *)m_ui.editorTabWidget->widget(tabIdx);
+    m_ui.editorTabWidget->removeTab(tabIdx);
+    delete codeViewTab;
+}
+
+
+CodeViewTab* MainWindow::open(QString filename)
 {
     if(filename.isEmpty())
-        return;
+        return NULL;
 
+    // Already open
+    int foundCodeViewTabIdx = -1;
+    for(int tabIdx = 0;tabIdx <  m_ui.editorTabWidget->count();tabIdx++)
+    {
+        CodeViewTab* codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
+        if(codeViewTab->m_filepath == filename)
+        {
+            foundCodeViewTabIdx = tabIdx;
+            
+        }
+    }
+
+    CodeViewTab* codeViewTab = NULL;
+    if(foundCodeViewTabIdx != -1)
+    {
+            m_ui.editorTabWidget->setCurrentIndex(foundCodeViewTabIdx);
+            codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(foundCodeViewTabIdx);
+    }
+    else
+    {
     QString text;
 
+    codeViewTab = createTab(filename);
+    
     // Read file content
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         errorMsg("Failed to open '%s'", stringToCStr(filename));
-        return;
+        return NULL;
     }
     while (!file.atEnd())
     {
          QByteArray line = file.readLine();
          text += line;
-     }
+    }
 
-    m_ui.scrollArea_codeView->setWidgetResizable(true);
+    codeViewTab->m_ui.scrollArea_codeView->setWidgetResizable(true);
 
     // Set window title
     QString windowTitle;
@@ -547,11 +616,10 @@ void MainWindow::open(QString filename)
     setWindowTitle(windowTitle);
 
 
-    m_filename = filename;
-    m_ui.codeView->setPlainText(text);
+    codeViewTab->m_ui.codeView->setPlainText(text);
 
     // Fill in the functions
-    m_ui.comboBox_funcList->clear();
+    codeViewTab->m_ui.comboBox_funcList->clear();
     QList<Tag> tagList;
     m_tagScanner.scan(filename, &tagList);
     for(int tagIdx = 0;tagIdx < tagList.size();tagIdx++)
@@ -559,25 +627,60 @@ void MainWindow::open(QString filename)
         Tag &tag = tagList[tagIdx];
         if(tag.type == Tag::TAG_FUNC)
         {
-            m_ui.comboBox_funcList->addItem(tag.getLongName(), QVariant(tag.getLineNo()));
+            codeViewTab->m_ui.comboBox_funcList->addItem(tag.getLongName(), QVariant(tag.getLineNo()));
         }
         
     }
 
-
-    // Update the current line view
-    if(m_currentFile == filename)
-    {
-        m_ui.codeView->setCurrentLine(m_currentLine);
-
-        // Scroll to the current line
-        ensureLineIsVisible(m_currentLine);
     }
-    else
-        m_ui.codeView->disableCurrentLine();
 
 
     ICore_onBreakpointsChanged();
+
+    return codeViewTab;
+}
+
+
+void MainWindow::updateCurrentLine(QString filename, int lineno)
+{
+    m_currentFile = filename;
+    m_currentLine = lineno;
+
+    if(!filename.isEmpty())
+    {
+        open(filename);
+    }
+
+    
+    // Update the current line view
+    if(!filename.isEmpty())
+    {
+        for(int tabIdx = 0;tabIdx <  m_ui.editorTabWidget->count();tabIdx++)
+        {
+            CodeViewTab* codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
+            if(codeViewTab->m_filepath == m_currentFile)
+                codeViewTab->m_ui.codeView->setCurrentLine(m_currentLine);
+        }
+        
+        // Scroll to the current line
+        CodeViewTab* currentCodeViewTab = currentTab();
+        if(currentCodeViewTab)
+        {
+            if(currentCodeViewTab->m_filepath == m_currentFile)
+                ensureLineIsVisible(m_currentLine);
+        }
+            
+    }
+    else
+    {
+        for(int tabIdx = 0;tabIdx <  m_ui.editorTabWidget->count();tabIdx++)
+        {
+            CodeViewTab* codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
+        
+            codeViewTab->m_ui.codeView->disableCurrentLine();
+        }
+    }
+
 }
 
  
@@ -620,10 +723,12 @@ void MainWindow::onRun()
 
 void MainWindow::onContinue()
 {
+    CodeViewTab* codeViewTab = currentTab();
     Core &core = Core::getInstance();
     core.gdbContinue();
 
-    m_ui.codeView->disableCurrentLine();
+    if(codeViewTab)
+        codeViewTab->m_ui.codeView->disableCurrentLine();
 
 }
 
@@ -695,8 +800,7 @@ void MainWindow::ICore_onBreakpointsChanged()
 {
     Core &core = Core::getInstance();
     QList<BreakPoint*>  bklist = core.getBreakPoints();
-    QVector<int> numList;
-
+    
 
     // Update the settings
     m_cfg.m_breakpoints.clear();
@@ -737,15 +841,22 @@ void MainWindow::ICore_onBreakpointsChanged()
     }
 
     // Update the fileview
-    for(int i = 0;i <  bklist.size();i++)
+    for(int tabIdx = 0;tabIdx <  m_ui.editorTabWidget->count();tabIdx++)
     {
-        BreakPoint* bk = bklist[i];
+        CodeViewTab* codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
 
-        if(bk->fullname == m_filename)
-            numList.push_back(bk->lineNo);
+        QVector<int> numList;
+        for(int i = 0;i <  bklist.size();i++)
+        {
+            BreakPoint* bk = bklist[i];
+
+            if(bk->fullname == codeViewTab->m_filepath)
+                numList.push_back(bk->lineNo);
+        }
+
+        codeViewTab->m_ui.codeView->setBreakpoints(numList);
+        codeViewTab->m_ui.codeView->update();
     }
-    m_ui.codeView->setBreakpoints(numList);
-    m_ui.codeView->update();
 }
 
 
@@ -799,14 +910,8 @@ void MainWindow::ICore_onCurrentFrameChanged(int frameIdx)
     {
         StackFrameEntry &entry = m_stackFrameList[m_stackFrameList.size()-frameIdx-1];
 
-        m_currentFile = entry.m_sourcePath;
-        m_currentLine = entry.m_line;
-        if(!m_currentFile.isEmpty())
-        {
-            open(m_currentFile);
-        }
-        else
-            m_ui.codeView->disableCurrentLine();
+        QString currentFile = entry.m_sourcePath;
+        updateCurrentLine(currentFile, entry.m_line);
     }
 
     // Update the selection of the current thread
@@ -855,14 +960,19 @@ void MainWindow::onBreakpointsWidgetItemDoubleClicked(QTreeWidgetItem * item,int
 
 void MainWindow::ensureLineIsVisible(int lineIdx)
 {
-    m_ui.scrollArea_codeView->ensureVisible(0, m_ui.codeView->getRowHeight()*lineIdx-1);
+    CodeViewTab* codeViewTab = currentTab();
+
+    if(!codeViewTab)
+        return;
+        
+    codeViewTab->m_ui.scrollArea_codeView->ensureVisible(0, codeViewTab->m_ui.codeView->getRowHeight()*lineIdx-1);
 
     // Select the function in the function combobox
     int bestFitIdx = -1;
     int bestFitDist = -1;
-    for(int u = 0;u < m_ui.comboBox_funcList->count();u++)
+    for(int u = 0;u < codeViewTab->m_ui.comboBox_funcList->count();u++)
     {
-        int funcLineNo = m_ui.comboBox_funcList->itemData(u).toInt();
+        int funcLineNo = codeViewTab->m_ui.comboBox_funcList->itemData(u).toInt();
         int dist = lineIdx-funcLineNo;
         if((bestFitDist > dist || bestFitIdx == -1) && dist >= 0)
         {
@@ -871,17 +981,17 @@ void MainWindow::ensureLineIsVisible(int lineIdx)
         }
     }
 
-    if(m_ui.comboBox_funcList->count() > 0)
+    if(codeViewTab->m_ui.comboBox_funcList->count() > 0)
     {
 
         if(bestFitIdx == -1)
         {
-            m_ui.comboBox_funcList->hide();
+            codeViewTab->m_ui.comboBox_funcList->hide();
         }
         else
         {
-            m_ui.comboBox_funcList->show();
-            m_ui.comboBox_funcList->setCurrentIndex(bestFitIdx);
+            codeViewTab->m_ui.comboBox_funcList->show();
+            codeViewTab->m_ui.comboBox_funcList->setCurrentIndex(bestFitIdx);
         }
 
     }
@@ -1030,11 +1140,15 @@ void MainWindow::onCodeViewContextMenuToggleBreakpoint()
     int lineNo = action->data().toInt();
     Core &core = Core::getInstance();
 
-    BreakPoint* bkpt = core.findBreakPoint(m_filename, lineNo);
+    CodeViewTab* currentCodeViewTab = currentTab();
+    if(!currentCodeViewTab)
+        return;
+        
+    BreakPoint* bkpt = core.findBreakPoint(currentCodeViewTab->m_filepath, lineNo);
     if(bkpt)
         core.gdbRemoveBreakpoint(bkpt);
     else
-        core.gdbSetBreakpoint(m_filename, lineNo);
+        core.gdbSetBreakpoint(currentCodeViewTab->m_filepath, lineNo);
 
 }
 
@@ -1050,6 +1164,7 @@ void MainWindow::onCodeViewContextMenuShowCurrentLocation()
 
 void MainWindow::onCodeViewContextMenuShowDefinition()
 {
+    
     // Get the selected function name
     QAction *action = static_cast<QAction *>(sender ());
     QStringList list = action->data().toStringList();
@@ -1061,20 +1176,23 @@ void MainWindow::onCodeViewContextMenuShowDefinition()
     int lineNo = list[1].toInt();
 
     // Open file
-    open(foundFilepath);            
+    CodeViewTab* codeViewTab = open(foundFilepath);
 
     // Scroll to the function
     int showLineNo = lineNo-1;
     if(showLineNo < 0)
         showLineNo = 0;
-    m_ui.scrollArea_codeView->verticalScrollBar()->setValue(m_ui.codeView->getRowHeight()*showLineNo);
+    if(codeViewTab)
+        codeViewTab->m_ui.scrollArea_codeView->verticalScrollBar()->setValue(codeViewTab->m_ui.codeView->getRowHeight()*showLineNo);
 
 
     // Select the function in the function combobox
-    int idx = m_ui.comboBox_funcList->findData(QVariant(lineNo));
+    if(codeViewTab)
+    {
+    int idx = codeViewTab->m_ui.comboBox_funcList->findData(QVariant(lineNo));
     if(idx >= 0)
-        m_ui.comboBox_funcList->setCurrentIndex(idx);
-
+        codeViewTab->m_ui.comboBox_funcList->setCurrentIndex(idx);
+    }
 }
 
 void MainWindow::onCodeViewContextMenuOpenFile()
@@ -1092,8 +1210,10 @@ void MainWindow::onCodeViewContextMenuOpenFile()
 
     
     // First try the same dir as the currently open file
+    CodeViewTab* currentCodeViewTab = currentTab();
+    assert(currentCodeViewTab != NULL);
     QString folderPath;
-    dividePath(m_filename, NULL, &folderPath);
+    dividePath(currentCodeViewTab->m_filepath, NULL, &folderPath);
     if(QFileInfo(folderPath + "/" + filename).exists())
         foundFilename = folderPath + "/" + filename;
     else
@@ -1154,13 +1274,18 @@ void MainWindow::onCodeViewContextMenuAddWatch()
 
 void MainWindow::onSettings()
 {
+    
     SettingsDialog dlg(this, &m_cfg);
     if(dlg.exec() == QDialog::Accepted)
     {
         dlg.getConfig(&m_cfg);
 
-        m_ui.codeView->setConfig(&m_cfg);
-
+        for(int tabIdx = 0;tabIdx <  m_ui.editorTabWidget->count();tabIdx++)
+        {
+            CodeViewTab* codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
+            codeViewTab->m_ui.codeView->setConfig(&m_cfg);
+        }
+        
         m_cfg.save(CONFIG_FILENAME);
     }
    
@@ -1168,6 +1293,8 @@ void MainWindow::onSettings()
 
 void MainWindow::ICore_onSignalReceived(QString signalName)
 {
+    CodeViewTab* codeViewTab = currentTab();
+
     if(signalName != "SIGINT")
     {
         //
@@ -1177,7 +1304,8 @@ void MainWindow::ICore_onSignalReceived(QString signalName)
         QMessageBox::warning(this, title, msgText);
     }
     
-    m_ui.codeView->disableCurrentLine();
+    if(codeViewTab)
+        codeViewTab->m_ui.codeView->disableCurrentLine();
 
     fillInStack();
 
@@ -1217,11 +1345,16 @@ void MainWindow::ICore_onStateChanged(TargetState state)
 
 void MainWindow::onFuncListItemActivated(int index)
 {
-    int funcLineNo = m_ui.comboBox_funcList->itemData(index).toInt();
+    CodeViewTab* codeViewTab = currentTab();
+    assert(codeViewTab != NULL);
+    if(!codeViewTab)
+        return;
+        
+    int funcLineNo = codeViewTab->m_ui.comboBox_funcList->itemData(index).toInt();
     int lineIdx = funcLineNo-2;
     if(lineIdx < 0)
         lineIdx = 0;
-    m_ui.scrollArea_codeView->verticalScrollBar()->setValue(m_ui.codeView->getRowHeight()*lineIdx);
+    codeViewTab->m_ui.scrollArea_codeView->verticalScrollBar()->setValue(codeViewTab->m_ui.codeView->getRowHeight()*lineIdx);
 }
 
 
