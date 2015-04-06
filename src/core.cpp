@@ -129,6 +129,7 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
 {
     Com& com = Com::getInstance();
     Tree resultData;
+    int rc = 0;
     
     if(com.init(gdbPath))
     {
@@ -154,7 +155,11 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
         com.command(NULL, commandStr);
     }
     
-    gdbSetBreakpointAtFunc("main");
+    if(gdbSetBreakpointAtFunc("main"))
+    {
+        rc = 1;
+        errorMsg("Failed to set breakpoint at main");
+    }
 
     gdbGetFiles();
 
@@ -174,7 +179,8 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
     }
 
 
-    gdbRun();
+    if(rc == 0)
+        gdbRun();
 
     
     return 0;
@@ -299,12 +305,20 @@ void Core::gdbGetFiles()
 }
 
 
-void Core::gdbSetBreakpointAtFunc(QString func)
+int Core::gdbSetBreakpointAtFunc(QString func)
 {
     Com& com = Com::getInstance();
     Tree resultData;
-
-    com.commandF(&resultData, "-break-insert %s", stringToCStr(func));
+    int rc = 0;
+    int res;
+    
+    res = com.commandF(&resultData, "-break-insert %s", stringToCStr(func));
+    if(res == GDB_ERROR)
+    {
+        rc = -1;
+    }
+    
+    return rc;
 }
 
 void Core::gdbRun()

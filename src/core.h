@@ -167,7 +167,7 @@ private:
     static ICore::StopReason parseReasonString(QString string);
     
 public:
-    void gdbSetBreakpointAtFunc(QString func);
+    int gdbSetBreakpointAtFunc(QString func);
     void gdbNext();
     void gdbStepIn();
     void gdbStepOut();
