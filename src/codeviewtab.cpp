@@ -113,7 +113,7 @@ void CodeViewTab::ensureLineIsVisible(int lineIdx)
     }
 
     m_ui.scrollArea_codeView->ensureVisible(0, m_ui.codeView->getRowHeight()*lineIdx-1);
-
+    m_ui.scrollArea_codeView->ensureVisible(0, m_ui.codeView->getRowHeight()*lineIdx-1);
 }
 
 void CodeViewTab::onFuncListItemActivated(int index)
