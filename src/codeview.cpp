@@ -30,7 +30,6 @@ CodeView::~CodeView()
 
 void CodeView::setPlainText(QString text)
 {
-    text.replace("\r\n", "\n");
     text.replace("\r", "");
 
     m_highlighter.colorize(text);
