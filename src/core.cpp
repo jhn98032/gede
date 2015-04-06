@@ -1007,15 +1007,21 @@ void Core::onLogStreamOutput(QString str)
         infoMsg("GDB | Log-stream | %s", stringToCStr(list[i]));
 }
 
-void Core::gdbSetBreakpoint(QString filename, int lineNo)
+int Core::gdbSetBreakpoint(QString filename, int lineNo)
 {
     Com& com = Com::getInstance();
     Tree resultData;
+    int rc = 0;
     
     assert(filename != "");
     
-    com.commandF(&resultData, "-break-insert %s:%d", stringToCStr(filename), lineNo);
-
+    int res = com.commandF(&resultData, "-break-insert %s:%d", stringToCStr(filename), lineNo);
+    if(res == GDB_ERROR)
+    {
+        rc = -1;
+    }
+    
+    return rc;
 }
 
 QList<ThreadInfo> Core::getThreadList()

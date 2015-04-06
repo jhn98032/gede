@@ -177,7 +177,7 @@ public:
     int gdbAddVarWatch(QString varName, QString *varType, QString *value, QString *watchId, bool *hasChildren);
     void gdbRemoveVarWatch(QString watchId);
     QString gdbGetVarWatchName(QString watchId);
-    void gdbSetBreakpoint(QString filename, int lineNo);
+    int gdbSetBreakpoint(QString filename, int lineNo);
     void gdbGetThreadList();
     void getStackFrames();
     void stop();
