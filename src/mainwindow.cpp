@@ -927,26 +927,9 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList tex
     QAction *action;
     int totalItemCount = 0;
 
-    m_popupMenu.clear();
-    for(int i = 0;i < text.size();i++)
-    {
-        action = m_popupMenu.addAction("Add '" + text[i] + "' to watch list");
-        action->setData(text[i]);
-        connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuAddWatch()));
-
-    }
-
-    // Add 'toggle breakpoint'
-    QString title;
-    m_popupMenu.addSeparator();
-    title.sprintf("Toggle breakpoint at L%d", lineNo);
-    action = m_popupMenu.addAction(title);
-    action->setData(lineNo);
-    connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuToggleBreakpoint()));
-
-    action = m_popupMenu.addSeparator();
-    
-
+    // Create actions for each tag
+    QList<QAction*> defActionList;
+    bool onlyFuncs = true;
     for(int k = 0;k < text.size();k++)
     {
         // Get the tag to look for
@@ -979,16 +962,54 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList tex
                         lineNoStr.sprintf("%d", tagInfo.getLineNo());
                         defList.push_back(lineNoStr);
 
+                        if(tagInfo.type != Tag::TAG_FUNC)
+                            onlyFuncs = false;
+                            
                         // Add to popupmenu
                         QString menuEntryText;
                         menuEntryText.sprintf("Show definition of '%s' L%d", stringToCStr(tagInfo.getLongName()), tagInfo.getLineNo());
-                        action = m_popupMenu.addAction(menuEntryText);
+                        QAction *action = new QAction(menuEntryText, &m_popupMenu);
                         action->setData(defList);
-                        connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuShowDefinition()));
+                        defActionList.push_back(action);
                     }
                 }
             }
         }
+    }
+
+
+    m_popupMenu.clear();
+
+    // Add 'Add to watch list'
+    if(!onlyFuncs)
+    {
+        for(int i = 0;i < text.size();i++)
+        {
+            action = m_popupMenu.addAction("Add '" + text[i] + "' to watch list");
+            action->setData(text[i]);
+            connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuAddWatch()));
+
+        }
+    }
+
+
+    // Add 'toggle breakpoint'
+    QString title;
+    m_popupMenu.addSeparator();
+    title.sprintf("Toggle breakpoint at L%d", lineNo);
+    action = m_popupMenu.addAction(title);
+    action->setData(lineNo);
+    connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuToggleBreakpoint()));
+
+    action = m_popupMenu.addSeparator();
+
+    // Add to the menu
+    for(int i = 0;i < defActionList.size();i++)
+    {
+        QAction *action = defActionList[i];
+                        
+        m_popupMenu.addAction(action);
+        connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuShowDefinition()));
     }
 
     
