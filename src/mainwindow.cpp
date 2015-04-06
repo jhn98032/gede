@@ -604,6 +604,29 @@ CodeViewTab* MainWindow::open(QString filename)
 }
 
 
+void MainWindow::onCurrentLineChanged(int lineno)
+{
+    for(int tabIdx = 0;tabIdx <  m_ui.editorTabWidget->count();tabIdx++)
+    {
+        CodeViewTab* codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
+        if(codeViewTab->getFilePath() == m_currentFile)
+            codeViewTab->setCurrentLine(lineno);
+    }
+
+}
+
+
+void MainWindow::onCurrentLineDisabled()
+{
+    for(int tabIdx = 0;tabIdx <  m_ui.editorTabWidget->count();tabIdx++)
+    {
+        CodeViewTab* codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
+    
+        codeViewTab->disableCurrentLine();
+    }
+
+}
+
 void MainWindow::updateCurrentLine(QString filename, int lineno)
 {
     m_currentFile = filename;
@@ -618,12 +641,8 @@ void MainWindow::updateCurrentLine(QString filename, int lineno)
     // Update the current line view
     if(!filename.isEmpty())
     {
-        for(int tabIdx = 0;tabIdx <  m_ui.editorTabWidget->count();tabIdx++)
-        {
-            CodeViewTab* codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
-            if(codeViewTab->getFilePath() == m_currentFile)
-                codeViewTab->setCurrentLine(m_currentLine);
-        }
+        onCurrentLineChanged(m_currentLine);
+        
         
         // Scroll to the current line
         CodeViewTab* currentCodeViewTab = currentTab();
@@ -636,12 +655,7 @@ void MainWindow::updateCurrentLine(QString filename, int lineno)
     }
     else
     {
-        for(int tabIdx = 0;tabIdx <  m_ui.editorTabWidget->count();tabIdx++)
-        {
-            CodeViewTab* codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
-        
-            codeViewTab->disableCurrentLine();
-        }
+        onCurrentLineDisabled();
     }
 
 }
@@ -684,16 +698,15 @@ void MainWindow::onRun()
 
 }
 
+
 void MainWindow::onContinue()
 {
-    CodeViewTab* codeViewTab = currentTab();
     Core &core = Core::getInstance();
     core.gdbContinue();
 
-    if(codeViewTab)
-        codeViewTab->disableCurrentLine();
-
+    onCurrentLineDisabled();
 }
+
 
 void MainWindow::onStepIn()
 {
@@ -1208,8 +1221,6 @@ void MainWindow::onSettings()
 
 void MainWindow::ICore_onSignalReceived(QString signalName)
 {
-    CodeViewTab* codeViewTab = currentTab();
-
     if(signalName != "SIGINT")
     {
         //
@@ -1219,8 +1230,7 @@ void MainWindow::ICore_onSignalReceived(QString signalName)
         QMessageBox::warning(this, title, msgText);
     }
     
-    if(codeViewTab)
-        codeViewTab->disableCurrentLine();
+    onCurrentLineDisabled();
         
     fillInStack();
 

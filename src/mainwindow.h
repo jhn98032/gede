@@ -84,6 +84,9 @@ private:
     CodeViewTab* createTab(QString filename);
     CodeViewTab* currentTab();
     void updateCurrentLine(QString filename, int lineno);
+    void onCurrentLineChanged(int lineno);
+    void onCurrentLineDisabled();
+
 
 public slots:
     void onFolderViewItemActivated ( QTreeWidgetItem * item, int column );
