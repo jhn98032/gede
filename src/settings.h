@@ -29,6 +29,8 @@ class Settings
         void save(QString filepath);
 
         static QStringList getDefaultKeywordList();
+        static QStringList getDefaultCppKeywordList();
+        
         
     public:
         QStringList m_argumentList;

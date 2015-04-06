@@ -1,12 +1,22 @@
 #include "syntaxhighlighter.h"
 
-   
 #include <assert.h>
+#include <stdio.h>
 #include <QStringList>
 #include "util.h"
 #include "settings.h"
 
-#include <stdio.h>
+
+SyntaxHighlighter::Row::Row()
+    : isCppRow(0)
+{
+};
+
+
+void SyntaxHighlighter::Row::appendField(TextField* field)
+{
+    fields.push_back(field);
+}
 
 
 SyntaxHighlighter::SyntaxHighlighter()
@@ -16,6 +26,14 @@ SyntaxHighlighter::SyntaxHighlighter()
     {
         m_keywords[keywordList[u]] = true;
     }
+
+    QStringList cppKeywordList = Settings::getDefaultCppKeywordList();
+    for(int u = 0;u < cppKeywordList.size();u++)
+    {
+        m_cppKeywords[cppKeywordList[u]] = true;
+    }
+
+
 }
 
 SyntaxHighlighter::~SyntaxHighlighter()
@@ -50,6 +68,23 @@ bool SyntaxHighlighter::isSpecialChar(TextField *field) const
     return false;
 }
 
+
+bool SyntaxHighlighter::isCppKeyword(QString text) const
+{
+    if(text.size() == 0)
+        return false;
+
+    if(m_cppKeywords.contains(text))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
+
 bool SyntaxHighlighter::isKeyword(QString text) const
 {
     if(text.size() == 0)
@@ -70,11 +105,15 @@ void SyntaxHighlighter::pickColor(TextField *field)
     if(field->m_type == TextField::COMMENT)
         field->m_color = Qt::green;
     else if(field->m_type == TextField::STRING)
-        field->m_color = QColor(60,60,255);
+        field->m_color = QColor(0,125, 250);
+    else if(field->m_type == TextField::INC_STRING)
+        field->m_color = QColor(0,125, 250);
     else if(field->m_text.isEmpty())
         field->m_color = Qt::white;
-    else if(isKeyword(field->m_text))
+    else if(field->m_type == TextField::KEYWORD)
        field->m_color = Qt::yellow;
+    else if(field->m_type == TextField::CPP_KEYWORD)
+        field->m_color = QColor(240,110,110);
     else if(field->m_text[0].isDigit())
         field->m_color = Qt::magenta;
     else
@@ -108,7 +147,8 @@ void SyntaxHighlighter::colorize(QString text)
         SPACES,
         WORD, GLOBAL_INCLUDE_FILE, COMMENT1,COMMENT,
         STRING,
-        ESCAPED_CHAR
+        ESCAPED_CHAR,
+        INC_STRING
     } state = IDLE;
     char c = '\n';
     char prevC = ' ';
@@ -144,7 +184,7 @@ void SyntaxHighlighter::colorize(QString text)
                     field = new TextField;
                     field->m_type = TextField::WORD;
                     field->m_color = Qt::white;
-                    currentRow->fields.push_back(field);
+                    currentRow->appendField(field);
                     field->m_text = c;
                 }
                 else if(c == ' ' || c == '\t')
@@ -153,7 +193,7 @@ void SyntaxHighlighter::colorize(QString text)
                     field = new TextField;
                     field->m_type = TextField::SPACES;
                     field->m_color = Qt::white;
-                    currentRow->fields.push_back(field);
+                    currentRow->appendField(field);
                     field->m_text = c;
                 }
                 else if(c == '\'')
@@ -161,15 +201,48 @@ void SyntaxHighlighter::colorize(QString text)
                     state = ESCAPED_CHAR;
                     field = new TextField;
                     field->m_type = TextField::STRING;
-                    currentRow->fields.push_back(field);
+                    currentRow->appendField(field);
                     field->m_text = c;
                 }
                 else if(c == '"')
                 {
                     state = STRING;
                     field = new TextField;
-                    field->m_type = TextField::STRING;
-                    currentRow->fields.push_back(field);
+                    if(currentRow->isCppRow)
+                        field->m_type = TextField::INC_STRING;
+                    else
+                        field->m_type = TextField::STRING;
+                    currentRow->appendField(field);
+                    field->m_text = c;
+                }
+                else if(c == '<' && currentRow->isCppRow)
+                {
+                    state = INC_STRING;
+                    field = new TextField;
+                    field->m_type = TextField::INC_STRING;
+                    currentRow->appendField(field);
+                    field->m_text = c;
+                }
+                else if(c == '#')
+                {
+                    bool onlySpaces = true;
+                    for(int j = 0;onlySpaces == true && j < currentRow->fields.size();j++)
+                    {
+                        if(currentRow->fields[j]->m_type != TextField::SPACES &&
+                            currentRow->fields[j]->m_type != TextField::COMMENT)
+                        {
+                            onlySpaces = false;
+                        }
+                    }
+                    currentRow->isCppRow = onlySpaces ? true : false;
+                    
+                    field = new TextField;
+                    if(currentRow->isCppRow)
+                        field->m_type = TextField::CPP_KEYWORD;
+                    else
+                        field->m_type = TextField::WORD;
+                    field->m_color = Qt::white;
+                    currentRow->appendField(field);
                     field->m_text = c;
                 }
                 else if(isSpecialChar(c))
@@ -177,7 +250,7 @@ void SyntaxHighlighter::colorize(QString text)
                     field = new TextField;
                     field->m_type = TextField::WORD;
                     field->m_color = Qt::white;
-                    currentRow->fields.push_back(field);
+                    currentRow->appendField(field);
                     field->m_text = c;
                 }
                 else if(c == '\n')
@@ -192,7 +265,7 @@ void SyntaxHighlighter::colorize(QString text)
                     field = new TextField;
                     field->m_type = TextField::WORD;
                     field->m_color = Qt::white;
-                    currentRow->fields.push_back(field);
+                    currentRow->appendField(field);
                     field->m_text = c;
                 }
             };break;
@@ -228,7 +301,7 @@ void SyntaxHighlighter::colorize(QString text)
 
                     field = new TextField;
                     field->m_type = TextField::COMMENT;
-                    currentRow->fields.push_back(field);
+                    currentRow->appendField(field);
                     
                 }
                 else if(text[i-1].toAscii() == '*' && c == '/')
@@ -283,6 +356,15 @@ void SyntaxHighlighter::colorize(QString text)
                     state = IDLE;
                 }
             };break;
+            case INC_STRING:
+            {
+                field->m_text += c;
+                if(!isEscaped && c == '>')
+                {
+                    field = NULL;
+                    state = IDLE;
+                }
+            };break;
             case STRING:
             {
                 field->m_text += c;
@@ -298,7 +380,17 @@ void SyntaxHighlighter::colorize(QString text)
                 if(isSpecialChar(c) || c == ' ' || c == '\t' || c == '\n')
                 {
                     i--;
-                    pickColor(field);
+                    if(currentRow->isCppRow)
+                    {
+                        if(isCppKeyword(field->m_text))
+                            field->m_type = TextField::CPP_KEYWORD;
+                    }
+                    else
+                    {
+                        if(isKeyword(field->m_text))
+                            field->m_type = TextField::KEYWORD;
+                    }
+    
                     field = NULL;
                     state = IDLE;
                 }
@@ -315,10 +407,11 @@ void SyntaxHighlighter::colorize(QString text)
     for(int r = 0;r < m_rows.size();r++)
     {
         Row *currentRow = m_rows[r];
-    
+
         for(int j = 0;j < currentRow->fields.size();j++)
         {
-            pickColor(currentRow->fields[j]);
+            TextField* currentField = currentRow->fields[j];
+            pickColor(currentField);
         }
     }
 }

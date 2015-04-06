@@ -93,6 +93,18 @@ void Settings::save(QString filepath)
 
 }
          
+QStringList Settings::getDefaultCppKeywordList()
+{
+    QStringList keywordList;
+    keywordList += "#";
+    keywordList += "if";
+    keywordList += "def";
+    keywordList += "defined";
+    keywordList += "ifdef";
+    keywordList += "ifndef";
+    keywordList += "include";
+    return keywordList;
+}
 
 QStringList Settings::getDefaultKeywordList()
 {
