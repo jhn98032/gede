@@ -667,7 +667,7 @@ void MainWindow::updateCurrentLine(QString filename, int lineno)
         if(currentCodeViewTab)
         {
             if(currentCodeViewTab->m_filepath == m_currentFile)
-                ensureLineIsVisible(m_currentLine);
+                currentCodeViewTab->ensureLineIsVisible(m_currentLine);
         }
             
     }
@@ -951,51 +951,13 @@ void MainWindow::onBreakpointsWidgetItemDoubleClicked(QTreeWidgetItem * item,int
     int idx = item->data(0, Qt::UserRole).toInt();
     BreakPoint* bk = bklist[idx];
 
-    open(bk->fullname);
+    CodeViewTab* currentCodeViewTab = open(bk->fullname);
     
-    ensureLineIsVisible(bk->lineNo);
+    currentCodeViewTab->ensureLineIsVisible(bk->lineNo);
     
 }
     
 
-void MainWindow::ensureLineIsVisible(int lineIdx)
-{
-    CodeViewTab* codeViewTab = currentTab();
-
-    if(!codeViewTab)
-        return;
-        
-    codeViewTab->m_ui.scrollArea_codeView->ensureVisible(0, codeViewTab->m_ui.codeView->getRowHeight()*lineIdx-1);
-
-    // Select the function in the function combobox
-    int bestFitIdx = -1;
-    int bestFitDist = -1;
-    for(int u = 0;u < codeViewTab->m_ui.comboBox_funcList->count();u++)
-    {
-        int funcLineNo = codeViewTab->m_ui.comboBox_funcList->itemData(u).toInt();
-        int dist = lineIdx-funcLineNo;
-        if((bestFitDist > dist || bestFitIdx == -1) && dist >= 0)
-        {
-            bestFitDist = dist;
-            bestFitIdx = u;
-        }
-    }
-
-    if(codeViewTab->m_ui.comboBox_funcList->count() > 0)
-    {
-
-        if(bestFitIdx == -1)
-        {
-            codeViewTab->m_ui.comboBox_funcList->hide();
-        }
-        else
-        {
-            codeViewTab->m_ui.comboBox_funcList->show();
-            codeViewTab->m_ui.comboBox_funcList->setCurrentIndex(bestFitIdx);
-        }
-
-    }
-}
 
 /**
  * @brief User has right clicked in the codeview on a include file.
@@ -1156,9 +1118,9 @@ void MainWindow::onCodeViewContextMenuToggleBreakpoint()
 void MainWindow::onCodeViewContextMenuShowCurrentLocation()
 {
     // Open file
-    open(m_currentFile);
+    CodeViewTab* currentCodeViewTab = open(m_currentFile);
 
-    ensureLineIsVisible(m_currentLine);    
+    currentCodeViewTab->ensureLineIsVisible(m_currentLine);    
 }
 
 

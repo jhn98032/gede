@@ -12,6 +12,8 @@ Q_OBJECT
 public:
     CodeViewTab(QWidget *parent);
     virtual ~CodeViewTab();
+
+    void ensureLineIsVisible(int lineIdx);
     
 
     QString m_filepath;

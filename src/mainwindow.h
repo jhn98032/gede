@@ -31,8 +31,7 @@ public:
     MainWindow(QWidget *parent);
 
     CodeViewTab* open(QString filename);
-    void ensureLineIsVisible(int lineIdx);
-
+    
 
 public:
     void insertSourceFiles();
