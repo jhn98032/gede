@@ -12,7 +12,8 @@ class ICodeView
     ICodeView(){};
 
     virtual void ICodeView_onRowDoubleClick(int lineNo) = 0;
-    virtual void ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList text) = 0;
+    virtual void ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList symbolList) = 0;
+    virtual void ICodeView_onContextMenuIncFile(QPoint pos, int lineNo, QString incFile) = 0;
     
 
 };

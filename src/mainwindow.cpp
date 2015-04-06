@@ -887,9 +887,38 @@ void MainWindow::ensureLineIsVisible(int lineIdx)
     }
 }
 
+/**
+ * @brief User has right clicked in the codeview on a include file.
+ */
+void MainWindow::ICodeView_onContextMenuIncFile(QPoint pos, int lineNo, QString incFile)
+{
+    QAction *action;
+    QString title;
+
+    Q_UNUSED(lineNo);
+    
+    m_popupMenu.clear();
+
+    // Add 'open'
+    action = m_popupMenu.addAction("Open " + incFile);
+    action->setData(incFile);
+    connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuOpenFile()));
+
+        
+    // Add 'Show current PC location'
+    action = m_popupMenu.addSeparator();
+    title = "Show current PC location";
+    action = m_popupMenu.addAction(title);
+    connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuShowCurrentLocation()));
+
+    
+    m_popupMenu.popup(pos);
+
+}
+
 
 /**
- * @brief User right clicked in the codeview.
+ * @brief User has right clicked in the codeview.
  * @param lineNo    The row (1=first row).
  *
  */
@@ -1027,6 +1056,67 @@ void MainWindow::onCodeViewContextMenuShowDefinition()
 
 }
 
+void MainWindow::onCodeViewContextMenuOpenFile()
+{
+    QString foundFilename;
+    
+    // Get the selected variable name
+    QAction *action = static_cast<QAction *>(sender ());
+    QString filename = action->data().toString();
+
+    QString filenameWop = filename;
+    int divPos = filenameWop.lastIndexOf('/');
+    if(divPos != -1)
+        filenameWop = filenameWop.mid(divPos+1);
+
+    
+    // First try the same dir as the currently open file
+    QString folderPath;
+    dividePath(m_filename, NULL, &folderPath);
+    if(QFileInfo(folderPath + "/" + filename).exists())
+        foundFilename = folderPath + "/" + filename;
+    else
+    {
+
+        // Look in all the project files
+        for(int j = 0;foundFilename == "" && j < m_sourceFiles.size();j++)
+        {
+            FileInfo &info = m_sourceFiles[j];
+            if(info.fullName.endsWith("/" + filenameWop))
+                foundFilename = info.fullName;
+        }
+
+        // otherwise look in all the dirs
+        if(foundFilename == "")
+        {
+            // Get a list of all dirs to look in
+            QStringList dirs;
+            for(int j = 0;foundFilename == "" && j < m_sourceFiles.size();j++)
+            {
+                FileInfo &info = m_sourceFiles[j];
+                dividePath(info.fullName, NULL, &folderPath);
+                dirs.push_back(folderPath);
+            }
+            dirs.removeDuplicates();
+
+
+            // Look in the dirs
+            for(int j = 0;foundFilename == "" && j < dirs.size();j++)
+            {
+                QString testDir = dirs[j];
+                if(QFileInfo(testDir + "/" + filenameWop).exists())
+                    foundFilename = testDir + "/" + filenameWop;
+            }
+            
+        }
+
+    }
+
+    // open the file
+    if(!foundFilename.isEmpty())
+        open(foundFilename);
+        
+}
 
 void MainWindow::onCodeViewContextMenuAddWatch()
 {

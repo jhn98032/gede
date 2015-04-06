@@ -195,20 +195,41 @@ void CodeView::mousePressEvent( QMouseEvent * event )
                     }
                 }
             }
-            
+
+            // Found anything under the cursor?
+            QString incFile;
             QStringList list;
             if(foundPos != -1)
             {
-                QStringList partList = cols[foundPos]->m_text.split('.');
-                for(int partIdx = 1;partIdx <= partList.size();partIdx++)
+                // Found a include file?
+                if(cols[foundPos]->m_type == TextField::INC_STRING)
                 {
-                    QStringList subList = partList.mid(0, partIdx);
-                    list += subList.join(".");
+                    incFile = cols[foundPos]->m_text.trimmed();
+                    if(incFile.length() > 2)
+                        incFile = incFile.mid(1, incFile.length()-2);
+                    else
+                        incFile = "";
+                }
+                else // or a variable?
+                {
+                    QStringList partList = cols[foundPos]->m_text.split('.');
+                    for(int partIdx = 1;partIdx <= partList.size();partIdx++)
+                    {
+                        QStringList subList = partList.mid(0, partIdx);
+                        list += subList.join(".");
+                    }
                 }
             }
-            if(m_inf)
-                m_inf->ICodeView_onContextMenu(pos, lineNo, list);
             
+            // Inform the listener
+            if(m_inf)
+            {
+                if(incFile.isEmpty())
+                    m_inf->ICodeView_onContextMenu(pos, lineNo, list);
+                else
+                    m_inf->ICodeView_onContextMenuIncFile(pos,lineNo, incFile);
+            
+            }
         }
     }
 }

@@ -54,6 +54,8 @@ public:
     void ICore_onStateChanged(TargetState state);
     void ICodeView_onRowDoubleClick(int lineNo);
     void ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList text);
+    void ICodeView_onContextMenuIncFile(QPoint pos, int lineNo, QString incFile);
+    
     void ICore_onWatchVarChildAdded(QString watchId, QString name, QString valueString, QString varType, bool hasChildren);
 
 private:
@@ -93,6 +95,7 @@ public slots:
     void onRun();
     void onContinue();
     void onCodeViewContextMenuAddWatch();
+    void onCodeViewContextMenuOpenFile();
     void onCodeViewContextMenuShowDefinition();
     void onCodeViewContextMenuShowCurrentLocation();
     void onSettings();
