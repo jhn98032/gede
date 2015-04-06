@@ -1115,6 +1115,8 @@ void MainWindow::onCodeViewContextMenuOpenFile()
     // open the file
     if(!foundFilename.isEmpty())
         open(foundFilename);
+    else
+        errorMsg("Unable to find '%s'", stringToCStr(filename));
         
 }
 
