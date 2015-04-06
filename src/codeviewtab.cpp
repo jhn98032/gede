@@ -72,9 +72,8 @@ void CodeViewTab::ensureLineIsVisible(int lineIdx)
     if(lineIdx < 0)
         lineIdx = 0;
 
-    m_ui.scrollArea_codeView->ensureVisible(0, m_ui.codeView->getRowHeight()*lineIdx-1);
 
-    // Select the function in the function combobox
+    // Find the function in the function combobox that matches the line
     int bestFitIdx = -1;
     int bestFitDist = -1;
     for(int u = 0;u < m_ui.comboBox_funcList->count();u++)
@@ -112,6 +111,9 @@ void CodeViewTab::ensureLineIsVisible(int lineIdx)
             m_ui.comboBox_funcList->setCurrentIndex(comboBoxIdx);
         }
     }
+
+    m_ui.scrollArea_codeView->ensureVisible(0, m_ui.codeView->getRowHeight()*lineIdx-1);
+
 }
 
 void CodeViewTab::onFuncListItemActivated(int index)

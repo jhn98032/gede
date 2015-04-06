@@ -629,29 +629,25 @@ void MainWindow::onCurrentLineDisabled()
 
 void MainWindow::updateCurrentLine(QString filename, int lineno)
 {
+    CodeViewTab* currentCodeViewTab = NULL;
+    
     m_currentFile = filename;
     m_currentLine = lineno;
 
     if(!filename.isEmpty())
     {
-        open(filename);
+        currentCodeViewTab = open(filename);
     }
 
     
     // Update the current line view
-    if(!filename.isEmpty())
+    if(currentCodeViewTab != NULL)
     {
         onCurrentLineChanged(m_currentLine);
         
-        
         // Scroll to the current line
-        CodeViewTab* currentCodeViewTab = currentTab();
-        if(currentCodeViewTab)
-        {
-            if(currentCodeViewTab->getFilePath() == m_currentFile)
-                currentCodeViewTab->ensureLineIsVisible(m_currentLine);
-        }
-            
+        if(currentCodeViewTab->getFilePath() == m_currentFile)
+            currentCodeViewTab->ensureLineIsVisible(m_currentLine);
     }
     else
     {
