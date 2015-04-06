@@ -23,7 +23,9 @@ CodeViewTab::~CodeViewTab()
 void CodeViewTab::ensureLineIsVisible(int lineIdx)
 {
     
-        
+    if(lineIdx < 0)
+        lineIdx = 0;
+
     m_ui.scrollArea_codeView->ensureVisible(0, m_ui.codeView->getRowHeight()*lineIdx-1);
 
     // Select the function in the function combobox
@@ -45,7 +47,7 @@ void CodeViewTab::ensureLineIsVisible(int lineIdx)
 
         if(bestFitIdx == -1)
         {
-            m_ui.comboBox_funcList->hide();
+            //m_ui.comboBox_funcList->hide();
         }
         else
         {

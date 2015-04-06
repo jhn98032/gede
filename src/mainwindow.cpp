@@ -1141,12 +1141,9 @@ void MainWindow::onCodeViewContextMenuShowDefinition()
     CodeViewTab* codeViewTab = open(foundFilepath);
 
     // Scroll to the function
-    int showLineNo = lineNo-1;
-    if(showLineNo < 0)
-        showLineNo = 0;
     if(codeViewTab)
-        codeViewTab->m_ui.scrollArea_codeView->verticalScrollBar()->setValue(codeViewTab->m_ui.codeView->getRowHeight()*showLineNo);
-
+        codeViewTab->ensureLineIsVisible(lineNo);
+    
 
     // Select the function in the function combobox
     if(codeViewTab)
