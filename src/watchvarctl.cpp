@@ -18,7 +18,7 @@ void WatchVarCtl::setWidget(QTreeWidget *varWidget)
 
         //
     m_varWidget->setColumnCount(3);
-    m_varWidget->setColumnWidth(0, 80);
+    m_varWidget->setColumnWidth(0, 120);
     QStringList names;
     names += "Name";
     names += "Value";
