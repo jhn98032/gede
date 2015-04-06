@@ -265,7 +265,8 @@ void CodeView::setConfig(Settings *cfg)
     m_font = QFont(m_cfg->m_fontFamily, m_cfg->m_fontSize);
     delete m_fontInfo;
     m_fontInfo = new QFontMetrics(m_font);
-    repaint();
+
+    update();
 }
 
     
