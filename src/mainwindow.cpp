@@ -1256,7 +1256,6 @@ void MainWindow::ICore_onStateChanged(TargetState state)
     m_ui.actionContinue->setEnabled(state == TARGET_STOPPED ? true : false);
     m_ui.actionRun->setEnabled(state == TARGET_STOPPED ? true : false);
 
-    m_ui.autoWidget->setEnabled(state == TARGET_STOPPED ? true : false);
     m_ui.varWidget->setEnabled(state == TARGET_STOPPED ? true : false);
 
     

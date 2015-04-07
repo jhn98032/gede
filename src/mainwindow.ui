@@ -88,6 +88,9 @@
         <property name="editTriggers">
          <set>QAbstractItemView::NoEditTriggers</set>
         </property>
+        <property name="uniformRowHeights">
+         <bool>true</bool>
+        </property>
         <column>
          <property name="text">
           <string notr="true">1</string>
