@@ -12,7 +12,7 @@ class GdbMiParser
     
     GdbMiParser(){};
 
-    static void parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList);
+    static int parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList);
     static QList<Token*> tokenizeVarString(QString str);
 
 };
