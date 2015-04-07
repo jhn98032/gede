@@ -254,8 +254,9 @@ int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
     else
     {
         QString valueStr = token->getString();
+        thisNode->setAddress(valueStr.toLongLong(0,0));
 
-        // Was it only a address with data following the address? (Eg: '0x0001 "string"' )
+        // Was it only an address with data following the address? (Eg: '0x0001 "string"' )
         Token *nextTok = tokenList->first();
         if(nextTok == NULL)
             return -1;
@@ -272,7 +273,7 @@ int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
 
         }
         
-        thisNode->setData(token->getString());
+        thisNode->setData(valueStr);
     }
     
     return rc;

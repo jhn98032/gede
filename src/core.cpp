@@ -41,7 +41,8 @@ Tree* CoreVarValue::toTree()
     {
         Token* token;
         token = tokenList.front();
-        if(token->getType() == Token::KEY_LEFT_BRACE || token->getType() == Token::KEY_SNABEL)
+
+        if(token)
         {
             TreeNode *rootNode;
             tree = new Tree;
@@ -64,10 +65,6 @@ Tree* CoreVarValue::toTree()
 
             GdbMiParser::parseVariableData(rootNode, &tokenList);
 
-        }
-        else
-        {
-            //errorMsg("Unknown token in beginning of data list. Expected '{', Got:'%s' ", stringToCStr(token->getString()));
         }
         
     }
