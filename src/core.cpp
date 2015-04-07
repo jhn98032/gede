@@ -36,12 +36,11 @@ Tree* CoreVarValue::toTree()
     QList<Token*> tokenList = GdbMiParser::tokenizeVarString(m_str);
 
     QList<Token*> orgList = tokenList;
-    Token* token;
-
-        token = tokenList.front();
 
     if(tokenList.size() > 1)
     {
+        Token* token;
+        token = tokenList.front();
         if(token->getType() == Token::KEY_LEFT_BRACE || token->getType() == Token::KEY_SNABEL)
         {
             TreeNode *rootNode;
@@ -64,7 +63,6 @@ Tree* CoreVarValue::toTree()
 
 
             GdbMiParser::parseVariableData(rootNode, &tokenList);
-
 
         }
         else

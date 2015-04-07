@@ -154,16 +154,14 @@ QList<Token*> Com::tokenize(QString str)
             {
                 if(c == '"')
                 {
-                    cur = new Token;
+                    cur = new Token(Token::C_STRING);
                     list.push_back(cur);
-                    cur->type = Token::C_STRING;
                     state = STRING;
                 }
                 else if(c == '(')
                 {
-                    cur = new Token;
+                    cur = new Token(Token::END_CODE);
                     list.push_back(cur);
-                    cur->type = Token::END_CODE;
                     cur->text += c;
                     state = END_CODE;
                 }
@@ -171,41 +169,40 @@ QList<Token*> Com::tokenize(QString str)
                     c == '[' || c == ']' || c == '+' || c == '^' ||
                     c == '~' || c == '@' || c == '&' || c == '*')
                 {
-                    cur = new Token;
+                    Token::Type type = Token::UNKNOWN;
+                    if(c == '=')
+                        type = Token::KEY_EQUAL;
+                    if(c == '{')
+                        type = Token::KEY_LEFT_BRACE;
+                    if(c == '}')
+                        type = Token::KEY_RIGHT_BRACE;
+                    if(c == '[')
+                        type = Token::KEY_LEFT_BAR;
+                    if(c == ']')
+                        type = Token::KEY_RIGHT_BAR;
+                    if(c == ',')
+                        type = Token::KEY_COMMA;
+                    if(c == '^')
+                        type = Token::KEY_UP;
+                    if(c == '+')
+                        type = Token::KEY_PLUS;
+                    if(c == '~')
+                        type = Token::KEY_TILDE;
+                    if(c == '@')
+                        type = Token::KEY_SNABEL;
+                    if(c == '&')
+                        type = Token::KEY_AND;
+                    if(c == '*')
+                        type = Token::KEY_STAR;
+                    cur = new Token(type);
                     list.push_back(cur);
                     cur->text += c;
-                    cur->type = Token::UNKNOWN;
-                    if(c == '=')
-                        cur->type = Token::KEY_EQUAL;
-                    if(c == '{')
-                        cur->type = Token::KEY_LEFT_BRACE;
-                    if(c == '}')
-                        cur->type = Token::KEY_RIGHT_BRACE;
-                    if(c == '[')
-                        cur->type = Token::KEY_LEFT_BAR;
-                    if(c == ']')
-                        cur->type = Token::KEY_RIGHT_BAR;
-                    if(c == ',')
-                        cur->type = Token::KEY_COMMA;
-                    if(c == '^')
-                        cur->type = Token::KEY_UP;
-                    if(c == '+')
-                        cur->type = Token::KEY_PLUS;
-                    if(c == '~')
-                        cur->type = Token::KEY_TILDE;
-                    if(c == '@')
-                        cur->type = Token::KEY_SNABEL;
-                    if(c == '&')
-                        cur->type = Token::KEY_AND;
-                    if(c == '*')
-                        cur->type = Token::KEY_STAR;
                     state = IDLE;
                 }
                 else if( c != ' ')
                 {
-                    cur = new Token;
+                    cur = new Token(Token::VAR);
                     list.push_back(cur);
-                    cur->type = Token::VAR;
                     cur->text = c;
                     state = VAR;
                 }
@@ -223,7 +220,7 @@ QList<Token*> Com::tokenize(QString str)
                 }
                 else if(cur->text.compare(codeEndStr.left(cur->text.length())) != 0)
                 {
-                    cur->type = Token::VAR;
+                    cur->setType(Token::VAR);
                     state = IDLE;
                 }
                 
@@ -262,7 +259,7 @@ QList<Token*> Com::tokenize(QString str)
     }
     if(cur)
     {
-        if(cur->type == Token::VAR)
+        if(cur->getType() == Token::VAR)
             cur->text = cur->text.trimmed();
     }
     return list;

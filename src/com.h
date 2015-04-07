@@ -10,7 +10,7 @@
 #include "config.h"
 
 
-struct Token
+class Token
 {
     public:
 
@@ -32,14 +32,20 @@ struct Token
             END_CODE,
             VAR
         };
-        Type type;
+    public:
 
+        Token(Type type) : m_type(type) {};
+    
         static const char *typeToString(Type type);
-        Type getType() { return type; };
-        QString getString() { return text; };
+        Type getType() const { return m_type; };
+        void setType(Type type) { m_type = type; };
+        QString getString() const { return text; };
 
-        char m_tmpBuff[128];
         const char *toString();
+
+    private:
+        Type m_type;
+        char m_tmpBuff[128];
     public:
         QString text;
 };
