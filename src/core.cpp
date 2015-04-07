@@ -546,6 +546,7 @@ void Core::gdbRemoveVarWatch(QString watchId)
     QMap <QString, VarWatch>::iterator pos = m_watchList.find(watchId);
     if(pos == m_watchList.end())
     {
+        debugMsg("Unable to find watch %s", stringToCStr(watchId));
         assert(0);
     }
     else
