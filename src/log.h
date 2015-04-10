@@ -19,6 +19,7 @@ void debugMsg_(const char *file, int lineNo, const char *fmt,...);
 #endif
 
 void errorMsg(const char *fmt,...);
+void warnMsg(const char *fmt,...);
 void infoMsg(const char *fmt,...);
 
 

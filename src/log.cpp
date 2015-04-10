@@ -49,6 +49,24 @@ void errorMsg(const char *fmt, ...)
 }
 
 
+void warnMsg(const char *fmt, ...)
+{
+    va_list ap;
+    char buffer[1024];
+    QTime curTime = QTime::currentTime();
+
+    va_start(ap, fmt);
+    vsnprintf(buffer, sizeof(buffer), fmt, ap);
+
+
+    va_end(ap);
+
+    printf("%2d.%03d| WARN  | %s\n",
+        curTime.second()%100, curTime.msec(),
+        buffer);
+}
+
+
 
 void infoMsg(const char *fmt, ...)
 {
