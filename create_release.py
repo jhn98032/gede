@@ -30,6 +30,8 @@ os.system("git archive --format tar --prefix=gede-%s/ --output %s rel-%s" % (ver
 
 #  Remove some files from the archive
 os.system("tar --delete -f %s 'gede-%s/create_release.py'" % (filename, version))
+os.system("tar --delete -f %s 'gede-%s/tagit.py'" % (filename, version))
+os.system("tar --delete -f %s 'gede-%s/.gitignore'" % (filename, version))
 os.system("tar --delete -f %s 'gede-%s/startpage'" % (filename, version))
 
 
