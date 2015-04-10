@@ -165,10 +165,15 @@ QList<Token*> GdbMiParser::tokenizeVarString(QString str)
  */
 int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
 {
-    Token *token = tokenList->takeFirst();
+    Token *token;
     TreeNode *childNode = NULL;
     int rc = 0;
-    
+
+    if(tokenList->isEmpty())
+        return -1;
+       
+    // Take the first item
+    token = tokenList->takeFirst();
     assert(token != NULL);
     if(token == NULL)
         return -1;
@@ -179,9 +184,9 @@ int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
         do
         {
             // Double braces?
-            Token *token2 = tokenList->first();
-            if(token2 == NULL)
+            if(tokenList->isEmpty())
                 return -1;
+            Token *token2 = tokenList->first();
                 
             if(token2->getType() == Token::KEY_LEFT_BRACE)
             {
@@ -195,16 +200,17 @@ int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
             
             // Get name
             QString name;
+            if(tokenList->isEmpty())
+                return -1;
             Token *nameTok = tokenList->takeFirst();
             assert(nameTok != NULL);
-            if(nameTok == NULL)
-                return -1;
             name = nameTok->getString();
 
+
             // Is it a "static varType" type?
-            Token *extraNameTok = tokenList->first();
-            if(extraNameTok == NULL)
+            if(tokenList->isEmpty())
                 return -1;
+            Token *extraNameTok = tokenList->first();
             if(extraNameTok->getType() == Token::VAR)
             {
                 extraNameTok = tokenList->takeFirst();
@@ -212,10 +218,10 @@ int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
             }
         
             // Get equal sign
+            if(tokenList->isEmpty())
+                return -1;
             Token *eqToken = tokenList->first();
             assert(eqToken != NULL);
-            if(eqToken == NULL)
-                return -1;
             if(eqToken->getType() == Token::KEY_EQUAL)
             {
                 eqToken = tokenList->takeFirst();
@@ -261,14 +267,16 @@ int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
     }
     else
     {
-        QString valueStr = token->getString();
-        thisNode->setAddress(valueStr.toLongLong(0,0));
+        QString valueStr;
+        QString defValueStr = token->getString();
+        thisNode->setAddress(defValueStr.toLongLong(0,0));
 
-        // Was it only an address with data following the address? (Eg: '0x0001 "string"' )
-        Token *nextTok = tokenList->first();
-        if(nextTok == NULL)
+
+        // Was the previous token only an address and the next token is the actual data? (Eg: '0x0001 "string"' )
+        if(tokenList->isEmpty())
             return -1;
-        if( nextTok->getType() == Token::VAR || nextTok->getType() == Token::C_STRING)
+        Token *nextTok = tokenList->first();
+        while( nextTok->getType() == Token::VAR || nextTok->getType() == Token::C_STRING)
         {
             nextTok = tokenList->takeFirst();
 
@@ -277,10 +285,16 @@ int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
             if(nextTok->getType() == Token::C_STRING)
                 valueStr = "\"" + nextTok->getString() + "\"";
             else
-                valueStr = nextTok->getString();
-
+            {
+                if(valueStr.isEmpty())
+                    valueStr = nextTok->getString();
+            }
+            nextTok = tokenList->isEmpty() ? NULL : tokenList->first();
+            if(nextTok == NULL)
+                break;
         }
-        
+        if(valueStr.isEmpty())
+            valueStr = defValueStr;
         thisNode->setData(valueStr);
     }
     
