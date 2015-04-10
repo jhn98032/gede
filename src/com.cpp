@@ -714,7 +714,6 @@ Resp *Com::parseResultRecord()
         rc = parseResult(resp->tree.getRoot());
     }
 
-    assert(m_pending.isEmpty() == false);
     if(!m_pending.isEmpty())
     {
         PendingCommand cmd = m_pending.takeFirst();
