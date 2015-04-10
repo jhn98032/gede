@@ -35,24 +35,21 @@ QList<Token*> GdbMiParser::tokenizeVarString(QString str)
             {
                 if(c == '"')
                 {
-                    cur = new Token;
+                    cur = new Token(Token::C_STRING);
                     list.push_back(cur);
-                    cur->type = Token::C_STRING;
                     state = STRING;
                 }
                 else if(c == '<')
                 {
-                    cur = new Token;
+                    cur = new Token(Token::VAR);
                     list.push_back(cur);
-                    cur->type = Token::VAR;
                     cur->text += c;
                     state = BLOCK;
                 }
                 else if(c == '(')
                 {
-                    cur = new Token;
+                    cur = new Token(Token::VAR);
                     list.push_back(cur);
-                    cur->type = Token::VAR;
                     cur->text += c;
                     state = BLOCK_COLON;
                 }
@@ -60,41 +57,40 @@ QList<Token*> GdbMiParser::tokenizeVarString(QString str)
                     c == '[' || c == ']' || c == '+' || c == '^' ||
                     c == '~' || c == '@' || c == '&' || c == '*')
                 {
-                    cur = new Token;
+                    Token::Type type = Token::UNKNOWN;
+                    if(c == '=')
+                        type = Token::KEY_EQUAL;
+                    if(c == '{')
+                        type = Token::KEY_LEFT_BRACE;
+                    if(c == '}')
+                        type = Token::KEY_RIGHT_BRACE;
+                    if(c == '[')
+                        type = Token::KEY_LEFT_BAR;
+                    if(c == ']')
+                        type = Token::KEY_RIGHT_BAR;
+                    if(c == ',')
+                        type = Token::KEY_COMMA;
+                    if(c == '^')
+                        type = Token::KEY_UP;
+                    if(c == '+')
+                        type = Token::KEY_PLUS;
+                    if(c == '~')
+                        type = Token::KEY_TILDE;
+                    if(c == '@')
+                        type = Token::KEY_SNABEL;
+                    if(c == '&')
+                        type = Token::KEY_AND;
+                    if(c == '*')
+                        type = Token::KEY_STAR;
+                    cur = new Token(type);
                     list.push_back(cur);
                     cur->text += c;
-                    cur->type = Token::UNKNOWN;
-                    if(c == '=')
-                        cur->type = Token::KEY_EQUAL;
-                    if(c == '{')
-                        cur->type = Token::KEY_LEFT_BRACE;
-                    if(c == '}')
-                        cur->type = Token::KEY_RIGHT_BRACE;
-                    if(c == '[')
-                        cur->type = Token::KEY_LEFT_BAR;
-                    if(c == ']')
-                        cur->type = Token::KEY_RIGHT_BAR;
-                    if(c == ',')
-                        cur->type = Token::KEY_COMMA;
-                    if(c == '^')
-                        cur->type = Token::KEY_UP;
-                    if(c == '+')
-                        cur->type = Token::KEY_PLUS;
-                    if(c == '~')
-                        cur->type = Token::KEY_TILDE;
-                    if(c == '@')
-                        cur->type = Token::KEY_SNABEL;
-                    if(c == '&')
-                        cur->type = Token::KEY_AND;
-                    if(c == '*')
-                        cur->type = Token::KEY_STAR;
                     state = IDLE;
                 }
                 else if( c != ' ')
                 {
-                    cur = new Token;
+                    cur = new Token(Token::VAR);
                     list.push_back(cur);
-                    cur->type = Token::VAR;
                     cur->text = c;
                     state = VAR;
                 }
@@ -156,7 +152,7 @@ QList<Token*> GdbMiParser::tokenizeVarString(QString str)
     }
     if(cur)
     {
-        if(cur->type == Token::VAR)
+        if(cur->getType() == Token::VAR)
             cur->text = cur->text.trimmed();
     }
     return list;
@@ -167,13 +163,16 @@ QList<Token*> GdbMiParser::tokenizeVarString(QString str)
 /**
  * @brief Parses a variable assignment block.
  */
-void GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
+int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
 {
     Token *token = tokenList->takeFirst();
     TreeNode *childNode = NULL;
-
+    int rc = 0;
+    
     assert(token != NULL);
-
+    if(token == NULL)
+        return -1;
+        
     if(token->getType() == Token::KEY_LEFT_BRACE)
     {
         
@@ -181,10 +180,13 @@ void GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList
         {
             // Double braces?
             Token *token2 = tokenList->first();
+            if(token2 == NULL)
+                return -1;
+                
             if(token2->getType() == Token::KEY_LEFT_BRACE)
             {
                 
-                parseVariableData(thisNode, tokenList);
+                rc = parseVariableData(thisNode, tokenList);
 
                 token = tokenList->takeFirst();
             }
@@ -195,10 +197,14 @@ void GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList
             QString name;
             Token *nameTok = tokenList->takeFirst();
             assert(nameTok != NULL);
+            if(nameTok == NULL)
+                return -1;
             name = nameTok->getString();
 
             // Is it a "static varType" type?
             Token *extraNameTok = tokenList->first();
+            if(extraNameTok == NULL)
+                return -1;
             if(extraNameTok->getType() == Token::VAR)
             {
                 extraNameTok = tokenList->takeFirst();
@@ -208,6 +214,8 @@ void GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList
             // Get equal sign
             Token *eqToken = tokenList->first();
             assert(eqToken != NULL);
+            if(eqToken == NULL)
+                return -1;
             if(eqToken->getType() == Token::KEY_EQUAL)
             {
                 eqToken = tokenList->takeFirst();
@@ -218,7 +226,7 @@ void GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList
                 thisNode->addChild(childNode);
 
                 // Get variable data
-                parseVariableData(childNode, tokenList);
+                rc = parseVariableData(childNode, tokenList);
 
                 // End of the data
                 token = tokenList->takeFirst();
@@ -254,9 +262,12 @@ void GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList
     else
     {
         QString valueStr = token->getString();
+        thisNode->setAddress(valueStr.toLongLong(0,0));
 
-        // Was it only a address with data following the address? (Eg: '0x0001 "string"' )
+        // Was it only an address with data following the address? (Eg: '0x0001 "string"' )
         Token *nextTok = tokenList->first();
+        if(nextTok == NULL)
+            return -1;
         if( nextTok->getType() == Token::VAR || nextTok->getType() == Token::C_STRING)
         {
             nextTok = tokenList->takeFirst();
@@ -270,8 +281,9 @@ void GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList
 
         }
         
-        thisNode->setData(token->getString());
+        thisNode->setData(valueStr);
     }
-
+    
+    return rc;
 }
 

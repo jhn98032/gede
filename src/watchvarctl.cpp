@@ -172,8 +172,8 @@ WatchVarCtl::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int col
     // Remove a variable?
     else if(newName.isEmpty())
     {
-        QTreeWidgetItem *item = varWidget->invisibleRootItem();
-        item->removeChild(current);
+        QTreeWidgetItem *rootItem = varWidget->invisibleRootItem();
+        rootItem->removeChild(current);
 
         core.gdbRemoveVarWatch(oldKey);
 
@@ -379,6 +379,7 @@ void WatchVarCtl::deleteSelected()
         
     QList<QTreeWidgetItem *> items = m_varWidget->selectedItems();
 
+    // Get the root item for each item in the list
     for(int i =0;i < items.size();i++)
     {
         QTreeWidgetItem *item = items[i];
@@ -386,7 +387,16 @@ void WatchVarCtl::deleteSelected()
         {
             item = item->parent();
         }
+        items[i] = item;
+    }
 
+    // Loop through the items
+    QSet<QTreeWidgetItem *> itemSet = items.toSet();
+    QSet<QTreeWidgetItem *>::const_iterator setItr = itemSet.constBegin();
+    for (;setItr != itemSet.constEnd();++setItr)
+    {
+        QTreeWidgetItem *item = *setItr;
+    
         // Delete the item
         Core &core = Core::getInstance();
         QString watchId = item->data(0, Qt::UserRole).toString();

@@ -44,13 +44,13 @@ Tree* CoreVarValue::toTree()
     QList<Token*> tokenList = GdbMiParser::tokenizeVarString(m_str);
 
     QList<Token*> orgList = tokenList;
-    Token* token;
-
-        token = tokenList.front();
 
     if(tokenList.size() > 1)
     {
-        if(token->getType() == Token::KEY_LEFT_BRACE || token->getType() == Token::KEY_SNABEL)
+        Token* token;
+        token = tokenList.front();
+
+        if(token)
         {
             TreeNode *rootNode;
             tree = new Tree;
@@ -73,11 +73,6 @@ Tree* CoreVarValue::toTree()
 
             GdbMiParser::parseVariableData(rootNode, &tokenList);
 
-
-        }
-        else
-        {
-            //errorMsg("Unknown token in beginning of data list. Expected '{', Got:'%s' ", stringToCStr(token->getString()));
         }
         
     }
@@ -559,6 +554,7 @@ void Core::gdbRemoveVarWatch(QString watchId)
     QMap <QString, VarWatch>::iterator pos = m_watchList.find(watchId);
     if(pos == m_watchList.end())
     {
+        debugMsg("Unable to find watch %s", stringToCStr(watchId));
         assert(0);
     }
     else

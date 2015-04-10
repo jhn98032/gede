@@ -161,6 +161,8 @@ void AutoVarCtl::addVariableDataTree(
 
     QString parentPath = getTreeWidgetItemPath(item);
 
+    item->setText(1, rootNode->getData());
+
     for(int i = 0;i < rootNode->getChildCount();i++)
     {
         TreeNode *child = rootNode->getChild(i);
