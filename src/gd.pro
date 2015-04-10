@@ -63,7 +63,10 @@ FORMS += opendialog.ui
 
 RESOURCES += resource.qrc
 
-QMAKE_CXXFLAGS += -I./  -g
+#QMAKE_CXXFLAGS += -I./  -g
+
+QMAKE_CXXFLAGS += -I./   -DNDEBUG
+
 
 
 TARGET=gede
