@@ -27,5 +27,14 @@ if os.path.exists(filename + ".xz"):
     os.remove(filename + ".xz")
 
 os.system("git archive --format tar --prefix=gede-%s/ --output %s rel-%s" % (version, filename, version))
+
+#  Remove some files from the archive
+os.system("tar --delete -f %s 'gede-%s/create_release.py'" % (filename, version))
+os.system("tar --delete -f %s 'gede-%s/startpage'" % (filename, version))
+
+
 os.system("xz -9 %s" % (filename))
 print("%s.xz created" % (filename)) 
+
+
+
