@@ -34,6 +34,7 @@ const char* Com::asyncClassToString(ComListener::AsyncClass ac)
         case ComListener::AC_LIBRARY_UNLOADED: return "library_unloaded";break;
         case ComListener::AC_THREAD_SELECTED: return "thread_selected";break;
         case ComListener::AC_DOWNLOAD: return "download";break;
+        case ComListener::AC_CMD_PARAM_CHANGED: return "cmd_param_changed";break;
 
     };
     return "?";
@@ -68,7 +69,7 @@ const char *Token::typeToString(Type type)
         case KEY_STAR:str = "*";break;
         case KEY_AND:str = "&";break;
         case END_CODE: str = "endcode";break;
-        case VAR: str = "string";break;
+        case VAR: str = "var";break;
     }
     return str;
 }
@@ -360,11 +361,14 @@ int Com::parseAsyncOutput(Resp *resp, ComListener::AsyncClass *ac)
     {
         *ac = ComListener::AC_DOWNLOAD;
     }
+    else if(acString == "cmd-param-changed")
+    {
+        *ac = ComListener::AC_CMD_PARAM_CHANGED;
+    }
     else
     {
-        errorMsg("Unexpected response '%s'", stringToCStr(acString));
+        warnMsg("Unexpected response '%s'", stringToCStr(acString));
         assert(0);
-        rc = -1;
     }
 
 
@@ -559,6 +563,7 @@ Token* Com::checkToken(Token::Type type)
 int Com::parseValue(TreeNode *item)
 {
     Token *tok;
+    int rc = 0;
 
     tok = pop_token();
 
@@ -608,7 +613,7 @@ int Com::parseValue(TreeNode *item)
                 name.sprintf("%d", idx++);
                 node->setName(name);
                 item->addChild(node); 
-                parseValue(node);
+                rc = parseValue(node);
             } while(checkToken(Token::KEY_COMMA) != NULL);
             
         }
@@ -620,7 +625,7 @@ int Com::parseValue(TreeNode *item)
     }
     else
         errorMsg("Unexpected token: '%s'", stringToCStr(tok->getString()));
-    return 0;
+    return rc;
 }
 
 
