@@ -29,6 +29,10 @@ void MemoryDialog::setStartAddress(unsigned int addr)
 {
     m_ui.memorywidget->setStartAddress(addr);
     m_ui.verticalScrollBar->setValue(addr/16);
+
+    QString addrText;
+    addrText.sprintf("0x%x", addr);
+    m_ui.lineEdit_address->setText(addrText);
 }
 
 

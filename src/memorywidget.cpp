@@ -4,7 +4,7 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <QColor>
-
+#include "log.h"
 
 static const int PAD_ADDR_LEFT = 10;
 static const int PAD_ADDR_RIGHT = 10;
@@ -231,21 +231,22 @@ unsigned int MemoryWidget::getAddrAtPos(QPoint pos)
 void MemoryWidget::mouseMoveEvent ( QMouseEvent * event )
 {
     m_selectionEnd = getAddrAtPos(event->pos());
-    //printf("%s()\n", __func__);
-    //printf("%x\n", getAddrAtPos(event->pos()));
+
+    debugMsg("addr:%x", getAddrAtPos(event->pos()));
+
     update();
 }
     
 void MemoryWidget::mouseReleaseEvent(QMouseEvent * event)
 {
-    //printf("%s()\n", __func__);
+    Q_UNUSED(event);
+    
     update();
     
 }
 
 void MemoryWidget::mousePressEvent(QMouseEvent * event)
 {
-    //printf("%s()\n", __func__);
     m_selectionStart = getAddrAtPos(event->pos());
     m_selectionEnd = m_selectionStart;
     update();
