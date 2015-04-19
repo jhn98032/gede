@@ -16,7 +16,8 @@ public:
     
 public slots:
     void onVertScroll(int pos);
-    
+    void onUpdate();
+
 private:
     Ui_MemoryDialog m_ui;
 

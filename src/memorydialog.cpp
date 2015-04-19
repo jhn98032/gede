@@ -1,6 +1,7 @@
 #include "memorydialog.h"
 
 #include "core.h"
+#include "util.h"
 
 QByteArray MemoryDialog::getMemory(unsigned int startAddress, int count)
 {
@@ -23,15 +24,29 @@ MemoryDialog::MemoryDialog(QWidget *parent)
 
     m_ui.memorywidget->setInterface(this);
 
+    setStartAddress(0x0);
+
+   connect(m_ui.pushButton_update, SIGNAL(clicked()), SLOT(onUpdate()));
+
+
+}
+
+
+void MemoryDialog::onUpdate()
+{
+    uint64_t addr = stringToLongLong(m_ui.lineEdit_address->text());
+    setStartAddress(addr);
 }
 
 void MemoryDialog::setStartAddress(unsigned int addr)
 {
-    m_ui.memorywidget->setStartAddress(addr);
-    m_ui.verticalScrollBar->setValue(addr/16);
+    unsigned int addrAligned = addr & ~0xfULL;
+    
+    m_ui.memorywidget->setStartAddress(addrAligned);
+    m_ui.verticalScrollBar->setValue(addrAligned/16);
 
     QString addrText;
-    addrText.sprintf("0x%x", addr);
+    addrText.sprintf("0x%04x_%04x", addr>>16, addr&0xffff);
     m_ui.lineEdit_address->setText(addrText);
 }
 

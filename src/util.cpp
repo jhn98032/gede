@@ -167,6 +167,12 @@ unsigned char hexStringToU8(const char *str)
     return d;
 }
 
+long long stringToLongLong(QString str)
+{
+    return stringToLongLong(stringToCStr(str));
+}
+
+
 
 #ifdef NEVER
 void testFuncs()
