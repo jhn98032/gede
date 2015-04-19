@@ -128,6 +128,44 @@ QString simplifyPath(QString path)
     return out;
 }
 
+/**
+*  @brief Converts a hex two byte string to a unsigned char.
+*/
+unsigned char hexStringToU8(const char *str)
+{
+    unsigned char d = 0;
+    char c1 = str[0];
+    char c2 = str[1];
+
+    // Upper byte
+    if('0' <= c1 && c1 <= '9')
+        d =  c1-'0';
+    else if('a' <= c1 && c1 <= 'f')
+        d =  0xa + (c1-'a');
+    else if('A' <= c1 && c1 <= 'F')
+        d =  0xa + (c1-'A');
+    else // invalid character
+    {
+        assert(0);
+        return 0;
+    }
+    d = d<<4;
+
+    // Lower byte
+    if('0' <= c2 && c2 <= '9')
+        d +=  c2-'0';
+    else if('a' <= c2 && c2 <= 'f')
+        d +=  0xa + (c2-'a');
+    else if('A' <= c2 && c2 <= 'F')
+        d +=  0xa + (c2-'A');
+    else // invalid character?
+    {
+        assert(0);
+        d = d>>4;
+    }
+
+    return d;
+}
 
 
 #ifdef NEVER

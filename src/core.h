@@ -190,6 +190,7 @@ public:
     void getStackFrames();
     void stop();
     void gdbExpandVarWatchChildren(QString watchId);
+    int gdbGetMemory(uint64_t addr, size_t count, QByteArray *data);
     
     void selectThread(int threadId);
     void selectFrame(int selectedFrameIdx);

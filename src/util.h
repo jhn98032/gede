@@ -21,6 +21,7 @@
 QString getFilenamePart(QString fullPath);
 void dividePath(QString fullPath, QString *filename, QString *folderPath);
 
+unsigned char hexStringToU8(const char *str);
 long long stringToLongLong(const char* str);
 QString longLongToHexString(long long num);
 

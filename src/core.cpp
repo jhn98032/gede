@@ -253,6 +253,42 @@ void Core::onGdbOutput(int socketFd)
     m_inf->ICore_onTargetOutput(buff);
 }
 
+
+/**
+ * @brief Reads a memory area.
+ */
+int Core::gdbGetMemory(uint64_t addr, size_t count, QByteArray *data)
+{
+    Com& com = Com::getInstance();
+    Tree resultData;
+
+    int rc = 0;
+    QString cmdStr;
+    cmdStr.sprintf("-data-read-memory-bytes 0x%lx %u" , addr, (unsigned int)count);
+    
+    rc = com.command(&resultData, cmdStr);
+
+
+    QString dataStr = resultData.getString("/memory/1/contents");
+    if(!dataStr.isEmpty())
+    {
+        data->clear();
+
+        QByteArray dataByteArray = dataStr.toLocal8Bit();
+        const char *dataCStr = dataByteArray.constData();
+        int dataCStrLen = strlen(dataCStr);
+        for(int i = 0;i+1 < dataCStrLen;i+=2)
+        {
+            unsigned char dataByte = hexStringToU8(dataCStr+i);
+            
+            data->push_back(dataByte);
+        }
+    }
+
+    return rc;
+}
+
+
 void Core::gdbGetFiles()
 {
     Com& com = Com::getInstance();
