@@ -109,7 +109,7 @@ Com::~Com()
 {
     // Send the command to gdb to exit cleanly
     QString text = "-gdb-exit\n";
-    m_process.write((const char*)text.toAscii());
+    m_process.write((const char*)text.toLatin1());
     
     
     m_process.terminate();
@@ -802,7 +802,7 @@ void Com::readTokens()
 #endif
 
                 QList<Token*> list;
-                char firstChar = row[0].toAscii();
+                char firstChar = row[0].toLatin1();
                 if(firstChar == '(' ||
                     firstChar == '^' ||
                     firstChar == '*' ||
@@ -964,7 +964,7 @@ GdbResult Com::command(Tree *resultData, QString text)
 
     // Send the command to gdb
     text += "\n";
-    m_process.write((const char*)text.toAscii());
+    m_process.write((const char*)text.toLatin1());
 
 #ifdef ENABLE_GDB_LOG
     //

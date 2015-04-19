@@ -71,7 +71,7 @@ bool SyntaxHighlighter::isSpecialChar(TextField *field) const
 {
     if(field->m_text.size() == 1)
     {
-        return isSpecialChar(field->m_text[0].toAscii());
+        return isSpecialChar(field->m_text[0].toLatin1());
     }
     return false;
 }
@@ -171,7 +171,7 @@ void SyntaxHighlighter::colorize(QString text)
 
     for(int i = 0;i < text.size();i++)
     {
-        c = text[i].toAscii();
+        c = text[i].toLatin1();
 
         // Was the last c a escape?
         if(prevC == '\\' && prevPrevC != '\\')
@@ -315,7 +315,7 @@ void SyntaxHighlighter::colorize(QString text)
                     currentRow->appendField(field);
                     
                 }
-                else if(text[i-1].toAscii() == '*' && c == '/')
+                else if(text[i-1].toLatin1() == '*' && c == '/')
                 {
                     field->m_text += c;
                     state = IDLE;

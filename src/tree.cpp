@@ -132,7 +132,7 @@ TreeNode *TreeNode::findChild(QString path) const
         restPath = path.mid(indexPos+1);
     }
 
-    if(childName[0].toAscii() == '#')
+    if(childName[0].toLatin1() == '#')
     {
         QString numStr = childName.mid(1);
         int idx = atoi(stringToCStr(numStr))-1;

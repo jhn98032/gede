@@ -87,7 +87,7 @@ QString VarCtl::valueDisplay(long long val, DispFormat format)
     {
         QChar c = QChar((int)val);
         if(c.isPrint())
-            valueText.sprintf("'%c'", c.toAscii());
+            valueText.sprintf("'%c'", c.toLatin1());
         else
             valueText.sprintf("' '");
         
