@@ -690,7 +690,7 @@ void MainWindow::onNext()
  */
 void MainWindow::onAbout()
 {
-    AboutDialog dlg(this);
+    AboutDialog dlg(this, &m_cfg);
     dlg.exec();
 }
 

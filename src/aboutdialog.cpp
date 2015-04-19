@@ -7,10 +7,15 @@
  */
 
 #include "aboutdialog.h"
+
 #include "version.h"
+#include <QProcess>
+#include "util.h"
+#include "log.h"
 
 
-AboutDialog::AboutDialog(QWidget *parent)
+
+AboutDialog::AboutDialog(QWidget *parent, Settings *cfg)
     : QDialog(parent)
 {
     
@@ -28,6 +33,37 @@ AboutDialog::AboutDialog(QWidget *parent)
     buildStr += __TIME__;
     m_ui.label_buildDate->setText("Built: " + buildStr);
 
+
+    QString qtVersionStr;
+    qtVersionStr.sprintf("Qt: %s (compiled) / %s (running)", QT_VERSION_STR, qVersion());
+    m_ui.label_qtVersion->setText(qtVersionStr);
+
+    
+    QString gdbPath = "Gdb: " + cfg->m_gdbPath + " ('" + getGdbVersion(cfg->m_gdbPath) + "')";
+    m_ui.label_gdbPath->setText(gdbPath);
+    
+
+}
+
+
+QString AboutDialog::getGdbVersion(QString gdbPath)
+{
+    QString versionStr;
+    QProcess process;
+    process.start(gdbPath,
+        QStringList("--version"),
+        QIODevice::ReadWrite | QIODevice::Text);
+    if(!process.waitForFinished(2000))
+    {
+        errorMsg("Failed to launch gdb to get version: %s", stringToCStr(process.exitCode()));
+    }
+    else
+    {
+        QStringList versionStrList = QString(process.readAllStandardOutput()).split('\n');
+        if(versionStrList.size() >= 1)
+            versionStr = versionStrList[0];
+    }
+    return versionStr;
 }
 
 

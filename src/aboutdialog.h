@@ -11,6 +11,7 @@
 
 #include <QDialog>
 
+#include "settings.h"
 #include "ui_aboutdialog.h"
 
 
@@ -18,10 +19,13 @@ class AboutDialog : public QDialog
 {
     Q_OBJECT
 
-    public:
+public:
 
-    AboutDialog(QWidget *parent);
+    AboutDialog(QWidget *parent, Settings *cfg);
 
+
+private:
+    QString getGdbVersion(QString gdbPath);
 
 
     Ui_AboutDialog m_ui;

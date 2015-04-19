@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>282</width>
-    <height>183</height>
+    <height>203</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -39,9 +39,30 @@
     </widget>
    </item>
    <item>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QLabel" name="label_buildDate">
      <property name="text">
       <string>&lt;Build Date&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_qtVersion">
+     <property name="text">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&amp;lt;Qt version&amp;gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_gdbPath">
+     <property name="text">
+      <string>&lt;Gdb Path&gt;</string>
      </property>
     </widget>
    </item>
