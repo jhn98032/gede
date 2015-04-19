@@ -1,10 +1,13 @@
 #include "memorywidget.h"
 
+#include <QApplication>
+#include <QClipboard>
 #include <stdint.h>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QColor>
 #include "log.h"
+#include "util.h"
 
 static const int PAD_ADDR_LEFT = 10;
 static const int PAD_ADDR_RIGHT = 10;
@@ -24,11 +27,24 @@ MemoryWidget::MemoryWidget(QWidget *parent)
 
 
 
+    setFocusPolicy(Qt::StrongFocus);
 
     setMinimumSize(400,getRowHeight()*10);
     update();
 
     m_startAddress = 0;
+}
+
+void MemoryWidget::keyPressEvent(QKeyEvent *e)
+{
+    if(e->type() == QKeyEvent::KeyPress)
+    {
+        if(e->matches(QKeySequence::Copy))
+        {
+            onCopy();
+        }
+    }
+    QWidget::keyPressEvent(e);
 }
 
 void MemoryWidget::setInterface(IMemoryWidget *inf)
@@ -270,10 +286,93 @@ void MemoryWidget::mouseReleaseEvent(QMouseEvent * event)
 
 void MemoryWidget::mousePressEvent(QMouseEvent * event)
 {
-    m_selectionStart = getAddrAtPos(event->pos());
-    m_selectionEnd = m_selectionStart;
-    update();
-    
+    if(event->button() == Qt::RightButton)
+    {
+        QPoint pos = event->globalPos();
+
+        //
+        m_popupMenu.clear();
+        // Add 'copy'
+        QAction *action = m_popupMenu.addAction("Copy");
+        connect(action, SIGNAL(triggered()), this, SLOT(onCopy()));
+
+        m_popupMenu.popup(pos);
+
+    }
+    else
+    {
+        m_selectionStart = getAddrAtPos(event->pos());
+        m_selectionEnd = m_selectionStart;
+    }
+
+
+    update();    
 }
+
+
+
+void MemoryWidget::onCopy()
+{
+    unsigned int selectionFirst,selectionLast;
+    
+    if(m_selectionEnd < m_selectionStart)
+    {
+        selectionFirst = m_selectionEnd;
+        selectionLast = m_selectionStart;
+    }
+    else
+    {
+        selectionFirst = m_selectionStart;
+        selectionLast = m_selectionEnd;
+    }
+
+    if(m_inf)
+    {
+        QByteArray content;
+        content = m_inf->getMemory(selectionFirst, selectionLast-selectionFirst+1);
+
+        QString contentStr;
+        QString subText;
+        for(uint64_t addr = (selectionFirst & ~0xfULL);addr <= selectionLast;addr+=16)
+        {
+            unsigned int j;
+            
+            // Display address
+            subText.sprintf("0x%08lx | ", addr);
+            contentStr += subText;
+
+            // Display data as hex
+            for(j = 0;j < 16;j++)
+            {
+                uint8_t b = (unsigned char)content[(int)(addr+j-selectionFirst)];
+                if(selectionFirst <= addr+j && addr+j <= selectionLast) 
+                    subText.sprintf("%02x ", b);
+                else
+                    subText = "   ";
+                if(j == 7)
+                    subText += " ";
+                contentStr += subText;
+            }
+            contentStr += "| ";
+
+            // Display data as ascii
+            for(j = 0;j < 16;j++)
+            {
+                uint8_t b = content[(int)(addr+j-selectionFirst)];
+                if(selectionFirst <= addr+j && addr+j <= selectionLast) 
+                    subText.sprintf("%c", byteToChar(b));
+                else
+                    subText = " ";
+                if(j == 7)
+                    subText += "  ";
+                contentStr += subText;
+            }
+            contentStr += "\n";
+        }
+        QClipboard * clipboard = QApplication::clipboard();
+        clipboard->setText(contentStr);
+    }
+}
+
 
 

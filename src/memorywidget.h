@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QFont>
 #include <QScrollBar>
+#include <QMenu>
 
 #include <stdint.h>
 
@@ -31,10 +32,13 @@ private:
     unsigned int getAddrAtPos(QPoint pos);
     int getHeaderHeight();
     char byteToChar(uint8_t d);
+
+    virtual void keyPressEvent(QKeyEvent *e);
     
 public slots:
     void setStartAddress(unsigned int addr);
-
+    void onCopy();
+    
 private:
     void mousePressEvent(QMouseEvent * event);
     void mouseMoveEvent ( QMouseEvent * event );
@@ -48,6 +52,7 @@ private:
     unsigned int m_startAddress;
     unsigned int m_selectionStart, m_selectionEnd;
     IMemoryWidget *m_inf;
+    QMenu m_popupMenu;
     
 };
 
