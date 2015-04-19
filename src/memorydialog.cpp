@@ -1,10 +1,14 @@
 #include "memorydialog.h"
 
+#include "core.h"
 
 QByteArray MemoryDialog::getMemory(unsigned int startAddress, int count)
 {
+     Core &core = Core::getInstance();
+   
     QByteArray b;
-    b.fill('a', count/3);
+    core.gdbGetMemory(startAddress, count, &b);
+
     return b;
 }
 
@@ -18,7 +22,13 @@ MemoryDialog::MemoryDialog(QWidget *parent)
     connect(m_ui.verticalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(onVertScroll(int)));
 
     m_ui.memorywidget->setInterface(this);
-    
+
+}
+
+void MemoryDialog::setStartAddress(unsigned int addr)
+{
+    m_ui.memorywidget->setStartAddress(addr);
+    m_ui.verticalScrollBar->setValue(addr/16);
 }
 
 

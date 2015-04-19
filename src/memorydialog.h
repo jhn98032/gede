@@ -12,6 +12,7 @@ public:
     MemoryDialog(QWidget *parent = NULL);
 
     virtual QByteArray getMemory(unsigned int startAddress, int count);
+    void setStartAddress(unsigned int addr);
     
 public slots:
     void onVertScroll(int pos);
