@@ -35,7 +35,8 @@ void MemoryWidget::setInterface(IMemoryWidget *inf)
 {
     m_inf = inf;
 }
-    
+
+
 void MemoryWidget::setStartAddress(unsigned int addr)
 {
 
@@ -65,6 +66,17 @@ int MemoryWidget::getHeaderHeight()
 }
 
 
+char MemoryWidget::byteToChar(uint8_t d)
+{
+    char c;
+    if(0x21 <= d && d <= 0x7e)
+        c = (char)d;
+    else
+        c = '.';
+    return c;
+}
+
+
 
 void MemoryWidget::paintEvent ( QPaintEvent * event )
 {
@@ -76,6 +88,20 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
     int x;
     int rowCount = ((size().height()-HEADER_HEIGHT)/rowHeight)+1;
     unsigned int startAddress = m_startAddress;
+
+    unsigned int selectionFirst;
+    unsigned int selectionLast;
+    if(m_selectionEnd < m_selectionStart)
+    {
+        selectionFirst = m_selectionEnd;
+        selectionLast = m_selectionStart;
+    }
+    else
+    {
+        selectionFirst = m_selectionStart;
+        selectionLast = m_selectionEnd;
+    }
+     
     
     painter.setFont(m_font);
 
@@ -134,6 +160,7 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
         if(memoryAddr < startAddress)
             break;
             
+        painter.setPen(Qt::black);
         text.sprintf("%04x_%04x", (unsigned int)(memoryAddr>>16),(unsigned int)(memoryAddr&0xffffUL));
         painter.drawText(x, y, text);
         x += charWidth*text.length();
@@ -146,15 +173,15 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
             {
             uint8_t d = content[dataIdx];
 
-            if(m_selectionStart != 0 || m_selectionEnd != 0)
+            if(selectionFirst != 0 || selectionLast != 0)
             {
-                if(m_selectionStart <= off+memoryAddr && off+memoryAddr <=  m_selectionEnd)
+                if(selectionFirst <= off+memoryAddr && off+memoryAddr <=  selectionLast)
                     painter.setPen(Qt::red);
                 else
                     painter.setPen(Qt::black);
             }
             
-            text.sprintf("%02u", d);
+            text.sprintf("%02x", d);
             painter.drawText(x, y, text);
             }
         
@@ -172,23 +199,19 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
             int dataIdx = rowIdx*16+off;
             if(dataIdx < content.size())
             {
-            uint8_t d = content[dataIdx];
-            if(isalnum(d))
-                text.sprintf("%c", (char)d);
-            else
-                text.sprintf(".");
+                char c2 = byteToChar(content[dataIdx]);
 
-            if(m_selectionStart != 0 || m_selectionEnd != 0)
+            if(selectionFirst != 0 || selectionLast != 0)
             {
-                if(m_selectionStart <= off+memoryAddr && off+memoryAddr <=  m_selectionEnd)
+                if(selectionFirst <= off+memoryAddr && off+memoryAddr <=  selectionLast)
                     painter.setPen(Qt::red);
                 else
                     painter.setPen(Qt::black);
             }
             
-            painter.drawText(x, y, text);
+            painter.drawText(x, y, QString(c2));
             }
-            x += charWidth*text.length();
+            x += charWidth*1;
         }
 
 
@@ -196,7 +219,7 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
 
     // Draw border
     painter.setPen(Qt::black);
-    painter.drawRect(0,0, frameSize().width()-2,frameSize().height()-2);
+    painter.drawRect(0,0, frameSize().width()-2,frameSize().height()-1);
 
 }
 
@@ -210,7 +233,7 @@ unsigned int MemoryWidget::getAddrAtPos(QPoint pos)
     
     addr = m_startAddress+(pos.y()-getHeaderHeight())/rowHeight*16;
 
-
+    // Adjust for the address column
     int x = pos.x();
     x -= PAD_ADDR_LEFT+(charWidth*9)+PAD_ADDR_RIGHT;
     if(x > 0)
@@ -221,8 +244,8 @@ unsigned int MemoryWidget::getAddrAtPos(QPoint pos)
     }
     if(x < 0)
         x = 0;
-    if(16 < x)
-        x = 16;
+    else if(15 < x)
+        x = 15;
 
     addr += x;
     return addr;
