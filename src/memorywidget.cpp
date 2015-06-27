@@ -18,11 +18,12 @@
 #include "log.h"
 #include "util.h"
 
-static const int PAD_ADDR_LEFT = 10;
-static const int PAD_ADDR_RIGHT = 10;
-static const int PAD_HEX_MIDDLE = 10;
-static const int PAD_HEX_RIGHT = 10;
-static const int PAD_DATA  =5;
+static const int PAD_ADDR_LEFT = 10; //!< Pad length left to the address field
+static const int PAD_ADDR_RIGHT = 10; //!< Pad length right to the address field.
+static const int PAD_HEX_MIDDLE = 10;  //!< Space between the first 8 and the last 8 bytes in a row
+static const int PAD_HEX_RIGHT = 10;   //!< Pad length right to the hex field.
+static const int PAD_DATA = 5;
+static const int BYTES_PER_ROW = 16;
 
 
 MemoryWidget::MemoryWidget(QWidget *parent)
@@ -31,7 +32,7 @@ MemoryWidget::MemoryWidget(QWidget *parent)
  ,m_selectionEnd(0)
  ,m_inf(0)
 {
-    m_font = QFont("Monospace", 8);
+    m_font = QFont("Monospace", 10);
     m_fontInfo = new QFontMetrics(m_font);
 
 
@@ -138,14 +139,15 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
     //if((0xffffffffU-startAddress) < rowCount*16)
     //    startAddress = 0xffffffffU-((rowCount-2)*16);
     
-    // Draw background
+    // Draw 'address' field background
     QRect rect2(0,0,PAD_ADDR_LEFT+charWidth*9+PAD_ADDR_RIGHT/2, event->rect().bottom()+1);
     painter.fillRect(rect2, Qt::lightGray);
 
-
+    // Draw 'header' background
     QRect rect3(0,0, event->rect().right()+1, HEADER_HEIGHT);
     painter.fillRect(rect3, Qt::cyan);
 
+    // Draw 'header' frame
     rect3 = QRect(0,HEADER_HEIGHT, event->rect().right(), HEADER_HEIGHT);
     painter.setPen(Qt::black);
     painter.drawLine(0, HEADER_HEIGHT, event->rect().right(), HEADER_HEIGHT);
@@ -255,24 +257,38 @@ unsigned int MemoryWidget::getAddrAtPos(QPoint pos)
     const int rowHeight = getRowHeight();
     const int charWidth = m_fontInfo->width("H");
     unsigned int addr;
+    const int field_hex_width = PAD_HEX_MIDDLE + 16*(PAD_DATA+charWidth*2) + PAD_HEX_RIGHT;
+    const int field_address_width = PAD_ADDR_LEFT+(PAD_DATA+charWidth*9)+PAD_ADDR_RIGHT;
+    int idx = 0;
     
-    addr = m_startAddress+(pos.y()-getHeaderHeight())/rowHeight*16;
+    addr = m_startAddress+(pos.y()-getHeaderHeight())/rowHeight*BYTES_PER_ROW;
 
     // Adjust for the address column
     int x = pos.x();
-    x -= PAD_ADDR_LEFT+(charWidth*9)+PAD_ADDR_RIGHT;
+    x -= field_address_width;
     if(x > 0)
     {
-        if(x > (PAD_HEX_MIDDLE+8*((charWidth*2)+5)))
-            x -= PAD_HEX_MIDDLE;
-        x/= ((charWidth*2)+5);
-    }
-    if(x < 0)
-        x = 0;
-    else if(15 < x)
-        x = 15;
+        // In the ascii field?
+        if(x >= field_hex_width)
+        {
+            idx = (x-field_hex_width)/charWidth;
+        }
+        else
+        {
+            // Adjust for the middle space
+            if(x > (PAD_HEX_MIDDLE+8*((charWidth*2)+5)))
+                x -= PAD_HEX_MIDDLE;
 
-    addr += x;
+            // Get the character index
+            idx = x / (((charWidth*2)+5));
+        }
+    }
+    if(idx < 0)
+        idx = -1;
+    else if(BYTES_PER_ROW-1 < idx)
+        idx = BYTES_PER_ROW-1;
+
+    addr += idx;
     return addr;
  } 
 
