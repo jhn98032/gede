@@ -13,6 +13,7 @@
 #include "core.h"
 #include <QTreeWidget>
 #include "varctl.h"
+#include <QMenu>
 
 
 class AutoVarCtl : public VarCtl
@@ -42,14 +43,17 @@ private:
                                 
 public slots:
 
+    void onContextMenu ( const QPoint &pos);
     void onAutoWidgetItemCollapsed(QTreeWidgetItem *item);
     void onAutoWidgetItemExpanded(QTreeWidgetItem *item);
     void onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
+    void onShowMemory();
 
     
 public:
     QTreeWidget *m_autoWidget;
-
+    QMenu m_popupMenu;
+    
     VarCtl::DispInfoMap m_autoVarDispInfo;
 
 };

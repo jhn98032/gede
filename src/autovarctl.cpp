@@ -9,6 +9,10 @@
 #include "autovarctl.h"
 
 #include "mainwindow.h"
+#include "log.h"
+#include "util.h"
+#include "memorydialog.h"
+
 
 AutoVarCtl::AutoVarCtl()
     : m_autoWidget(0)
@@ -30,7 +34,8 @@ void AutoVarCtl::setWidget(QTreeWidget *autoWidget)
 {
     m_autoWidget = autoWidget;
 
-
+    autoWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_autoWidget, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(onContextMenu(const QPoint&)));
 
     //
     m_autoWidget->setColumnCount(2);
@@ -50,6 +55,39 @@ void AutoVarCtl::setWidget(QTreeWidget *autoWidget)
 
 }
 
+void AutoVarCtl::onContextMenu ( const QPoint &pos)
+{
+
+    m_popupMenu.clear();
+    
+    // Add 'open'
+    QAction *action = m_popupMenu.addAction("Show memory");
+    action->setData(0);
+    connect(action, SIGNAL(triggered()), this, SLOT(onShowMemory()));
+
+        
+    m_popupMenu.popup(m_autoWidget->mapToGlobal(pos));
+}
+
+void AutoVarCtl::onShowMemory()
+{
+    QList<QTreeWidgetItem *> selectedItems = m_autoWidget->selectedItems();
+    if(!selectedItems.empty())
+    {
+        QTreeWidgetItem *item = selectedItems[0];
+
+        long long addr = item->data(1, Qt::UserRole).toLongLong(0);
+        debugMsg("%s addr:%llx\n", stringToCStr(item->text(0)), addr);
+        if(addr != 0)
+        {
+            
+            MemoryDialog dlg;
+            dlg.setStartAddress(addr);
+            dlg.exec();
+        }
+    }
+        
+}
 
 void AutoVarCtl::onAutoWidgetItemCollapsed(QTreeWidgetItem *item)
 {
@@ -162,6 +200,7 @@ void AutoVarCtl::addVariableDataTree(
     QString parentPath = getTreeWidgetItemPath(item);
 
     item->setText(1, rootNode->getData());
+    item->setData(1, Qt::UserRole, QVariant((qlonglong)rootNode->getAddress()));
 
     for(int i = 0;i < rootNode->getChildCount();i++)
     {
@@ -177,6 +216,8 @@ void AutoVarCtl::addVariableDataTree(
                     varPath,
                     child->getName(),
                     child->getData());
+
+            childItem->setData(1, Qt::UserRole, QVariant((qlonglong)child->getAddress()));
 
             item->addChild(childItem);
 
