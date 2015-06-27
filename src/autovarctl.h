@@ -15,6 +15,7 @@
 #include "varctl.h"
 #include <QMenu>
 
+#include "settings.h"
 
 class AutoVarCtl : public VarCtl
 {
@@ -29,6 +30,8 @@ public:
     void setWidget(QTreeWidget *autoWidget);
 
     void ICore_onLocalVarChanged(QString name, CoreVarValue varValue);
+
+    void setConfig(Settings *cfg);
 
 private:
     void addVariableDataTree(
@@ -49,13 +52,14 @@ public slots:
     void onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
     void onShowMemory();
 
+
     
 public:
     QTreeWidget *m_autoWidget;
     QMenu m_popupMenu;
     
     VarCtl::DispInfoMap m_autoVarDispInfo;
-
+    Settings m_cfg;
 };
 
 

@@ -8,6 +8,9 @@
 
 #include <stdint.h>
 
+#include "settings.h"
+
+
 class IMemoryWidget
 {
 public:
@@ -26,6 +29,8 @@ public:
 
  void paintEvent ( QPaintEvent * event );
     void setInterface(IMemoryWidget *inf);
+
+    void setConfig(Settings *cfg);
     
 private:
     int getRowHeight();

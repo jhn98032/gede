@@ -65,5 +65,9 @@ void MemoryDialog::onVertScroll(int pos)
     m_ui.memorywidget->setStartAddress(((unsigned int)pos)*16UL);
 }
 
+void MemoryDialog::setConfig(Settings *cfg)
+{
+    m_ui.memorywidget->setConfig(cfg);
+}
 
 

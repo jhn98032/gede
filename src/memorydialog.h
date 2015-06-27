@@ -13,7 +13,9 @@ public:
 
     virtual QByteArray getMemory(unsigned int startAddress, int count);
     void setStartAddress(unsigned int addr);
-    
+
+    void setConfig(Settings *cfg);
+
 public slots:
     void onVertScroll(int pos);
     void onUpdate();

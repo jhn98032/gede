@@ -34,13 +34,18 @@ private:
 private slots:
 
     void onSelectFont();
+    void onSelectMemoryFont();
 
+    void showFontSelection(QString *fontFamily, int *fontSize);
+    
 private:
     Ui_SettingsDialog m_ui;
     Settings *m_cfg;
 
     QString m_settingsFontFamily;    
     int m_settingsFontSize;
+    QString m_settingsMemoryFontFamily;    
+    int m_settingsMemoryFontSize;
 };
 
 #endif // FILE__SETTINGSDIALOG_H

@@ -36,6 +36,8 @@ void Settings::load(QString filepath)
 
     m_fontFamily = tmpIni.getString("Font","Monospace");
     m_fontSize = tmpIni.getInt("FontSize", 8);
+    m_memoryFontFamily = tmpIni.getString("MemoryFont","Monospace");
+    m_memoryFontSize = tmpIni.getInt("MemoryFontSize", 8);
 
     m_reloadBreakpoints = tmpIni.getBool("ReuseBreakpoints", false);
 
@@ -76,6 +78,9 @@ void Settings::save(QString filepath)
     
     tmpIni.setString("Font", m_fontFamily);
     tmpIni.setInt("FontSize", m_fontSize);
+
+    tmpIni.setString("MemoryFont", m_memoryFontFamily);
+    tmpIni.setInt("MemoryFontSize", m_memoryFontSize);
 
     tmpIni.setBool("ReuseBreakpoints", m_reloadBreakpoints);
 

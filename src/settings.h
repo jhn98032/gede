@@ -51,6 +51,8 @@ class Settings
         QString m_lastProgram;
         QString m_fontFamily;
         int m_fontSize;
+        QString m_memoryFontFamily;
+        int m_memoryFontSize;
         bool m_reloadBreakpoints;
 
         QList<SettingsBreakpoint> m_breakpoints;

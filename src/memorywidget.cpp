@@ -45,6 +45,21 @@ MemoryWidget::MemoryWidget(QWidget *parent)
     m_startAddress = 0;
 }
 
+MemoryWidget::~MemoryWidget()
+{
+    delete m_fontInfo;
+}
+
+
+void MemoryWidget::setConfig(Settings *cfg)
+{
+    delete m_fontInfo;
+    m_font = QFont(cfg->m_memoryFontFamily, cfg->m_memoryFontSize);
+    m_fontInfo = new QFontMetrics(m_font);
+
+    update();
+}
+
 void MemoryWidget::keyPressEvent(QKeyEvent *e)
 {
     if(e->type() == QKeyEvent::KeyPress)
@@ -80,10 +95,6 @@ int MemoryWidget::getRowHeight()
     return rowHeight;
 }
 
-MemoryWidget::~MemoryWidget()
-{
-    delete m_fontInfo;
-}
 
 
 int MemoryWidget::getHeaderHeight()

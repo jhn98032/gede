@@ -82,6 +82,7 @@ void AutoVarCtl::onShowMemory()
         {
             
             MemoryDialog dlg;
+            dlg.setConfig(&m_cfg);
             dlg.setStartAddress(addr);
             dlg.exec();
         }
@@ -297,4 +298,13 @@ QTreeWidgetItem *AutoVarCtl::insertTreeWidgetItem(
 
     return item;
 }
+
+
+void AutoVarCtl::setConfig(Settings *cfg)
+{
+    m_cfg = *cfg;
+}
+
+
+
 

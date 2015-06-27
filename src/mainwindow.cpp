@@ -16,7 +16,7 @@
 #include "tagscanner.h"
 #include "codeview.h"
 
-
+#include "memorydialog.h"
 #include <QDirIterator>
 #include <QMessageBox>
 #include <QScrollBar>
@@ -172,6 +172,8 @@ void MainWindow::loadConfig()
         codeViewTab->setConfig(&m_cfg);
     }
     
+
+    m_autoVarCtl.setConfig(&m_cfg);
 
     m_cfg.save(CONFIG_FILENAME);
 
@@ -1217,6 +1219,9 @@ void MainWindow::onSettings()
             CodeViewTab* codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
             codeViewTab->setConfig(&m_cfg);
         }
+
+        m_autoVarCtl.setConfig(&m_cfg);
+
         
         m_cfg.save(CONFIG_FILENAME);
     }
