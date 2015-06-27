@@ -12,6 +12,13 @@
 #include "util.h"
 #include <assert.h>
 
+TreeNode::TreeNode()
+    : m_address(0)
+{
+
+}
+
+
 
 void TreeNode::copy(const TreeNode &other)
 {
@@ -77,8 +84,8 @@ void TreeNode::removeAll()
 void TreeNode::dump(int parentCnt)
 {
     QString text;
-    text.sprintf("+- %s='%s'", stringToCStr(m_name),
-                        stringToCStr(m_data));
+    text.sprintf("+- %s='%s' (0x%x)", stringToCStr(m_name),
+                        stringToCStr(m_data), m_address);
 
     for(int i = 0;i < parentCnt;i++)
         text  = "    " + text;

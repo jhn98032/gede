@@ -19,7 +19,7 @@
 class TreeNode
 {
 public:
-    TreeNode() { };
+    TreeNode();
     virtual ~TreeNode();
     
     TreeNode *findChild(QString path) const;
