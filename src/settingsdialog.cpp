@@ -25,11 +25,28 @@ SettingsDialog::SettingsDialog(QWidget *parent, Settings *cfg)
     connect(m_ui.pushButton_selectFont, SIGNAL(clicked()), SLOT(onSelectFont()));
     connect(m_ui.pushButton_selectMemoryFont, SIGNAL(clicked()), SLOT(onSelectMemoryFont()));
 
+    QObject::connect(m_ui.buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(onButtonBoxClicked(QAbstractButton*)));
+
+
+
     loadConfig();
     
     updateGui();
     
 }
+
+void SettingsDialog::onButtonBoxClicked(QAbstractButton* button)
+{
+    // Clicked on the "Restore Defaults" button?
+    if(m_ui.buttonBox->standardButton(button) == QDialogButtonBox::RestoreDefaults)
+    {
+        m_cfg->loadDefaultsGui();
+        loadConfig();
+
+        updateGui();
+    }
+}
+
 
 void SettingsDialog::updateGui()
 {

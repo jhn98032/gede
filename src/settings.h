@@ -11,6 +11,8 @@
 
 #include <QString>
 #include <QStringList>
+#include "ini.h"
+
 
 enum ConnectionMode
 {
@@ -35,10 +37,14 @@ class Settings
 
         void load(QString filepath);
         void save(QString filepath);
-
+        void loadDefaultsGui();
+        
         static QStringList getDefaultKeywordList();
         static QStringList getDefaultCppKeywordList();
         
+
+    private:
+        void loadFromIni(Ini &tmpIni);
         
     public:
         QStringList m_argumentList;

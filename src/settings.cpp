@@ -19,12 +19,27 @@ Settings::Settings()
 
 }
 
+void Settings::loadDefaultsGui()
+{
+    m_fontFamily = "Monospace";
+    m_fontSize = 8;
+    m_memoryFontFamily = "Monospace";
+    m_memoryFontSize = 8;
+}
+
 void Settings::load(QString filepath)
 {
     Ini tmpIni;
     if(tmpIni.appendLoad(filepath))
         infoMsg("Failed to load '%s'. File will be created.", stringToCStr(filepath));
 
+    loadFromIni(tmpIni);
+}
+
+void Settings::loadFromIni(Ini &tmpIni)
+{
+    loadDefaultsGui();
+    
     m_connectionMode = tmpIni.getInt("Mode", MODE_LOCAL) == MODE_LOCAL ? MODE_LOCAL : MODE_TCP;
     m_tcpPort = tmpIni.getInt("TcpPort", 2000);
     m_tcpHost = tmpIni.getString("TcpHost", "localhost");
@@ -34,10 +49,10 @@ void Settings::load(QString filepath)
     m_lastProgram = tmpIni.getString("LastProgram", "");
     m_argumentList = tmpIni.getStringList("LastProgramArguments", m_argumentList);
 
-    m_fontFamily = tmpIni.getString("Font","Monospace");
-    m_fontSize = tmpIni.getInt("FontSize", 8);
-    m_memoryFontFamily = tmpIni.getString("MemoryFont","Monospace");
-    m_memoryFontSize = tmpIni.getInt("MemoryFontSize", 8);
+    m_fontFamily = tmpIni.getString("Font", m_fontFamily);
+    m_fontSize = tmpIni.getInt("FontSize", m_fontSize);
+    m_memoryFontFamily = tmpIni.getString("MemoryFont", m_memoryFontFamily);
+    m_memoryFontSize = tmpIni.getInt("MemoryFontSize", m_memoryFontSize);
 
     m_reloadBreakpoints = tmpIni.getBool("ReuseBreakpoints", false);
 

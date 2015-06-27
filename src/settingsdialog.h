@@ -37,6 +37,7 @@ private slots:
     void onSelectMemoryFont();
 
     void showFontSelection(QString *fontFamily, int *fontSize);
+    void onButtonBoxClicked(QAbstractButton* button);
     
 private:
     Ui_SettingsDialog m_ui;
