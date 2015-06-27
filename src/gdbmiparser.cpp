@@ -280,8 +280,6 @@ int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
         {
             nextTok = tokenList->takeFirst();
 
-            QString addrStr = valueStr;
-            thisNode->setAddress(addrStr.toInt(0,0));
             if(nextTok->getType() == Token::C_STRING)
                 valueStr = "\"" + nextTok->getString() + "\"";
             else
