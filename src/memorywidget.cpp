@@ -353,9 +353,11 @@ void MemoryWidget::onCopy()
             // Display data as hex
             for(j = 0;j < 16;j++)
             {
-                uint8_t b = (unsigned char)content[(int)(addr+j-selectionFirst)];
                 if(selectionFirst <= addr+j && addr+j <= selectionLast) 
+                {
+                    uint8_t b = (unsigned char)content[(int)(addr+j-selectionFirst)];
                     subText.sprintf("%02x ", b);
+                }
                 else
                     subText = "   ";
                 if(j == 7)
@@ -367,9 +369,11 @@ void MemoryWidget::onCopy()
             // Display data as ascii
             for(j = 0;j < 16;j++)
             {
-                uint8_t b = content[(int)(addr+j-selectionFirst)];
                 if(selectionFirst <= addr+j && addr+j <= selectionLast) 
+                {
+                    uint8_t b = content[(int)(addr+j-selectionFirst)];
                     subText.sprintf("%c", byteToChar(b));
+                }
                 else
                     subText = " ";
                 if(j == 7)
