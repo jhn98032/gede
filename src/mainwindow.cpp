@@ -1034,9 +1034,9 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList tex
     m_popupMenu.clear();
 
     // Add 'Add to watch list'
-    if(!onlyFuncs)
+    if(!onlyFuncs || totalItemCount == 0)
     {
-        for(int i = 0;i < text.size();i++)
+        for(int i = text.size()-1;i >= 0;i--)
         {
             action = m_popupMenu.addAction("Add '" + text[i] + "' to watch list");
             action->setData(text[i]);

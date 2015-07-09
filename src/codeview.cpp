@@ -15,6 +15,7 @@
 #include <assert.h>
 
 #include "syntaxhighlighter.h"
+#include "util.h"
 
 
 static const int BORDER_WIDTH = 50;
@@ -162,6 +163,8 @@ void CodeView::mousePressEvent( QMouseEvent * event )
     if(event->button() == Qt::RightButton)
     {
         QPoint pos = event->globalPos();
+            
+        // Clicked on a text row?
         int rowHeight = getRowHeight();
         int rowIdx = event->pos().y() / rowHeight;
         int lineNo = rowIdx+1;
@@ -184,7 +187,7 @@ void CodeView::mousePressEvent( QMouseEvent * event )
                 x += w;
             }
 
-            // Go backwards as much as possible
+            // Go to the left until a word is found
             if(foundPos != -1)
             {
                 
@@ -221,11 +224,38 @@ void CodeView::mousePressEvent( QMouseEvent * event )
                 else if(cols[foundPos]->m_type == TextField::WORD)
                 {
                     QStringList partList = cols[foundPos]->m_text.split('.');
+
+                    // Remove the last word if it is a function
+                    if(foundPos+1 < cols.size())
+                    {
+                        if(cols[foundPos+1]->m_text == "(")
+                            partList.removeLast();
+                    }
+                    
+                    
                     for(int partIdx = 1;partIdx <= partList.size();partIdx++)
                     {
                         QStringList subList = partList.mid(0, partIdx);
                         list += subList.join(".");
                     }
+
+                    // A '[...]' section to the right of the variable?
+                    if(foundPos+1 < cols.size())
+                    {
+                        if(cols[foundPos+1]->m_text == "[")
+                        {
+                            // Add the entire '[...]' section to the variable name
+                            QString extraString = "[";
+                            for(int j = foundPos+2;foundPos < cols.size() && cols[j]->m_text != "]";j++)
+                            {
+                                extraString += cols[j]->m_text;
+                            }
+                            extraString += ']';
+                            list += partList.join(".") + extraString;
+
+                        }
+                    }
+
                 }
             }
             
