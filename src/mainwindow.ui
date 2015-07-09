@@ -251,6 +251,9 @@
    <property name="text">
     <string>Quit</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
   </action>
   <action name="actionNext">
    <property name="icon">
@@ -260,6 +263,9 @@
    <property name="text">
     <string>Next</string>
    </property>
+   <property name="shortcut">
+    <string>F6</string>
+   </property>
   </action>
   <action name="actionStep_In">
    <property name="icon">
@@ -268,6 +274,9 @@
    </property>
    <property name="text">
     <string>Step In</string>
+   </property>
+   <property name="shortcut">
+    <string>F5</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -283,6 +292,9 @@
    <property name="text">
     <string>Stop</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+F2</string>
+   </property>
   </action>
   <action name="actionContinue">
    <property name="icon">
@@ -292,6 +304,9 @@
    <property name="text">
     <string>Continue</string>
    </property>
+   <property name="shortcut">
+    <string>F8</string>
+   </property>
   </action>
   <action name="actionRun">
    <property name="icon">
@@ -300,6 +315,9 @@
    </property>
    <property name="text">
     <string>Run</string>
+   </property>
+   <property name="shortcut">
+    <string>F11</string>
    </property>
   </action>
   <action name="actionSettings">
@@ -314,6 +332,9 @@
    </property>
    <property name="text">
     <string>Step Out</string>
+   </property>
+   <property name="shortcut">
+    <string>F7</string>
    </property>
   </action>
  </widget>
