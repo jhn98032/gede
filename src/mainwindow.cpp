@@ -230,7 +230,25 @@ void MainWindow::ICore_onLocalVarReset()
     autoWidget->clear();
 }
 
+/**
+ * @brief Finds a child to a treewidget node.
+ */
+QTreeWidgetItem *findTreeWidgetChildByName(QTreeWidget *treeWidget, QTreeWidgetItem *parent, QString name)
+{
+    QTreeWidgetItem *foundItem = NULL;
+    if(parent == NULL)
+        parent = treeWidget->invisibleRootItem();
 
+    for(int i = 0;i < parent->childCount() && foundItem == NULL;i++)
+    {
+        QTreeWidgetItem *childItem = parent->child(i);
+        if(childItem->text(0) == name)
+            foundItem = childItem;
+    }
+    return foundItem;
+}
+
+    
 /**
  * @brief Adds a path of directories to a tree widget.
  * @return returns the root directory of the newly created directories.
@@ -270,19 +288,9 @@ QTreeWidgetItem *MainWindow::addTreeWidgetPath(QTreeWidget *treeWidget, QTreeWid
 
 
     // Check if the item already exist?
-    QTreeWidgetItem * lookParent;
-    if(parent == NULL)
-        lookParent = treeWidget->invisibleRootItem();
-    else
-        lookParent = parent;
-    for(int i = 0;i < lookParent->childCount() && newItem == NULL;i++)
-    {
-        QTreeWidgetItem *item = lookParent->child(i);
+    newItem = findTreeWidgetChildByName(treeWidget, parent, firstName);
 
-
-        if(item->text(0) == firstName)
-            newItem = item;
-    }
+    
     
 
     // Add the item
@@ -355,6 +363,9 @@ void MainWindow::insertSourceFiles()
     QTreeWidget *treeWidget = m_ui.treeWidget_file;
     Core &core = Core::getInstance();
 
+
+    treeWidget->clear();
+    
     // Get source files
     QVector <SourceFile*> sourceFiles = core.getSourceFiles();
     m_sourceFiles.clear();
@@ -378,7 +389,6 @@ void MainWindow::insertSourceFiles()
         m_tagScanner.scan(info.fullName, &info.m_tagList);
         
 
-        QTreeWidgetItem *item = new QTreeWidgetItem;
         QTreeWidgetItem *parentNode  = NULL;
 
         // Get parent path
@@ -390,16 +400,24 @@ void MainWindow::insertSourceFiles()
         if(!folderPath.isEmpty())
             parentNode = addTreeWidgetPath(treeWidget, NULL, folderPath);
             
-        item->setText(0, filename);
-        item->setData(0, Qt::UserRole, info.fullName);
-        item->setIcon(0, m_fileIcon);
+
+        // Check if the item already exist?
+        QTreeWidgetItem *item = findTreeWidgetChildByName(treeWidget, parentNode, filename);
         
-        if(parentNode == NULL)
-            treeWidget->insertTopLevelItem(0, item);
-        else
+        if(item == NULL)
         {
-            parentNode->addChild(item);
-            parentNode->setExpanded(true);
+            item = new QTreeWidgetItem;
+            item->setText(0, filename);
+            item->setData(0, Qt::UserRole, info.fullName);
+            item->setIcon(0, m_fileIcon);
+            
+            if(parentNode == NULL)
+                treeWidget->insertTopLevelItem(0, item);
+            else
+            {
+                parentNode->addChild(item);
+                parentNode->setExpanded(true);
+            }
         }
     }
 
@@ -437,6 +455,10 @@ void MainWindow::ICore_onWatchVarChildAdded(QString watchId, QString name, QStri
 }
 
 
+void MainWindow::ICore_onSourceFileListChanged()
+{
+    insertSourceFiles();
+}
 
 /**
  * @brief User doubleclicked on the border

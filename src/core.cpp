@@ -289,11 +289,16 @@ int Core::gdbGetMemory(uint64_t addr, size_t count, QByteArray *data)
 }
 
 
-void Core::gdbGetFiles()
+/**
+* @brief Asks GDB for a list of source files.
+* @return true if any files was added or removed.
+*/
+bool Core::gdbGetFiles()
 {
     Com& com = Com::getInstance();
     Tree resultData;
     QMap<QString, bool> fileLookup;
+    bool modified = false;
     
     com.command(&resultData, "-file-list-exec-source-files");
 
@@ -302,6 +307,7 @@ void Core::gdbGetFiles()
     for(int m = 0;m < m_sourceFiles.size();m++)
     {
         SourceFile *sourceFile = m_sourceFiles[m];
+        fileLookup[sourceFile->fullName] = false;
         delete sourceFile;
     }
     m_sourceFiles.clear();
@@ -326,21 +332,43 @@ void Core::gdbGetFiles()
                     continue;
 
                 SourceFile *sourceFile = NULL;
-                // Already added this file?
-                if(!fileLookup.contains(fullname) && !name.contains("<built-in>"))
+                if(!name.contains("<built-in>"))
                 {
-                    fileLookup[fullname] = true;
-                    
-                    sourceFile = new SourceFile; 
+                    // Already added this file?
+                    bool alreadyAdded = false;
+                    if(fileLookup.contains(fullname))
+                    {
+                        if(fileLookup[fullname] == true)
+                            alreadyAdded = true;
+                    }
+                    else
+                        modified = true;
+                        
+                    if(!alreadyAdded)
+                    {
+                        fileLookup[fullname] = true;
+                        
+                        sourceFile = new SourceFile; 
 
-                    sourceFile->name = name;
-                    sourceFile->fullName = fullname;
+                        sourceFile->name = name;
+                        sourceFile->fullName = fullname;
 
-                    m_sourceFiles.append(sourceFile);
+                        m_sourceFiles.append(sourceFile);
+                    }
                 }
             }
         }
     }
+
+    // Any file removed?
+    QMap<QString, bool> ::const_iterator iterFl = fileLookup.constBegin();
+    while (iterFl != fileLookup.constEnd()) {
+        if(iterFl.value() == false)
+            modified = false;
+        ++iterFl;
+    }
+    
+    return modified;
 }
 
 
@@ -626,7 +654,11 @@ void Core::onNotifyAsyncOut(Tree &tree, AsyncClass ac)
         gdbGetThreadList();
         
     }
-    
+    else if(ac == ComListener::AC_LIBRARY_LOADED)
+    {
+        if(gdbGetFiles())
+            m_inf->ICore_onSourceFileListChanged();
+    }
     tree.dump();
 }
 

@@ -61,6 +61,8 @@ public:
     void ICore_onSignalReceived(QString sigtype);
     void ICore_onTargetOutput(QString msg);
     void ICore_onStateChanged(TargetState state);
+    void ICore_onSourceFileListChanged();
+    
     void ICodeView_onRowDoubleClick(int lineNo);
     void ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList text);
     void ICodeView_onContextMenuIncFile(QPoint pos, int lineNo, QString incFile);

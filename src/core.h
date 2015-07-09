@@ -123,6 +123,8 @@ class ICore
     virtual void ICore_onMessage(QString message) = 0;
     virtual void ICore_onTargetOutput(QString message) = 0;
     virtual void ICore_onCurrentFrameChanged(int frameIdx) = 0;
+    virtual void ICore_onSourceFileListChanged() = 0;
+
     /**
      * @brief Called when a new child item has been added for a watched item.
      * @param watchId    The watchId of the new child.
@@ -181,7 +183,7 @@ public:
     void gdbStepOut();
     void gdbContinue();
     void gdbRun();
-    void gdbGetFiles();
+    bool gdbGetFiles();
     int gdbAddVarWatch(QString varName, QString *varType, QString *value, QString *watchId, bool *hasChildren);
     void gdbRemoveVarWatch(QString watchId);
     QString gdbGetVarWatchName(QString watchId);
