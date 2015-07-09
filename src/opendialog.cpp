@@ -202,7 +202,9 @@ void OpenDialog::saveConfig(Settings *cfg)
     cfg->m_tcpProgram = dlg.getTcpRemoteProgram();
     cfg->m_initCommands = dlg.getInitCommands();
     cfg->m_gdbPath = dlg.getGdbPath();
-
+    cfg->m_initialBreakpoint = dlg.getInitialBreakpoint().trimmed();
+    if(cfg->m_initialBreakpoint.isEmpty())
+        cfg->m_initialBreakpoint = "main";
     if(dlg.m_ui.checkBox_reloadBreakpoints->checkState() == Qt::Checked)
         cfg->m_reloadBreakpoints = true;
     else
@@ -228,7 +230,19 @@ void OpenDialog::loadConfig(Settings &cfg)
     dlg.setProgram(cfg.m_lastProgram);
     QStringList defList;
     dlg.setArguments(cfg.m_argumentList.join(" "));
+    dlg.setInitialBreakpoint(cfg.m_initialBreakpoint);
 
+}
+
+
+void OpenDialog::setInitialBreakpoint(QString list)
+{
+    m_ui.lineEdit_initialBreakpoint->setText(list);
+}
+    
+QString OpenDialog::getInitialBreakpoint()
+{
+    return m_ui.lineEdit_initialBreakpoint->text();
 }
 
 

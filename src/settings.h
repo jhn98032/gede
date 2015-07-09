@@ -62,7 +62,8 @@ class Settings
         QString m_outputFontFamily;
         int m_outputFontSize;
         bool m_reloadBreakpoints;
-
+        QString m_initialBreakpoint;
+        
         QList<SettingsBreakpoint> m_breakpoints;
 };
 

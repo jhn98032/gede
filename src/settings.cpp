@@ -60,6 +60,9 @@ void Settings::loadFromIni(Ini &tmpIni)
 
     m_reloadBreakpoints = tmpIni.getBool("ReuseBreakpoints", false);
 
+    m_initialBreakpoint = tmpIni.getString("InitialBreakpoint","main");
+    
+
     //
     QStringList breakpointStringList;
     breakpointStringList = tmpIni.getStringList("Breakpoints", breakpointStringList);
@@ -105,7 +108,8 @@ void Settings::save(QString filepath)
 
     tmpIni.setBool("ReuseBreakpoints", m_reloadBreakpoints);
 
-
+    tmpIni.setString("InitialBreakpoint",m_initialBreakpoint);
+    
     //
     QStringList breakpointStringList;
     for(int i = 0;i < m_breakpoints.size();i++)

@@ -28,6 +28,10 @@ public:
     void setArguments(QString program);
     QString getProgram();
     QString getArguments();
+
+    void setInitialBreakpoint(QString list);
+    QString getInitialBreakpoint();
+    
     
     void setTcpRemoteHost(QString host);
     QString getTcpRemoteHost();

@@ -158,10 +158,10 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
         com.command(NULL, commandStr);
     }
     
-    if(gdbSetBreakpointAtFunc("main"))
+    if(gdbSetBreakpointAtFunc(cfg->m_initialBreakpoint))
     {
         rc = 1;
-        errorMsg("Failed to set breakpoint at main");
+        errorMsg("Failed to set breakpoint at %s", stringToCStr(cfg->m_initialBreakpoint));
     }
 
     gdbGetFiles();
