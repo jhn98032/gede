@@ -136,6 +136,7 @@ private:
 
     AutoVarCtl m_autoVarCtl;
     WatchVarCtl m_watchVarCtl;
+    QFont m_outputFont;
 };
 
 

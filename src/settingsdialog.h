@@ -35,6 +35,7 @@ private slots:
 
     void onSelectFont();
     void onSelectMemoryFont();
+    void onSelectOutputFont();
 
     void showFontSelection(QString *fontFamily, int *fontSize);
     void onButtonBoxClicked(QAbstractButton* button);
@@ -47,6 +48,8 @@ private:
     int m_settingsFontSize;
     QString m_settingsMemoryFontFamily;    
     int m_settingsMemoryFontSize;
+    QString m_settingsOutputFontFamily;    
+    int m_settingsOutputFontSize;
 };
 
 #endif // FILE__SETTINGSDIALOG_H

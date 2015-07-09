@@ -173,6 +173,9 @@ void MainWindow::loadConfig()
     }
     
 
+    m_outputFont = QFont(m_cfg.m_outputFontFamily, m_cfg.m_outputFontSize);
+    m_ui.targetOutputView->setFont(m_outputFont);
+    
     m_autoVarCtl.setConfig(&m_cfg);
 
     m_cfg.save(CONFIG_FILENAME);
@@ -1241,6 +1244,9 @@ void MainWindow::onSettings()
             CodeViewTab* codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
             codeViewTab->setConfig(&m_cfg);
         }
+
+        m_outputFont = QFont(m_cfg.m_outputFontFamily, m_cfg.m_outputFontSize);
+        m_ui.targetOutputView->setFont(m_outputFont);
 
         m_autoVarCtl.setConfig(&m_cfg);
 
