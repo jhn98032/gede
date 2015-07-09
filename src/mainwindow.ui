@@ -204,8 +204,13 @@
     <property name="title">
      <string>Execution</string>
     </property>
+    <addaction name="actionRun"/>
+    <addaction name="actionStop"/>
+    <addaction name="separator"/>
     <addaction name="actionNext"/>
     <addaction name="actionStep_In"/>
+    <addaction name="actionStep_Out"/>
+    <addaction name="actionContinue"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
