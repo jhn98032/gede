@@ -157,7 +157,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ui.editorTabWidget, SIGNAL(tabCloseRequested(int)), SLOT(onCodeViewTab_tabCloseRequested(int)));
     connect(m_ui.editorTabWidget, SIGNAL(currentChanged(int)), SLOT(onCodeViewTab_currentChanged(int)));
     
-    
+    statusBar()->addPermanentWidget(&m_statusLineWidget);
 }
 
 
@@ -1307,6 +1307,34 @@ void MainWindow::ICore_onStateChanged(TargetState state)
     }
 }
 
+
+/**
+* @brief Sets the status line in the mainwindow
+*/
+void MainWindow::setStatusLine(Settings &cfg)
+{
+    MainWindow &w = *this;
+    QString statusText;
+    if(cfg.m_connectionMode == MODE_LOCAL)
+    {
+        QString argumentText;
+        for(int j = 0;j < cfg.m_argumentList.size();j++)
+        {
+            argumentText += "\"" + cfg.m_argumentList[j] + "\"";
+            if(j+1 != cfg.m_argumentList.size())
+                argumentText += ",";
+        }
+        if(argumentText.length() > 50)
+        {
+            argumentText = argumentText.left(50);
+            argumentText += "...";
+        }
+        statusText.sprintf("[%s] [%s]", stringToCStr(cfg.m_lastProgram), stringToCStr(argumentText));
+    }
+    else
+        statusText.sprintf("[%s] [%s:%d]", stringToCStr(cfg.m_tcpProgram), stringToCStr(cfg.m_tcpHost), (int)cfg.m_tcpPort);
+    w.m_statusLineWidget.setText(statusText);
+}
 
 
 

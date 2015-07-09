@@ -12,6 +12,7 @@
 #include <QMainWindow>
 #include <QApplication>
 #include <QMap>
+#include <QLabel>
 
 #include "ui_mainwindow.h"
 #include "core.h"
@@ -43,6 +44,7 @@ public:
 
 public:
     void insertSourceFiles();
+    void setStatusLine(Settings &cfg);
     
 public:
     void ICore_onStopped(ICore::StopReason reason, QString path, int lineNo);
@@ -137,6 +139,7 @@ private:
     AutoVarCtl m_autoVarCtl;
     WatchVarCtl m_watchVarCtl;
     QFont m_outputFont;
+    QLabel m_statusLineWidget;
 };
 
 

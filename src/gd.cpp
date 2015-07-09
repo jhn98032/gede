@@ -130,6 +130,9 @@ int main(int argc, char *argv[])
     if(rc)
         return rc;
 
+    // Set the status line
+    w.setStatusLine(cfg);
+
     w.insertSourceFiles();
 
     if(cfg.m_reloadBreakpoints)
