@@ -10,6 +10,10 @@
 #include "util.h"
 #include "log.h"
 #include "ini.h"
+#include "config.h"
+
+#include <QDir>
+
 
 
 Settings::Settings()
@@ -29,18 +33,44 @@ void Settings::loadDefaultsGui()
     m_outputFontSize = 8;
 }
 
-void Settings::load(QString filepath)
+
+void Settings::load()
 {
+    loadProjectConfig();
+    loadGlobalConfig();
+}
+ 
+
+
+void Settings::loadGlobalConfig()
+{
+    // Load from file
+    QString globalConfigFilename = QDir::homePath() + "/"  GLOBAL_CONFIG_FILENAME;
+    Ini tmpIni;
+    if(tmpIni.appendLoad(globalConfigFilename))
+        infoMsg("Failed to load '%s'. File will be created.", stringToCStr(globalConfigFilename));
+
+    loadDefaultsGui();
+
+    m_fontFamily = tmpIni.getString("Font", m_fontFamily);
+    m_fontSize = tmpIni.getInt("FontSize", m_fontSize);
+    m_memoryFontFamily = tmpIni.getString("MemoryFont", m_memoryFontFamily);
+    m_memoryFontSize = tmpIni.getInt("MemoryFontSize", m_memoryFontSize);
+    m_outputFontFamily = tmpIni.getString("OutputFont", m_outputFontFamily);
+    m_outputFontSize = tmpIni.getInt("OutputFontSize", m_outputFontSize);
+
+}
+
+void Settings::loadProjectConfig()
+{
+    // Load from file
+    QString filepath = PROJECT_CONFIG_FILENAME;
     Ini tmpIni;
     if(tmpIni.appendLoad(filepath))
         infoMsg("Failed to load '%s'. File will be created.", stringToCStr(filepath));
 
-    loadFromIni(tmpIni);
-}
 
-void Settings::loadFromIni(Ini &tmpIni)
-{
-    loadDefaultsGui();
+
     
     m_connectionMode = tmpIni.getInt("Mode", MODE_LOCAL) == MODE_LOCAL ? MODE_LOCAL : MODE_TCP;
     m_tcpPort = tmpIni.getInt("TcpPort", 2000);
@@ -50,13 +80,6 @@ void Settings::loadFromIni(Ini &tmpIni)
     m_gdbPath = tmpIni.getString("GdpPath", "gdb");
     m_lastProgram = tmpIni.getString("LastProgram", "");
     m_argumentList = tmpIni.getStringList("LastProgramArguments", m_argumentList);
-
-    m_fontFamily = tmpIni.getString("Font", m_fontFamily);
-    m_fontSize = tmpIni.getInt("FontSize", m_fontSize);
-    m_memoryFontFamily = tmpIni.getString("MemoryFont", m_memoryFontFamily);
-    m_memoryFontSize = tmpIni.getInt("MemoryFontSize", m_memoryFontSize);
-    m_outputFontFamily = tmpIni.getString("OutputFont", m_outputFontFamily);
-    m_outputFontSize = tmpIni.getInt("OutputFontSize", m_outputFontSize);
 
     m_reloadBreakpoints = tmpIni.getBool("ReuseBreakpoints", false);
 
@@ -82,11 +105,25 @@ void Settings::loadFromIni(Ini &tmpIni)
 
 }
  
-void Settings::save(QString filepath)
+
+void Settings::save()
+{
+    saveProjectConfig();
+    saveGlobalConfig();
+}
+
+
+
+void Settings::saveProjectConfig()
 {
 
+    QString filepath = PROJECT_CONFIG_FILENAME;
+    
     Ini tmpIni;
+
     tmpIni.appendLoad(filepath);
+
+    //
     tmpIni.setInt("TcpPort", m_tcpPort);
     tmpIni.setString("TcpHost", m_tcpHost);
     tmpIni.setInt("Mode", (int)m_connectionMode);
@@ -98,14 +135,6 @@ void Settings::save(QString filepath)
     tmpArgs = m_argumentList;
     tmpIni.setStringList("LastProgramArguments", tmpArgs);
     
-    tmpIni.setString("Font", m_fontFamily);
-    tmpIni.setInt("FontSize", m_fontSize);
-
-    tmpIni.setString("MemoryFont", m_memoryFontFamily);
-    tmpIni.setInt("MemoryFontSize", m_memoryFontSize);
-    tmpIni.setString("OutputFont", m_outputFontFamily);
-    tmpIni.setInt("OutputFontSize", m_outputFontSize);
-
     tmpIni.setBool("ReuseBreakpoints", m_reloadBreakpoints);
 
     tmpIni.setString("InitialBreakpoint",m_initialBreakpoint);
@@ -130,6 +159,31 @@ void Settings::save(QString filepath)
         infoMsg("Failed to save '%s'", stringToCStr(filepath));
 
 }
+
+
+void Settings::saveGlobalConfig()
+{
+    QString globalConfigFilename = QDir::homePath() + "/"  GLOBAL_CONFIG_FILENAME;
+
+    Ini tmpIni;
+
+    tmpIni.appendLoad(globalConfigFilename);
+
+    tmpIni.setString("Font", m_fontFamily);
+    tmpIni.setInt("FontSize", m_fontSize);
+
+    tmpIni.setString("MemoryFont", m_memoryFontFamily);
+    tmpIni.setInt("MemoryFontSize", m_memoryFontSize);
+    tmpIni.setString("OutputFont", m_outputFontFamily);
+    tmpIni.setInt("OutputFontSize", m_outputFontSize);
+
+    if(tmpIni.save(globalConfigFilename))
+        infoMsg("Failed to save '%s'", stringToCStr(globalConfigFilename));
+
+}
+
+
+
          
 QStringList Settings::getDefaultCppKeywordList()
 {

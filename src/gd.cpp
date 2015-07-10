@@ -60,7 +60,7 @@ int main(int argc, char *argv[])
     bool showConfigDialog = true;
     
     // Load default config
-    cfg.load(CONFIG_FILENAME);
+    cfg.load();
     for(int i = 1;i < argc;i++)
     {
         const char *curArg = argv[i];
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
     }
 
     // Save config
-    cfg.save(CONFIG_FILENAME);
+    cfg.save();
 
     //
     if(cfg.m_lastProgram.isEmpty())

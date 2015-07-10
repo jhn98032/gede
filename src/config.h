@@ -9,7 +9,9 @@
 #ifndef FILE__CONFIG_H
 #define FILE__CONFIG_H
 
-#define CONFIG_FILENAME   "gede.ini"
+#define PROJECT_CONFIG_FILENAME   "gede.ini"
+
+#define GLOBAL_CONFIG_FILENAME   ".gede.ini"
 
 //#define ENABLE_GDB_LOG
 

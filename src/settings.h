@@ -35,16 +35,19 @@ class Settings
     public:
         Settings();
 
-        void load(QString filepath);
-        void save(QString filepath);
+        void load();
+        void save();
         void loadDefaultsGui();
         
         static QStringList getDefaultKeywordList();
         static QStringList getDefaultCppKeywordList();
         
-
     private:
-        void loadFromIni(Ini &tmpIni);
+        void loadProjectConfig();
+        void loadGlobalConfig();
+
+        void saveProjectConfig();
+        void saveGlobalConfig();
         
     public:
         QStringList m_argumentList;

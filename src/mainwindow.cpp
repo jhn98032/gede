@@ -163,7 +163,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::loadConfig()
 {
-    m_cfg.load(CONFIG_FILENAME);
+    m_cfg.load();
 
 
     for(int tabIdx = 0;tabIdx <  m_ui.editorTabWidget->count();tabIdx++)
@@ -178,7 +178,7 @@ void MainWindow::loadConfig()
     
     m_autoVarCtl.setConfig(&m_cfg);
 
-    m_cfg.save(CONFIG_FILENAME);
+    m_cfg.save();
 
 }
 
@@ -819,7 +819,7 @@ void MainWindow::ICore_onBreakpointsChanged()
         bkptCfg.lineNo = bkpt->lineNo;
         m_cfg.m_breakpoints.push_back(bkptCfg);
     }
-    m_cfg.save(CONFIG_FILENAME);
+    m_cfg.save();
     
 
     // Update the breakpoint list widget
@@ -1251,7 +1251,7 @@ void MainWindow::onSettings()
         m_autoVarCtl.setConfig(&m_cfg);
 
         
-        m_cfg.save(CONFIG_FILENAME);
+        m_cfg.save();
     }
    
 }
