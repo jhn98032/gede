@@ -379,7 +379,7 @@ int Core::gdbSetBreakpointAtFunc(QString func)
     int rc = 0;
     int res;
     
-    res = com.commandF(&resultData, "-break-insert %s", stringToCStr(func));
+    res = com.commandF(&resultData, "-break-insert -f %s", stringToCStr(func));
     if(res == GDB_ERROR)
     {
         rc = -1;
