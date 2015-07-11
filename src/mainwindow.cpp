@@ -945,8 +945,8 @@ void MainWindow::onBreakpointsWidgetItemDoubleClicked(QTreeWidgetItem * item,int
     BreakPoint* bk = bklist[idx];
 
     CodeViewTab* currentCodeViewTab = open(bk->fullname);
-    
-    currentCodeViewTab->ensureLineIsVisible(bk->lineNo);
+    if(currentCodeViewTab)
+        currentCodeViewTab->ensureLineIsVisible(bk->lineNo);
     
 }
     
@@ -1112,8 +1112,8 @@ void MainWindow::onCodeViewContextMenuShowCurrentLocation()
 {
     // Open file
     CodeViewTab* currentCodeViewTab = open(m_currentFile);
-
-    currentCodeViewTab->ensureLineIsVisible(m_currentLine);    
+    if(currentCodeViewTab)
+        currentCodeViewTab->ensureLineIsVisible(m_currentLine);    
 }
 
 
