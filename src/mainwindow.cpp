@@ -144,11 +144,7 @@ MainWindow::MainWindow(QWidget *parent)
     core.setListener(this);
 
 
-    //
-    QFont font = m_ui.logView->font();
-    font.setPointSize(9);
-    m_ui.logView->setFont(font);
-
+    
 
     installEventFilter(this);
 
@@ -166,18 +162,9 @@ void MainWindow::loadConfig()
     m_cfg.load();
 
 
-    for(int tabIdx = 0;tabIdx <  m_ui.editorTabWidget->count();tabIdx++)
-    {
-        CodeViewTab* codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
-        codeViewTab->setConfig(&m_cfg);
-    }
+    setConfig();
     
-
-    m_outputFont = QFont(m_cfg.m_outputFontFamily, m_cfg.m_outputFontSize);
-    m_ui.targetOutputView->setFont(m_outputFont);
     
-    m_autoVarCtl.setConfig(&m_cfg);
-
     m_cfg.save();
 
 }
@@ -1231,6 +1218,30 @@ void MainWindow::onCodeViewContextMenuAddWatch()
     
 }
 
+
+
+/**
+ * @brief Update the GUI with the settings in the config
+ */
+void MainWindow::setConfig()
+{
+    for(int tabIdx = 0;tabIdx <  m_ui.editorTabWidget->count();tabIdx++)
+    {
+        CodeViewTab* codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
+        codeViewTab->setConfig(&m_cfg);
+    }
+    
+    m_gdbOutputFont = QFont(m_cfg.m_gdbOutputFontFamily, m_cfg.m_gdbOutputFontSize);
+    m_ui.logView->setFont(m_gdbOutputFont);
+
+    m_outputFont = QFont(m_cfg.m_outputFontFamily, m_cfg.m_outputFontSize);
+    m_ui.targetOutputView->setFont(m_outputFont);
+    
+    m_autoVarCtl.setConfig(&m_cfg);
+
+}
+
+
 void MainWindow::onSettings()
 {
     
@@ -1239,17 +1250,8 @@ void MainWindow::onSettings()
     {
         dlg.getConfig(&m_cfg);
 
-        for(int tabIdx = 0;tabIdx <  m_ui.editorTabWidget->count();tabIdx++)
-        {
-            CodeViewTab* codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
-            codeViewTab->setConfig(&m_cfg);
-        }
-
-        m_outputFont = QFont(m_cfg.m_outputFontFamily, m_cfg.m_outputFontSize);
-        m_ui.targetOutputView->setFont(m_outputFont);
-
-        m_autoVarCtl.setConfig(&m_cfg);
-
+        setConfig();
+        
         
         m_cfg.save();
     }

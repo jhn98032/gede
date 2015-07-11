@@ -25,6 +25,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, Settings *cfg)
     connect(m_ui.pushButton_selectFont, SIGNAL(clicked()), SLOT(onSelectFont()));
     connect(m_ui.pushButton_selectMemoryFont, SIGNAL(clicked()), SLOT(onSelectMemoryFont()));
     connect(m_ui.pushButton_selectOutputFont, SIGNAL(clicked()), SLOT(onSelectOutputFont()));
+    connect(m_ui.pushButton_selectGdbOutputFont, SIGNAL(clicked()), SLOT(onSelectGdbOutputFont()));
 
     QObject::connect(m_ui.buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(onButtonBoxClicked(QAbstractButton*)));
 
@@ -60,6 +61,9 @@ void SettingsDialog::updateGui()
 
     labelText.sprintf("%s  %d", stringToCStr(m_settingsOutputFontFamily), m_settingsOutputFontSize);
     m_ui.pushButton_selectOutputFont->setText(labelText);
+
+    labelText.sprintf("%s  %d", stringToCStr(m_settingsGdbOutputFontFamily), m_settingsGdbOutputFontSize);
+    m_ui.pushButton_selectGdbOutputFont->setText(labelText);
 }    
 
 void SettingsDialog::loadConfig()
@@ -70,6 +74,8 @@ void SettingsDialog::loadConfig()
     m_settingsMemoryFontSize = m_cfg->m_memoryFontSize;
     m_settingsOutputFontFamily = m_cfg->m_outputFontFamily;
     m_settingsOutputFontSize = m_cfg->m_outputFontSize;
+    m_settingsGdbOutputFontFamily = m_cfg->m_gdbOutputFontFamily;
+    m_settingsGdbOutputFontSize = m_cfg->m_gdbOutputFontSize;
 }
 
 void SettingsDialog::saveConfig()
@@ -87,6 +93,9 @@ void SettingsDialog::getConfig(Settings *cfg)
 
     cfg->m_outputFontFamily = m_settingsOutputFontFamily;
     cfg->m_outputFontSize = m_settingsOutputFontSize;
+
+    cfg->m_gdbOutputFontFamily = m_settingsGdbOutputFontFamily;
+    cfg->m_gdbOutputFontSize = m_settingsGdbOutputFontSize;
 }
 
 
@@ -124,5 +133,10 @@ void SettingsDialog::onSelectMemoryFont()
 void SettingsDialog::onSelectOutputFont()
 {
     showFontSelection(&m_settingsOutputFontFamily, &m_settingsOutputFontSize);
+}
+
+void SettingsDialog::onSelectGdbOutputFont()
+{
+    showFontSelection(&m_settingsGdbOutputFontFamily, &m_settingsGdbOutputFontSize);
 }
 

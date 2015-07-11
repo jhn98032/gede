@@ -58,12 +58,16 @@ class Settings
         QStringList m_initCommands;
         QString m_gdbPath;
         QString m_lastProgram;
+
         QString m_fontFamily;
         int m_fontSize;
         QString m_memoryFontFamily;
         int m_memoryFontSize;
         QString m_outputFontFamily;
         int m_outputFontSize;
+        QString m_gdbOutputFontFamily;
+        int m_gdbOutputFontSize;
+
         bool m_reloadBreakpoints;
         QString m_initialBreakpoint;
         

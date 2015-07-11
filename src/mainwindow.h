@@ -76,6 +76,8 @@ private:
 public:
         
 private:
+    void setConfig();
+    
     void wrapSourceTree(QTreeWidget *treeWidget);
 
     QTreeWidgetItem *addTreeWidgetPath(QTreeWidget *treeWidget, QTreeWidgetItem *parent, QString path);
@@ -139,6 +141,7 @@ private:
     AutoVarCtl m_autoVarCtl;
     WatchVarCtl m_watchVarCtl;
     QFont m_outputFont;
+    QFont m_gdbOutputFont;
     QLabel m_statusLineWidget;
 };
 

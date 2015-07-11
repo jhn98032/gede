@@ -31,6 +31,8 @@ void Settings::loadDefaultsGui()
     m_memoryFontSize = 8;
     m_outputFontFamily = "Monospace";
     m_outputFontSize = 8;
+    m_gdbOutputFontFamily = "Monospace";
+    m_gdbOutputFontSize = 8;
 }
 
 
@@ -58,6 +60,8 @@ void Settings::loadGlobalConfig()
     m_memoryFontSize = tmpIni.getInt("MemoryFontSize", m_memoryFontSize);
     m_outputFontFamily = tmpIni.getString("OutputFont", m_outputFontFamily);
     m_outputFontSize = tmpIni.getInt("OutputFontSize", m_outputFontSize);
+    m_gdbOutputFontFamily = tmpIni.getString("GdbOutputFont", m_outputFontFamily);
+    m_gdbOutputFontSize = tmpIni.getInt("GdbOutputFontSize", m_outputFontSize);
 
 }
 
@@ -176,6 +180,8 @@ void Settings::saveGlobalConfig()
     tmpIni.setInt("MemoryFontSize", m_memoryFontSize);
     tmpIni.setString("OutputFont", m_outputFontFamily);
     tmpIni.setInt("OutputFontSize", m_outputFontSize);
+    tmpIni.setString("GdbOutputFont", m_gdbOutputFontFamily);
+    tmpIni.setInt("GdbOutputFontSize", m_gdbOutputFontSize);
 
     if(tmpIni.save(globalConfigFilename))
         infoMsg("Failed to save '%s'", stringToCStr(globalConfigFilename));
