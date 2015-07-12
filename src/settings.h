@@ -38,6 +38,7 @@ class Settings
         void load();
         void save();
         void loadDefaultsGui();
+        void loadDefaultsAdvanced();
         
         static QStringList getDefaultKeywordList();
         static QStringList getDefaultCppKeywordList();
@@ -67,6 +68,8 @@ class Settings
         int m_outputFontSize;
         QString m_gdbOutputFontFamily;
         int m_gdbOutputFontSize;
+
+        QStringList m_sourceIgnoreDirs;
 
         bool m_reloadBreakpoints;
         QString m_initialBreakpoint;

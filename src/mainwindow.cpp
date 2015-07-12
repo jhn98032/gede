@@ -363,11 +363,26 @@ void MainWindow::insertSourceFiles()
     {
         SourceFile* source = sourceFiles[i];
 
-        FileInfo info;
-        info.name = source->name;
-        info.fullName = source->fullName;
-        
-        m_sourceFiles.push_back(info);
+        // Ignore directory?
+        bool ignore = false;
+        for(int j = 0;j < m_cfg.m_sourceIgnoreDirs.size();j++)
+        {
+            QString ignoreDir = m_cfg.m_sourceIgnoreDirs[j];
+            if(!ignoreDir.isEmpty())
+            {
+                if(source->fullName.startsWith(ignoreDir))
+                    ignore = true;
+            }
+        }
+
+        if(!ignore)
+        {
+            FileInfo info;
+            info.name = source->name;
+            info.fullName = source->fullName;
+            
+            m_sourceFiles.push_back(info);
+        }
     }
 
     

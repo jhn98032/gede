@@ -53,6 +53,8 @@ private:
     int m_settingsOutputFontSize;
     QString m_settingsGdbOutputFontFamily;    
     int m_settingsGdbOutputFontSize;
+
+    QStringList m_sourceIgnoreDirs;
 };
 
 #endif // FILE__SETTINGSDIALOG_H

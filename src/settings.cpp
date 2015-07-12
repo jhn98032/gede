@@ -33,6 +33,12 @@ void Settings::loadDefaultsGui()
     m_outputFontSize = 8;
     m_gdbOutputFontFamily = "Monospace";
     m_gdbOutputFontSize = 8;
+
+}
+
+void Settings::loadDefaultsAdvanced()
+{
+    m_sourceIgnoreDirs.clear();
 }
 
 
@@ -53,7 +59,8 @@ void Settings::loadGlobalConfig()
         infoMsg("Failed to load '%s'. File will be created.", stringToCStr(globalConfigFilename));
 
     loadDefaultsGui();
-
+    loadDefaultsAdvanced();
+    
     m_fontFamily = tmpIni.getString("Font", m_fontFamily);
     m_fontSize = tmpIni.getInt("FontSize", m_fontSize);
     m_memoryFontFamily = tmpIni.getString("MemoryFont", m_memoryFontFamily);
@@ -62,6 +69,8 @@ void Settings::loadGlobalConfig()
     m_outputFontSize = tmpIni.getInt("OutputFontSize", m_outputFontSize);
     m_gdbOutputFontFamily = tmpIni.getString("GdbOutputFont", m_outputFontFamily);
     m_gdbOutputFontSize = tmpIni.getInt("GdbOutputFontSize", m_outputFontSize);
+
+    m_sourceIgnoreDirs = tmpIni.getStringList("ScannerIgnoreDirs", m_sourceIgnoreDirs);
 
 }
 
@@ -182,6 +191,8 @@ void Settings::saveGlobalConfig()
     tmpIni.setInt("OutputFontSize", m_outputFontSize);
     tmpIni.setString("GdbOutputFont", m_gdbOutputFontFamily);
     tmpIni.setInt("GdbOutputFontSize", m_gdbOutputFontSize);
+
+    tmpIni.setStringList("ScannerIgnoreDirs", m_sourceIgnoreDirs);
 
     if(tmpIni.save(globalConfigFilename))
         infoMsg("Failed to save '%s'", stringToCStr(globalConfigFilename));

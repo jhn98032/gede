@@ -43,6 +43,7 @@ void SettingsDialog::onButtonBoxClicked(QAbstractButton* button)
     if(m_ui.buttonBox->standardButton(button) == QDialogButtonBox::RestoreDefaults)
     {
         m_cfg->loadDefaultsGui();
+        m_cfg->loadDefaultsAdvanced();
         loadConfig();
 
         updateGui();
@@ -76,6 +77,9 @@ void SettingsDialog::loadConfig()
     m_settingsOutputFontSize = m_cfg->m_outputFontSize;
     m_settingsGdbOutputFontFamily = m_cfg->m_gdbOutputFontFamily;
     m_settingsGdbOutputFontSize = m_cfg->m_gdbOutputFontSize;
+
+    m_ui.lineEdit_sourceIgnoreDirs->setText(m_cfg->m_sourceIgnoreDirs.join(";"));
+
 }
 
 void SettingsDialog::saveConfig()
@@ -96,6 +100,8 @@ void SettingsDialog::getConfig(Settings *cfg)
 
     cfg->m_gdbOutputFontFamily = m_settingsGdbOutputFontFamily;
     cfg->m_gdbOutputFontSize = m_settingsGdbOutputFontSize;
+
+    cfg->m_sourceIgnoreDirs = m_ui.lineEdit_sourceIgnoreDirs->text().split(';');
 }
 
 
