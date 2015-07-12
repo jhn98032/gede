@@ -228,7 +228,7 @@ void CodeView::mousePressEvent( QMouseEvent * event )
                     // Remove the last word if it is a function
                     if(foundPos+1 < cols.size())
                     {
-                        if(cols[foundPos+1]->m_text == "(")
+                        if(cols[foundPos+1]->m_text == "(" && partList.size() > 1)
                             partList.removeLast();
                     }
                     
