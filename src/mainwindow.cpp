@@ -135,10 +135,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ui.actionSettings, SIGNAL(triggered()), SLOT(onSettings()));
 
     
-    m_tagScanner.init();
-
-
-
 
     Core &core = Core::getInstance();
     core.setListener(this);
@@ -391,7 +387,7 @@ void MainWindow::insertSourceFiles()
     {
         FileInfo &info = m_sourceFiles[i];
 
-        m_tagScanner.scan(info.fullName, &info.m_tagList);
+        m_tagManager.queueScan(&info);
         
 
         QTreeWidgetItem *parentNode  = NULL;
@@ -611,7 +607,7 @@ CodeViewTab* MainWindow::open(QString filename)
     {
         // Get the tags in the file
         QList<Tag> tagList;
-        m_tagScanner.scan(filename, &tagList);
+        m_tagManager.scan(filename, &tagList);
         
     
         // Create the tab
@@ -1007,6 +1003,9 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList tex
     QAction *action;
     int totalItemCount = 0;
 
+
+    m_tagManager.waitAll();
+
     // Create actions for each tag
     QList<QAction*> defActionList;
     bool onlyFuncs = true;
@@ -1024,11 +1023,12 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList tex
             FileInfo& fileInfo = m_sourceFiles[i];
 
             // Loop through all the tags
-            for(int j = 0;j < fileInfo.m_tagList.size();j++)
+            QList<Tag> tagList = fileInfo.m_tagList;
+            for(int j = 0;j < tagList.size();j++)
             {
-                Tag &tagInfo = fileInfo.m_tagList[j];
+                Tag &tagInfo = tagList[j];
                 QString tagName = tagInfo.m_name;
-                
+
                 // Tag match?
                 if(tagName == wantedTag)
                 {

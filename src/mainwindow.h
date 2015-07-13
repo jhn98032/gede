@@ -22,6 +22,7 @@
 #include "autovarctl.h"
 #include "watchvarctl.h"
 #include "codeviewtab.h"
+#include "tagmanager.h"
 
 
 class FileInfo
@@ -135,7 +136,7 @@ private:
     QMenu m_popupMenu;
     
     Settings m_cfg;
-    TagScanner m_tagScanner;
+    TagManager m_tagManager;
     QList<FileInfo> m_sourceFiles;
 
     AutoVarCtl m_autoVarCtl;

@@ -47,8 +47,8 @@ HEADERS+=opendialog.h
 SOURCES+=settings.cpp
 HEADERS+=settings.h
 
-SOURCES+=tagscanner.cpp
-HEADERS+=tagscanner.h
+SOURCES+=tagscanner.cpp tagmanager.cpp
+HEADERS+=tagscanner.h   tagmanager.h
 
 HEADERS+=config.h
 
