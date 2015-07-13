@@ -99,6 +99,7 @@ Core::Core()
     ,m_pid(0)
     ,m_currentFrameIdx(-1)
     ,m_varWatchLastId(10)
+    ,m_scanSources(false)
 {
     
     Com& com = Com::getInstance();
@@ -656,8 +657,7 @@ void Core::onNotifyAsyncOut(Tree &tree, AsyncClass ac)
     }
     else if(ac == ComListener::AC_LIBRARY_LOADED)
     {
-        if(gdbGetFiles())
-            m_inf->ICore_onSourceFileListChanged();
+        m_scanSources = true;
     }
     tree.dump();
 }
@@ -705,6 +705,14 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
         com.commandF(NULL, "-var-update --all-values *");
         com.commandF(NULL, "-stack-list-locals 1");
 
+        if(m_scanSources)
+        {
+            if(gdbGetFiles())
+            {
+                m_inf->ICore_onSourceFileListChanged();
+            }
+            m_scanSources = false;
+        }    
 
         QString p = tree.getString("frame/fullname");
         int lineNo = tree.getInt("frame/line");

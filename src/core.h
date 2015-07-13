@@ -226,6 +226,7 @@ private:
     int m_varWatchLastId;
 
     int m_ptsFd;
+    bool m_scanSources; //!< True if the source filelist may have changed
     QSocketNotifier  *m_ptsListener;
 
 };
