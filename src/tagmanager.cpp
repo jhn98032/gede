@@ -38,8 +38,8 @@ void ScannerWorker::run()
             scan(fileInfo, fileInfo->fullName);
             m_mutex.lock();
         }
-        m_doneCond.wakeAll();
         m_mutex.unlock();
+        m_doneCond.wakeAll();
     }
 }
 
