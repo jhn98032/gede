@@ -34,7 +34,9 @@ class ScannerWorker : public QThread
     private:
         TagScanner m_scanner;
         
+#ifndef NDEBUG
         Qt::HANDLE m_dbgMainThread;
+#endif
 
         QMutex m_mutex;
         QWaitCondition m_wait;
@@ -66,7 +68,9 @@ private:
     ScannerWorker m_worker;
     TagScanner m_tagScanner;
 
+#ifndef NDEBUG
     Qt::HANDLE m_dbgMainThread;
+#endif
 };
 
 

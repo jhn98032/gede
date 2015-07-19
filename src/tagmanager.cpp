@@ -8,7 +8,9 @@
 
 ScannerWorker::ScannerWorker()
 {
+#ifndef NDEBUG
     m_dbgMainThread = QThread::currentThreadId ();
+#endif
     m_quit = false;
     m_scanner.init();
 }
@@ -78,7 +80,9 @@ void ScannerWorker::scan(FileInfo *info, QString filepath)
 
 TagManager::TagManager()
 {
+#ifndef NDEBUG
     m_dbgMainThread = QThread::currentThreadId ();
+#endif
 
     m_worker.start();
     
