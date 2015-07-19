@@ -196,8 +196,6 @@ void AutoVarCtl::addVariableDataTree(
                 VarCtl::DispInfoMap *map,
                 QTreeWidgetItem *item, TreeNode *rootNode)
 {
-    QList <TreeNode *> m_list;
-
     QString parentPath = getTreeWidgetItemPath(item);
 
     item->setText(1, rootNode->getData());

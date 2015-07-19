@@ -24,7 +24,6 @@ void ScannerWorker::run()
 {
     assert(m_dbgMainThread != QThread::currentThreadId ());
 
-    QMutex m_mutex;
     while(m_quit == false)
     {
         m_mutex.lock();
