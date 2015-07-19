@@ -26,9 +26,9 @@ SyntaxHighlighter::Row::Row()
  */
 TextField *SyntaxHighlighter::Row::getLastNonSpaceField()
 {
-    for(int j = fields.size()-1;j >= 0;j--)
+    for(int j = m_fields.size()-1;j >= 0;j--)
     {
-        TextField *thisField = fields[j];
+        TextField *thisField = m_fields[j];
         if(thisField->m_type != TextField::SPACES &&
             thisField->m_type != TextField::COMMENT)
         {
@@ -41,7 +41,7 @@ TextField *SyntaxHighlighter::Row::getLastNonSpaceField()
 
 void SyntaxHighlighter::Row::appendField(TextField* field)
 {
-    fields.push_back(field);
+    m_fields.push_back(field);
 }
 
 
@@ -158,9 +158,9 @@ void SyntaxHighlighter::reset()
         Row *currentRow = m_rows[r];
 
         assert(currentRow != NULL);
-        for(int j = 0;j < currentRow->fields.size();j++)
+        for(int j = 0;j < currentRow->m_fields.size();j++)
         {
-            delete currentRow->fields[j];
+            delete currentRow->m_fields[j];
         }
         delete currentRow;
     }
@@ -276,10 +276,10 @@ void SyntaxHighlighter::colorize(QString text)
                 {
                     // Only spaces before the '#' at the line?
                     bool onlySpaces = true;
-                    for(int j = 0;onlySpaces == true && j < currentRow->fields.size();j++)
+                    for(int j = 0;onlySpaces == true && j < currentRow->m_fields.size();j++)
                     {
-                        if(currentRow->fields[j]->m_type != TextField::SPACES &&
-                            currentRow->fields[j]->m_type != TextField::COMMENT)
+                        if(currentRow->m_fields[j]->m_type != TextField::SPACES &&
+                            currentRow->m_fields[j]->m_type != TextField::COMMENT)
                         {
                             onlySpaces = false;
                         }
@@ -477,9 +477,9 @@ void SyntaxHighlighter::colorize(QString text)
     {
         Row *currentRow = m_rows[r];
 
-        for(int j = 0;j < currentRow->fields.size();j++)
+        for(int j = 0;j < currentRow->m_fields.size();j++)
         {
-            TextField* currentField = currentRow->fields[j];
+            TextField* currentField = currentRow->m_fields[j];
             pickColor(currentField);
         }
     }
@@ -492,5 +492,5 @@ QVector<TextField*> SyntaxHighlighter::getRow(unsigned int rowIdx)
     assert(rowIdx < getRowCount());
     
     Row *row = m_rows[rowIdx];
-    return row->fields;
+    return row->m_fields;
 }

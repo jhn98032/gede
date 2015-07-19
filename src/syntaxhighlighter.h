@@ -53,7 +53,7 @@ private:
         void appendField(TextField* field);
         
         bool isCppRow;
-        QVector<TextField*>  fields;
+        QVector<TextField*>  m_fields;
     };
 private:
     void pickColor(TextField *field);
