@@ -30,12 +30,13 @@ void ScannerWorker::run()
     {
         m_mutex.lock();
         m_wait.wait(&m_mutex);
-        while(!m_queue.isEmpty())
+        while(!m_workQueue.isEmpty())
         {
-            FileInfo* fileInfo = m_queue.takeFirst();
+            ScannerWork* work = m_workQueue.takeFirst();
             m_mutex.unlock();
 
-            scan(fileInfo, fileInfo->fullName);
+            scan(work->fileInfo, work->filename);
+            delete work;
             m_mutex.lock();
         }
         m_mutex.unlock();
@@ -46,7 +47,7 @@ void ScannerWorker::run()
 void ScannerWorker::waitAll()
 {
     m_mutex.lock();
-    while(!m_queue.isEmpty())
+    while(!m_workQueue.isEmpty())
     {
         m_doneCond.wait(&m_mutex);
     }
@@ -57,7 +58,11 @@ void ScannerWorker::waitAll()
 void ScannerWorker::queueScan(FileInfo *info)
 {
     m_mutex.lock();
-    m_queue.append(info);
+    ScannerWork *work = new ScannerWork;
+    work->fileInfo = info;
+    work->filename = info->fullName;
+    
+    m_workQueue.append(work);
     m_wait.wakeAll();
     m_mutex.unlock();
 }

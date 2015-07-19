@@ -12,6 +12,12 @@
 
 class FileInfo;
 
+struct ScannerWork
+{
+    QString filename;
+    FileInfo *fileInfo;
+};
+
 class ScannerWorker : public QThread
 {
     Q_OBJECT
@@ -41,7 +47,7 @@ class ScannerWorker : public QThread
         QMutex m_mutex;
         QWaitCondition m_wait;
         QWaitCondition m_doneCond;
-        QList<FileInfo*> m_queue;
+        QList<ScannerWork*> m_workQueue;
         bool m_quit;
 };
 
