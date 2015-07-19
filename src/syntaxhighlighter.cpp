@@ -21,6 +21,24 @@ SyntaxHighlighter::Row::Row()
 };
 
 
+/**
+ * @brief Returns the last nonspace field in the row.
+ */
+TextField *SyntaxHighlighter::Row::getLastNonSpaceField()
+{
+    for(int j = fields.size()-1;j >= 0;j--)
+    {
+        TextField *thisField = fields[j];
+        if(thisField->m_type != TextField::SPACES &&
+            thisField->m_type != TextField::COMMENT)
+        {
+            return thisField;
+        }
+    }
+    return NULL;
+}
+
+
 void SyntaxHighlighter::Row::appendField(TextField* field)
 {
     fields.push_back(field);
@@ -60,8 +78,10 @@ bool SyntaxHighlighter::isSpecialChar(char c) const
                     c == '(' || c == ')' ||
                     c == '[' || c == ']' ||
                     c == '*' || c == '-' || c == '+' ||
+                    c == '?' ||
                     c == '#' ||
                     c == '{' || c == '}' ||
+                    c == '<' || c == '>' ||
                     c == '/')
         return true;
     else
@@ -130,6 +150,7 @@ void SyntaxHighlighter::pickColor(TextField *field)
     
 }
 
+
 void SyntaxHighlighter::reset()
 {
     for(int r = 0;r < m_rows.size();r++)
@@ -174,7 +195,7 @@ void SyntaxHighlighter::colorize(QString text)
     {
         c = text[i].toLatin1();
 
-        // Was the last c a escape?
+        // Was the last character an escape?
         if(prevC == '\\' && prevPrevC != '\\')
             isEscaped = true;
         else
@@ -226,14 +247,34 @@ void SyntaxHighlighter::colorize(QString text)
                 }
                 else if(c == '<' && currentRow->isCppRow)
                 {
-                    state = INC_STRING;
+                    // Is it a include string?
+                    bool isIncString = false;
+                    TextField *lastField = currentRow->getLastNonSpaceField();
+                    if(lastField)
+                    {
+                        if(lastField->m_text == "include")
+                            isIncString = true;
+                    }
+
+                    // Add the field
                     field = new TextField;
-                    field->m_type = TextField::INC_STRING;
-                    currentRow->appendField(field);
                     field->m_text = c;
+                    if(isIncString)
+                    {
+                        state = INC_STRING;
+                        field->m_type = TextField::INC_STRING;
+                    }
+                    else
+                    {
+                        field->m_type = TextField::WORD;
+                        field->m_color = Qt::white;
+                    }
+                    currentRow->appendField(field);
+                
                 }
                 else if(c == '#')
                 {
+                    // Only spaces before the '#' at the line?
                     bool onlySpaces = true;
                     for(int j = 0;onlySpaces == true && j < currentRow->fields.size();j++)
                     {
@@ -244,7 +285,8 @@ void SyntaxHighlighter::colorize(QString text)
                         }
                     }
                     currentRow->isCppRow = onlySpaces ? true : false;
-                    
+
+                    // Create a new field structure
                     field = new TextField;
                     if(currentRow->isCppRow)
                         field->m_type = TextField::CPP_KEYWORD;
@@ -352,12 +394,18 @@ void SyntaxHighlighter::colorize(QString text)
             };break;
             case GLOBAL_INCLUDE_FILE:
             {
-                field->m_text += c;
-                if(c == '>')
+                if(!isEscaped && c == '\n')
                 {
                     state = IDLE;
                 }
-                
+                else
+                {
+                    field->m_text += c;
+                    if(c == '>')
+                    {
+                        state = IDLE;
+                    }
+                }
             };break;
             case ESCAPED_CHAR:
             {
@@ -370,11 +418,20 @@ void SyntaxHighlighter::colorize(QString text)
             };break;
             case INC_STRING:
             {
-                field->m_text += c;
-                if(!isEscaped && c == '>')
+                if(!isEscaped && c == '\n')
                 {
+                    i--;
                     field = NULL;
                     state = IDLE;
+                }
+                else
+                {
+                    field->m_text += c;
+                    if(!isEscaped && c == '>')
+                    {
+                        field = NULL;
+                        state = IDLE;
+                    }
                 }
             };break;
             case STRING:
@@ -427,6 +484,8 @@ void SyntaxHighlighter::colorize(QString text)
         }
     }
 }
+
+
 
 QVector<TextField*> SyntaxHighlighter::getRow(unsigned int rowIdx)
 {

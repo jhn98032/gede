@@ -14,6 +14,7 @@
 #include <QColor>
 #include <QHash>
 
+
 struct TextField
 {
     QColor m_color;
@@ -31,7 +32,7 @@ public:
     SyntaxHighlighter();
     virtual ~SyntaxHighlighter();
     
-    void colorize(QString rowText);
+    void colorize(QString text);
 
     QVector<TextField*> getRow(unsigned int rowIdx);
     unsigned int getRowCount() { return m_rows.size(); };
@@ -48,6 +49,7 @@ private:
     public:
         Row();
 
+        TextField *getLastNonSpaceField();
         void appendField(TextField* field);
         
         bool isCppRow;
