@@ -9,6 +9,10 @@
 #include "log.h"
 #include <QDebug>
 #include <QTime>
+#include <QMutex>
+
+
+static QMutex g_mutex;
 
 
 
@@ -17,6 +21,8 @@ void debugMsg_(const char *filename, int lineNo, const char *fmt, ...)
     va_list ap;
     char buffer[1024];
     QTime curTime = QTime::currentTime();
+
+    QMutexLocker locker(&g_mutex);
 
     va_start(ap, fmt);
     
@@ -37,6 +43,8 @@ void errorMsg(const char *fmt, ...)
     char buffer[1024];
     QTime curTime = QTime::currentTime();
 
+    QMutexLocker locker(&g_mutex);
+
     va_start(ap, fmt);
     vsnprintf(buffer, sizeof(buffer), fmt, ap);
 
@@ -54,6 +62,8 @@ void warnMsg(const char *fmt, ...)
     va_list ap;
     char buffer[1024];
     QTime curTime = QTime::currentTime();
+
+    QMutexLocker locker(&g_mutex);
 
     va_start(ap, fmt);
     vsnprintf(buffer, sizeof(buffer), fmt, ap);
@@ -73,6 +83,8 @@ void infoMsg(const char *fmt, ...)
     va_list ap;
     char buffer[1024];
     QTime curTime = QTime::currentTime();
+
+    QMutexLocker locker(&g_mutex);
 
     va_start(ap, fmt);
     vsnprintf(buffer, sizeof(buffer), fmt, ap);
