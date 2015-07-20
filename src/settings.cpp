@@ -209,6 +209,7 @@ QStringList Settings::getDefaultCppKeywordList()
     keywordList += "if";
     keywordList += "def";
     keywordList += "defined";
+    keywordList += "define";
     keywordList += "ifdef";
     keywordList += "endif";
     keywordList += "ifndef";
