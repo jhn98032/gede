@@ -143,7 +143,8 @@ int TagManager::queueScan(QString filePath)
 {
     assert(m_dbgMainThread == QThread::currentThreadId ());
 
-    m_worker.queueScan(filePath);
+    if(!m_db.contains(filePath))
+        m_worker.queueScan(filePath);
     return 0;
 }
 
