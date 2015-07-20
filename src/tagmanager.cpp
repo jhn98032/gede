@@ -3,7 +3,7 @@
 #include "tagscanner.h"
 #include "mainwindow.h"
 #include "log.h"
-
+#include "util.h"
 
 
 ScannerWorker::ScannerWorker()
@@ -22,6 +22,12 @@ void ScannerWorker::requestQuit()
     m_wait.wakeAll();
 }
         
+void ScannerWorker::abort()
+{
+    QMutexLocker locker(&m_mutex);
+    m_workQueue.clear();
+}
+
 void ScannerWorker::run()
 {
     assert(m_dbgMainThread != QThread::currentThreadId ());
@@ -32,11 +38,11 @@ void ScannerWorker::run()
         m_wait.wait(&m_mutex);
         while(!m_workQueue.isEmpty())
         {
-            ScannerWork* work = m_workQueue.takeFirst();
+            QString filePath = m_workQueue.takeFirst();
             m_mutex.unlock();
 
-            scan(work->fileInfo, work->filename);
-            delete work;
+            scan(filePath);
+
             m_mutex.lock();
         }
         m_mutex.unlock();
@@ -55,20 +61,18 @@ void ScannerWorker::waitAll()
     
 }
 
-void ScannerWorker::queueScan(FileInfo *info)
+void ScannerWorker::queueScan(QString filePath)
 {
     m_mutex.lock();
-    ScannerWork *work = new ScannerWork;
-    work->fileInfo = info;
-    work->filename = info->fullName;
-    
-    m_workQueue.append(work);
-    m_wait.wakeAll();
+    m_workQueue.append(filePath);
     m_mutex.unlock();
+    m_wait.wakeAll();
 }
 
 
-void ScannerWorker::scan(FileInfo *info, QString filepath)
+
+
+void ScannerWorker::scan(QString filePath)
 {
     QList<Tag> *taglist = new QList<Tag>;
     
@@ -76,10 +80,10 @@ void ScannerWorker::scan(FileInfo *info, QString filepath)
     assert(m_dbgMainThread != QThread::currentThreadId ());
     
     
-    m_scanner.scan(filepath,taglist);
+    m_scanner.scan(filePath, taglist);
 
 
-    emit onScanDone(info, taglist);
+    emit onScanDone(filePath, taglist);
 }
 
 
@@ -91,14 +95,22 @@ TagManager::TagManager()
 
     m_worker.start();
     
-    connect(&m_worker, SIGNAL(onScanDone(FileInfo *, QList<Tag>* )), this, SLOT(onScanDone(FileInfo *, QList<Tag>* )));
+    connect(&m_worker, SIGNAL(onScanDone(QString, QList<Tag>* )), this, SLOT(onScanDone(QString, QList<Tag>* )));
     
+    m_tagScanner.init();
+
 }
 
 TagManager::~TagManager()
 {
     m_worker.requestQuit();
     m_worker.wait();
+
+    
+    foreach (ScannerResult* info, m_db)
+    {
+        delete info;
+    }
 }
 
 void TagManager::waitAll()
@@ -108,30 +120,54 @@ void TagManager::waitAll()
 
 
 
-void TagManager::onScanDone(FileInfo *info, QList<Tag> *tags)
+void TagManager::onScanDone(QString filePath, QList<Tag> *tags)
 {
     assert(m_dbgMainThread == QThread::currentThreadId ());
 
-    
-    info->m_tagList.append(*tags);
+    ScannerResult *info = new ScannerResult;
+    info->m_filePath = filePath;
+    info->m_tagList = *tags;
+
+    if(m_db.contains(filePath))
+    {
+        ScannerResult *oldInfo = m_db[filePath];
+        delete oldInfo;
+    }
+
+    m_db[filePath] = info;
+
     delete tags;
 }
     
-int TagManager::queueScan(FileInfo *info)
+int TagManager::queueScan(QString filePath)
 {
     assert(m_dbgMainThread == QThread::currentThreadId ());
 
-  // m_tagScanner.scan(info->fullName, &info->m_tagList);  
-    m_worker.queueScan(info);
+    m_worker.queueScan(filePath);
     return 0;
 }
 
-int TagManager::scan(QString filename, QList<Tag> *tagList)
+void TagManager::scan(QString filePath, QList<Tag> *tagList)
 {
-    m_tagScanner.init();
-    return m_tagScanner.scan(filename, tagList);
+    if(m_db.contains(filePath))
+    {
+        *tagList = m_db[filePath]->m_tagList;
+    }
+    else
+        m_tagScanner.scan(filePath, tagList);
 }
 
-        
+void TagManager::abort()
+{
+    m_worker.abort();
+}
 
-    
+void TagManager::getTags(QString filePath, QList<Tag> *tagList)
+{
+    if(m_db.contains(filePath))
+    {
+        *tagList = m_db[filePath]->m_tagList;
+    }
+}
+
+

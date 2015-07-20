@@ -6,16 +6,17 @@
 #include <QThread>
 #include <QMutex>
 #include <QWaitCondition>
- 
+#include <QString>
+#include <QMap>
 
 #include "tagscanner.h"
 
 class FileInfo;
 
-struct ScannerWork
+struct ScannerResult
 {
-    QString filename;
-    FileInfo *fileInfo;
+    QString m_filePath;
+    QList<Tag> m_tagList;
 };
 
 class ScannerWorker : public QThread
@@ -27,15 +28,17 @@ class ScannerWorker : public QThread
 
         void run();
         
+        void abort();
         void waitAll();
 
         void requestQuit();
-        void queueScan(FileInfo *info);
+        void queueScan(QString filePath);
+
     private:
-        void scan(FileInfo *info, QString filepath);
+        void scan(QString filePath);
     
     signals:
-        void onScanDone(FileInfo *info, QList<Tag> *taglist);
+        void onScanDone(QString filePath, QList<Tag> *taglist);
 
     private:
         TagScanner m_scanner;
@@ -47,8 +50,9 @@ class ScannerWorker : public QThread
         QMutex m_mutex;
         QWaitCondition m_wait;
         QWaitCondition m_doneCond;
-        QList<ScannerWork*> m_workQueue;
+        QList<QString> m_workQueue;
         bool m_quit;
+
 };
 
 
@@ -62,13 +66,17 @@ public:
     virtual ~TagManager();
 
 
-    int queueScan(FileInfo *info);
-    int scan(QString filename, QList<Tag> *tagList);
+    int queueScan(QString filePath);
+    void scan(QString filePath, QList<Tag> *tagList);
 
     void waitAll();
 
+    void abort();
+
+    void getTags(QString filePath, QList<Tag> *tagList);
+
 private slots:
-    void onScanDone(FileInfo *info, QList<Tag> *tags);
+    void onScanDone(QString filePath, QList<Tag> *tags);
     
 private:
     ScannerWorker m_worker;
@@ -77,6 +85,7 @@ private:
 #ifndef NDEBUG
     Qt::HANDLE m_dbgMainThread;
 #endif
+    QMap<QString, ScannerResult*> m_db;
 };
 
 

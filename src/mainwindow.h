@@ -30,7 +30,6 @@ class FileInfo
 public:
     QString name;
     QString fullName;
-    QList<Tag> m_tagList;
 };
 
 

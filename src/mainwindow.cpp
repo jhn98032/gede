@@ -349,6 +349,7 @@ void MainWindow::insertSourceFiles()
     QTreeWidget *treeWidget = m_ui.treeWidget_file;
     Core &core = Core::getInstance();
 
+    m_tagManager.abort();
 
     treeWidget->clear();
     
@@ -387,7 +388,7 @@ void MainWindow::insertSourceFiles()
     {
         FileInfo &info = m_sourceFiles[i];
 
-        m_tagManager.queueScan(&info);
+        m_tagManager.queueScan(info.fullName);
         
 
         QTreeWidgetItem *parentNode  = NULL;
@@ -1022,8 +1023,10 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList tex
         {
             FileInfo& fileInfo = m_sourceFiles[i];
 
+            QList<Tag> tagList;
+            m_tagManager.getTags(fileInfo.fullName, &tagList);
+
             // Loop through all the tags
-            QList<Tag> tagList = fileInfo.m_tagList;
             for(int j = 0;j < tagList.size();j++)
             {
                 Tag &tagInfo = tagList[j];
