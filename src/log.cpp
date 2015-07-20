@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QTime>
 #include <QMutex>
+#include <QMutexLocker>
 
 
 static QMutex g_mutex;
