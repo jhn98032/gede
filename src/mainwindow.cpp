@@ -1051,6 +1051,7 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList tex
                         // Add to popupmenu
                         QString menuEntryText;
                         menuEntryText.sprintf("Show definition of '%s' L%d", stringToCStr(tagInfo.getLongName()), tagInfo.getLineNo());
+                        menuEntryText.replace("&", "&&");
                         QAction *action = new QAction(menuEntryText, &m_popupMenu);
                         action->setData(defList);
                         defActionList.push_back(action);
