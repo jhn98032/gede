@@ -259,3 +259,21 @@ QStringList Settings::getDefaultKeywordList()
     return keywordList;
 }
 
+
+/**
+ * @brief Returns the path of the program to debug
+ */
+QString Settings::getProgramPath()
+{
+    if(m_connectionMode == MODE_LOCAL)
+    {
+        return m_lastProgram;
+    }
+    else
+    {
+        return m_tcpProgram;
+    }
+    return "";
+}
+
+

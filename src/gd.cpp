@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
     cfg.save();
 
     //
-    if(cfg.m_lastProgram.isEmpty())
+    if(cfg.getProgramPath().isEmpty())
     {
         errorMsg("No program to debug");
         return 1;

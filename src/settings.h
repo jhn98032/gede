@@ -42,6 +42,8 @@ class Settings
         
         static QStringList getDefaultKeywordList();
         static QStringList getDefaultCppKeywordList();
+
+        QString getProgramPath();
         
     private:
         void loadProjectConfig();
