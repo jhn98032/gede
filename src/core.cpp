@@ -99,6 +99,8 @@ Core::Core()
     ,m_pid(0)
     ,m_currentFrameIdx(-1)
     ,m_varWatchLastId(10)
+    ,m_isRemote(false)
+    ,m_ptsFd(0)
     ,m_scanSources(false)
 {
     
@@ -134,6 +136,8 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
     Com& com = Com::getInstance();
     Tree resultData;
     int rc = 0;
+
+    m_isRemote = false;
     
     if(com.init(gdbPath))
     {
@@ -194,6 +198,8 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
 {
     Com& com = Com::getInstance();
     Tree resultData;
+
+    m_isRemote = true;
     
     if(com.init(gdbPath))
     {
@@ -232,7 +238,7 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
     }
     
 
-    gdbSetBreakpointAtFunc("main");
+    gdbSetBreakpointAtFunc(cfg->m_initialBreakpoint);
     
     gdbGetFiles();
 
@@ -435,10 +441,24 @@ void Core::stop()
             m_inf->ICore_onMessage("Program is not running");
         return;
     }
-    if(m_pid != 0)
-        kill(m_pid, SIGINT);
+
+
+    if(m_isRemote)
+    {
+        Com& com = Com::getInstance();
+        Tree resultData;
+        com.command(NULL, "-exec-interrupt --all");
+        com.command(NULL, "-exec-step-instruction");
+        
+    }
     else
-        errorMsg("Failed to stop since PID not known");
+    {
+        debugMsg("sending INTR to %d\n", m_pid);
+        if(m_pid != 0)
+            kill(m_pid, SIGINT);
+        else
+            errorMsg("Failed to stop since PID not known");
+    }
 }
 
 void Core::gdbNext()

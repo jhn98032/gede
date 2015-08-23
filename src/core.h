@@ -224,7 +224,7 @@ private:
     int m_currentFrameIdx;
     QMap <QString, VarWatch> m_watchList;
     int m_varWatchLastId;
-
+    bool m_isRemote; //!< True if "remote target" or false if it is a "local target".
     int m_ptsFd;
     bool m_scanSources; //!< True if the source filelist may have changed
     QSocketNotifier  *m_ptsListener;
