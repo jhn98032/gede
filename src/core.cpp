@@ -207,7 +207,7 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
         return -1;
     }
 
-    com.commandF(&resultData, "-target-select remote %s:%d", stringToCStr(tcpHost), tcpPort); 
+    com.commandF(&resultData, "-target-select extended-remote %s:%d", stringToCStr(tcpHost), tcpPort); 
 
     if(!programPath.isEmpty())
     {
@@ -242,7 +242,7 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
     
     gdbGetFiles();
 
-    gdbContinue();
+    gdbRun();
 
     return 0;
 }
