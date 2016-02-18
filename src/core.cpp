@@ -18,6 +18,8 @@
 #include <unistd.h>
 #include <assert.h>
 #include <signal.h>
+#include <stdlib.h> // posix_openpt()
+#include <fcntl.h> //  O_RDWR
 
 
 
@@ -107,7 +109,7 @@ Core::Core()
     Com& com = Com::getInstance();
     com.setListener(this);
 
-    m_ptsFd = getpt();
+    m_ptsFd = posix_openpt(O_RDWR | O_NOCTTY);
    
     if(grantpt(m_ptsFd))
         errorMsg("Failed to grantpt");
