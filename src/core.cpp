@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Johan Henriksson.
+ * Copyright (C) 2014-2016 Johan Henriksson.
  * All rights reserved.
  *
  * This software may be modified and distributed under the terms
@@ -893,6 +893,22 @@ void Core::dispatchBreakpointTree(Tree &tree)
     }
     bkpt->lineNo = lineNo;
     bkpt->fullname = tree.getString("bkpt/fullname");
+
+    // We did not receive 'fullname' from gdb.
+    // Lets try original-location instead...
+    if(bkpt->fullname.isEmpty())
+    {
+        QString orgLoc = tree.getString("bkpt/original-location");
+        int divPos = orgLoc.lastIndexOf(":");
+        assert(divPos != -1);
+        if(divPos == -1)
+            warnMsg("Original-location in unknown format");
+        else
+        {
+            bkpt->fullname = orgLoc.left(divPos);
+        }
+    }
+    
     bkpt->m_funcName = tree.getString("bkpt/func");
     bkpt->m_addr = tree.getLongLong("bkpt/addr");
 
@@ -1121,6 +1137,7 @@ int Core::gdbSetBreakpoint(QString filename, int lineNo)
     if(res == GDB_ERROR)
     {
         rc = -1;
+        errorMsg("Failed to set breakpoint at %s:%d", stringToCStr(filename), lineNo);
     }
     
     return rc;
