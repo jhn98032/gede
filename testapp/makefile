@@ -1,5 +1,6 @@
 CFLAGS+=-g -O0 -Wall
 LDFLAGS+=-lpthread
+OBJ=subdir/subfile.o test.o
 
 test: subdir/subfile.o test.o
 	$(CC) -o $@ $^ $(LDFLAGS)
@@ -7,5 +8,6 @@ test: subdir/subfile.o test.o
 
 clean:
 	rm -f test
-	rm -f *.o
+	rm -f $(OBJ)
+
 
