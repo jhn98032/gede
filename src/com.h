@@ -82,7 +82,8 @@ private:
             AC_LIBRARY_UNLOADED,
             AC_THREAD_SELECTED,
             AC_DOWNLOAD,
-            AC_CMD_PARAM_CHANGED
+            AC_CMD_PARAM_CHANGED,
+            AC_UNKNOWN
         };
 
 

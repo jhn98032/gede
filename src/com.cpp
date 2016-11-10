@@ -35,6 +35,7 @@ const char* Com::asyncClassToString(ComListener::AsyncClass ac)
         case ComListener::AC_THREAD_SELECTED: return "thread_selected";break;
         case ComListener::AC_DOWNLOAD: return "download";break;
         case ComListener::AC_CMD_PARAM_CHANGED: return "cmd_param_changed";break;
+        case ComListener::AC_UNKNOWN: return "unknown";break;
 
     };
     return "?";
@@ -365,10 +366,17 @@ int Com::parseAsyncOutput(Resp *resp, ComListener::AsyncClass *ac)
     {
         *ac = ComListener::AC_CMD_PARAM_CHANGED;
     }
+    else if(acString == "tsv-created" ||
+            acString == "tsv-deleted" ||
+            acString == "tsv-modified")
+    {
+        *ac = ComListener::AC_UNKNOWN;
+    }
     else
     {
         warnMsg("Unexpected response '%s'", stringToCStr(acString));
         assert(0);
+        *ac = ComListener::AC_UNKNOWN;
     }
 
 
@@ -558,6 +566,7 @@ Token* Com::checkToken(Token::Type type)
 
 /**
  * @brief Parses 'VALUE'
+ * @param item   The tree item to put the result of the parse in.
  * @return 0 on success.
  */
 int Com::parseValue(TreeNode *item)
