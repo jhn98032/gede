@@ -39,6 +39,9 @@ void Settings::loadDefaultsGui()
 void Settings::loadDefaultsAdvanced()
 {
     m_sourceIgnoreDirs.clear();
+    m_sourceIgnoreDirs.append("/build");
+    m_sourceIgnoreDirs.append("/usr");
+    
 }
 
 
