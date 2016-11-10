@@ -784,19 +784,23 @@ void MainWindow::ICore_onCurrentThreadChanged(int threadId)
 {
     QTreeWidget *threadWidget = m_ui.treeWidget_threads;
     QTreeWidgetItem *rootItem = threadWidget->invisibleRootItem();
+    threadWidget->clearSelection();
+    QTreeWidgetItem *selectItem = NULL;
     for(int i = 0;i < rootItem->childCount();i++)
     {
         QTreeWidgetItem *item = rootItem->child(i);
-    
-        int id = item->data(0, Qt::UserRole).toInt();
-        if(id == threadId)
+        assert(item != NULL);
+        if(item)
         {
-            item->setSelected(true);    
+            int id = item->data(0, Qt::UserRole).toInt();
+            if(id == threadId)
+            {
+                selectItem = item;
+            }
         }
-        else
-            item->setSelected(false);
     }
-    
+    if(selectItem)
+        threadWidget->setCurrentItem(selectItem);
 }
 
 
@@ -908,10 +912,9 @@ void MainWindow::ICore_onStackFrameChange(QList<StackFrameEntry> stackFrameList)
 void MainWindow::ICore_onCurrentFrameChanged(int frameIdx)
 {
     QTreeWidget *threadWidget = m_ui.treeWidget_stack;
-    QTreeWidgetItem *rootItem = threadWidget->invisibleRootItem();
 
     // Update the sourceview (with the current row).
-    if(frameIdx < m_stackFrameList.size())
+    if(frameIdx >= 0 && frameIdx < m_stackFrameList.size())
     {
         StackFrameEntry &entry = m_stackFrameList[m_stackFrameList.size()-frameIdx-1];
 
@@ -920,18 +923,20 @@ void MainWindow::ICore_onCurrentFrameChanged(int frameIdx)
     }
 
     // Update the selection of the current thread
+    QTreeWidgetItem *rootItem = threadWidget->invisibleRootItem();
+    threadWidget->clearSelection();
+    QTreeWidgetItem *selectItem = NULL;
     for(int i = 0;i < rootItem->childCount();i++)
     {
         QTreeWidgetItem *item = rootItem->child(i);
-    
         int id = item->data(0, Qt::UserRole).toInt();
         if(id == frameIdx)
         {
-            item->setSelected(true);    
+            selectItem = item;
         }
-        else
-            item->setSelected(false);
     }
+    if(selectItem)
+        threadWidget->setCurrentItem(selectItem);
     
 }
 
