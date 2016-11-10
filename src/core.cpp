@@ -967,11 +967,13 @@ void Core::onResult(Tree &tree)
                 QString threadId = tree.getString(treePath + "/id");
                 QString targetId = tree.getString(treePath + "/target-id");
                 QString funcName = tree.getString(treePath + "/frame/func");
+                QString details = tree.getString(treePath + "/details");
 
                 
                 ThreadInfo tinfo;
                 tinfo.id = atoi(stringToCStr(threadId));
                 tinfo.m_name = targetId;
+                tinfo.m_details = details;
                 tinfo.m_func = funcName;
                 m_threadList[tinfo.id] = tinfo;
             }

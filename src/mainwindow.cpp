@@ -64,18 +64,20 @@ MainWindow::MainWindow(QWidget *parent)
     treeWidget->setColumnWidth(0, 200);
 
 
-    //
+    // Thread widget
     treeWidget = m_ui.treeWidget_threads;
     names.clear();
     names += "Name";
+    names += "Details";
     treeWidget->setHeaderLabels(names);
-    treeWidget->setColumnCount(1);
-    treeWidget->setColumnWidth(0, 200);
+    treeWidget->setColumnCount(2);
+    treeWidget->setColumnWidth(0, 150);
+    treeWidget->setColumnWidth(1, 100);
 
     connect(m_ui.treeWidget_threads, SIGNAL(itemSelectionChanged()), this,
                 SLOT(onThreadWidgetSelectionChanged()));
 
-    //
+    // Stack widget
     treeWidget = m_ui.treeWidget_stack;
     names.clear();
     names += "Name";
@@ -766,11 +768,13 @@ void MainWindow::ICore_onThreadListChanged()
     {
         // Get name
         QString name = list[idx].m_name;
+        QString desc = list[idx].m_details;
         
 
         // Add the item
         QStringList names;
         names.push_back(name);
+        names.push_back(desc);
         QTreeWidgetItem *item = new QTreeWidgetItem(names);
         item->setData(0, Qt::UserRole, list[idx].id);
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
