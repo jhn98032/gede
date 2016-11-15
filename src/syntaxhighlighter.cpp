@@ -46,6 +46,8 @@ void SyntaxHighlighter::Row::appendField(TextField* field)
 
 
 SyntaxHighlighter::SyntaxHighlighter()
+    : m_cfg(NULL)
+
 {
     QStringList keywordList = Settings::getDefaultKeywordList();
     for(int u = 0;u < keywordList.size();u++)
@@ -131,22 +133,26 @@ bool SyntaxHighlighter::isKeyword(QString text) const
 void SyntaxHighlighter::pickColor(TextField *field)
 {
     assert(field != NULL);
-    if(field->m_type == TextField::COMMENT)
-        field->m_color = Qt::green;
-    else if(field->m_type == TextField::STRING)
-        field->m_color = QColor(0,125, 250);
-    else if(field->m_type == TextField::INC_STRING)
-        field->m_color = QColor(0,125, 250);
-    else if(field->m_text.isEmpty())
+    assert(m_cfg != NULL);
+    if(m_cfg == NULL)
         field->m_color = Qt::white;
+        
+    if(field->m_type == TextField::COMMENT)
+        field->m_color = m_cfg->m_clrComment;
+    else if(field->m_type == TextField::STRING)
+        field->m_color = m_cfg->m_clrString;
+    else if(field->m_type == TextField::INC_STRING)
+        field->m_color = m_cfg->m_clrIncString;
+    else if(field->m_text.isEmpty())
+        field->m_color = m_cfg->m_clrForeground;
     else if(field->m_type == TextField::KEYWORD)
-       field->m_color = Qt::yellow;
+       field->m_color = m_cfg->m_clrKeyword;
     else if(field->m_type == TextField::CPP_KEYWORD)
-        field->m_color = QColor(240,110,110);
+        field->m_color = m_cfg->m_clrCppKeyword;
     else if(field->m_type == TextField::NUMBER)
-        field->m_color = Qt::magenta;
+        field->m_color = m_cfg->m_clrNumber;
     else
-       field->m_color = Qt::white;
+       field->m_color = m_cfg->m_clrForeground;
     
 }
 
@@ -167,6 +173,11 @@ void SyntaxHighlighter::reset()
     m_rows.clear();
 }
 
+void SyntaxHighlighter::setConfig(Settings *cfg)
+{
+    m_cfg = cfg;
+
+}
 
 void SyntaxHighlighter::colorize(QString text)
 {

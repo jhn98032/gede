@@ -63,6 +63,7 @@ public:
     QVector<int> m_breakpointList;
     SyntaxHighlighter m_highlighter;
     Settings *m_cfg;
+    QString m_text;
 };
 
 

@@ -34,6 +34,16 @@ void Settings::loadDefaultsGui()
     m_gdbOutputFontFamily = "Monospace";
     m_gdbOutputFontSize = 8;
 
+
+    m_clrBackground = Qt::black;
+    m_clrComment = Qt::green;
+    m_clrString = QColor(0,125, 250);
+    m_clrIncString = QColor(0,125, 250);
+    m_clrKeyword = Qt::yellow;
+    m_clrCppKeyword = QColor(240,110,110);
+    m_clrNumber = Qt::magenta;
+    m_clrForeground = Qt::white;
+
 }
 
 void Settings::loadDefaultsAdvanced()

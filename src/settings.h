@@ -77,6 +77,16 @@ class Settings
         QString m_initialBreakpoint;
         
         QList<SettingsBreakpoint> m_breakpoints;
+
+        QColor m_clrBackground;
+        QColor m_clrComment;
+        QColor m_clrString;
+        QColor m_clrIncString;
+        QColor m_clrKeyword;
+        QColor m_clrCppKeyword;
+        QColor m_clrNumber;
+        QColor m_clrForeground;
+       
 };
 
 #endif // FILE_SETTINGS_H

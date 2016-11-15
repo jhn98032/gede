@@ -71,6 +71,9 @@ FORMS += mainwindow.ui
 FORMS += aboutdialog.ui
 FORMS += opendialog.ui
 
+SOURCES+=colorbutton.cpp
+HEADERS+=colorbutton.h
+
 RESOURCES += resource.qrc
 
 #QMAKE_CXXFLAGS += -I./  -g

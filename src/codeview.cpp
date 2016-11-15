@@ -41,6 +41,7 @@ void CodeView::setPlainText(QString text)
 {
     text.replace("\r", "");
 
+    m_text = text;
     m_highlighter.colorize(text);
 
 //    m_rows = text.split("\n");
@@ -66,9 +67,12 @@ void CodeView::paintEvent ( QPaintEvent * event )
     int rowHeight = getRowHeight();
     QColor darkRed(100,0,0);
     QPainter painter(this);
+    assert(m_cfg != NULL);
+
 
     // Draw background
-    painter.fillRect(event->rect(), Qt::black);
+    if(m_cfg)
+    painter.fillRect(event->rect(), m_cfg->m_clrBackground);
 
 
 
@@ -297,6 +301,10 @@ void CodeView::setConfig(Settings *cfg)
 {
     m_cfg = cfg;
 
+    m_highlighter.setConfig(cfg);
+
+    m_highlighter.colorize(m_text);
+    
     assert(cfg != NULL);
 
     m_font = QFont(m_cfg->m_fontFamily, m_cfg->m_fontSize);

@@ -80,6 +80,15 @@ void SettingsDialog::loadConfig()
 
     m_ui.lineEdit_sourceIgnoreDirs->setText(m_cfg->m_sourceIgnoreDirs.join(";"));
 
+    m_ui.pushButton_clr_background->setColor(m_cfg->m_clrBackground);
+    m_ui.pushButton_clr_comment->setColor(m_cfg->m_clrComment);
+    m_ui.pushButton_clr_string->setColor(m_cfg->m_clrString);
+    m_ui.pushButton_clr_incString->setColor(m_cfg->m_clrIncString);
+    m_ui.pushButton_clr_keyword->setColor(m_cfg->m_clrKeyword);
+    m_ui.pushButton_clr_cppKeyword->setColor(m_cfg->m_clrCppKeyword);
+    m_ui.pushButton_clr_number->setColor(m_cfg->m_clrNumber);
+    m_ui.pushButton_clr_foreground->setColor(m_cfg->m_clrForeground);
+
 }
 
 void SettingsDialog::saveConfig()
@@ -102,6 +111,17 @@ void SettingsDialog::getConfig(Settings *cfg)
     cfg->m_gdbOutputFontSize = m_settingsGdbOutputFontSize;
 
     cfg->m_sourceIgnoreDirs = m_ui.lineEdit_sourceIgnoreDirs->text().split(';');
+
+
+    m_cfg->m_clrBackground = m_ui.pushButton_clr_background->getColor();
+    m_cfg->m_clrComment = m_ui.pushButton_clr_comment->getColor();
+    m_cfg->m_clrString = m_ui.pushButton_clr_string->getColor();
+    m_cfg->m_clrIncString = m_ui.pushButton_clr_incString->getColor();
+    m_cfg->m_clrKeyword = m_ui.pushButton_clr_keyword->getColor();
+    m_cfg->m_clrCppKeyword = m_ui.pushButton_clr_cppKeyword->getColor();
+    m_cfg->m_clrNumber = m_ui.pushButton_clr_number->getColor();
+    m_cfg->m_clrForeground = m_ui.pushButton_clr_foreground->getColor();
+
 }
 
 

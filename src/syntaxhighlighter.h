@@ -9,6 +9,8 @@
 #ifndef  FILE__SYNTAXHIGHLIGHTER
 #define  FILE__SYNTAXHIGHLIGHTER
 
+#include <settings.h>
+
 #include <QVector>
 #include <QString>
 #include <QColor>
@@ -42,6 +44,7 @@ public:
     bool isKeyword(QString text) const;
     bool isSpecialChar(char c) const;
     bool isSpecialChar(TextField *field) const;
+    void setConfig(Settings *cfg);
 
 private:
     class Row
@@ -59,6 +62,7 @@ private:
     void pickColor(TextField *field);
 
 private:
+    Settings *m_cfg;
     QVector <Row*> m_rows;
     QHash <QString, bool> m_keywords;
     QHash <QString, bool> m_cppKeywords;
