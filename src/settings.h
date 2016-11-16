@@ -61,6 +61,7 @@ class Settings
         QStringList m_initCommands;
         QString m_gdbPath;
         QString m_lastProgram;
+        bool m_download;
 
         QString m_fontFamily;
         int m_fontSize;

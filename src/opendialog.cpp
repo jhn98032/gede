@@ -143,6 +143,8 @@ void OpenDialog::onConnectionTypeTcp(bool checked)
     m_ui.lineEdit_tcpHost->setEnabled(checked);
     m_ui.lineEdit_tcpPort->setEnabled(checked);
     m_ui.lineEdit_tcpProgram->setEnabled(checked);
+    m_ui.checkBox_download->setEnabled(checked);
+    
 }
 
 void OpenDialog::setTcpRemoteHost(QString host)
@@ -198,6 +200,7 @@ void OpenDialog::saveConfig(Settings *cfg)
     cfg->m_argumentList = dlg.getArguments().split(' ');
     cfg->m_connectionMode = dlg.getMode();
     cfg->m_tcpPort = dlg.getTcpRemotePort();
+    cfg->m_download = dlg.getDownload();
     cfg->m_tcpHost = dlg.getTcpRemoteHost();
     cfg->m_tcpProgram = dlg.getTcpRemoteProgram();
     cfg->m_initCommands = dlg.getInitCommands();
@@ -214,12 +217,23 @@ void OpenDialog::saveConfig(Settings *cfg)
 
 }
 
+bool OpenDialog::getDownload()
+{
+    return m_ui.checkBox_download->checkState() == Qt::Checked ? true : false;
+};
+
+void OpenDialog::setDownload(bool enable)
+{
+    m_ui.checkBox_download->setChecked(enable);
+};
+
 void OpenDialog::loadConfig(Settings &cfg)
 {
     OpenDialog &dlg = *this;
     dlg.setMode(cfg.m_connectionMode);
 
     dlg.setTcpRemotePort(cfg.m_tcpPort);
+    dlg.setDownload(cfg.m_download);
     dlg.setTcpRemoteHost(cfg.m_tcpHost);
     dlg.setTcpRemoteProgram(cfg.m_tcpProgram);
     dlg.setInitCommands(cfg.m_initCommands);

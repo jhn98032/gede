@@ -98,6 +98,7 @@ void Settings::loadProjectConfig()
 
 
     
+    m_download = tmpIni.getBool("Download", true);
     m_connectionMode = tmpIni.getInt("Mode", MODE_LOCAL) == MODE_LOCAL ? MODE_LOCAL : MODE_TCP;
     m_tcpPort = tmpIni.getInt("TcpPort", 2000);
     m_tcpHost = tmpIni.getString("TcpHost", "localhost");
@@ -150,6 +151,7 @@ void Settings::saveProjectConfig()
     tmpIni.appendLoad(filepath);
 
     //
+    tmpIni.setBool("Download", m_download);
     tmpIni.setInt("TcpPort", m_tcpPort);
     tmpIni.setString("TcpHost", m_tcpHost);
     tmpIni.setInt("Mode", (int)m_connectionMode);

@@ -39,6 +39,8 @@ public:
     void setTcpRemotePort(int port);
     int getTcpRemotePort();
     
+    bool getDownload();
+    void setDownload(bool enable);
 
     void setTcpRemoteProgram(QString path);
     QString getTcpRemoteProgram();
