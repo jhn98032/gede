@@ -267,6 +267,7 @@ void Core::onGdbOutput(int socketFd)
 
 /**
  * @brief Reads a memory area.
+ * @return 0 on success.
  */
 int Core::gdbGetMemory(uint64_t addr, size_t count, QByteArray *data)
 {
@@ -383,6 +384,9 @@ bool Core::gdbGetFiles()
 }
 
 
+/**
+ * @brief Sets a breakpoint at a function
+ */
 int Core::gdbSetBreakpointAtFunc(QString func)
 {
     Com& com = Com::getInstance();
@@ -399,6 +403,10 @@ int Core::gdbSetBreakpointAtFunc(QString func)
     return rc;
 }
 
+
+/**
+ * @brief Asks gdb to run the program.
+ */
 void Core::gdbRun()
 {
     Com& com = Com::getInstance();
@@ -442,6 +450,10 @@ void Core::gdbContinue()
 
 }
 
+
+/**
+ * @brief Tries to stop the program.
+ */ 
 void Core::stop()
 {
     Com& com = Com::getInstance();
@@ -484,6 +496,10 @@ void Core::stop()
     }
 }
 
+
+/**
+ * @brief Execute the next row in the program.
+ */
 void Core::gdbNext()
 {
     Com& com = Com::getInstance();
@@ -501,6 +517,9 @@ void Core::gdbNext()
 }
 
 
+/**
+ * @brief Request a list of stack frames.
+ */
 void Core::getStackFrames()
 {
     Com& com = Com::getInstance();
@@ -510,7 +529,9 @@ void Core::getStackFrames()
 }
 
 
-
+/**
+ * @brief Step in the current line.
+ */
 void Core::gdbStepIn()
 {
     Com& com = Com::getInstance();
@@ -530,6 +551,9 @@ void Core::gdbStepIn()
 }
 
 
+/**
+ * @brief Step out of the current function.
+ */
 void Core::gdbStepOut()
 {
     Com& com = Com::getInstance();
@@ -555,6 +579,11 @@ Core& Core::getInstance()
 }
 
 
+/**
+ * @brief Adds a watch for a variable.
+ * @param varName   The name of the variable to watch
+ * @return 0 on success.
+ */
 int Core::gdbAddVarWatch(QString varName, QString *varType, QString *value, QString *watchId_, bool *hasChildren)
 {
     Com& com = Com::getInstance();
@@ -600,7 +629,11 @@ int Core::gdbAddVarWatch(QString varName, QString *varType, QString *value, QStr
 }
 
 
-void Core::gdbExpandVarWatchChildren(QString watchId)
+/**
+ * @brief Expands all the children of a watched variable.
+ * @return 0 on success.
+ */
+int Core::gdbExpandVarWatchChildren(QString watchId)
 {
     int res;
     Tree resultData;
@@ -614,7 +647,7 @@ void Core::gdbExpandVarWatchChildren(QString watchId)
 
     if(res != 0)
     {
-        return;
+        return -1;
     }
 
         
@@ -635,10 +668,14 @@ void Core::gdbExpandVarWatchChildren(QString watchId)
             hasChildren = true;
         m_inf->ICore_onWatchVarChildAdded(childName, childExp, childValue, childType, hasChildren);
     }
-    
+
+    return 0;
 }
 
 
+/**
+ * @brief Returns the variable name that is being watched.
+ */
 QString Core::gdbGetVarWatchName(QString watchId)
 {
     if(m_watchList.contains(watchId))
@@ -651,6 +688,9 @@ QString Core::gdbGetVarWatchName(QString watchId)
         return watchId.mid(divPos+1);
 }
 
+/**
+ * @brief Removes a watch.
+ */
 void Core::gdbRemoveVarWatch(QString watchId)
 {
     Com& com = Com::getInstance();
@@ -705,6 +745,7 @@ void Core::onNotifyAsyncOut(Tree &tree, AsyncClass ac)
     tree.dump();
 }
 
+
 ICore::StopReason Core::parseReasonString(QString reasonString)
 {
     if( reasonString == "breakpoint-hit")
@@ -726,6 +767,7 @@ ICore::StopReason Core::parseReasonString(QString reasonString)
     return ICore::UNKNOWN;
 }
     
+
 void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
 {
     Com& com = Com::getInstance();
@@ -831,6 +873,9 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
 }
 
 
+/**
+ * @brief Remove a breakpoint.
+ */
 void Core::gdbRemoveBreakpoint(BreakPoint* bkpt)
 {
     Com& com = Com::getInstance();
@@ -867,6 +912,9 @@ void Core::gdbGetThreadList()
 }
 
 
+/**
+ * @brief Find a breakpoint based on path and linenumber.
+ */
 BreakPoint* Core::findBreakPoint(QString fullPath, int lineNo)
 {
     for(int i = 0;i < m_breakpoints.size();i++)
@@ -884,6 +932,9 @@ BreakPoint* Core::findBreakPoint(QString fullPath, int lineNo)
 }
 
 
+/**
+ * @brief Finds a breakpoint by number.
+ */
 BreakPoint* Core::findBreakPointByNumber(int number)
 {
     for(int i = 0;i < m_breakpoints.size();i++)
@@ -1147,6 +1198,10 @@ void Core::onLogStreamOutput(QString str)
         infoMsg("GDB | Log-stream | %s", stringToCStr(list[i]));
 }
 
+
+/**
+ * @brief Adds a breakpoint on a specified linenumber.
+ */
 int Core::gdbSetBreakpoint(QString filename, int lineNo)
 {
     Com& com = Com::getInstance();
@@ -1165,11 +1220,19 @@ int Core::gdbSetBreakpoint(QString filename, int lineNo)
     return rc;
 }
 
+
+/**
+ * @brief Returns a list of threads.
+ */
 QList<ThreadInfo> Core::getThreadList()
 {
     return m_threadList.values();
 }
 
+
+/**
+ * @brief Changes context to a specified thread.
+ */
 void Core::selectThread(int threadId)
 {
     if(m_selectedThreadId == threadId)
@@ -1179,10 +1242,12 @@ void Core::selectThread(int threadId)
     Tree resultData;
     
     
-    com.commandF(&resultData, "-thread-select %d", threadId);
+    if(com.commandF(&resultData, "-thread-select %d", threadId) == GDB_DONE)
+    {
 
         
-    m_selectedThreadId = threadId;
+        m_selectedThreadId = threadId;
+    }
 }
 
 

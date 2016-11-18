@@ -193,7 +193,7 @@ public:
     void gdbGetThreadList();
     void getStackFrames();
     void stop();
-    void gdbExpandVarWatchChildren(QString watchId);
+    int gdbExpandVarWatchChildren(QString watchId);
     int gdbGetMemory(uint64_t addr, size_t count, QByteArray *data);
     
     void selectThread(int threadId);
