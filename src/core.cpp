@@ -458,6 +458,18 @@ void Core::stop()
     {
         Com& com = Com::getInstance();
         Tree resultData;
+
+        // Send 'kill' to interrupt gdbserver
+        debugMsg("sending INTR to %d", m_pid);
+        if(m_pid == 0)
+            m_pid = com.getPid();
+            
+        if(m_pid != 0)
+            kill(m_pid, SIGINT);
+        else
+            errorMsg("Failed to stop since PID not known");
+
+
         com.command(NULL, "-exec-interrupt --all");
         com.command(NULL, "-exec-step-instruction");
         
