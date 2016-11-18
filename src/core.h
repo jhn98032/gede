@@ -85,7 +85,8 @@ class ICore
 
     enum TargetState 
     {
-        TARGET_STOPPED, 
+        TARGET_STOPPED,
+        TARGET_STARTING,
         TARGET_RUNNING,
         TARGET_FINISHED 
     }; 

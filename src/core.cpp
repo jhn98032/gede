@@ -255,6 +255,7 @@ void Core::onGdbOutput(int socketFd)
 {
     Q_UNUSED(socketFd);
     char buff[128];
+    buff[0] = '\0';
     int n =  read(m_ptsFd, buff, sizeof(buff)-1);
     if(n > 0)
     {
@@ -402,8 +403,9 @@ void Core::gdbRun()
 {
     Com& com = Com::getInstance();
     Tree resultData;
+    ICore::TargetState oldState;
 
-    if(m_targetState == ICore::TARGET_RUNNING)
+    if(m_targetState == ICore::TARGET_STARTING || m_targetState == ICore::TARGET_RUNNING)
     {
         if(m_inf)
             m_inf->ICore_onMessage("Program is currently running");
@@ -411,7 +413,12 @@ void Core::gdbRun()
     }
 
     m_pid = 0;
-    com.commandF(&resultData, "-exec-run");
+    oldState = m_targetState;
+    m_targetState = ICore::TARGET_STARTING;
+    GdbResult rc = com.commandF(&resultData, "-exec-run");
+    if(rc == GDB_ERROR)
+        m_targetState = oldState;
+
 
 }
 
@@ -424,7 +431,7 @@ void Core::gdbContinue()
     Com& com = Com::getInstance();
     Tree resultData;
 
-    if(m_targetState == ICore::TARGET_RUNNING)
+    if(m_targetState == ICore::TARGET_STARTING || m_targetState == ICore::TARGET_RUNNING)
     {
         if(m_inf)
             m_inf->ICore_onMessage("Program is currently running");
@@ -437,6 +444,7 @@ void Core::gdbContinue()
 
 void Core::stop()
 {
+    Com& com = Com::getInstance();
 
     if(m_targetState != ICore::TARGET_RUNNING)
     {
@@ -748,7 +756,7 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
         else
             reason = parseReasonString(reasonString);
 
-        if(reason == ICore::EXITED_NORMALLY)
+        if(reason == ICore::EXITED_NORMALLY || reason == ICore::EXITED)
         {
             m_targetState = ICore::TARGET_FINISHED;
         }
@@ -833,7 +841,7 @@ void Core::gdbGetThreadList()
     Com& com = Com::getInstance();
     Tree resultData;
 
-    if(m_targetState == ICore::TARGET_RUNNING)
+    if(m_targetState == ICore::TARGET_STARTING || m_targetState == ICore::TARGET_RUNNING)
     {
         if(m_inf)
             m_inf->ICore_onMessage("Program is currently running");
@@ -901,7 +909,6 @@ void Core::dispatchBreakpointTree(Tree &tree)
     {
         QString orgLoc = tree.getString("bkpt/original-location");
         int divPos = orgLoc.lastIndexOf(":");
-        assert(divPos != -1);
         if(divPos == -1)
             warnMsg("Original-location in unknown format");
         else
@@ -1177,7 +1184,7 @@ void Core::selectFrame(int selectedFrameIdx)
     Com& com = Com::getInstance();
     Tree resultData;
 
-    if(m_targetState == ICore::TARGET_RUNNING)
+    if(m_targetState == ICore::TARGET_STARTING || m_targetState == ICore::TARGET_RUNNING)
     {
         return;
     }
