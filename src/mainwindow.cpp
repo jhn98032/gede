@@ -197,10 +197,15 @@ void MainWindow::ICore_onStopped(ICore::StopReason reason, QString path, int lin
 {
     Q_UNUSED(reason);
 
-    if(reason == ICore::EXITED_NORMALLY)
+
+    if(reason == ICore::EXITED_NORMALLY || reason == ICore::EXITED)
     {
         QString title = "Program exited";
-        QString text = "Program exited normally";
+        QString text;
+        if(reason == ICore::EXITED_NORMALLY)
+            text = "Program exited normally";
+        else
+            text = "Program exited";
         QMessageBox::information (this, title, text); 
     }
     
@@ -1320,17 +1325,22 @@ void MainWindow::ICore_onTargetOutput(QString message)
 
 void MainWindow::ICore_onStateChanged(TargetState state)
 {
-    m_ui.actionNext->setEnabled(state == TARGET_STOPPED ? true : false);
-    m_ui.actionStep_In->setEnabled(state == TARGET_STOPPED ? true : false);
-    m_ui.actionStep_Out->setEnabled(state == TARGET_STOPPED ? true : false);
-    m_ui.actionStop->setEnabled(state == TARGET_STOPPED ? false : true);
-    m_ui.actionContinue->setEnabled(state == TARGET_STOPPED ? true : false);
-    m_ui.actionRun->setEnabled(state == TARGET_STOPPED ? true : false);
+    bool isRunning = true;
+    if (state == TARGET_STOPPED || state == TARGET_FINISHED)
+        isRunning = false;
+    bool isStopped = state == TARGET_STOPPED ? true : false;
+    
+    m_ui.actionNext->setEnabled(isStopped);
+    m_ui.actionStep_In->setEnabled(isStopped);
+    m_ui.actionStep_Out->setEnabled(isStopped);
+    m_ui.actionStop->setEnabled(isRunning);
+    m_ui.actionContinue->setEnabled(isStopped);
+    m_ui.actionRun->setEnabled(!isRunning);
 
-    m_ui.varWidget->setEnabled(state == TARGET_STOPPED ? true : false);
+    m_ui.varWidget->setEnabled(isStopped);
 
     
-    if(state == TARGET_RUNNING)
+    if(state == TARGET_STARTING || state == TARGET_RUNNING)
     {
         m_ui.treeWidget_stack->clear();
         m_ui.autoWidget->clear();
