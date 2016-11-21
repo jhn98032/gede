@@ -130,6 +130,13 @@ Core::~Core()
     com.setListener(NULL);
 
     close(m_ptsFd);
+
+    for(int m = 0;m < m_sourceFiles.size();m++)
+    {
+        SourceFile *sourceFile = m_sourceFiles[m];
+        delete sourceFile;
+    }
+
 }
 
 
