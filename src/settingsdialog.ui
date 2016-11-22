@@ -23,7 +23,7 @@
       </size>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_gui">
       <attribute name="title">
@@ -41,7 +41,7 @@
             </size>
            </property>
            <property name="text">
-            <string>Sourcecode font:</string>
+            <string>Sourceview font:</string>
            </property>
           </widget>
          </item>
@@ -167,7 +167,7 @@
      </widget>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>Colors</string>
+       <string>Sourceview Colors</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
