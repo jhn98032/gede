@@ -54,7 +54,7 @@ public slots:
 
 
     
-public:
+private:
     QTreeWidget *m_autoWidget;
     QMenu m_popupMenu;
     
