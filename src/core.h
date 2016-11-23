@@ -12,6 +12,7 @@
 #include "com.h"
 #include <QList>
 #include <QMap>
+#include <QHash>
 #include <QSocketNotifier>
 #include <QObject>
 
@@ -78,6 +79,30 @@ public:
 };
 
 
+class VarWatch
+{
+    public:
+        VarWatch() { m_parent = NULL; };
+        VarWatch(QString watchId_, QString name_)
+        : watchId(watchId_),
+            name(name_)
+         { m_parent = NULL; };
+
+        QString getName() { return name; };
+        QString getWatchId() { return watchId; };
+
+    private:
+
+        QString watchId;
+        QString name;
+
+    public:
+    
+        QVector <VarWatch*> m_children;
+        VarWatch* m_parent;
+};
+
+
 
 class ICore
 {
@@ -101,7 +126,7 @@ class ICore
         FUNCTION_FINISHED,
         EXITED
     };
-
+    
     enum SignalType
     {
         SIGINT,
@@ -116,7 +141,7 @@ class ICore
     virtual void ICore_onLocalVarChanged(QString name, CoreVarValue value) = 0;
     virtual void ICore_onFrameVarReset() = 0;
     virtual void ICore_onFrameVarChanged(QString name, QString value) = 0;
-    virtual void ICore_onWatchVarChanged(QString watchId, QString name, QString value, bool hasChildren) = 0;
+    virtual void ICore_onWatchVarChanged(VarWatch &watch, QString value, bool hasChildren, bool inScope) = 0;
     virtual void ICore_onConsoleStream(QString text) = 0;
     virtual void ICore_onBreakpointsChanged() = 0;
     virtual void ICore_onThreadListChanged() = 0;
@@ -133,16 +158,12 @@ class ICore
      * @param name       The name of the child.
      * @param valueString  The value of the child.
      */
-    virtual void ICore_onWatchVarChildAdded(QString watchId, QString name, QString valueString, QString varType, bool hasChildren) = 0;
+    virtual void ICore_onWatchVarChildAdded(VarWatch &watch, QString valueString, QString varType, bool hasChildren) = 0;
     
 };
 
-struct VarWatch
-{
-    QString name;
-    QString watchId;
-};
-    
+
+
 
 
 class Core : public ComListener
@@ -224,7 +245,7 @@ private:
     ICore::TargetState m_lastTargetState;
     int m_pid;
     int m_currentFrameIdx;
-    QMap <QString, VarWatch> m_watchList;
+    QHash <QString, VarWatch> m_watchList;
     int m_varWatchLastId;
     bool m_isRemote; //!< True if "remote target" or false if it is a "local target".
     int m_ptsFd;

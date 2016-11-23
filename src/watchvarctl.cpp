@@ -44,12 +44,18 @@ void WatchVarCtl::setWidget(QTreeWidget *varWidget)
 
 
 
-         
-void WatchVarCtl::ICore_onWatchVarChildAdded(QString watchId, QString name, QString valueString, QString varType, bool hasChildren)
+
+void WatchVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch,
+                                            QString valueString,
+                                            QString varType,
+                                            bool hasChildren,
+                                            bool inScope)
 {
     QTreeWidget *varWidget = m_varWidget;
     QStringList names;
-
+    QString watchId = watch.getWatchId();
+    QString name = watch.getName();
+                                            
     Q_UNUSED(name);
 
     //
@@ -76,7 +82,7 @@ void WatchVarCtl::ICore_onWatchVarChildAdded(QString watchId, QString name, QStr
             }
         }
 
-        // Did not find one
+        // Did not find one?
         QTreeWidgetItem *item;
         if(foundItem == NULL)
         {
@@ -124,15 +130,15 @@ void WatchVarCtl::ICore_onWatchVarChildAdded(QString watchId, QString name, QStr
                     valueString = VarCtl::valueDisplay(valueString.toLongLong(0,0), dispInfo.dispFormat);
                 }
             }
-            if(item->childCount() != 0)
-            {
-                if(!hasChildren)
+
+            bool enable = inScope;
+
+                if(!enable)
                     item->setDisabled(true);
                 else
                     item->setDisabled(false);
                 
 
-            }
             item->setText(1, valueString);
         }
     }

@@ -620,9 +620,7 @@ int Core::gdbAddVarWatch(QString varName, QString *varType, QString *value, QStr
 
     // debugMsg("%s = %s = %s\n", stringToCStr(varName2),stringToCStr(varValue2), stringToCStr(varType2));
 
-    VarWatch w;
-    w.name = varName;
-    w.watchId = watchId;
+    VarWatch w(watchId,varName);
     m_watchList[watchId] = w;
     
     *hasChildren = numChild == 0 ? false : true;
@@ -665,7 +663,7 @@ int Core::gdbExpandVarWatchChildren(QString watchId)
         // Get name and value
         QString treePath;
         treePath.sprintf("children/#%d",i+1);
-        QString childName = resultData.getString(treePath + "/name");
+        QString childWatchId = resultData.getString(treePath + "/name");
         QString childExp = resultData.getString(treePath + "/exp");
         QString childValue = resultData.getString(treePath + "/value");
         QString childType = resultData.getString(treePath + "/type");
@@ -673,7 +671,16 @@ int Core::gdbExpandVarWatchChildren(QString watchId)
         bool hasChildren = false;
         if(numChild > 0)
             hasChildren = true;
-        m_inf->ICore_onWatchVarChildAdded(childName, childExp, childValue, childType, hasChildren);
+
+        if(!m_watchList.contains(childWatchId))
+        {
+            VarWatch w(childWatchId,childExp);
+            m_watchList[childWatchId] = w;
+    
+        }
+
+        m_inf->ICore_onWatchVarChildAdded(m_watchList[childWatchId], childValue, childType, hasChildren);
+
     }
 
     return 0;
@@ -686,7 +693,7 @@ int Core::gdbExpandVarWatchChildren(QString watchId)
 QString Core::gdbGetVarWatchName(QString watchId)
 {
     if(m_watchList.contains(watchId))
-        return m_watchList[watchId].name;
+        return m_watchList[watchId].getName();
     int divPos = watchId.lastIndexOf(".");
     assert(divPos != -1);
     if(divPos == -1)
@@ -706,7 +713,7 @@ void Core::gdbRemoveVarWatch(QString watchId)
     assert(watchId != "");
     
     
-    QMap <QString, VarWatch>::iterator pos = m_watchList.find(watchId);
+    QHash <QString, VarWatch>::iterator pos = m_watchList.find(watchId);
     if(pos == m_watchList.end())
     {
         debugMsg("Unable to find watch %s", stringToCStr(watchId));
@@ -1017,14 +1024,31 @@ void Core::onResult(Tree &tree)
                 QString watchId = tree.getString(path);
                 path.sprintf("changelist/%d/value", j+1);
                 QString varValue = tree.getString(path);
+                path.sprintf("changelist/%d/in_scope", j+1);
+                bool inScope = true;
+                QString inScopeStr = tree.getString(path);
+                if(inScopeStr == "true" || inScopeStr.isEmpty())
+                    inScope = true;
+                else
+                    inScope = false;
 
-                QString varName = gdbGetVarWatchName(watchId);
-                    
-                bool hasChildren = false;
-                if (varValue == "{...}")
-                    hasChildren = true;
-                if(m_inf)
-                    m_inf->ICore_onWatchVarChanged(watchId, varName, varValue, hasChildren);
+                if(m_watchList.contains(watchId))
+                {
+                    VarWatch watch = m_watchList[watchId];
+                        
+                    bool hasChildren = false;
+                    if (varValue == "{...}")
+                        hasChildren = true;
+                    if(m_inf)
+                    {
+                        
+                        m_inf->ICore_onWatchVarChanged(watch, varValue, hasChildren, inScope);
+                    }
+                }
+                else
+                {
+                    warnMsg("Received watch info for unknown watch %s", stringToCStr(watchId));
+                }
             }
             
         }

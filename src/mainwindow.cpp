@@ -1,3 +1,5 @@
+//#define ENABLE_DEBUGMSG
+
 /*
  * Copyright (C) 2014-2015 Johan Henriksson.
  * All rights reserved.
@@ -450,17 +452,17 @@ void MainWindow::ICore_onLocalVarChanged(QString name, CoreVarValue varValue)
 
 
 
-void MainWindow::ICore_onWatchVarChanged(QString watchId, QString name, QString valueString, bool hasChildren)
+void MainWindow::ICore_onWatchVarChanged(VarWatch &watch, QString valueString, bool hasChildren, bool inScope)
 {
-    ICore_onWatchVarChildAdded( watchId,  name,  valueString, "", hasChildren);
+    m_watchVarCtl.ICore_onWatchVarChildAdded(watch, valueString, "", hasChildren, inScope);
     
 }
 
 
             
-void MainWindow::ICore_onWatchVarChildAdded(QString watchId, QString name, QString valueString, QString varType, bool hasChildren)
+void MainWindow::ICore_onWatchVarChildAdded(VarWatch &watch, QString valueString, QString varType, bool hasChildren)
 {
-    m_watchVarCtl.ICore_onWatchVarChildAdded(watchId, name, valueString, varType, hasChildren);
+    m_watchVarCtl.ICore_onWatchVarChildAdded(watch, valueString, varType, hasChildren, true);
 }
 
 

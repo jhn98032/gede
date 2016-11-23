@@ -9,10 +9,10 @@
 #ifndef WATCHVAR_CTL_H
 #define WATCHVAR_CTL_H
 
-#include <QObject>
 #include <QString>
 #include <QTreeWidget>
 
+#include "core.h"
 #include "varctl.h"
 
 
@@ -25,7 +25,7 @@ public:
     
     void setWidget(QTreeWidget *varWidget);
 
-    void ICore_onWatchVarChildAdded(QString watchId_, QString name, QString valueString, QString varType, bool hasChildren);
+    void ICore_onWatchVarChildAdded(VarWatch &watch, QString valueString, QString varType, bool hasChildren, bool inScope);
     void addNewWatch(QString varName);
     void deleteSelected();
 
