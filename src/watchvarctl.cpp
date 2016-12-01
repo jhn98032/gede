@@ -44,19 +44,24 @@ void WatchVarCtl::setWidget(QTreeWidget *varWidget)
 
 
 
+void WatchVarCtl::ICore_onWatchVarChanged(VarWatch &watch)
+{
 
-void WatchVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch,
-                                            QString valueString,
-                                            QString varType,
-                                            bool hasChildren,
-                                            bool inScope)
+    ICore_onWatchVarChildAdded(watch);
+}
+
+void WatchVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
 {
     QTreeWidget *varWidget = m_varWidget;
     QStringList names;
     QString watchId = watch.getWatchId();
     QString name = watch.getName();
-                                            
-    Q_UNUSED(name);
+    QString varType = watch.getVarType();
+    
+    QString valueString = watch.m_varValue;
+    bool hasChildren  = watch.hasChildren();
+    bool inScope = watch.inScope();
+
 
     //
     QTreeWidgetItem * rootItem = varWidget->invisibleRootItem();
@@ -161,7 +166,6 @@ WatchVarCtl::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int col
     if(oldKey != "" && oldName == newName)
         return;
     
-    debugMsg("oldKey:'%s' oldName:'%s' newName:'%s' ", stringToCStr(oldKey), stringToCStr(oldName), stringToCStr(newName));
 
     if(newName == "...")
         newName = "";
@@ -189,12 +193,15 @@ WatchVarCtl::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int col
     else if(oldName == "")
     {
         //debugMsg("%s", stringToCStr(current->text(0)));
-        QString value;
-        QString watchId;
-        QString varType;
-        bool hasChildren = false;
-        if(core.gdbAddVarWatch(newName, &varType, &value, &watchId, &hasChildren) == 0)
+        VarWatch *watch = NULL;
+        if(core.gdbAddVarWatch(newName, &watch) == 0)
         {
+            QString watchId = watch->getWatchId();
+            QString varType = watch->getVarType();
+            QString value  = watch->getValue();
+            bool hasChildren = watch->hasChildren();
+
+            
             if(hasChildren)
                 current->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
             current->setData(0, Qt::UserRole, watchId);
@@ -242,12 +249,14 @@ WatchVarCtl::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int col
 
         m_watchVarDispInfo.remove(oldKey);
 
-        QString value;
-        QString watchId;
-        QString varType;
-        bool hasChildren = false;
-        if(core.gdbAddVarWatch(newName, &varType, &value, &watchId, &hasChildren) == 0)
+        VarWatch *watch = NULL;
+        if(core.gdbAddVarWatch(newName, &watch) == 0)
         {
+            QString watchId = watch->getWatchId();
+            QString varType = watch->getVarType();
+            QString value  = watch->getValue();
+            bool hasChildren = watch->hasChildren();
+
             current->setData(0, Qt::UserRole, watchId);
             current->setText(1, value);
             current->setText(2, varType);

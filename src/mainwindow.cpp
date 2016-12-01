@@ -452,17 +452,16 @@ void MainWindow::ICore_onLocalVarChanged(QString name, CoreVarValue varValue)
 
 
 
-void MainWindow::ICore_onWatchVarChanged(VarWatch &watch, QString valueString, bool hasChildren, bool inScope)
+void MainWindow::ICore_onWatchVarChanged(VarWatch &watch)
 {
-    m_watchVarCtl.ICore_onWatchVarChildAdded(watch, valueString, "", hasChildren, inScope);
+    m_watchVarCtl.ICore_onWatchVarChanged(watch);
     
 }
 
 
-            
-void MainWindow::ICore_onWatchVarChildAdded(VarWatch &watch, QString valueString, QString varType, bool hasChildren)
+void MainWindow::ICore_onWatchVarChildAdded(VarWatch &watch)
 {
-    m_watchVarCtl.ICore_onWatchVarChildAdded(watch, valueString, varType, hasChildren, true);
+    m_watchVarCtl.ICore_onWatchVarChildAdded(watch);
 }
 
 

@@ -82,24 +82,31 @@ public:
 class VarWatch
 {
     public:
-        VarWatch() { m_parent = NULL; };
+        VarWatch() {  };
         VarWatch(QString watchId_, QString name_)
         : watchId(watchId_),
             name(name_)
-         { m_parent = NULL; };
+         {  };
 
         QString getName() { return name; };
         QString getWatchId() { return watchId; };
 
+        bool hasChildren();
+        bool inScope() { return m_inScope;};
+        QString getVarType() { return m_varType; };
+        QString getValue() { return m_varValue; };
     private:
 
         QString watchId;
         QString name;
 
     public:
-    
-        QVector <VarWatch*> m_children;
-        VarWatch* m_parent;
+        bool m_inScope;
+        QString m_varValue;
+        QString m_varType;
+        bool m_hasChildren;
+        
+        QString m_parentWatchId;
 };
 
 
@@ -141,7 +148,7 @@ class ICore
     virtual void ICore_onLocalVarChanged(QString name, CoreVarValue value) = 0;
     virtual void ICore_onFrameVarReset() = 0;
     virtual void ICore_onFrameVarChanged(QString name, QString value) = 0;
-    virtual void ICore_onWatchVarChanged(VarWatch &watch, QString value, bool hasChildren, bool inScope) = 0;
+    virtual void ICore_onWatchVarChanged(VarWatch &watch) = 0;
     virtual void ICore_onConsoleStream(QString text) = 0;
     virtual void ICore_onBreakpointsChanged() = 0;
     virtual void ICore_onThreadListChanged() = 0;
@@ -158,7 +165,7 @@ class ICore
      * @param name       The name of the child.
      * @param valueString  The value of the child.
      */
-    virtual void ICore_onWatchVarChildAdded(VarWatch &watch, QString valueString, QString varType, bool hasChildren) = 0;
+    virtual void ICore_onWatchVarChildAdded(VarWatch &watch) = 0;
     
 };
 
@@ -207,7 +214,7 @@ public:
     void gdbContinue();
     void gdbRun();
     bool gdbGetFiles();
-    int gdbAddVarWatch(QString varName, QString *varType, QString *value, QString *watchId, bool *hasChildren);
+    int gdbAddVarWatch(QString varName, VarWatch **watchPtr);
     void gdbRemoveVarWatch(QString watchId);
     QString gdbGetVarWatchName(QString watchId);
     int gdbSetBreakpoint(QString filename, int lineNo);
@@ -227,7 +234,9 @@ public:
     void gdbRemoveBreakpoint(BreakPoint* bkpt);
 
     QList<ThreadInfo> getThreadList();
-    
+
+    // Watch
+    VarWatch *getVarWatchInfo(QString watchId);
 
     QVector <SourceFile*> getSourceFiles() { return m_sourceFiles; };
 
@@ -245,7 +254,7 @@ private:
     ICore::TargetState m_lastTargetState;
     int m_pid;
     int m_currentFrameIdx;
-    QHash <QString, VarWatch> m_watchList;
+    QList <VarWatch*> m_watchList;
     int m_varWatchLastId;
     bool m_isRemote; //!< True if "remote target" or false if it is a "local target".
     int m_ptsFd;

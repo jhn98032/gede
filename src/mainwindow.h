@@ -50,7 +50,7 @@ public:
     void ICore_onStopped(ICore::StopReason reason, QString path, int lineNo);
     void ICore_onLocalVarReset();
     void ICore_onLocalVarChanged(QString name, CoreVarValue varValue);
-    void ICore_onWatchVarChanged(VarWatch &watch, QString value, bool hasChildren, bool inScope);
+    void ICore_onWatchVarChanged(VarWatch &watch);
     void ICore_onConsoleStream(QString text);
     void ICore_onBreakpointsChanged();
     void ICore_onThreadListChanged();
@@ -69,7 +69,7 @@ public:
     void ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList text);
     void ICodeView_onContextMenuIncFile(QPoint pos, int lineNo, QString incFile);
     
-    void ICore_onWatchVarChildAdded(VarWatch &watch, QString valueString, QString varType, bool hasChildren);
+    void ICore_onWatchVarChildAdded(VarWatch &watch);
     
 private:
 

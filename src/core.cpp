@@ -22,7 +22,10 @@
 #include <fcntl.h> //  O_RDWR
 
 
-
+bool VarWatch::hasChildren()
+{
+    return m_hasChildren;
+}
 
 
 QString CoreVarValue::toString()
@@ -124,6 +127,12 @@ Core::Core()
 
 Core::~Core()
 {
+    for(int i = 0;i < m_watchList.size();i++)
+    {
+        VarWatch* watch = m_watchList[i];
+        delete watch;
+    }
+
     delete m_ptsListener;
     
     Com& com = Com::getInstance();
@@ -587,11 +596,27 @@ Core& Core::getInstance()
 
 
 /**
+ * @brief Returns info for an existing watch.
+ */
+VarWatch* Core::getVarWatchInfo(QString watchId)
+{
+    for(int i = 0;i < m_watchList.size();i++)
+    {
+        VarWatch* watch = m_watchList[i];
+        if(watch->getWatchId() == watchId)
+            return watch;
+    }
+    return NULL;
+}
+
+
+/**
  * @brief Adds a watch for a variable.
  * @param varName   The name of the variable to watch
+ * @param watchPtr  Pointer to a watch handle for the newly created watch.
  * @return 0 on success.
  */
-int Core::gdbAddVarWatch(QString varName, QString *varType, QString *value, QString *watchId_, bool *hasChildren)
+int Core::gdbAddVarWatch(QString varName, VarWatch** watchPtr)
 {
     Com& com = Com::getInstance();
     Tree resultData;
@@ -599,6 +624,8 @@ int Core::gdbAddVarWatch(QString varName, QString *varType, QString *value, QStr
     GdbResult res;
     int rc = 0;
 
+    *watchPtr = NULL;
+    
     watchId.sprintf("w%d", m_varWatchLastId++);
 
     assert(varName.isEmpty() == false);
@@ -620,15 +647,16 @@ int Core::gdbAddVarWatch(QString varName, QString *varType, QString *value, QStr
 
     // debugMsg("%s = %s = %s\n", stringToCStr(varName2),stringToCStr(varValue2), stringToCStr(varType2));
 
-    VarWatch w(watchId,varName);
-    m_watchList[watchId] = w;
+    VarWatch *w = new VarWatch(watchId,varName);
+    w->m_varType = varType2;
+    w->m_varValue = varValue2;
+    w->m_hasChildren = numChild > 0 ? true : false;
+    m_watchList.append(w);
     
-    *hasChildren = numChild == 0 ? false : true;
-    *varType = varType2;
-    *value = varValue2;
+        *watchPtr = w;
+        
     }
 
-    *watchId_ = watchId;
 
     return rc;
 }
@@ -644,9 +672,9 @@ int Core::gdbExpandVarWatchChildren(QString watchId)
     Tree resultData;
     Com& com = Com::getInstance();
 
-    // Get the variable name
-//    QString varName = m_watchList[watchId].name;
+    assert(getVarWatchInfo(watchId) != NULL);
 
+    
     // Request its children
     res = com.commandF(&resultData, "-var-list-children --all-values %s", stringToCStr(watchId));
 
@@ -672,14 +700,19 @@ int Core::gdbExpandVarWatchChildren(QString watchId)
         if(numChild > 0)
             hasChildren = true;
 
-        if(!m_watchList.contains(childWatchId))
+        VarWatch *watch = getVarWatchInfo(childWatchId);
+        if(watch == NULL)
         {
-            VarWatch w(childWatchId,childExp);
-            m_watchList[childWatchId] = w;
-    
+            watch = new VarWatch(childWatchId,childExp);
+            watch->m_inScope = true;
+            watch->m_varValue = childValue;
+            watch->m_varType = childType;
+            watch->m_hasChildren = hasChildren;
+            watch->m_parentWatchId = watchId;
+            m_watchList.append(watch);
         }
 
-        m_inf->ICore_onWatchVarChildAdded(m_watchList[childWatchId], childValue, childType, hasChildren);
+        m_inf->ICore_onWatchVarChildAdded(*watch);
 
     }
 
@@ -692,8 +725,9 @@ int Core::gdbExpandVarWatchChildren(QString watchId)
  */
 QString Core::gdbGetVarWatchName(QString watchId)
 {
-    if(m_watchList.contains(watchId))
-        return m_watchList[watchId].getName();
+    VarWatch* watch = getVarWatchInfo(watchId);
+    if(watch)
+        return watch->getName();
     int divPos = watchId.lastIndexOf(".");
     assert(divPos != -1);
     if(divPos == -1)
@@ -712,19 +746,33 @@ void Core::gdbRemoveVarWatch(QString watchId)
     
     assert(watchId != "");
     
-    
-    QHash <QString, VarWatch>::iterator pos = m_watchList.find(watchId);
-    if(pos == m_watchList.end())
+    // Remove from the list
+    for(int i = 0;i < m_watchList.size();i++)
     {
-        debugMsg("Unable to find watch %s", stringToCStr(watchId));
-        assert(0);
+        VarWatch* watch = m_watchList[i];
+        if(watch->getWatchId() == watchId)
+        {
+            m_watchList.removeAt(i--);
+            delete watch;
+        }
     }
-    else
+
+    // Remove children first
+    QStringList removeList;
+    for(int i = 0;i < m_watchList.size();i++)
     {
-        m_watchList.erase(pos);
-    
-        com.commandF(&resultData, "-var-delete %s", stringToCStr(watchId));
+        VarWatch* watch = m_watchList[i];
+        if(watch->m_parentWatchId == watchId)
+            removeList.push_back(watch->getWatchId());
     }
+    for(int i = 0;i < removeList.size();i++)
+    {
+        gdbRemoveVarWatch(removeList[i]);
+    }
+
+    com.commandF(&resultData, "-var-delete %s", stringToCStr(watchId));
+
+     
 }
 
 
@@ -1022,27 +1070,30 @@ void Core::onResult(Tree &tree)
                 QString path;
                 path.sprintf("changelist/%d/name", j+1);
                 QString watchId = tree.getString(path);
+
+                VarWatch *watch = getVarWatchInfo(watchId);
+                if(watch)
+                {
+                    
                 path.sprintf("changelist/%d/value", j+1);
-                QString varValue = tree.getString(path);
+                watch->m_varValue = tree.getString(path);
                 path.sprintf("changelist/%d/in_scope", j+1);
-                bool inScope = true;
                 QString inScopeStr = tree.getString(path);
                 if(inScopeStr == "true" || inScopeStr.isEmpty())
-                    inScope = true;
+                    watch->m_inScope = true;
                 else
-                    inScope = false;
+                    watch->m_inScope = false;
 
-                if(m_watchList.contains(watchId))
-                {
-                    VarWatch watch = m_watchList[watchId];
+                if (watch->m_varValue == "{...}" && watch->hasChildren() == false)
+                    watch->m_hasChildren = true;
+                
+//                printf("in_scope:%s -> %d\n", stringToCStr(inScopeStr), inScope);
+
                         
-                    bool hasChildren = false;
-                    if (varValue == "{...}")
-                        hasChildren = true;
                     if(m_inf)
                     {
                         
-                        m_inf->ICore_onWatchVarChanged(watch, varValue, hasChildren, inScope);
+                        m_inf->ICore_onWatchVarChanged(*watch);
                     }
                 }
                 else

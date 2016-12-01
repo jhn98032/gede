@@ -25,7 +25,8 @@ public:
     
     void setWidget(QTreeWidget *varWidget);
 
-    void ICore_onWatchVarChildAdded(VarWatch &watch, QString valueString, QString varType, bool hasChildren, bool inScope);
+    void ICore_onWatchVarChanged(VarWatch &watch);
+    void ICore_onWatchVarChildAdded(VarWatch &watch);
     void addNewWatch(QString varName);
     void deleteSelected();
 
