@@ -1058,9 +1058,9 @@ void Core::onResult(Tree &tree)
     debugMsg("Result>");
 
 
-    for(int i = 0;i < tree.getRootChildCount();i++)
+    for(int treeChildIdx = 0;treeChildIdx < tree.getRootChildCount();treeChildIdx++)
     {
-        TreeNode *rootNode = tree.getChildAt(i);
+        TreeNode *rootNode = tree.getChildAt(treeChildIdx);
         QString rootName = rootNode->getName();
         if(rootName == "changelist")
          {
@@ -1114,9 +1114,9 @@ void Core::onResult(Tree &tree)
             
             // Parse the result
             QStringList childList = tree.getChildList("threads");
-            for(int i = 0;i < childList.size();i++)
+            for(int cIdx = 0;cIdx < childList.size();cIdx++)
             {
-                QString treePath = "threads/" + childList[i];
+                QString treePath = "threads/" + childList[cIdx];
                 QString threadId = tree.getString(treePath + "/id");
                 QString targetId = tree.getString(treePath + "/target-id");
                 QString funcName = tree.getString(treePath + "/frame/func");
