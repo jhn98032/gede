@@ -214,9 +214,7 @@ public:
     void gdbContinue();
     void gdbRun();
     bool gdbGetFiles();
-    int gdbAddVarWatch(QString varName, VarWatch **watchPtr);
-    void gdbRemoveVarWatch(QString watchId);
-    QString gdbGetVarWatchName(QString watchId);
+
     int gdbSetBreakpoint(QString filename, int lineNo);
     void gdbGetThreadList();
     void getStackFrames();
@@ -237,7 +235,12 @@ public:
 
     // Watch
     VarWatch *getVarWatchInfo(QString watchId);
+    QList <VarWatch*> getWatchChildren(VarWatch &watch);
+    int gdbAddVarWatch(QString varName, VarWatch **watchPtr);
+    void gdbRemoveVarWatch(QString watchId);
+    QString gdbGetVarWatchName(QString watchId);
 
+    
     QVector <SourceFile*> getSourceFiles() { return m_sourceFiles; };
 
 

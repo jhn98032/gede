@@ -600,6 +600,8 @@ Core& Core::getInstance()
  */
 VarWatch* Core::getVarWatchInfo(QString watchId)
 {
+    assert(watchId != "");
+    assert(watchId[0] == 'w');
     for(int i = 0;i < m_watchList.size();i++)
     {
         VarWatch* watch = m_watchList[i];
@@ -607,6 +609,22 @@ VarWatch* Core::getVarWatchInfo(QString watchId)
             return watch;
     }
     return NULL;
+}
+
+
+/**
+ * @brief Returns all children of a watch.
+ */
+QList <VarWatch*> Core::getWatchChildren(VarWatch &parentWatch)
+{
+    QList <VarWatch*> list;
+    for(int i = 0;i < m_watchList.size();i++)
+    {
+        VarWatch* otherWatch = m_watchList[i];
+        if(parentWatch.getWatchId() == otherWatch->m_parentWatchId)
+            list.push_back(otherWatch);
+    }    
+    return list;
 }
 
 
@@ -744,8 +762,8 @@ void Core::gdbRemoveVarWatch(QString watchId)
     Com& com = Com::getInstance();
     Tree resultData;
     
-    assert(watchId != "");
-    
+    assert(getVarWatchInfo(watchId) != NULL);
+
     // Remove from the list
     for(int i = 0;i < m_watchList.size();i++)
     {
@@ -761,9 +779,9 @@ void Core::gdbRemoveVarWatch(QString watchId)
     QStringList removeList;
     for(int i = 0;i < m_watchList.size();i++)
     {
-        VarWatch* watch = m_watchList[i];
-        if(watch->m_parentWatchId == watchId)
-            removeList.push_back(watch->getWatchId());
+        VarWatch* childWatch = m_watchList[i];
+        if(childWatch->m_parentWatchId == watchId)
+            removeList.push_back(childWatch->getWatchId());
     }
     for(int i = 0;i < removeList.size();i++)
     {
@@ -1051,7 +1069,9 @@ void Core::dispatchBreakpointTree(Tree &tree)
 
     
 }
-        
+
+
+
 void Core::onResult(Tree &tree)
 {
          
@@ -1070,9 +1090,36 @@ void Core::onResult(Tree &tree)
                 QString path;
                 path.sprintf("changelist/%d/name", j+1);
                 QString watchId = tree.getString(path);
-
+                path.sprintf("changelist/%d/type_changed", j+1);
+                bool typeChanged = false;
+                if(tree.getString(path) == "true")
+                    typeChanged = true;
+                
                 VarWatch *watch = getVarWatchInfo(watchId);
-                if(watch)
+
+                // If the type has changed then all of the children must be removed.
+                if(watch != NULL && typeChanged)
+                {
+                    QString varName = watch->getName();
+
+                    // Remove children
+                    QList <VarWatch*> removeList = getWatchChildren(*watch);
+
+                        
+                    for(int cidx = 0;cidx < removeList.size();cidx++)
+                    {
+                        gdbRemoveVarWatch(removeList[cidx]->getWatchId());
+                    }
+                    watch->m_varValue = "";
+                    path.sprintf("changelist/%d/new_type", j+1);
+                    watch->m_varType = tree.getString(path);
+                    path.sprintf("changelist/%d/new_num_children", j+1);
+                    watch->m_hasChildren = tree.getInt(path) > 0 ? true : false;
+                    m_inf->ICore_onWatchVarChanged(*watch);
+
+                }
+                // value changed?
+                else if(watch)
                 {
                     
                 path.sprintf("changelist/%d/value", j+1);
@@ -1083,6 +1130,8 @@ void Core::onResult(Tree &tree)
                     watch->m_inScope = true;
                 else
                     watch->m_inScope = false;
+
+                
 
                 if (watch->m_varValue == "{...}" && watch->hasChildren() == false)
                     watch->m_hasChildren = true;

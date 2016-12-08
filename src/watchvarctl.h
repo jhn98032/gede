@@ -30,6 +30,12 @@ public:
     void addNewWatch(QString varName);
     void deleteSelected();
 
+private:
+    QString getWatchId(QTreeWidgetItem* item);
+
+    
+    void sync(QTreeWidgetItem * parentItem, VarWatch &watch);
+    
 public slots:
     void onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
     void onWatchWidgetCurrentItemChanged ( QTreeWidgetItem * current, int column );
