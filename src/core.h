@@ -215,6 +215,9 @@ public:
     void gdbRun();
     bool gdbGetFiles();
 
+    void changeWatchVariable(QString variable, QString newValue);
+    
+
     int gdbSetBreakpoint(QString filename, int lineNo);
     void gdbGetThreadList();
     void getStackFrames();

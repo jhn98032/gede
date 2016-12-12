@@ -1409,8 +1409,26 @@ void Core::selectFrame(int selectedFrameIdx)
 }
 
 
+/**
+ * @brief Changes the content of a variable.
+ */
+void Core::changeWatchVariable(QString variable, QString newValue)
+{
+    Com& com = Com::getInstance();
+    Tree resultData;
 
-    
+    if(m_targetState == ICore::TARGET_STARTING || m_targetState == ICore::TARGET_RUNNING)
+    {
+        if(m_inf)
+            m_inf->ICore_onMessage("Program is currently running");
+        return;
+    }
+
+    com.commandF(&resultData, "-var-assign %s %s", stringToCStr(variable), stringToCStr(newValue));    
+
+
+}
+
 
 
 

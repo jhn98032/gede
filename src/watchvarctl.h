@@ -11,6 +11,8 @@
 
 #include <QString>
 #include <QTreeWidget>
+#include <QMenu>
+
 
 #include "core.h"
 #include "varctl.h"
@@ -33,6 +35,8 @@ public:
 private:
     QString getWatchId(QTreeWidgetItem* item);
 
+    void selectedChangeDisplayFormat(VarCtl::DispFormat fmt);
+
     
     void sync(QTreeWidgetItem * parentItem, VarWatch &watch);
     
@@ -42,6 +46,14 @@ public slots:
     void onWatchWidgetItemExpanded(QTreeWidgetItem *item );
     void onWatchWidgetItemCollapsed(QTreeWidgetItem *item);
 
+    void onContextMenu ( const QPoint &pos);
+
+
+    void onDisplayAsDec();
+    void onDisplayAsHex();
+    void onDisplayAsBin();
+    void onDisplayAsChar();
+    void onRemoveWatch();
 
 private:
     void fillInVars();
@@ -49,6 +61,8 @@ private:
 private:
     QTreeWidget *m_varWidget;
     VarCtl::DispInfoMap m_watchVarDispInfo;
+    QMenu m_popupMenu;
+
 };
 
 #endif // WATCHVAR_CTL_H
