@@ -12,18 +12,22 @@
 #include <QVector>
 #include <QString>
 #include <QColor>
+#include <QVariant>
+
 
 class Entry
 {
 public:
     Entry(const Entry &other);
-    Entry(QString name_) : name(name_) {};
+    Entry(QString name_) : m_name(name_) {};
     
-    int getValueAsInt() { return value.toInt(0,0); };
-    QString getValueAsString() { return value; };
-
-    QString name;
-    QString value;
+    int getValueAsInt();
+    QString getValueAsString();
+    
+    QString m_name;
+    QVariant m_value;
+    typedef enum {TYPE_BYTE_ARRAY, TYPE_STRING, TYPE_INT, TYPE_COLOR} EntryType;
+    EntryType m_type;
 };
 
 class Ini
@@ -38,12 +42,14 @@ public:
     Ini& operator= (const Ini &src);
     void copy(const Ini &src);
     
+    void setByteArray(QString name, const QByteArray &byteArray);
     void setInt(QString name, int value);
     void setString(QString name, QString value);
     void setStringList(QString name, QStringList value);
     void setBool(QString name, bool value);
     
     bool getBool(QString name, bool defaultValue = false);
+    void getByteArray(QString name, QByteArray *byteArray);
     int getInt(QString name, int defaultValue = -1);
     QColor getColor(QString name, QColor defaultValue);
     QString getString(QString name, QString defaultValue = "");
@@ -57,10 +63,13 @@ public:
 private:
     void removeAll();
     Entry *findEntry(QString name);
-    Entry *addEntry(QString name);
-
+    Entry *addEntry(QString name, Entry::EntryType type);
+    void decodeValueString(Entry *entry, QString valueStr);
+    QString encodeValueString(const Entry &entry);
+    
 private:
     QVector<Entry*> m_entries;
 };
 
 #endif // FILE__INI_H
+

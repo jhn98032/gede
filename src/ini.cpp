@@ -15,10 +15,21 @@
 #include <assert.h>
 
 Entry::Entry(const Entry &src)
-    : name(src.name)
-    ,value(src.value)
+    : m_name(src.m_name)
+    ,m_value(src.m_value)
+    ,m_type(src.m_type)
 {
 
+}
+
+int Entry::getValueAsInt()
+{
+    return m_value.toInt();
+}
+
+QString Entry::getValueAsString()
+{
+    return m_value.toString();
 }
 
 
@@ -86,14 +97,14 @@ Entry *Ini::findEntry(QString name)
     {
         Entry *entry = NULL;
         entry = m_entries[i];
-        if(entry->name == name)
+        if(entry->m_name == name)
             return entry;
     }
     return NULL;
 }
 
     
-Entry *Ini::addEntry(QString name)
+Entry *Ini::addEntry(QString name, Entry::EntryType type)
 {
     Entry *entry = findEntry(name);
     if(!entry)
@@ -101,32 +112,41 @@ Entry *Ini::addEntry(QString name)
         entry = new Entry(name);
         m_entries.push_back(entry);
     }
+    entry->m_type = type;
     return entry;
 }
 
     
 void Ini::setInt(QString name, int value)
 {
-    Entry *entry = addEntry(name);
-    entry->value.sprintf("%d", value);
+    Entry *entry = addEntry(name, Entry::TYPE_INT);
+    entry->m_value = value;
 }
+
+
+void Ini::setByteArray(QString name, const QByteArray &byteArray)
+{
+    Entry *entry = addEntry(name, Entry::TYPE_BYTE_ARRAY);
+    entry->m_value = byteArray;
+}
+
 
 void Ini::setBool(QString name, bool value)
 {
-    Entry *entry = addEntry(name);
-    entry->value.sprintf("%d", (int)value);
+    Entry *entry = addEntry(name, Entry::TYPE_INT);
+    entry->m_value = (int)value;
 }
 
 void Ini::setString(QString name, QString value)
 {
-    Entry *entry = addEntry(name);
-    entry->value = value;
+    Entry *entry = addEntry(name, Entry::TYPE_STRING);
+    entry->m_value = value;
 }
 
 void Ini::setStringList(QString name, QStringList value)
 {
-    Entry *entry = addEntry(name);
-    entry->value = value.join(";");
+    Entry *entry = addEntry(name, Entry::TYPE_STRING);
+    entry->m_value = value.join(";");
 }
 
 int Ini::getInt(QString name, int defaultValue)
@@ -170,6 +190,19 @@ QStringList Ini::getStringList(QString name, QStringList defaultValue)
     return list.split(";");
 }
 
+
+void Ini::getByteArray(QString name, QByteArray *byteArray)
+{
+    Entry *entry = findEntry(name);
+    if(!entry)
+    {
+        setByteArray(name, *byteArray);
+        entry = findEntry(name);
+    }
+    *byteArray = entry->m_value.toByteArray();
+}
+
+
 QColor Ini::getColor(QString name, QColor defaultValue)
 {
     Entry *entry = findEntry(name);
@@ -178,15 +211,17 @@ QColor Ini::getColor(QString name, QColor defaultValue)
         setColor(name, defaultValue);
         entry = findEntry(name);
     }
-    return QColor(entry->value);
+    return QColor(entry->m_value.toString());
     
 }
 
-
+    
 void Ini::setColor(QString name, QColor value)
 {
-    Entry *entry = addEntry(name);
-    entry->value.sprintf("#%02x%02x%02x", value.red(), value.green(), value.blue());
+    Entry *entry = addEntry(name, Entry::TYPE_COLOR);
+    QString valueStr;
+    valueStr.sprintf("#%02x%02x%02x", value.red(), value.green(), value.blue());
+    entry->m_value = valueStr;
 }
 
 void Ini::dump()
@@ -195,7 +230,8 @@ void Ini::dump()
     for(int i = 0;i < m_entries.size();i++)
     {
         Entry *entry = m_entries[i];
-        printf("_%s_%s_\n", stringToCStr(entry->name), stringToCStr(entry->value));
+        QString valueStr = entry->m_value.toString();
+        printf("_%s_%s_\n", stringToCStr(entry->m_name), stringToCStr(valueStr));
     }
 
 }
@@ -213,13 +249,114 @@ int Ini::save(QString filename)
     for(int i = 0;i < m_entries.size();i++)
     {
         Entry *entry = m_entries[i];
-        file.write(stringToCStr(entry->name));
-        file.write("=\"");
-        file.write(stringToCStr(entry->value));
-        file.write("\"\r\n");
+        file.write(stringToCStr(entry->m_name));
+        file.write("=");
+        QString valueStr = encodeValueString(*entry);
+        file.write(stringToCStr(valueStr));
+        file.write("\r\n");
     }
     return 0;
 }
+
+
+/**
+ * @brief Fills in a entry from a ini-file string.
+ */
+void Ini::decodeValueString(Entry *entry, QString valueStr)
+{
+    if(valueStr.startsWith("@ByteArray("))
+    {
+        valueStr = valueStr.mid(11);
+        if(valueStr.endsWith(")"))
+            valueStr = valueStr.left(valueStr.length()-1);
+
+        QByteArray byteArray;
+        char hexStr[3];
+        enum {IDLE, ESC, FIRST_HEX, SECOND_HEX} state = IDLE;
+        for(int i = 0;i < valueStr.length();i++)
+        {
+            QChar c = valueStr[i];
+            switch(state)
+            {
+                case IDLE:
+                {
+                    if(c == '\\')
+                        state = ESC;
+                    else
+                        byteArray += c;
+                    
+                };break;
+                case ESC:
+                {
+                    if(c == '\\')
+                    {
+                        byteArray += '\\';
+                        state = IDLE;
+                    }
+                    else if(c == '0')
+                    {
+                        byteArray += '\0';
+                        state = IDLE;
+                    }
+                    else if(c == 'x' || c == 'X')
+                    {
+                        state = FIRST_HEX;
+                        memset(hexStr, 0, sizeof(hexStr));
+                    }
+                    else if(c == '\r' || c == '\n')
+                        state = IDLE;
+                    else
+                    {
+                        byteArray += c;
+                        state = IDLE;
+                    }
+                    
+                };break;
+                case FIRST_HEX:
+                {
+                    hexStr[0] = c.toAscii();
+                    state = SECOND_HEX;
+                };break;
+                case SECOND_HEX:
+                {
+                    hexStr[1] = c.toAscii();
+                    byteArray += hexStringToU8(hexStr);
+                    state = IDLE;
+                };break;
+            };
+            
+        }
+        entry->m_value = byteArray;
+        entry->m_type = Entry::TYPE_BYTE_ARRAY;
+        //printf("_>%s<\n", stringToCStr(valueStr));
+    }
+    else
+        entry->m_value = valueStr;
+}
+
+/**
+ * @brief Converts a entry to a string suitable to storing in a ini file.
+ */
+QString Ini::encodeValueString(const Entry &entry)
+{
+    QString value;
+    if(entry.m_type == Entry::TYPE_BYTE_ARRAY)
+    {
+        QByteArray byteArray = entry.m_value.toByteArray();
+        value = "@ByteArray(";
+        for (int i = 0;i < byteArray.size();i++)
+        {
+            QString subStr;
+            subStr.sprintf("\\x%02x", (unsigned char)byteArray[i]);
+            value += subStr;
+        }
+        value += ")";
+    }
+    else
+        value = "\"" + entry.m_value.toString() + "\"";
+    return value;
+}
+
 
 /**
  * @brief Loads the content of a ini file.
@@ -298,8 +435,8 @@ int Ini::appendLoad(QString filename)
                 {
                     lineNo++;
 
-                    Entry *entry = addEntry(name.trimmed());
-                    entry->value = value.trimmed();
+                    Entry *entry = addEntry(name.trimmed(), Entry::TYPE_STRING);
+                    decodeValueString(entry, value.trimmed());
                              
                     state = IDLE;
                 }
@@ -322,8 +459,8 @@ int Ini::appendLoad(QString filename)
                 {
                     lineNo++;
 
-                    Entry *entry = addEntry(name.trimmed());
-                    entry->value = value.trimmed();
+                    Entry *entry = addEntry(name.trimmed(), Entry::TYPE_STRING);
+                    decodeValueString(entry,value.trimmed());
                              
                     state = IDLE;
                 }
