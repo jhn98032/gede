@@ -9,6 +9,7 @@
 #ifndef FILE__INI_H
 #define FILE__INI_H
 
+#include <QSize>
 #include <QVector>
 #include <QString>
 #include <QColor>
@@ -26,7 +27,7 @@ public:
     
     QString m_name;
     QVariant m_value;
-    typedef enum {TYPE_BYTE_ARRAY, TYPE_STRING, TYPE_INT, TYPE_COLOR} EntryType;
+    typedef enum {TYPE_BYTE_ARRAY, TYPE_SIZE, TYPE_STRING, TYPE_INT, TYPE_COLOR} EntryType;
     EntryType m_type;
 };
 
@@ -47,6 +48,8 @@ public:
     void setString(QString name, QString value);
     void setStringList(QString name, QStringList value);
     void setBool(QString name, bool value);
+    void setColor(QString name, QColor value);
+    void setSize(QString name, QSize size);
     
     bool getBool(QString name, bool defaultValue = false);
     void getByteArray(QString name, QByteArray *byteArray);
@@ -54,7 +57,8 @@ public:
     QColor getColor(QString name, QColor defaultValue);
     QString getString(QString name, QString defaultValue = "");
     QStringList getStringList(QString name, QStringList defaultValue);
-    void setColor(QString name, QColor value);
+    QSize getSize(QString name, QSize defaultSize);
+    
     
     int appendLoad(QString filename);
     int save(QString filename);
@@ -64,7 +68,7 @@ private:
     void removeAll();
     Entry *findEntry(QString name);
     Entry *addEntry(QString name, Entry::EntryType type);
-    void decodeValueString(Entry *entry, QString valueStr);
+    int decodeValueString(Entry *entry, QString specialKind, QString valueStr);
     QString encodeValueString(const Entry &entry);
     
 private:

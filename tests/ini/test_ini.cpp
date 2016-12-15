@@ -11,8 +11,13 @@ void writeInit()
     QByteArray byteArray;
     byteArray += 0xde;
     byteArray += 0xad;
-    ini1.setByteArray("byteArray",byteArray);
+    ini1.setByteArray("byteArray", byteArray);
+    QByteArray emptyByteArray;
+    ini1.setByteArray("emptyByteArray", emptyByteArray);
     assert(ini1.getInt("int") == 11);
+
+    QSize size(123,456);
+    ini1.setSize("size", size);
 
     ini1.save("test.ini");
 }
@@ -29,6 +34,11 @@ void readIni()
     assert(byteArray.size() == 2);
     assert(byteArray[0] == (char)0xDE);
     assert(byteArray[1] == (char)0xAD);
+
+    QSize size;
+    size = ini2.getSize("size", QSize(0,0));
+    assert(size.width() == 123);
+    assert(size.height() == 456);
     
 }
 

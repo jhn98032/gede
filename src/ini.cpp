@@ -215,7 +215,24 @@ QColor Ini::getColor(QString name, QColor defaultValue)
     
 }
 
-    
+QSize Ini::getSize(QString name, QSize defaultSize)
+{
+    Entry *entry = findEntry(name);
+    if(!entry)
+    {
+        setSize(name, defaultSize);
+        entry = findEntry(name);
+    }
+    return entry->m_value.toSize();
+}
+
+void Ini::setSize(QString name, QSize size)
+{
+    Entry *entry = addEntry(name, Entry::TYPE_SIZE);
+    entry->m_value = size;
+}
+
+
 void Ini::setColor(QString name, QColor value)
 {
     Entry *entry = addEntry(name, Entry::TYPE_COLOR);
@@ -262,14 +279,11 @@ int Ini::save(QString filename)
 /**
  * @brief Fills in a entry from a ini-file string.
  */
-void Ini::decodeValueString(Entry *entry, QString valueStr)
+int Ini::decodeValueString(Entry *entry, QString specialKind, QString valueStr)
 {
-    if(valueStr.startsWith("@ByteArray("))
+    int rc = 0;
+    if(specialKind == "ByteArray")
     {
-        valueStr = valueStr.mid(11);
-        if(valueStr.endsWith(")"))
-            valueStr = valueStr.left(valueStr.length()-1);
-
         QByteArray byteArray;
         char hexStr[3];
         enum {IDLE, ESC, FIRST_HEX, SECOND_HEX} state = IDLE;
@@ -314,12 +328,12 @@ void Ini::decodeValueString(Entry *entry, QString valueStr)
                 };break;
                 case FIRST_HEX:
                 {
-                    hexStr[0] = c.toAscii();
+                    hexStr[0] = c.toLatin1();
                     state = SECOND_HEX;
                 };break;
                 case SECOND_HEX:
                 {
-                    hexStr[1] = c.toAscii();
+                    hexStr[1] = c.toLatin1();
                     byteArray += hexStringToU8(hexStr);
                     state = IDLE;
                 };break;
@@ -330,8 +344,27 @@ void Ini::decodeValueString(Entry *entry, QString valueStr)
         entry->m_type = Entry::TYPE_BYTE_ARRAY;
         //printf("_>%s<\n", stringToCStr(valueStr));
     }
-    else
+    else if(specialKind == "Size")
+    {
+        QStringList list = valueStr.split(' ');
+        QSize s;
+        if(list.size() > 2)
+            rc = -1;
+        else
+            s = QSize(list[0].toInt(), list[1].toInt());
+        entry->m_value = s;
+        entry->m_type = Entry::TYPE_SIZE;
+    }
+    else if(specialKind == "")
+    {
         entry->m_value = valueStr;
+    }
+    else
+    {
+        entry->m_value = valueStr;
+        rc = -1;
+    }
+    return rc;
 }
 
 /**
@@ -352,6 +385,11 @@ QString Ini::encodeValueString(const Entry &entry)
         }
         value += ")";
     }
+    else if(entry.m_type == Entry::TYPE_SIZE)
+    {
+        QSize s = entry.m_value.toSize();
+        value.sprintf("@Size(%d %d)", s.width(), s.height());
+    }
     else
         value = "\"" + entry.m_value.toString() + "\"";
     return value;
@@ -368,6 +406,7 @@ int Ini::appendLoad(QString filename)
     QString str;
     QString name;
     QString value;
+    QString specialKind;
     
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -377,7 +416,8 @@ int Ini::appendLoad(QString filename)
     QString allContent(file.readAll ());
 
 
-    enum { IDLE, SKIP_LINE, KEY, VALUE, VALUE_STR } state = IDLE;
+    enum { STATE_IDLE, STATE_SKIP_LINE, STATE_KEY, STATE_VALUE,
+        STATE_SPECIAL_TYPE, STATE_SPECIAL_DATA, STATE_VALUE_STR } state = STATE_IDLE;
     for(int i = 0;i < allContent.size();i++)
     {
 
@@ -385,12 +425,12 @@ int Ini::appendLoad(QString filename)
 
     switch(state)
     {
-            case IDLE:
+            case STATE_IDLE:
             {
                 if(c == QChar('='))
                 {
                     errorMsg("Empty key at L%d", lineNo);
-                    state = SKIP_LINE;
+                    state = STATE_SKIP_LINE;
                 }
                 else if(c == QChar('\n') || c == QChar('\r'))
                 {
@@ -402,78 +442,118 @@ int Ini::appendLoad(QString filename)
                 }
                 else if(c == QChar('#'))
                 {
-                    state = SKIP_LINE;
+                    state = STATE_SKIP_LINE;
                 }
                 else
                 {
                     str = c;
-                    state = KEY;
+                    state = STATE_KEY;
+                    specialKind = "";
                 }
                 
             };break;
-            case KEY:
+            case STATE_KEY:
             {
                 if(c == QChar('\n') || c == QChar('\r'))
                 {
                     errorMsg("Parse error at L%d", lineNo);
                     lineNo++;
-                    state = IDLE;
+                    state = STATE_IDLE;
                 }
                 else if(c == QChar('='))
                 {
                     name = str;
                     value = "";
-                    state = VALUE;
+                    state = STATE_VALUE;
                 }
                 else
                     str += c;
 
             };break;
-            case VALUE:
+            case STATE_VALUE:
             {
                 if(c == QChar('\n') || c == QChar('\r'))
                 {
                     lineNo++;
 
                     Entry *entry = addEntry(name.trimmed(), Entry::TYPE_STRING);
-                    decodeValueString(entry, value.trimmed());
+                    if(decodeValueString(entry, "", value.trimmed()))
+                        warnMsg("Parse error in %s:L%d", stringToCStr(filename), lineNo);
                              
-                    state = IDLE;
+                    state = STATE_IDLE;
                 }
                 else
                 {
                     if(value.isEmpty())
                     {
                         if(c == '"')
-                            state = VALUE_STR;
+                            state = STATE_VALUE_STR;
+                        else if(c == '@')
+                            state = STATE_SPECIAL_TYPE;
                         else if(!c.isSpace())
                             value += c;
                     }
                     else
+                    {
                         value += c;
+                    }
                 }
             };break;
-            case VALUE_STR:
+            case STATE_SPECIAL_TYPE:
             {
-                if(c == QChar('"'))
+                if(c == QChar('\n') || c == QChar('\r'))
                 {
                     lineNo++;
 
-                    Entry *entry = addEntry(name.trimmed(), Entry::TYPE_STRING);
-                    decodeValueString(entry,value.trimmed());
+                    errorMsg("Parse error in L%d", lineNo);
                              
-                    state = IDLE;
+                    state = STATE_IDLE;
+                }
+                else
+                {
+                    if(c == '(')
+                    {
+                        specialKind = value;
+                        value.clear();
+                        state = STATE_SPECIAL_DATA;
+                    }
+                    else if(!c.isSpace())
+                        value += c;
+                }
+            };break;
+            case STATE_SPECIAL_DATA:
+            {
+                if(c == QChar(')'))
+                {
+                    Entry *entry = addEntry(name.trimmed(), Entry::TYPE_STRING);
+                    decodeValueString(entry,specialKind, value.trimmed());
+                             
+                    state = STATE_IDLE;
+                }
+                else
+                    value += c;
+
+            };break;
+            case STATE_VALUE_STR:
+            {
+                if(c == QChar('"'))
+                {
+
+                    Entry *entry = addEntry(name.trimmed(), Entry::TYPE_STRING);
+                    entry->m_value = value;
+                             
+                    state = STATE_IDLE;
                 }
                 else
                     value += c;
                 
             };break;
-            case SKIP_LINE:
+            case STATE_SKIP_LINE:
             {
                 if(c == QChar('\n') || c == QChar('\r'))
                 {
                     lineNo++;
-                    state = IDLE;
+                    state = STATE_IDLE;
                 }
             };break;
 
