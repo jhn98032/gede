@@ -116,6 +116,8 @@ IniEntry *IniGroup::findEntry(QString entryName)
         entry = m_entries[i];
         if(entry->m_name == entryName)
             return entry;
+        assert(entry->m_name.toUpper() != entryName.toUpper());
+
     }
     return NULL;
 }
@@ -244,9 +246,14 @@ IniEntry *Ini::findEntry(QString name)
     QString entryName;
     divideName(name, &groupName, &entryName);
     IniGroup *group = findGroup(groupName);
+    IniEntry *entry = NULL;
     if(group)
-        return group->findEntry(entryName);
-    return NULL;
+        entry = group->findEntry(entryName);
+
+    //assert(entry != NULL);
+    //debugMsg("Unable to find '%s'", stringToCStr(name));
+
+    return entry;
 }
 
 IniEntry *Ini::addEntry(QString name, IniEntry::EntryType type)
@@ -472,6 +479,9 @@ int Ini::save(QString filename)
             file.write(valueStr.toUtf8());
             file.write("\r\n");
         }
+
+        file.write("\r\n");
+
     }
     file.close();
     return 0;
@@ -620,11 +630,14 @@ int Ini::appendLoad(QString filename)
     QByteArray value2;
     QString specialKind;
     QString groupName;
+
+    debugMsg("Ini::%s(filename:\"%s\")", __func__, stringToCStr(filename));
     
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
         return 1;
-
+    }
     
     QString allContent(file.readAll ());
 
