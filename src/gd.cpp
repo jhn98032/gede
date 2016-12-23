@@ -19,6 +19,8 @@
 #include "opendialog.h"
 #include "settings.h"
 
+#include <QDir>
+
 
 static int dumpUsage()
 {
@@ -58,6 +60,10 @@ int main(int argc, char *argv[])
     int rc = 0;
     Settings cfg;
     bool showConfigDialog = true;
+
+    // Ensure that the config dir exist
+    QDir d;
+    d.mkdir(QDir::homePath() + "/" + GLOBAL_CONFIG_DIR);
     
     // Load default config
     cfg.load();

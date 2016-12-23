@@ -66,10 +66,10 @@ void Settings::load()
 void Settings::loadGlobalConfig()
 {
     // Load from file
-    QString globalConfigFilename = QDir::homePath() + "/"  GLOBAL_CONFIG_FILENAME;
+    QString globalConfigFilename = QDir::homePath() + "/"  GLOBAL_CONFIG_DIR + "/" + GLOBAL_CONFIG_FILENAME;
     Ini tmpIni;
     if(tmpIni.appendLoad(globalConfigFilename))
-        infoMsg("Failed to load '%s'. File will be created.", stringToCStr(globalConfigFilename));
+        infoMsg("Failed to global ini '%s'. File will be created.", stringToCStr(globalConfigFilename));
 
     loadDefaultsGui();
     loadDefaultsAdvanced();
@@ -93,7 +93,7 @@ void Settings::loadProjectConfig()
     QString filepath = PROJECT_CONFIG_FILENAME;
     Ini tmpIni;
     if(tmpIni.appendLoad(filepath))
-        infoMsg("Failed to load '%s'. File will be created.", stringToCStr(filepath));
+        infoMsg("Failed to load project ini '%s'. File will be created.", stringToCStr(filepath));
 
 
 
@@ -191,7 +191,7 @@ void Settings::saveProjectConfig()
 
 void Settings::saveGlobalConfig()
 {
-    QString globalConfigFilename = QDir::homePath() + "/"  GLOBAL_CONFIG_FILENAME;
+    QString globalConfigFilename = QDir::homePath() + "/"  GLOBAL_CONFIG_DIR + "/" + GLOBAL_CONFIG_FILENAME;
 
     Ini tmpIni;
 
