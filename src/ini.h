@@ -15,20 +15,53 @@
 #include <QColor>
 #include <QVariant>
 
+class IniGroup;
+class Ini;
 
-class Entry
+class IniEntry
 {
 public:
-    Entry(const Entry &other);
-    Entry(QString name_) : m_name(name_) {};
+    IniEntry(const IniEntry &other);
+    IniEntry(QString name_);
     
-    int getValueAsInt();
-    QString getValueAsString();
-    
+    int getValueAsInt() const;
+    double getValueAsFloat() const;
+    QString getValueAsString() const;
+
+    typedef enum {TYPE_BYTE_ARRAY, TYPE_SIZE, TYPE_STRING, TYPE_FLOAT, TYPE_INT, TYPE_COLOR} EntryType;
+
+    QString getName() const { return m_name; };
+
+private:
     QString m_name;
     QVariant m_value;
-    typedef enum {TYPE_BYTE_ARRAY, TYPE_SIZE, TYPE_STRING, TYPE_INT, TYPE_COLOR} EntryType;
     EntryType m_type;
+
+friend IniGroup;
+friend Ini;
+};
+
+class IniGroup
+{
+    public:
+        IniGroup(const IniGroup &other);
+        IniGroup(QString name_);
+        IniGroup();
+        virtual ~IniGroup();
+
+        void removeAll();
+        void dump() const;
+        IniEntry *findEntry(QString entryName);
+        IniEntry *addEntry(QString name, IniEntry::EntryType type);
+        void copy(const IniGroup &src);
+
+        QString getName() const { return m_name; };
+
+    private:
+        QString m_name;
+        QVector<IniEntry *> m_entries;
+        
+    friend Ini;
 };
 
 class Ini
@@ -50,6 +83,7 @@ public:
     void setBool(QString name, bool value);
     void setColor(QString name, QColor value);
     void setSize(QString name, QSize size);
+    void setDouble(QString name, double value);
     
     bool getBool(QString name, bool defaultValue = false);
     void getByteArray(QString name, QByteArray *byteArray);
@@ -58,6 +92,7 @@ public:
     QString getString(QString name, QString defaultValue = "");
     QStringList getStringList(QString name, QStringList defaultValue);
     QSize getSize(QString name, QSize defaultSize);
+    double getDouble(QString name, double defValue);
     
     
     int appendLoad(QString filename);
@@ -65,14 +100,17 @@ public:
     void dump();
 
 private:
+    IniEntry *addEntry(QString groupName, QString name, IniEntry::EntryType type);
+    void divideName(QString name, QString *groupName, QString *entryName);
+    IniGroup *findGroup(QString groupName);
     void removeAll();
-    Entry *findEntry(QString name);
-    Entry *addEntry(QString name, Entry::EntryType type);
-    int decodeValueString(Entry *entry, QString specialKind, QString valueStr);
-    QString encodeValueString(const Entry &entry);
+    IniEntry *findEntry(QString name);
+    IniEntry *addEntry(QString name, IniEntry::EntryType type);
+    int decodeValueString(IniEntry *entry, QString specialKind, QByteArray valueStr);
+    QString encodeValueString(const IniEntry &entry);
     
 private:
-    QVector<Entry*> m_entries;
+    QVector<IniGroup*> m_entries;
 };
 
 #endif // FILE__INI_H

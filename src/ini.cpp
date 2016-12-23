@@ -14,7 +14,21 @@
 #include "log.h"
 #include <assert.h>
 
-Entry::Entry(const Entry &src)
+// Enables this if the entries should be sorted in the ini file.
+#define INI_SORT_ENTRIES
+
+//----------------------------------------------------------------
+//
+//     -- IniEntry --
+//
+//----------------------------------------------------------------
+
+IniEntry::IniEntry(QString name_)
+ : m_name(name_)
+{
+}
+
+IniEntry::IniEntry(const IniEntry &src)
     : m_name(src.m_name)
     ,m_value(src.m_value)
     ,m_type(src.m_type)
@@ -22,15 +36,122 @@ Entry::Entry(const Entry &src)
 
 }
 
-int Entry::getValueAsInt()
+int IniEntry::getValueAsInt() const
 {
     return m_value.toInt();
 }
 
-QString Entry::getValueAsString()
+
+double IniEntry::getValueAsFloat() const
+{
+    return m_value.toDouble();
+}
+
+QString IniEntry::getValueAsString()  const
 {
     return m_value.toString();
 }
+
+
+
+//----------------------------------------------------------------
+//
+//     -- IniGroup --
+//
+//----------------------------------------------------------------
+
+
+IniGroup::IniGroup(const IniGroup &other)
+{
+    copy(other);
+}
+
+IniGroup::IniGroup(QString name_)
+    : m_name(name_)
+{
+
+}
+
+void IniGroup::dump() const
+{
+
+    for(int i = 0;i < m_entries.size();i++)
+    {
+        IniEntry *entry = m_entries[i];
+        QString valueStr = entry->m_value.toString();
+        printf("_%s_%s_\n", stringToCStr(entry->m_name), stringToCStr(valueStr));
+    }
+
+}
+
+        
+IniGroup::IniGroup()
+{
+
+}
+        
+IniGroup::~IniGroup()
+{
+    removeAll();
+}
+
+IniEntry *IniGroup::addEntry(QString name, IniEntry::EntryType type)
+{
+    IniEntry *entry = findEntry(name);
+    if(!entry)
+    {
+        entry = new IniEntry(name);
+        m_entries.push_back(entry);
+    }
+    entry->m_type = type;
+    return entry;
+}
+
+
+IniEntry *IniGroup::findEntry(QString entryName)
+{
+    for(int i = 0;i < m_entries.size();i++)
+    {
+        IniEntry *entry = NULL;
+        entry = m_entries[i];
+        if(entry->m_name == entryName)
+            return entry;
+    }
+    return NULL;
+}
+
+
+void IniGroup::removeAll()
+{
+    for(int i = 0;i < m_entries.size();i++)
+    {
+        IniEntry *entry = m_entries[i];
+        delete entry;
+    }
+    m_entries.clear();
+}
+
+/**
+  * @brief Replaces the entries in this ini with another one.
+  */
+void IniGroup::copy(const IniGroup &src)
+{
+    removeAll();
+    for(int i = 0;i < src.m_entries.size();i++)
+    {
+        IniEntry *entry = src.m_entries[i];
+        IniEntry *newEntry = new IniEntry(*entry);
+        m_entries.push_back(newEntry);
+    }
+}
+
+
+
+//----------------------------------------------------------------
+//
+//     -- Ini --
+//
+//----------------------------------------------------------------
 
 
 
@@ -48,7 +169,7 @@ Ini::~Ini()
 {
     for(int i = 0;i < m_entries.size();i++)
     {
-        Entry *entry = m_entries[i];
+        IniGroup *entry = m_entries[i];
         delete entry;
     }
 
@@ -72,8 +193,8 @@ void Ini::copy(const Ini &src)
     removeAll();
     for(int i = 0;i < src.m_entries.size();i++)
     {
-        Entry *entry = src.m_entries[i];
-        Entry *newEntry = new Entry(*entry);
+        IniGroup *entry = src.m_entries[i];
+        IniGroup *newEntry = new IniGroup(*entry);
         m_entries.push_back(newEntry);
     }
 }
@@ -83,75 +204,112 @@ void Ini::removeAll()
 {
     for(int i = 0;i < m_entries.size();i++)
     {
-        Entry *entry = m_entries[i];
+        IniGroup *entry = m_entries[i];
         delete entry;
     }
     m_entries.clear();
 }
 
 
-
-Entry *Ini::findEntry(QString name)
+IniGroup *Ini::findGroup(QString groupName)
 {
     for(int i = 0;i < m_entries.size();i++)
     {
-        Entry *entry = NULL;
+        IniGroup *entry = NULL;
         entry = m_entries[i];
-        if(entry->m_name == name)
+        if(entry->m_name == groupName)
             return entry;
     }
     return NULL;
 }
 
-    
-Entry *Ini::addEntry(QString name, Entry::EntryType type)
+void Ini::divideName(QString name, QString *groupName, QString *entryName)
 {
-    Entry *entry = findEntry(name);
-    if(!entry)
+    *groupName = "";
+    *entryName = "";
+    int divPos = name.lastIndexOf('/');
+    if(divPos != -1)
     {
-        entry = new Entry(name);
-        m_entries.push_back(entry);
+        *groupName = name.left(divPos);
+        *entryName = name.mid(divPos+1);
     }
-    entry->m_type = type;
-    return entry;
+    else
+        *entryName = name;
+
+}
+
+IniEntry *Ini::findEntry(QString name)
+{
+    QString groupName;
+    QString entryName;
+    divideName(name, &groupName, &entryName);
+    IniGroup *group = findGroup(groupName);
+    if(group)
+        return group->findEntry(entryName);
+    return NULL;
+}
+
+IniEntry *Ini::addEntry(QString name, IniEntry::EntryType type)
+{
+    QString groupName;
+    QString entryName;
+    divideName(name, &groupName, &entryName);
+    return addEntry(groupName, entryName, type);
+}
+    
+IniEntry *Ini::addEntry(QString groupName, QString entryName, IniEntry::EntryType type)
+{
+    IniGroup *group = findGroup(groupName);
+    if(group == NULL)
+    {
+        group = new IniGroup(groupName);
+        m_entries.push_back(group);
+    }
+    return group->addEntry(entryName, type);
 }
 
     
 void Ini::setInt(QString name, int value)
 {
-    Entry *entry = addEntry(name, Entry::TYPE_INT);
+    IniEntry *entry = addEntry(name, IniEntry::TYPE_INT);
+    entry->m_value = value;
+}
+
+void Ini::setDouble(QString name, double value)
+{
+    IniEntry *entry = addEntry(name, IniEntry::TYPE_FLOAT);
     entry->m_value = value;
 }
 
 
 void Ini::setByteArray(QString name, const QByteArray &byteArray)
 {
-    Entry *entry = addEntry(name, Entry::TYPE_BYTE_ARRAY);
+    IniEntry *entry = addEntry(name, IniEntry::TYPE_BYTE_ARRAY);
     entry->m_value = byteArray;
 }
 
 
 void Ini::setBool(QString name, bool value)
 {
-    Entry *entry = addEntry(name, Entry::TYPE_INT);
+    IniEntry *entry = addEntry(name, IniEntry::TYPE_INT);
     entry->m_value = (int)value;
 }
 
 void Ini::setString(QString name, QString value)
 {
-    Entry *entry = addEntry(name, Entry::TYPE_STRING);
+    IniEntry *entry = addEntry(name, IniEntry::TYPE_STRING);
     entry->m_value = value;
 }
 
 void Ini::setStringList(QString name, QStringList value)
 {
-    Entry *entry = addEntry(name, Entry::TYPE_STRING);
+    IniEntry *entry = addEntry(name, IniEntry::TYPE_STRING);
     entry->m_value = value.join(";");
 }
 
 int Ini::getInt(QString name, int defaultValue)
 {
-    Entry *entry = findEntry(name);
+    IniEntry *entry = findEntry(name);
     if(!entry)
     {
         setInt(name, defaultValue);
@@ -160,10 +318,21 @@ int Ini::getInt(QString name, int defaultValue)
     return entry->getValueAsInt();
 }
 
+double Ini::getDouble(QString name, double defaultValue)
+{
+    IniEntry *entry = findEntry(name);
+    if(!entry)
+    {
+        setDouble(name, defaultValue);
+        entry = findEntry(name);
+    }
+    return entry->getValueAsFloat();
+}
+
 
 bool Ini::getBool(QString name, bool defaultValue)
 {
-    Entry *entry = findEntry(name);
+    IniEntry *entry = findEntry(name);
     if(!entry)
     {
         setBool(name, defaultValue);
@@ -174,7 +343,7 @@ bool Ini::getBool(QString name, bool defaultValue)
 
 QString Ini::getString(QString name, QString defaultValue)
 {
-    Entry *entry = findEntry(name);
+    IniEntry *entry = findEntry(name);
     if(!entry)
     {
         setString(name, defaultValue);
@@ -193,7 +362,7 @@ QStringList Ini::getStringList(QString name, QStringList defaultValue)
 
 void Ini::getByteArray(QString name, QByteArray *byteArray)
 {
-    Entry *entry = findEntry(name);
+    IniEntry *entry = findEntry(name);
     if(!entry)
     {
         setByteArray(name, *byteArray);
@@ -205,7 +374,7 @@ void Ini::getByteArray(QString name, QByteArray *byteArray)
 
 QColor Ini::getColor(QString name, QColor defaultValue)
 {
-    Entry *entry = findEntry(name);
+    IniEntry *entry = findEntry(name);
     if(!entry)
     {
         setColor(name, defaultValue);
@@ -217,7 +386,7 @@ QColor Ini::getColor(QString name, QColor defaultValue)
 
 QSize Ini::getSize(QString name, QSize defaultSize)
 {
-    Entry *entry = findEntry(name);
+    IniEntry *entry = findEntry(name);
     if(!entry)
     {
         setSize(name, defaultSize);
@@ -228,14 +397,14 @@ QSize Ini::getSize(QString name, QSize defaultSize)
 
 void Ini::setSize(QString name, QSize size)
 {
-    Entry *entry = addEntry(name, Entry::TYPE_SIZE);
+    IniEntry *entry = addEntry(name, IniEntry::TYPE_SIZE);
     entry->m_value = size;
 }
 
 
 void Ini::setColor(QString name, QColor value)
 {
-    Entry *entry = addEntry(name, Entry::TYPE_COLOR);
+    IniEntry *entry = addEntry(name, IniEntry::TYPE_COLOR);
     QString valueStr;
     valueStr.sprintf("#%02x%02x%02x", value.red(), value.green(), value.blue());
     entry->m_value = valueStr;
@@ -246,13 +415,22 @@ void Ini::dump()
 
     for(int i = 0;i < m_entries.size();i++)
     {
-        Entry *entry = m_entries[i];
-        QString valueStr = entry->m_value.toString();
-        printf("_%s_%s_\n", stringToCStr(entry->m_name), stringToCStr(valueStr));
+        IniGroup *entry = m_entries[i];
+        entry->dump();
     }
 
 }
 
+
+static bool compareGroup(const IniGroup* s1, const IniGroup* s2)
+{
+    return s1->getName() < s2->getName();
+}
+
+static bool compareEntry(const IniEntry* s1, const IniEntry* s2)
+{
+    return s1->getName() < s2->getName();
+}
 
 /**
  * @brief Saves the content to a ini file.
@@ -263,15 +441,39 @@ int Ini::save(QString filename)
     QFile file(filename);
     if (!file.open(QIODevice::Truncate | QIODevice::ReadWrite | QIODevice::Text))
         return 1;
-    for(int i = 0;i < m_entries.size();i++)
+
+    QVector<IniGroup*> entriesList;
+    entriesList = m_entries;
+#ifdef INI_SORT_ENTRIES
+    qSort(entriesList.begin(), entriesList.end(), compareGroup);
+#endif
+    
+    for(int j = 0;j < entriesList.size();j++)
     {
-        Entry *entry = m_entries[i];
-        file.write(stringToCStr(entry->m_name));
-        file.write("=");
-        QString valueStr = encodeValueString(*entry);
-        file.write(stringToCStr(valueStr));
-        file.write("\r\n");
+        IniGroup *group = entriesList[j];
+        assert(group != NULL);
+        QString groupName = group->m_name;
+        if(!groupName.isEmpty())
+        {
+            QString data = "[" + groupName + "]\r\n";
+            file.write(data.toUtf8());
+        }
+
+        QVector<IniEntry*> entryList = group->m_entries;
+#ifdef INI_SORT_ENTRIES
+        qSort(entryList.begin(), entryList.end(), compareEntry);
+#endif
+        for(int i = 0;i < entryList.size();i++)
+        {
+            IniEntry *entry = entryList[i];
+            file.write(entry->m_name.toUtf8());
+            file.write("=");
+            QString valueStr = encodeValueString(*entry);
+            file.write(valueStr.toUtf8());
+            file.write("\r\n");
+        }
     }
+    file.close();
     return 0;
 }
 
@@ -279,7 +481,7 @@ int Ini::save(QString filename)
 /**
  * @brief Fills in a entry from a ini-file string.
  */
-int Ini::decodeValueString(Entry *entry, QString specialKind, QString valueStr)
+int Ini::decodeValueString(IniEntry *entry, QString specialKind, QByteArray dataArray)
 {
     int rc = 0;
     if(specialKind == "ByteArray")
@@ -287,6 +489,7 @@ int Ini::decodeValueString(Entry *entry, QString specialKind, QString valueStr)
         QByteArray byteArray;
         char hexStr[3];
         enum {IDLE, ESC, FIRST_HEX, SECOND_HEX} state = IDLE;
+        QString valueStr = dataArray;
         for(int i = 0;i < valueStr.length();i++)
         {
             QChar c = valueStr[i];
@@ -341,11 +544,12 @@ int Ini::decodeValueString(Entry *entry, QString specialKind, QString valueStr)
             
         }
         entry->m_value = byteArray;
-        entry->m_type = Entry::TYPE_BYTE_ARRAY;
+        entry->m_type = IniEntry::TYPE_BYTE_ARRAY;
         //printf("_>%s<\n", stringToCStr(valueStr));
     }
     else if(specialKind == "Size")
     {
+        QString valueStr = dataArray;
         QStringList list = valueStr.split(' ');
         QSize s;
         if(list.size() > 2)
@@ -353,15 +557,15 @@ int Ini::decodeValueString(Entry *entry, QString specialKind, QString valueStr)
         else
             s = QSize(list[0].toInt(), list[1].toInt());
         entry->m_value = s;
-        entry->m_type = Entry::TYPE_SIZE;
+        entry->m_type = IniEntry::TYPE_SIZE;
     }
     else if(specialKind == "")
     {
-        entry->m_value = valueStr;
+        entry->m_value =  QString::fromUtf8(dataArray);
     }
     else
     {
-        entry->m_value = valueStr;
+        entry->m_value = QString::fromUtf8(dataArray);
         rc = -1;
     }
     return rc;
@@ -370,10 +574,10 @@ int Ini::decodeValueString(Entry *entry, QString specialKind, QString valueStr)
 /**
  * @brief Converts a entry to a string suitable to storing in a ini file.
  */
-QString Ini::encodeValueString(const Entry &entry)
+QString Ini::encodeValueString(const IniEntry &entry)
 {
     QString value;
-    if(entry.m_type == Entry::TYPE_BYTE_ARRAY)
+    if(entry.m_type == IniEntry::TYPE_BYTE_ARRAY)
     {
         QByteArray byteArray = entry.m_value.toByteArray();
         value = "@ByteArray(";
@@ -385,10 +589,18 @@ QString Ini::encodeValueString(const Entry &entry)
         }
         value += ")";
     }
-    else if(entry.m_type == Entry::TYPE_SIZE)
+    else if(entry.m_type == IniEntry::TYPE_SIZE)
     {
         QSize s = entry.m_value.toSize();
         value.sprintf("@Size(%d %d)", s.width(), s.height());
+    }
+    else if(entry.m_type == IniEntry::TYPE_INT)
+    {
+        value.setNum(entry.getValueAsInt());
+    }
+    else if(entry.m_type == IniEntry::TYPE_FLOAT)
+    {
+        value.setNum(entry.getValueAsFloat());
     }
     else
         value = "\"" + entry.m_value.toString() + "\"";
@@ -405,8 +617,9 @@ int Ini::appendLoad(QString filename)
     int lineNo = 1;
     QString str;
     QString name;
-    QString value;
+    QByteArray value2;
     QString specialKind;
+    QString groupName;
     
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -416,7 +629,7 @@ int Ini::appendLoad(QString filename)
     QString allContent(file.readAll ());
 
 
-    enum { STATE_IDLE, STATE_SKIP_LINE, STATE_KEY, STATE_VALUE,
+    enum { STATE_IDLE, STATE_SKIP_LINE, STATE_KEY, STATE_GROUP, STATE_VALUE,
         STATE_SPECIAL_TYPE, STATE_SPECIAL_DATA, STATE_VALUE_STR } state = STATE_IDLE;
     for(int i = 0;i < allContent.size();i++)
     {
@@ -444,6 +657,11 @@ int Ini::appendLoad(QString filename)
                 {
                     state = STATE_SKIP_LINE;
                 }
+                else if(c == QChar('['))
+                {
+                    str = "";
+                    state = STATE_GROUP;
+                }
                 else
                 {
                     str = c;
@@ -451,6 +669,24 @@ int Ini::appendLoad(QString filename)
                     specialKind = "";
                 }
                 
+            };break;
+            case STATE_GROUP:
+            {
+                if(c == QChar('\n') || c == QChar('\r'))
+                {
+                    errorMsg("Parse error at L%d", lineNo);
+                    lineNo++;
+                    state = STATE_IDLE;
+                }
+                else if(c == QChar(']'))
+                {
+                    groupName = str;
+                    state = STATE_IDLE;
+                }
+                else
+                    str += c;
+
+
             };break;
             case STATE_KEY:
             {
@@ -463,7 +699,7 @@ int Ini::appendLoad(QString filename)
                 else if(c == QChar('='))
                 {
                     name = str;
-                    value = "";
+                    value2.clear();
                     state = STATE_VALUE;
                 }
                 else
@@ -476,26 +712,26 @@ int Ini::appendLoad(QString filename)
                 {
                     lineNo++;
 
-                    Entry *entry = addEntry(name.trimmed(), Entry::TYPE_STRING);
-                    if(decodeValueString(entry, "", value.trimmed()))
+                    IniEntry *entry = addEntry(groupName, name.trimmed(), IniEntry::TYPE_STRING);
+                    if(decodeValueString(entry, "", value2.trimmed()))
                         warnMsg("Parse error in %s:L%d", stringToCStr(filename), lineNo);
                              
                     state = STATE_IDLE;
                 }
                 else
                 {
-                    if(value.isEmpty())
+                    if(value2.isEmpty())
                     {
                         if(c == '"')
                             state = STATE_VALUE_STR;
                         else if(c == '@')
                             state = STATE_SPECIAL_TYPE;
                         else if(!c.isSpace())
-                            value += c;
+                            value2 += c;
                     }
                     else
                     {
-                        value += c;
+                        value2 += c;
                     }
                 }
             };break;
@@ -513,39 +749,38 @@ int Ini::appendLoad(QString filename)
                 {
                     if(c == '(')
                     {
-                        specialKind = value;
-                        value.clear();
+                        specialKind = value2;
+                        value2.clear();
                         state = STATE_SPECIAL_DATA;
                     }
                     else if(!c.isSpace())
-                        value += c;
+                        value2 += c;
                 }
             };break;
             case STATE_SPECIAL_DATA:
             {
                 if(c == QChar(')'))
                 {
-                    Entry *entry = addEntry(name.trimmed(), Entry::TYPE_STRING);
-                    decodeValueString(entry,specialKind, value.trimmed());
+                    IniEntry *entry = addEntry(groupName, name.trimmed(), IniEntry::TYPE_STRING);
+                    decodeValueString(entry,specialKind, value2.trimmed());
                              
                     state = STATE_IDLE;
                 }
                 else
-                    value += c;
+                    value2 += c;
 
             };break;
             case STATE_VALUE_STR:
             {
                 if(c == QChar('"'))
                 {
-
-                    Entry *entry = addEntry(name.trimmed(), Entry::TYPE_STRING);
-                    entry->m_value = value;
+                    IniEntry *entry = addEntry(groupName, name.trimmed(), IniEntry::TYPE_STRING);
+                    entry->m_value = QString::fromUtf8(value2);
                              
                     state = STATE_IDLE;
                 }
                 else
-                    value += c;
+                    value2 += c;
                 
             };break;
             case STATE_SKIP_LINE:
