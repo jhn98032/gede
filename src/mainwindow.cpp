@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent)
     QList<int> slist;
     slist.append(100);
     slist.append(300);
-    m_ui.splitter->setSizes(slist);
+    m_ui.splitter_1->setSizes(slist);
 
      
     //
@@ -135,6 +135,14 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ui.actionRun, SIGNAL(triggered()), SLOT(onRun()));
     connect(m_ui.actionContinue, SIGNAL(triggered()), SLOT(onContinue()));
 
+    connect(m_ui.actionViewStack, SIGNAL(triggered()), SLOT(onViewStack()));
+    connect(m_ui.actionViewBreakpoints, SIGNAL(triggered()), SLOT(onViewBreakpoints()));
+    connect(m_ui.actionViewThreads, SIGNAL(triggered()), SLOT(onViewThreads()));
+    connect(m_ui.actionViewWatch, SIGNAL(triggered()), SLOT(onViewWatch()));
+    connect(m_ui.actionViewAutoVariables, SIGNAL(triggered()), SLOT(onViewAutoVariables()));
+    connect(m_ui.actionViewTargetOutput, SIGNAL(triggered()), SLOT(onViewTargetOutput()));
+    connect(m_ui.actionViewGdbOutput, SIGNAL(triggered()), SLOT(onViewGdbOutput()));
+    connect(m_ui.actionViewFileBrowser, SIGNAL(triggered()), SLOT(onViewFileBrowser()));
 
     connect(m_ui.actionSettings, SIGNAL(triggered()), SLOT(onSettings()));
 
@@ -157,6 +165,116 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 
+
+MainWindow::~MainWindow()
+{
+}
+
+
+void MainWindow::showWidgets()
+{
+
+    QWidget *currentSelection = m_ui.tabWidget->currentWidget();
+    m_ui.tabWidget->clear();
+
+//
+    QTreeWidget *stackWidget = m_ui.treeWidget_stack;
+    if(m_cfg.m_viewWindowStack)
+        m_ui.tabWidget->insertTab(0, stackWidget, "Stack");
+
+//
+    QTreeWidget *breakpointsWidget = m_ui.treeWidget_breakpoints;
+    if(m_cfg.m_viewWindowBreakpoints)
+        m_ui.tabWidget->insertTab(0, breakpointsWidget, "Breakpoints");
+
+//
+    QTreeWidget *threadsWidget = m_ui.treeWidget_threads;
+    if(m_cfg.m_viewWindowThreads)
+        m_ui.tabWidget->insertTab(0, threadsWidget, "Threads");
+
+    int selectionIdx = m_ui.tabWidget->indexOf(currentSelection);
+    if(selectionIdx != -1)
+        m_ui.tabWidget->setCurrentIndex(selectionIdx);
+    m_ui.tabWidget->setVisible(m_ui.tabWidget->count() == 0 ? false : true);
+    
+
+    
+    
+    m_ui.varWidget->setVisible(m_cfg.m_viewWindowWatch);
+    m_ui.autoWidget->setVisible(m_cfg.m_viewWindowAutoVariables);
+    m_ui.treeWidget_file->setVisible(m_cfg.m_viewWindowFileBrowser);
+
+
+    currentSelection = m_ui.tabWidget_2->currentWidget();
+    m_ui.tabWidget_2->clear();
+    if(m_cfg.m_viewWindowTargetOutput)
+        m_ui.tabWidget_2->insertTab(0, m_ui.targetOutputView, "Target Output");
+    if(m_cfg.m_viewWindowGdbOutput)
+        m_ui.tabWidget_2->insertTab(0, m_ui.logView, "GDB Output");
+    selectionIdx = m_ui.tabWidget_2->indexOf(currentSelection);
+    if(selectionIdx != -1)
+        m_ui.tabWidget_2->setCurrentIndex(selectionIdx);
+    m_ui.tabWidget_2->setVisible(m_ui.tabWidget_2->count() == 0 ? false : true);
+
+
+}
+
+void MainWindow::onViewStack()
+{
+    m_cfg.m_viewWindowStack = m_cfg.m_viewWindowStack == true ? 0 : 1;
+
+    showWidgets();
+}
+
+void MainWindow::onViewBreakpoints()
+{
+    m_cfg.m_viewWindowBreakpoints = m_cfg.m_viewWindowBreakpoints == true ? 0 : 1;
+
+    showWidgets();
+}
+
+void MainWindow::onViewThreads()
+{
+    m_cfg.m_viewWindowThreads = m_cfg.m_viewWindowThreads == true ? 0 : 1;
+
+    showWidgets();
+}
+
+void MainWindow::onViewWatch()
+{
+      m_cfg.m_viewWindowWatch = m_cfg.m_viewWindowWatch ? false : true;
+
+    showWidgets();
+}
+
+void MainWindow::onViewAutoVariables()
+{
+      m_cfg.m_viewWindowAutoVariables = m_cfg.m_viewWindowAutoVariables ? false : true;
+     
+    showWidgets();
+}
+
+void MainWindow::onViewTargetOutput()
+{
+      m_cfg.m_viewWindowTargetOutput = m_cfg.m_viewWindowTargetOutput ? false : true;
+     
+    showWidgets();
+}
+
+void MainWindow::onViewGdbOutput()
+{
+      m_cfg.m_viewWindowGdbOutput = m_cfg.m_viewWindowGdbOutput ? false : true;
+     
+    showWidgets();
+}
+
+void MainWindow::onViewFileBrowser()
+{
+      m_cfg.m_viewWindowFileBrowser = m_cfg.m_viewWindowFileBrowser ? false : true;
+    
+    showWidgets();
+}
+
 void MainWindow::loadConfig()
 {
     m_cfg.load();
@@ -165,6 +283,44 @@ void MainWindow::loadConfig()
     setConfig();
     
     
+    m_cfg.save();
+
+    m_ui.actionViewStack->setChecked(m_cfg.m_viewWindowStack);
+    m_ui.actionViewThreads->setChecked(m_cfg.m_viewWindowThreads);
+    m_ui.actionViewBreakpoints->setChecked(m_cfg.m_viewWindowBreakpoints);
+    m_ui.actionViewWatch->setChecked(m_cfg.m_viewWindowWatch);
+    m_ui.actionViewAutoVariables->setChecked(m_cfg.m_viewWindowAutoVariables);
+    m_ui.actionViewTargetOutput->setChecked(m_cfg.m_viewWindowTargetOutput);
+    m_ui.actionViewGdbOutput->setChecked(m_cfg.m_viewWindowGdbOutput);
+    m_ui.actionViewFileBrowser->setChecked(m_cfg.m_viewWindowFileBrowser);
+
+    showWidgets();
+    
+
+}
+
+void MainWindow::showEvent(QShowEvent* e)
+{
+
+    restoreGeometry(m_cfg.m_gui_mainwindowGeometry);
+    restoreState(m_cfg.m_gui_mainwindowState);
+    m_ui.splitter_1->restoreState(m_cfg.m_gui_splitter1State);
+    m_ui.splitter_2->restoreState(m_cfg.m_gui_splitter2State);
+    m_ui.splitter_3->restoreState(m_cfg.m_gui_splitter3State);
+    m_ui.splitter_4->restoreState(m_cfg.m_gui_splitter4State);
+
+}
+
+void MainWindow::closeEvent(QCloseEvent *)
+{
+
+    m_cfg.m_gui_mainwindowState = saveState();
+    m_cfg.m_gui_mainwindowGeometry = saveGeometry();
+    m_cfg.m_gui_splitter1State = m_ui.splitter_1->saveState();
+    m_cfg.m_gui_splitter2State = m_ui.splitter_2->saveState();
+    m_cfg.m_gui_splitter3State = m_ui.splitter_3->saveState();
+    m_cfg.m_gui_splitter4State = m_ui.splitter_4->saveState();
+
     m_cfg.save();
 
 }

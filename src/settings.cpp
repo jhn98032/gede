@@ -20,6 +20,14 @@ Settings::Settings()
 : m_connectionMode(MODE_LOCAL)
     ,m_tcpPort(0)
 {
+    m_viewWindowStack = true;
+    m_viewWindowThreads = true;
+    m_viewWindowBreakpoints = true;
+    m_viewWindowWatch = true;
+    m_viewWindowAutoVariables = true;
+    m_viewWindowTargetOutput = true;
+    m_viewWindowGdbOutput = true;
+    m_viewWindowFileBrowser = true;
 
 }
 
@@ -74,16 +82,33 @@ void Settings::loadGlobalConfig()
     loadDefaultsGui();
     loadDefaultsAdvanced();
     
-    m_fontFamily = tmpIni.getString("Font", m_fontFamily);
-    m_fontSize = tmpIni.getInt("FontSize", m_fontSize);
-    m_memoryFontFamily = tmpIni.getString("MemoryFont", m_memoryFontFamily);
-    m_memoryFontSize = tmpIni.getInt("MemoryFontSize", m_memoryFontSize);
-    m_outputFontFamily = tmpIni.getString("OutputFont", m_outputFontFamily);
-    m_outputFontSize = tmpIni.getInt("OutputFontSize", m_outputFontSize);
-    m_gdbOutputFontFamily = tmpIni.getString("GdbOutputFont", m_outputFontFamily);
-    m_gdbOutputFontSize = tmpIni.getInt("GdbOutputFontSize", m_outputFontSize);
+    m_fontFamily = tmpIni.getString("Gui/CodeFont", m_fontFamily);
+    m_fontSize = tmpIni.getInt("Gui/CodeFontSize", m_fontSize);
+    m_memoryFontFamily = tmpIni.getString("Gui/MemoryFont", m_memoryFontFamily);
+    m_memoryFontSize = tmpIni.getInt("Gui/MemoryFontSize", m_memoryFontSize);
+    m_outputFontFamily = tmpIni.getString("Gui/OutputFont", m_outputFontFamily);
+    m_outputFontSize = tmpIni.getInt("Gui/OutputFontSize", m_outputFontSize);
+    m_gdbOutputFontFamily = tmpIni.getString("Gui/GdbOutputFont", m_outputFontFamily);
+    m_gdbOutputFontSize = tmpIni.getInt("Gui/GdbOutputFontSize", m_outputFontSize);
 
-    m_sourceIgnoreDirs = tmpIni.getStringList("ScannerIgnoreDirs", m_sourceIgnoreDirs);
+    m_sourceIgnoreDirs = tmpIni.getStringList("General/ScannerIgnoreDirs", m_sourceIgnoreDirs);
+
+    tmpIni.getByteArray("GuiState/MainWindowState", &m_gui_mainwindowState);
+    tmpIni.getByteArray("GuiState/MainWindowGeometry", &m_gui_mainwindowGeometry);
+    tmpIni.getByteArray("GuiState/Splitter1State", &m_gui_splitter1State);
+    tmpIni.getByteArray("GuiState/Splitter2State", &m_gui_splitter2State);
+    tmpIni.getByteArray("GuiState/Splitter3State", &m_gui_splitter3State);
+    tmpIni.getByteArray("GuiState/Splitter4State", &m_gui_splitter4State);
+
+    m_viewWindowStack = tmpIni.getBool("GuiState/EnableWindowStack", m_viewWindowStack);
+    m_viewWindowThreads = tmpIni.getBool("GuiState/EnableWindowThreads", m_viewWindowThreads);
+    m_viewWindowBreakpoints = tmpIni.getBool("GuiState/EnableWindowBreakpoints", m_viewWindowBreakpoints);
+    m_viewWindowWatch = tmpIni.getBool("GuiState/EnableWindowWatch", m_viewWindowWatch);
+    m_viewWindowAutoVariables = tmpIni.getBool("GuiState/EnableWindowAuto", m_viewWindowAutoVariables);
+    m_viewWindowTargetOutput = tmpIni.getBool("GuiState/EnableWindowTargetOutput", m_viewWindowTargetOutput);
+    m_viewWindowGdbOutput = tmpIni.getBool("GuiState/EnableWindowGdbOutput", m_viewWindowGdbOutput);
+    m_viewWindowFileBrowser = tmpIni.getBool("GuiState/EnableWindowFileBrowser", m_viewWindowFileBrowser);
+
 
 }
 
@@ -96,8 +121,6 @@ void Settings::loadProjectConfig()
         infoMsg("Failed to load project ini '%s'. File will be created.", stringToCStr(filepath));
 
 
-
-    
     m_download = tmpIni.getBool("Download", true);
     m_connectionMode = tmpIni.getInt("Mode", MODE_LOCAL) == MODE_LOCAL ? MODE_LOCAL : MODE_TCP;
     m_tcpPort = tmpIni.getInt("TcpPort", 2000);
@@ -166,6 +189,8 @@ void Settings::saveProjectConfig()
     tmpIni.setBool("ReuseBreakpoints", m_reloadBreakpoints);
 
     tmpIni.setString("InitialBreakpoint",m_initialBreakpoint);
+
+
     
     //
     QStringList breakpointStringList;
@@ -197,17 +222,34 @@ void Settings::saveGlobalConfig()
 
     tmpIni.appendLoad(globalConfigFilename);
 
-    tmpIni.setString("Font", m_fontFamily);
-    tmpIni.setInt("FontSize", m_fontSize);
+    tmpIni.setString("Gui/CodeFont", m_fontFamily);
+    tmpIni.setInt("Gui/CodeFontSize", m_fontSize);
 
-    tmpIni.setString("MemoryFont", m_memoryFontFamily);
-    tmpIni.setInt("MemoryFontSize", m_memoryFontSize);
-    tmpIni.setString("OutputFont", m_outputFontFamily);
-    tmpIni.setInt("OutputFontSize", m_outputFontSize);
-    tmpIni.setString("GdbOutputFont", m_gdbOutputFontFamily);
-    tmpIni.setInt("GdbOutputFontSize", m_gdbOutputFontSize);
+    tmpIni.setString("Gui/MemoryFont", m_memoryFontFamily);
+    tmpIni.setInt("Gui/MemoryFontSize", m_memoryFontSize);
+    tmpIni.setString("Gui/OutputFont", m_outputFontFamily);
+    tmpIni.setInt("Gui/OutputFontSize", m_outputFontSize);
+    tmpIni.setString("Gui/GdbOutputFont", m_gdbOutputFontFamily);
+    tmpIni.setInt("Gui/GdbOutputFontSize", m_gdbOutputFontSize);
 
-    tmpIni.setStringList("ScannerIgnoreDirs", m_sourceIgnoreDirs);
+    tmpIni.setStringList("General/ScannerIgnoreDirs", m_sourceIgnoreDirs);
+
+    tmpIni.setByteArray("GuiState/MainWindowState", m_gui_mainwindowState);
+    tmpIni.setByteArray("GuiState/MainWindowGeometry", m_gui_mainwindowGeometry);
+    tmpIni.setByteArray("GuiState/Splitter1State", m_gui_splitter1State);
+    tmpIni.setByteArray("GuiState/Splitter2State", m_gui_splitter2State);
+    tmpIni.setByteArray("GuiState/Splitter3State", m_gui_splitter3State);
+    tmpIni.setByteArray("GuiState/Splitter4State", m_gui_splitter4State);
+
+    tmpIni.setBool("GuiState/EnableWindowStack", m_viewWindowStack);
+    tmpIni.setBool("GuiState/EnableWindowThreads", m_viewWindowThreads);
+    tmpIni.setBool("GuiState/EnableWindowBreakpoints", m_viewWindowBreakpoints);
+    tmpIni.setBool("GuiState/EnableWindowWatch", m_viewWindowWatch);
+    tmpIni.setBool("GuiState/EnableWindowAuto", m_viewWindowAutoVariables);
+    tmpIni.setBool("GuiState/EnableWindowTargetOutput", m_viewWindowTargetOutput);
+    tmpIni.setBool("GuiState/EnableWindowGdbOutput", m_viewWindowGdbOutput);
+    tmpIni.setBool("GuiState/EnableWindowFileBrowser", m_viewWindowFileBrowser);
+
 
     if(tmpIni.save(globalConfigFilename))
         infoMsg("Failed to save '%s'", stringToCStr(globalConfigFilename));

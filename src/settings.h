@@ -88,7 +88,25 @@ class Settings
         QColor m_clrNumber;
         QColor m_clrForeground;
        
+        QByteArray m_gui_mainwindowState;
+        QByteArray m_gui_mainwindowGeometry;
+        QByteArray m_gui_splitter1State;
+        QByteArray m_gui_splitter2State;
+        QByteArray m_gui_splitter3State;
+        QByteArray m_gui_splitter4State;
+
+        bool m_viewWindowStack;
+        bool m_viewWindowThreads;
+        bool m_viewWindowBreakpoints;
+        bool m_viewWindowWatch;
+        bool m_viewWindowAutoVariables;
+        bool m_viewWindowTargetOutput;
+        bool m_viewWindowGdbOutput;
+        bool m_viewWindowFileBrowser;
+        
 };
 
+
+ 
 #endif // FILE_SETTINGS_H
 

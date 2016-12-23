@@ -24,7 +24,7 @@
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
-       <widget class="QSplitter" name="splitter">
+       <widget class="QSplitter" name="splitter_1">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
@@ -129,7 +129,7 @@
         <property name="currentIndex">
          <number>2</number>
         </property>
-        <widget class="QWidget" name="tab">
+        <widget class="QWidget" name="tab_threads">
          <attribute name="title">
           <string>Threads</string>
          </attribute>
@@ -145,7 +145,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_2">
+        <widget class="QWidget" name="tab_breakpoints">
          <attribute name="title">
           <string>Breakpoints</string>
          </attribute>
@@ -161,7 +161,7 @@
           </item>
          </layout>
         </widget>
-        <widget class="QWidget" name="tab_3">
+        <widget class="QWidget" name="tab_stack">
          <attribute name="title">
           <string>Stack</string>
          </attribute>
@@ -189,7 +189,7 @@
      <x>0</x>
      <y>0</y>
      <width>881</width>
-     <height>27</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -218,8 +218,24 @@
     </property>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionViewStack"/>
+    <addaction name="actionViewBreakpoints"/>
+    <addaction name="actionViewThreads"/>
+    <addaction name="separator"/>
+    <addaction name="actionViewWatch"/>
+    <addaction name="actionViewAutoVariables"/>
+    <addaction name="separator"/>
+    <addaction name="actionViewTargetOutput"/>
+    <addaction name="actionViewGdbOutput"/>
+    <addaction name="actionViewFileBrowser"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuExecution"/>
+   <addaction name="menuView"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -335,6 +351,73 @@
    </property>
    <property name="shortcut">
     <string>F7</string>
+   </property>
+  </action>
+  <action name="actionViewStack">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Stack</string>
+   </property>
+  </action>
+  <action name="actionViewBreakpoints">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Breakpoints</string>
+   </property>
+  </action>
+  <action name="actionViewThreads">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Threads</string>
+   </property>
+  </action>
+  <action name="actionViewWatch">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Watch Variables</string>
+   </property>
+  </action>
+  <action name="actionViewAutoVariables">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Auto Variables</string>
+   </property>
+  </action>
+  <action name="actionViewTargetOutput">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Target Output</string>
+   </property>
+  </action>
+  <action name="actionViewGdbOutput">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>GDB Output</string>
+   </property>
+  </action>
+  <action name="actionViewFileBrowser">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>File Browser</string>
    </property>
   </action>
  </widget>

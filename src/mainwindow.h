@@ -38,6 +38,7 @@ class MainWindow : public QMainWindow, public ICore, public ICodeView
   Q_OBJECT
 public:
     MainWindow(QWidget *parent);
+    virtual ~MainWindow();
 
     CodeViewTab* open(QString filename);
     
@@ -72,6 +73,10 @@ public:
     void ICore_onWatchVarChildAdded(VarWatch &watch);
     
 private:
+    void showEvent(QShowEvent *);
+    void closeEvent(QCloseEvent *e);
+
+    void showWidgets();
 
 public:
         
@@ -124,6 +129,14 @@ public slots:
     void onCodeViewTab_tabCloseRequested ( int index );
     void onCodeViewTab_currentChanged( int tabIdx);
     
+    void onViewStack();
+    void onViewBreakpoints();
+    void onViewThreads();
+    void onViewWatch();
+    void onViewAutoVariables();
+    void onViewTargetOutput();
+    void onViewGdbOutput();
+    void onViewFileBrowser();
     
 private:
     Ui_MainWindow m_ui;
