@@ -144,6 +144,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ui.actionViewGdbOutput, SIGNAL(triggered()), SLOT(onViewGdbOutput()));
     connect(m_ui.actionViewFileBrowser, SIGNAL(triggered()), SLOT(onViewFileBrowser()));
 
+    connect(m_ui.actionDefaultViewSetup, SIGNAL(triggered()), SLOT(onDefaultViewSetup()));
+
     connect(m_ui.actionSettings, SIGNAL(triggered()), SLOT(onSettings()));
 
     
@@ -162,12 +164,22 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ui.editorTabWidget, SIGNAL(currentChanged(int)), SLOT(onCodeViewTab_currentChanged(int)));
     
     statusBar()->addPermanentWidget(&m_statusLineWidget);
+
+
+    m_gui_default_mainwindowState = saveState();
+    m_gui_default_mainwindowGeometry = saveGeometry();
+    m_gui_default_splitter1State = m_ui.splitter_1->saveState();
+    m_gui_default_splitter2State = m_ui.splitter_2->saveState();
+    m_gui_default_splitter3State = m_ui.splitter_3->saveState();
+    m_gui_default_splitter4State = m_ui.splitter_4->saveState();
+
 }
 
 
 
 MainWindow::~MainWindow()
 {
+ 
 }
 
 
@@ -218,6 +230,45 @@ void MainWindow::showWidgets()
 
 
 }
+
+
+
+void MainWindow::onDefaultViewSetup()
+{
+    m_cfg.m_viewWindowStack = true;
+    m_cfg.m_viewWindowBreakpoints = true;
+    m_cfg.m_viewWindowThreads = true;
+    m_cfg.m_viewWindowWatch = true;
+    m_cfg.m_viewWindowAutoVariables = true;
+    m_cfg.m_viewWindowTargetOutput = true;
+    m_cfg.m_viewWindowGdbOutput = true;
+    m_cfg.m_viewWindowFileBrowser = true;
+
+
+    m_cfg.m_gui_mainwindowGeometry = m_gui_default_mainwindowGeometry;
+    m_cfg.m_gui_mainwindowState = m_gui_default_mainwindowState;
+    m_cfg.m_gui_splitter1State = m_gui_default_splitter1State;
+    m_cfg.m_gui_splitter2State = m_gui_default_splitter2State;
+    m_cfg.m_gui_splitter3State = m_gui_default_splitter3State;
+    m_cfg.m_gui_splitter4State = m_gui_default_splitter4State;
+
+
+
+    m_ui.actionViewStack->setChecked(m_cfg.m_viewWindowStack);
+    m_ui.actionViewThreads->setChecked(m_cfg.m_viewWindowThreads);
+    m_ui.actionViewBreakpoints->setChecked(m_cfg.m_viewWindowBreakpoints);
+    m_ui.actionViewWatch->setChecked(m_cfg.m_viewWindowWatch);
+    m_ui.actionViewAutoVariables->setChecked(m_cfg.m_viewWindowAutoVariables);
+    m_ui.actionViewTargetOutput->setChecked(m_cfg.m_viewWindowTargetOutput);
+    m_ui.actionViewGdbOutput->setChecked(m_cfg.m_viewWindowGdbOutput);
+    m_ui.actionViewFileBrowser->setChecked(m_cfg.m_viewWindowFileBrowser);
+
+    showWidgets();
+
+    showEvent(NULL);
+    
+}
+
 
 void MainWindow::onViewStack()
 {

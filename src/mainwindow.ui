@@ -232,6 +232,8 @@
     <addaction name="actionViewTargetOutput"/>
     <addaction name="actionViewGdbOutput"/>
     <addaction name="actionViewFileBrowser"/>
+    <addaction name="separator"/>
+    <addaction name="actionDefaultViewSetup"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuExecution"/>
@@ -418,6 +420,11 @@
    </property>
    <property name="text">
     <string>File Browser</string>
+   </property>
+  </action>
+  <action name="actionDefaultViewSetup">
+   <property name="text">
+    <string>Restore Default View</string>
    </property>
   </action>
  </widget>

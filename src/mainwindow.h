@@ -137,7 +137,16 @@ public slots:
     void onViewTargetOutput();
     void onViewGdbOutput();
     void onViewFileBrowser();
-    
+    void onDefaultViewSetup();
+
+private:
+    QByteArray m_gui_default_mainwindowState;
+    QByteArray m_gui_default_mainwindowGeometry;
+    QByteArray m_gui_default_splitter1State;
+    QByteArray m_gui_default_splitter2State;
+    QByteArray m_gui_default_splitter3State;
+    QByteArray m_gui_default_splitter4State;
+
 private:
     Ui_MainWindow m_ui;
     QIcon m_fileIcon;
