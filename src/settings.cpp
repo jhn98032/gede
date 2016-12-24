@@ -53,6 +53,7 @@ void Settings::loadDefaultsGui()
     m_clrForeground = Qt::white;
 
     m_tagSortByName = false;
+    m_tagShowLineNumbers = true;
 }
 
 void Settings::loadDefaultsAdvanced()
