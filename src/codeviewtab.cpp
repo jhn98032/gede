@@ -30,6 +30,38 @@ CodeViewTab::~CodeViewTab()
 {
 }
 
+static bool compareTagsByLineNo(const Tag &t1, const Tag &t2)
+{
+        return t1.getLineNo() < t2.getLineNo();
+}
+
+static bool compareTagsByName(const Tag &t1, const Tag &t2)
+{
+        return t1.getLongName() < t2.getLongName();
+}
+
+void CodeViewTab::fillInFunctions(QList<Tag> tagList)
+{
+    m_ui.comboBox_funcList->clear();
+    if(m_cfg->m_tagSortByName)
+        qSort(tagList.begin(),tagList.end(), compareTagsByName);
+    else
+        qSort(tagList.begin(),tagList.end(), compareTagsByLineNo);
+    for(int tagIdx = 0;tagIdx < tagList.size();tagIdx++)
+    {
+        Tag &tag = tagList[tagIdx];
+        if(tag.type == Tag::TAG_FUNC)
+        {
+            QString text;
+            if(m_cfg->m_tagShowLineNumbers)
+                text.sprintf("L%d: ", tag.getLineNo());
+            text += tag.getLongName();
+            m_ui.comboBox_funcList->addItem(text, QVariant(tag.getLineNo()));
+        }
+        
+    }
+
+}
 
 int CodeViewTab::open(QString filename, QList<Tag> tagList)
 {
@@ -53,18 +85,9 @@ int CodeViewTab::open(QString filename, QList<Tag> tagList)
 
     m_ui.scrollArea_codeView->setWidgetResizable(true);
 
-
     // Fill in the functions
-    m_ui.comboBox_funcList->clear();
-    for(int tagIdx = 0;tagIdx < tagList.size();tagIdx++)
-    {
-        Tag &tag = tagList[tagIdx];
-        if(tag.type == Tag::TAG_FUNC)
-        {
-            m_ui.comboBox_funcList->addItem(tag.getLongName(), QVariant(tag.getLineNo()));
-        }
-        
-    }
+    fillInFunctions(tagList);
+    m_tagList = tagList;
 
 
     return 0;
@@ -143,7 +166,11 @@ void CodeViewTab::setBreakpoints(const QVector<int> &numList)
 
 void CodeViewTab::setConfig(Settings *cfg)
 {
+    m_cfg = cfg;
     m_ui.codeView->setConfig(cfg);
+
+    fillInFunctions(m_tagList);
+    
 }
 
 void CodeViewTab::disableCurrentLine()

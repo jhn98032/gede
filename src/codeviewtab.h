@@ -37,14 +37,19 @@ public:
     void setBreakpoints(const QVector<int> &numList);
 
     QString getFilePath() { return m_filepath; };
+
+private:
     
+    void fillInFunctions(QList<Tag> tagList);
+
 public slots:
     void onFuncListItemActivated(int index);
 
 private:
     Ui_CodeViewTab m_ui;
     QString m_filepath;
-   
+    Settings *m_cfg;
+    QList<Tag> m_tagList;
 };
 
 #endif

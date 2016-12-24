@@ -89,6 +89,15 @@ void SettingsDialog::loadConfig()
     m_ui.pushButton_clr_number->setColor(m_cfg->m_clrNumber);
     m_ui.pushButton_clr_foreground->setColor(m_cfg->m_clrForeground);
 
+    m_ui.checkBox_showLineNumbers->setCheckState(m_cfg->m_tagShowLineNumbers ? Qt::Checked : Qt::Unchecked);
+
+
+    int comboIdx = 0;
+    if(m_cfg->m_tagSortByName)
+        comboIdx = 1;
+    else
+        comboIdx = 0;
+    m_ui.comboBox_sortTags->setCurrentIndex(comboIdx);
 }
 
 void SettingsDialog::saveConfig()
@@ -112,16 +121,25 @@ void SettingsDialog::getConfig(Settings *cfg)
 
     cfg->m_sourceIgnoreDirs = m_ui.lineEdit_sourceIgnoreDirs->text().split(';');
 
+    cfg->m_tagShowLineNumbers = (m_ui.checkBox_showLineNumbers->checkState() == Qt::Unchecked) ? false : true;
 
-    m_cfg->m_clrBackground = m_ui.pushButton_clr_background->getColor();
-    m_cfg->m_clrComment = m_ui.pushButton_clr_comment->getColor();
-    m_cfg->m_clrString = m_ui.pushButton_clr_string->getColor();
-    m_cfg->m_clrIncString = m_ui.pushButton_clr_incString->getColor();
-    m_cfg->m_clrKeyword = m_ui.pushButton_clr_keyword->getColor();
-    m_cfg->m_clrCppKeyword = m_ui.pushButton_clr_cppKeyword->getColor();
-    m_cfg->m_clrNumber = m_ui.pushButton_clr_number->getColor();
-    m_cfg->m_clrForeground = m_ui.pushButton_clr_foreground->getColor();
+    cfg->m_clrBackground = m_ui.pushButton_clr_background->getColor();
+    cfg->m_clrComment = m_ui.pushButton_clr_comment->getColor();
+    cfg->m_clrString = m_ui.pushButton_clr_string->getColor();
+    cfg->m_clrIncString = m_ui.pushButton_clr_incString->getColor();
+    cfg->m_clrKeyword = m_ui.pushButton_clr_keyword->getColor();
+    cfg->m_clrCppKeyword = m_ui.pushButton_clr_cppKeyword->getColor();
+    cfg->m_clrNumber = m_ui.pushButton_clr_number->getColor();
+    cfg->m_clrForeground = m_ui.pushButton_clr_foreground->getColor();
 
+
+    int comboIdx = m_ui.comboBox_sortTags->currentIndex();
+    if(comboIdx == 0)
+        m_cfg->m_tagSortByName = false;
+    if(comboIdx == 1)
+        m_cfg->m_tagSortByName = true;
+    
+    
 }
 
 

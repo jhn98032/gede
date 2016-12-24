@@ -52,6 +52,7 @@ void Settings::loadDefaultsGui()
     m_clrNumber = Qt::magenta;
     m_clrForeground = Qt::white;
 
+    m_tagSortByName = false;
 }
 
 void Settings::loadDefaultsAdvanced()
@@ -91,6 +92,9 @@ void Settings::loadGlobalConfig()
     m_gdbOutputFontFamily = tmpIni.getString("Gui/GdbOutputFont", m_outputFontFamily);
     m_gdbOutputFontSize = tmpIni.getInt("Gui/GdbOutputFontSize", m_outputFontSize);
 
+    m_tagSortByName = tmpIni.getBool("Gui/TagsSortByName", false);
+    m_tagShowLineNumbers = tmpIni.getBool("Gui/TagsShowLinenumber", true);
+    
     m_sourceIgnoreDirs = tmpIni.getStringList("General/ScannerIgnoreDirs", m_sourceIgnoreDirs);
 
     tmpIni.getByteArray("GuiState/MainWindowState", &m_gui_mainwindowState);
@@ -232,6 +236,9 @@ void Settings::saveGlobalConfig()
     tmpIni.setString("Gui/GdbOutputFont", m_gdbOutputFontFamily);
     tmpIni.setInt("Gui/GdbOutputFontSize", m_gdbOutputFontSize);
 
+    tmpIni.setBool("Gui/TagsSortByName", m_tagSortByName);
+    tmpIni.setBool("Gui/TagsShowLinenumber", m_tagShowLineNumbers);
+    
     tmpIni.setStringList("General/ScannerIgnoreDirs", m_sourceIgnoreDirs);
 
     tmpIni.setByteArray("GuiState/MainWindowState", m_gui_mainwindowState);

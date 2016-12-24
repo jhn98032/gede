@@ -352,6 +352,7 @@ void MainWindow::loadConfig()
 
 void MainWindow::showEvent(QShowEvent* e)
 {
+    Q_UNUSED(e);
 
     restoreGeometry(m_cfg.m_gui_mainwindowGeometry);
     restoreState(m_cfg.m_gui_mainwindowState);
@@ -362,8 +363,9 @@ void MainWindow::showEvent(QShowEvent* e)
 
 }
 
-void MainWindow::closeEvent(QCloseEvent *)
+void MainWindow::closeEvent(QCloseEvent *e)
 {
+    Q_UNUSED(e);
 
     m_cfg.m_gui_mainwindowState = saveState();
     m_cfg.m_gui_mainwindowGeometry = saveGeometry();

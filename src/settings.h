@@ -103,7 +103,9 @@ class Settings
         bool m_viewWindowTargetOutput;
         bool m_viewWindowGdbOutput;
         bool m_viewWindowFileBrowser;
-        
+
+        bool m_tagSortByName;
+        bool m_tagShowLineNumbers;
 };
 
 
