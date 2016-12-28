@@ -28,7 +28,7 @@ Settings::Settings()
     m_viewWindowTargetOutput = true;
     m_viewWindowGdbOutput = true;
     m_viewWindowFileBrowser = true;
-
+    m_enableDebugLog = false;
 }
 
 void Settings::loadDefaultsGui()
@@ -83,6 +83,8 @@ void Settings::loadGlobalConfig()
 
     loadDefaultsGui();
     loadDefaultsAdvanced();
+
+    m_enableDebugLog = tmpIni.getBool("General/EnableDebugLog", false);
     
     m_fontFamily = tmpIni.getString("Gui/CodeFont", m_fontFamily);
     m_fontSize = tmpIni.getInt("Gui/CodeFontSize", m_fontSize);
@@ -226,6 +228,8 @@ void Settings::saveGlobalConfig()
     Ini tmpIni;
 
     tmpIni.appendLoad(globalConfigFilename);
+
+    tmpIni.setBool("General/EnableDebugLog", m_enableDebugLog);
 
     tmpIni.setString("Gui/CodeFont", m_fontFamily);
     tmpIni.setInt("Gui/CodeFontSize", m_fontSize);

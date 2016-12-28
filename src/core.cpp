@@ -156,8 +156,8 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
     int rc = 0;
 
     m_isRemote = false;
-    
-    if(com.init(gdbPath))
+
+    if(com.init(gdbPath, cfg->m_enableDebugLog))
     {
         errorMsg("Failed to start gdb ('%s')", stringToCStr(gdbPath));
         return -1;
@@ -219,7 +219,7 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
 
     m_isRemote = true;
     
-    if(com.init(gdbPath))
+    if(com.init(gdbPath, cfg->m_enableDebugLog))
     {
         errorMsg("Failed to start gdb");
         return -1;

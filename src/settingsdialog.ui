@@ -399,6 +399,13 @@ QGroupBox::title {
         </layout>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkBox_enableDebugLog">
+         <property name="text">
+          <string>Enable debug log</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>

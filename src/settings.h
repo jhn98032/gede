@@ -106,6 +106,8 @@ class Settings
 
         bool m_tagSortByName;
         bool m_tagShowLineNumbers;
+
+        bool m_enableDebugLog;
 };
 
 

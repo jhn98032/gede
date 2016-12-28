@@ -15,8 +15,6 @@
 
 #define GLOBAL_CONFIG_FILENAME    "gede2.ini"
 
-//#define ENABLE_GDB_LOG
-
 #define GDB_LOG_FILE  "gede_gdb_log.txt"
 
 

@@ -15,6 +15,9 @@
 #include <assert.h>
 #include <unistd.h>
 #include "config.h"
+#include "version.h"
+
+#include <QDateTime>
 
 
 
@@ -85,10 +88,9 @@ bool Resp::isResult()
         
 Com::Com()
  : m_listener(NULL)
-#ifdef ENABLE_GDB_LOG
  ,m_logFile(GDB_LOG_FILE)
-#endif
  ,m_busy(0)
+ ,m_enableLog(false)
  {
 /*
     QByteArray array = m_process.readAllStandardOutput();
@@ -98,9 +100,6 @@ Com::Com()
 */
 
 
-#ifdef ENABLE_GDB_LOG
-     m_logFile.open(QIODevice::Truncate | QIODevice::WriteOnly | QIODevice::Text);
-#endif
 
     connect(&m_process, SIGNAL(readyReadStandardOutput ()), this, SLOT(onReadyReadStandardOutput()));
 
@@ -122,6 +121,13 @@ Com::~Com()
     {
         Token *token = m_freeTokens.takeFirst();
         delete token;
+    }
+
+
+    if(m_enableLog)
+    {
+        writeLogEntry("\r\n#\r\n#\r\n");
+        m_logFile.close();
     }
 }
 
@@ -780,6 +786,13 @@ Resp *Com::parseOutput()
 }
 
 
+void Com::writeLogEntry(QString logText)
+{
+    assert(m_enableLog == true);
+    m_logFile.write(logText.toUtf8());
+    m_logFile.flush();
+}
+               
 /**
  * @brief Reads output from GDB.
  */
@@ -801,14 +814,14 @@ void Com::readTokens()
             {
                 debugMsg("row:%s", stringToCStr(row));
      
-#ifdef ENABLE_GDB_LOG
-                QString logText;
-                logText = ">> ";
-                logText += row;
-                logText += "\n";
-                m_logFile.write(stringToCStr(logText), logText.length());
-                m_logFile.flush();
-#endif
+                if(m_enableLog)
+                {
+                    QString logText;
+                    logText = ">> ";
+                    logText += row;
+                    logText += "\n";
+                    writeLogEntry(logText);
+                }
 
                 QList<Token*> list;
                 char firstChar = row[0].toLatin1();
@@ -975,15 +988,16 @@ GdbResult Com::command(Tree *resultData, QString text)
     text += "\n";
     m_process.write((const char*)text.toLatin1());
 
-#ifdef ENABLE_GDB_LOG
-    //
-    QString logText;
-    logText = "\n<< ";
-    logText += text + "\n";
-    m_logFile.write(stringToCStr(logText), logText.length());
-    m_logFile.flush();
-#endif
 
+    if(m_enableLog)
+    {
+        //
+        QString logText;
+        logText = "\n<< ";
+        logText += text + "\n";
+        writeLogEntry(logText);
+    }
+    
 
     do
     {
@@ -1009,11 +1023,22 @@ GdbResult Com::command(Tree *resultData, QString text)
 }
 
 
-int Com::init(QString gdbPath)
+int Com::init(QString gdbPath, bool enableDebugLog)
 {
     QString commandLine;
+
+    enableLog(enableDebugLog);
+
+        
     commandLine.sprintf("%s --interpreter=mi2", stringToCStr(gdbPath));
-    
+
+    if(m_enableLog)
+    {
+        QString logStr;
+        logStr = "# Gdb commandline: '" + commandLine + "'\r\n";
+        writeLogEntry(logStr);
+    }
+
     m_process.start(commandLine);//gdb ./testapp/test");
     m_process.waitForStarted();
 
@@ -1089,4 +1114,38 @@ void Com::dispatchResp()
 
 }
 
+void Com::enableLog(bool enable)
+{
+    if(m_enableLog == enable)
+        return;
 
+    if(m_enableLog)
+    {
+        writeLogEntry("#\r\n");
+        m_logFile.close();
+    }
+    m_enableLog = false;
+
+    if(enable)
+    {
+        if(m_logFile.open(QIODevice::Truncate | QIODevice::WriteOnly | QIODevice::Text))
+        {
+            warnMsg("Created %s", (const char*)GDB_LOG_FILE);
+
+            m_enableLog = true;
+
+            QString logStr;
+            QDateTime now = QDateTime::currentDateTime();
+            logStr = "# Created: " + now.toString("yyyy-MM-dd hh:mm:ss") + "\r\n";
+            writeLogEntry(logStr);
+            logStr.sprintf("# Gede version: %d.%d.%d \r\n", GD_MAJOR,GD_MINOR,GD_PATCH);
+            writeLogEntry(logStr);
+
+        }
+        else
+            warnMsg("Failed to create log file %s", (const char*)GDB_LOG_FILE);
+        
+    }
+}
+
+        

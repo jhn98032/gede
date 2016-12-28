@@ -91,6 +91,8 @@ void SettingsDialog::loadConfig()
 
     m_ui.checkBox_showLineNumbers->setCheckState(m_cfg->m_tagShowLineNumbers ? Qt::Checked : Qt::Unchecked);
 
+    m_ui.checkBox_enableDebugLog->setCheckState(m_cfg->m_enableDebugLog ? Qt::Checked : Qt::Unchecked);
+
 
     int comboIdx = 0;
     if(m_cfg->m_tagSortByName)
@@ -123,6 +125,8 @@ void SettingsDialog::getConfig(Settings *cfg)
 
     cfg->m_tagShowLineNumbers = (m_ui.checkBox_showLineNumbers->checkState() == Qt::Unchecked) ? false : true;
 
+    cfg->m_enableDebugLog = (m_ui.checkBox_enableDebugLog->checkState() == Qt::Unchecked) ? false : true;
+    
     cfg->m_clrBackground = m_ui.pushButton_clr_background->getColor();
     cfg->m_clrComment = m_ui.pushButton_clr_comment->getColor();
     cfg->m_clrString = m_ui.pushButton_clr_string->getColor();
