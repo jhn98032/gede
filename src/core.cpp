@@ -1412,8 +1412,9 @@ void Core::selectFrame(int selectedFrameIdx)
 /**
  * @brief Changes the content of a variable.
  */
-int Core::changeWatchVariable(QString variable, QString newValue)
+int Core::changeWatchVariable(QString watchId, QString newValue)
 {
+    QString dataStr;
     Com& com = Com::getInstance();
     Tree resultData;
     int rc = 0;
@@ -1426,11 +1427,33 @@ int Core::changeWatchVariable(QString variable, QString newValue)
         return -1;
     }
 
-    gdbRes = com.commandF(&resultData, "-var-assign %s %s", stringToCStr(variable), stringToCStr(newValue));    
-    if(gdbRes == GDB_ERROR)
+    //
+    dataStr = newValue;
+    QString varName = watchId;
+    VarWatch *watch = getVarWatchInfo(watchId);
+    if(watch)
+    {
+        varName = watch->getName();
+        QString varType = watch->getVarType();
+        if(varType == "char" && newValue.length() == 1)
+            dataStr = '\'' + newValue + '\'';
+    }
+
+    gdbRes = com.commandF(&resultData, "-var-assign %s %s", stringToCStr(watchId), stringToCStr(dataStr));    
+    if(gdbRes == GDB_DONE)
+    {
+        resultData.dump();
+        QString afterValue = resultData.getString("value");
+        if(watch != NULL)
+        {
+            watch->setValue(afterValue);
+            m_inf->ICore_onWatchVarChanged(*watch);
+        }
+    }
+    else if(gdbRes == GDB_ERROR)
     {
         rc = -1;
-        errorMsg("Failed change variable %s", stringToCStr(variable));
+        errorMsg("Failed to change variable %s", stringToCStr(watchId));
     }
     return rc;
 }

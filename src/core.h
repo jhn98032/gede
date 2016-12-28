@@ -95,6 +95,8 @@ class VarWatch
         bool inScope() { return m_inScope;};
         QString getVarType() { return m_varType; };
         QString getValue() { return m_varValue; };
+
+        void setValue(QString value) { m_varValue = value; };
     private:
 
         QString watchId;

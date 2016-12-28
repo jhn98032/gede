@@ -82,11 +82,13 @@ void WatchVarCtl::ICore_onWatchVarChanged(VarWatch &watch)
 
     AutoSignalBlocker autoBlocker(m_varWidget);
 
+    // Find the watch item
     QStringList watchIdParts = watch.getWatchId().split('.');
-
     QTreeWidgetItem* rootItem = varWidget->invisibleRootItem();
     VarWatch *rootWatch = core.getVarWatchInfo(watchIdParts[0]);
     assert(rootWatch != NULL);
+
+    // Sync it
     if(rootWatch)
         sync(rootItem, *rootWatch);
 }
@@ -461,6 +463,8 @@ WatchVarCtl::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int col
         else
         {
         watch = core.getVarWatchInfo(oldKey);
+        if(watch)
+        {
         QString oldValue  = watch->getValue();
         QString newValue = current->text(COLUMN_VALUE);
 
@@ -468,10 +472,10 @@ WatchVarCtl::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int col
             if (dispInfo.orgValue != newValue)
             {
 
-                 if(core.changeWatchVariable(oldKey, newValue))
+                if(core.changeWatchVariable(oldKey, newValue))
                     current->setText(COLUMN_VALUE, oldValue);
-    
             }
+        }
          }   
         
     }
