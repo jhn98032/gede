@@ -132,7 +132,7 @@ void WatchVarCtl::sync(QTreeWidgetItem* parentItem, VarWatch &watch)
         nameList += varType;
         treeItem = new QTreeWidgetItem(nameList);
         treeItem->setData(DATA_COLUMN, Qt::UserRole, watchId);
-        treeItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+        treeItem->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         parentItem->addChild(treeItem);
         
         if(watch.hasChildren())
@@ -280,7 +280,7 @@ void WatchVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
             nameList += varType;
             item = new QTreeWidgetItem(nameList);
             item->setData(DATA_COLUMN, Qt::UserRole, thisWatchId);
-            item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+            item->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
             rootItem->addChild(item);
             rootItem = item;
 
@@ -456,6 +456,10 @@ WatchVarCtl::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int col
     if(column == COLUMN_VALUE)
     {
         VarWatch *watch = NULL;
+        if(newName == "...")
+            current->setText(COLUMN_VALUE, "");
+        else
+        {
         watch = core.getVarWatchInfo(oldKey);
         QString oldValue  = watch->getValue();
         QString newValue = current->text(COLUMN_VALUE);
@@ -463,20 +467,29 @@ WatchVarCtl::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int col
             VarCtl::DispInfo dispInfo = m_watchVarDispInfo[oldKey];
             if (dispInfo.orgValue != newValue)
             {
-        
-                 core.changeWatchVariable(oldKey, newValue);
+
+                 if(core.changeWatchVariable(oldKey, newValue))
+                    current->setText(COLUMN_VALUE, oldValue);
     
             }
-            
+         }   
         
     }
 
+    // Only allow changes to 'Value' and 'Name' column
     if(column != 0)
         return;
 
+    // Changed name to the same name?
     if(oldKey != "" && oldName == newName)
         return;
-    
+
+    // Only allow name changes on root items
+    if(current->parent() != NULL)
+    {
+        current->setText(COLUMN_NAME, oldName);
+        return;
+    }
 
     if(newName == "...")
         newName = "";

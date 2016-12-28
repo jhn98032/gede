@@ -1412,21 +1412,27 @@ void Core::selectFrame(int selectedFrameIdx)
 /**
  * @brief Changes the content of a variable.
  */
-void Core::changeWatchVariable(QString variable, QString newValue)
+int Core::changeWatchVariable(QString variable, QString newValue)
 {
     Com& com = Com::getInstance();
     Tree resultData;
-
+    int rc = 0;
+    GdbResult gdbRes = GDB_ERROR;
+    
     if(m_targetState == ICore::TARGET_STARTING || m_targetState == ICore::TARGET_RUNNING)
     {
         if(m_inf)
             m_inf->ICore_onMessage("Program is currently running");
-        return;
+        return -1;
     }
 
-    com.commandF(&resultData, "-var-assign %s %s", stringToCStr(variable), stringToCStr(newValue));    
-
-
+    gdbRes = com.commandF(&resultData, "-var-assign %s %s", stringToCStr(variable), stringToCStr(newValue));    
+    if(gdbRes == GDB_ERROR)
+    {
+        rc = -1;
+        errorMsg("Failed change variable %s", stringToCStr(variable));
+    }
+    return rc;
 }
 
 
