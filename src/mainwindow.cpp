@@ -387,9 +387,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         QWidget *widget = QApplication::focusWidget();
 
         // 'Delete' key pressed in the var widget 
-        if(widget == m_ui.varWidget && keyEvent->key() == Qt::Key_Delete)
+        if(widget == m_ui.varWidget)
         {
-            m_watchVarCtl.deleteSelected();
+            m_watchVarCtl.onKeyPress(keyEvent);
             
         }
         

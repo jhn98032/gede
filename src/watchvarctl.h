@@ -12,6 +12,7 @@
 #include <QString>
 #include <QTreeWidget>
 #include <QMenu>
+#include <QKeyEvent>
 
 
 #include "core.h"
@@ -31,6 +32,8 @@ public:
     void ICore_onWatchVarChildAdded(VarWatch &watch);
     void addNewWatch(QString varName);
     void deleteSelected();
+
+    void onKeyPress(QKeyEvent *keyEvent);
 
 private:
     QString getWatchId(QTreeWidgetItem* item);

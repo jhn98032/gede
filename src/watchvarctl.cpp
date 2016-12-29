@@ -756,6 +756,30 @@ void WatchVarCtl::deleteSelected()
 
 }
 
+void WatchVarCtl::onKeyPress(QKeyEvent *keyEvent)
+{
+    if(keyEvent->key() == Qt::Key_Delete)
+    {
+        deleteSelected();
+    }
+    else if(keyEvent->key() == Qt::Key_Return)
+    {
+        // Get the active unit
+        QTreeWidgetItem * item = m_varWidget->currentItem();
+        if(item)
+        {
+            while(item->parent() != NULL)
+            {
+                item = item->parent();
+            }
+        }
+        if(item)
+        {
+            m_varWidget->editItem(item,COLUMN_NAME);
+        }   
+    }
+
+}
     
 
     
