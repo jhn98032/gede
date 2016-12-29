@@ -768,14 +768,11 @@ void WatchVarCtl::onKeyPress(QKeyEvent *keyEvent)
         QTreeWidgetItem * item = m_varWidget->currentItem();
         if(item)
         {
-            while(item->parent() != NULL)
-            {
-                item = item->parent();
-            }
-        }
-        if(item)
-        {
-            m_varWidget->editItem(item,COLUMN_NAME);
+            if(item->text(COLUMN_NAME) == "...")
+                m_varWidget->editItem(item,COLUMN_NAME);
+            else
+                m_varWidget->editItem(item,COLUMN_VALUE);
+            
         }   
     }
 
