@@ -1442,13 +1442,8 @@ int Core::changeWatchVariable(QString watchId, QString newValue)
     gdbRes = com.commandF(&resultData, "-var-assign %s %s", stringToCStr(watchId), stringToCStr(dataStr));    
     if(gdbRes == GDB_DONE)
     {
-        resultData.dump();
-        QString afterValue = resultData.getString("value");
-        if(watch != NULL)
-        {
-            watch->setValue(afterValue);
-            m_inf->ICore_onWatchVarChanged(*watch);
-        }
+
+        com.commandF(&resultData, "-var-update --all-values *");
     }
     else if(gdbRes == GDB_ERROR)
     {
