@@ -30,20 +30,20 @@ public:
     void setWidget(QTreeWidget *autoWidget);
 
     void ICore_onLocalVarChanged(QString name, CoreVarValue varValue);
-
+    void ICore_onLocalVarReset();
+    
     void setConfig(Settings *cfg);
 
 private:
-    void addVariableDataTree(
-                QTreeWidget *treeWidget,
-                VarCtl::DispInfoMap *map,
-                QTreeWidgetItem *item, TreeNode *rootNode);
-    QTreeWidgetItem *insertTreeWidgetItem(
+    void createTreeWidgetItem(
+                    QTreeWidgetItem *parentItem,
                     VarCtl::DispInfoMap *map,
                     QString fullPath,
                     QString name,
-                    QString value);
-                                
+                    TreeNode *valueTree);
+    void selectedChangeDisplayFormat(VarCtl::DispFormat fmt);
+    QString getTreeWidgetItemPath(QTreeWidgetItem *item);
+
 public slots:
 
     void onContextMenu ( const QPoint &pos);
@@ -52,7 +52,11 @@ public slots:
     void onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
     void onShowMemory();
 
-
+    void onDisplayAsDec();
+    void onDisplayAsHex();
+    void onDisplayAsBin();
+    void onDisplayAsChar();
+    
     
 private:
     QTreeWidget *m_autoWidget;

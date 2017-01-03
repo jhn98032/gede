@@ -25,7 +25,7 @@ public:
 
     enum DispFormat
     {
-        DISP_NATIVE,
+        DISP_NATIVE = 0,
         DISP_DEC,
         DISP_BIN,
         DISP_HEX,
@@ -43,7 +43,7 @@ public:
 
 
     static DispFormat findVarType(QString dataString);
-    static QString valueDisplay(long long value, DispFormat format);
+    static QString valueDisplay(QString value, DispFormat format);
 
 };
 

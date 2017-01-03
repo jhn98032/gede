@@ -196,7 +196,7 @@ void WatchVarCtl::sync(QTreeWidgetItem* parentItem, VarWatch &watch)
         // Update the variable value
         if(orgFormat == VarCtl::DISP_DEC)
         {
-            valueString = VarCtl::valueDisplay(valueString.toLongLong(0,0), dispInfo.dispFormat);
+            valueString = VarCtl::valueDisplay(valueString, dispInfo.dispFormat);
         }
     }
     if(!inScope)
@@ -322,7 +322,7 @@ void WatchVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
                 // Update the variable value
                 if(orgFormat == VarCtl::DISP_DEC)
                 {
-                    valueString = VarCtl::valueDisplay(valueString.toLongLong(0,0), dispInfo.dispFormat);
+                    valueString = VarCtl::valueDisplay(valueString, dispInfo.dispFormat);
                 }
             }
 
@@ -364,11 +364,9 @@ void WatchVarCtl::selectedChangeDisplayFormat(VarCtl::DispFormat fmt)
             VarCtl::DispInfo &dispInfo = m_watchVarDispInfo[watchId];
             if(dispInfo.orgFormat == VarCtl::DISP_DEC)
             {
-                long long val = dispInfo.orgValue.toLongLong(0,0);
-
                 dispInfo.dispFormat = fmt;
                 
-                QString valueText = VarCtl::valueDisplay(val, dispInfo.dispFormat);
+                QString valueText = VarCtl::valueDisplay(dispInfo.orgValue, dispInfo.dispFormat);
 
                 item->setText(COLUMN_VALUE, valueText);
             }
@@ -658,8 +656,8 @@ void WatchVarCtl::onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int colu
             VarCtl::DispInfo &dispInfo = m_watchVarDispInfo[watchId];
             if(dispInfo.orgFormat == VarCtl::DISP_DEC)
             {
-                long long val = dispInfo.orgValue.toLongLong(0,0);
-
+                QString valStr = dispInfo.orgValue;
+                
                 if(dispInfo.dispFormat == VarCtl::DISP_DEC)
                 {
                     dispInfo.dispFormat = VarCtl::DISP_HEX;
@@ -677,7 +675,7 @@ void WatchVarCtl::onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int colu
                     dispInfo.dispFormat = VarCtl::DISP_DEC;
                 }
 
-                QString valueText = VarCtl::valueDisplay(val, dispInfo.dispFormat);
+                QString valueText = VarCtl::valueDisplay(valStr, dispInfo.dispFormat);
 
                 item->setText(1, valueText);
             }

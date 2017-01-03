@@ -13,6 +13,12 @@
 #include "util.h"
 #include "memorydialog.h"
 
+enum
+{
+    COLUMN_NAME = 0,
+    COLUMN_VALUE = 1,
+};
+
 
 AutoVarCtl::AutoVarCtl()
     : m_autoWidget(0)
@@ -20,7 +26,7 @@ AutoVarCtl::AutoVarCtl()
 
 }
 
-QString getTreeWidgetItemPath(QTreeWidgetItem *item)
+QString AutoVarCtl::getTreeWidgetItemPath(QTreeWidgetItem *item)
 {
     QTreeWidgetItem *parent = item->parent();
     if(parent)
@@ -57,11 +63,25 @@ void AutoVarCtl::setWidget(QTreeWidget *autoWidget)
 
 void AutoVarCtl::onContextMenu ( const QPoint &pos)
 {
+    QAction *action = NULL;
 
     m_popupMenu.clear();
     
     // Add 'open'
-    QAction *action = m_popupMenu.addAction("Show memory");
+    action = m_popupMenu.addAction("Display as dec");
+    action->setData(0);
+    connect(action, SIGNAL(triggered()), this, SLOT(onDisplayAsDec()));
+    action = m_popupMenu.addAction("Display as hex");
+    action->setData(0);
+    connect(action, SIGNAL(triggered()), this, SLOT(onDisplayAsHex()));
+    action = m_popupMenu.addAction("Display as bin");
+    action->setData(0);
+    connect(action, SIGNAL(triggered()), this, SLOT(onDisplayAsBin()));
+    action = m_popupMenu.addAction("Display as char");
+    action->setData(0);
+    connect(action, SIGNAL(triggered()), this, SLOT(onDisplayAsChar()));
+    m_popupMenu.addSeparator();
+    action = m_popupMenu.addAction("Show memory");
     action->setData(0);
     connect(action, SIGNAL(triggered()), this, SLOT(onShowMemory()));
 
@@ -128,7 +148,7 @@ void AutoVarCtl::onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column
             VarCtl::DispInfo &dispInfo = m_autoVarDispInfo[varName];
             if(dispInfo.orgFormat == VarCtl::DISP_DEC)
             {
-                long long val = dispInfo.orgValue.toLongLong(0,0);
+                QString valStr = dispInfo.orgValue;
 
                 if(dispInfo.dispFormat == VarCtl::DISP_DEC)
                 {
@@ -147,7 +167,7 @@ void AutoVarCtl::onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column
                     dispInfo.dispFormat = VarCtl::DISP_DEC;
                 }
 
-                QString valueText = VarCtl::valueDisplay(val, dispInfo.dispFormat);
+                QString valueText = VarCtl::valueDisplay(valStr, dispInfo.dispFormat);
 
                 item->setText(1, valueText);
             }
@@ -155,113 +175,51 @@ void AutoVarCtl::onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column
     }
 }
 
+void AutoVarCtl::ICore_onLocalVarReset()
+{
+    QTreeWidget *autoWidget = m_autoWidget;
+
+    autoWidget->clear();
+}
+
 
 void AutoVarCtl::ICore_onLocalVarChanged(QString name, CoreVarValue varValue)
 {
     Tree *valueTree = varValue.toTree();
-    
-    QTreeWidget *autoWidget = m_autoWidget;
-    QTreeWidgetItem *item;
-    QStringList names;
 
+    assert(valueTree != NULL);
 
-    item = insertTreeWidgetItem(&m_autoVarDispInfo, name, name, varValue.toString());
-    autoWidget->insertTopLevelItem(0, item);
-
-    // Expand it?
-    QString varPath = getTreeWidgetItemPath(item);
-    if(m_autoVarDispInfo.contains(varPath))
-    {
-        VarCtl::DispInfo &dispInfo = m_autoVarDispInfo[varPath];
-        if(dispInfo.isExpanded)
-        {
-            autoWidget->expandItem(item);
-        }
-    }
-
-    // Insert children
-    if(valueTree)
-    {
-        addVariableDataTree(autoWidget, &m_autoVarDispInfo, item, valueTree->getRoot());
-    }
-    
+    createTreeWidgetItem(NULL, &m_autoVarDispInfo, name, name, valueTree ? valueTree->getRoot() : NULL);
+   
     delete valueTree;
 }
 
 
 
 
-void AutoVarCtl::addVariableDataTree(
-                QTreeWidget *treeWidget,
-                VarCtl::DispInfoMap *map,
-                QTreeWidgetItem *item, TreeNode *rootNode)
-{
-    QString parentPath = getTreeWidgetItemPath(item);
-
-    item->setText(1, rootNode->getData());
-    item->setData(1, Qt::UserRole, QVariant((qlonglong)rootNode->getAddress()));
-
-    for(int i = 0;i < rootNode->getChildCount();i++)
-    {
-        TreeNode *child = rootNode->getChild(i);
-
-        QString varPath = parentPath + "/" + child->getName();
-        QTreeWidgetItem *childItem;
-
-        if(child->getChildCount() == 0)
-        {
-            childItem = insertTreeWidgetItem(
-                    map,
-                    varPath,
-                    child->getName(),
-                    child->getData());
-
-            childItem->setData(1, Qt::UserRole, QVariant((qlonglong)child->getAddress()));
-
-            item->addChild(childItem);
-
-        }
-        else
-        {
-            QStringList names;
-            names += child->getName();
-
-            childItem = new QTreeWidgetItem(names);
-            item->addChild(childItem);
-
-            addVariableDataTree(treeWidget, map, childItem, child);
-        }
 
 
-        // Expand it?
-        if(m_autoVarDispInfo.contains(varPath))
-        {
-            VarCtl::DispInfo &dispInfo = (*map)[varPath];
-
-            if(dispInfo.isExpanded)
-            {
-                treeWidget->expandItem(childItem);
-            }
-        }
-        else
-        {
-            // Add it to the dispinfomap
-            VarCtl::DispInfo dispInfo;
-            dispInfo.isExpanded = false;
-            (*map)[varPath] = dispInfo;
-        }
-    }
-}
-
-        
-QTreeWidgetItem *AutoVarCtl::insertTreeWidgetItem(
+/**
+ * @brief Create a item and adds it to the tree widget.
+ */        
+void AutoVarCtl::createTreeWidgetItem(
+                    QTreeWidgetItem *parentItem,
                     VarCtl::DispInfoMap *map,
                     QString fullPath,
                     QString name,
-                    QString value)
+                    TreeNode *valueTree)
 {
-    QString displayValue = value;
+    QTreeWidget *autoWidget = m_autoWidget;
+
+    // Get the text to display
+    QString value;
+    if(valueTree)
+    {
+        value = valueTree->getData();
+    }
+
     VarCtl::DispFormat orgFormat = VarCtl::findVarType(value);
+    QString displayValue = value;
 
     //
     if(map->contains(fullPath))
@@ -272,7 +230,7 @@ QTreeWidgetItem *AutoVarCtl::insertTreeWidgetItem(
         // Update the variable value
         if(orgFormat == VarCtl::DISP_DEC)
         {
-            displayValue = VarCtl::valueDisplay(value.toLongLong(0,0), dispInfo.dispFormat);
+            displayValue = VarCtl::valueDisplay(value, dispInfo.dispFormat);
         }
     }
     else
@@ -294,13 +252,109 @@ QTreeWidgetItem *AutoVarCtl::insertTreeWidgetItem(
     item = new QTreeWidgetItem(names);
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
-    return item;
+    if(valueTree)
+        item->setData(1, Qt::UserRole, QVariant((qlonglong)valueTree->getAddress()));
+
+
+    QString parentPath = fullPath;
+
+
+    if(parentItem)
+        parentItem->addChild(item);
+    else
+        autoWidget->insertTopLevelItem(0, item);
+    
+
+    for(int i = 0;i < valueTree->getChildCount();i++)
+    {
+        TreeNode *child = valueTree->getChild(i);
+
+        QString varPath = parentPath + "/" + child->getName();
+
+        createTreeWidgetItem(
+                item,
+                map,
+                varPath,
+                child->getName(),
+                child);
+    }
+
+    // Expand it?
+    if(m_autoVarDispInfo.contains(fullPath))
+    {
+        VarCtl::DispInfo &dispInfo = (*map)[fullPath];
+
+        if(dispInfo.isExpanded)
+        {
+            autoWidget->expandItem(item);
+        }
+    }
+    else
+    {
+        // Add it to the dispinfomap
+        VarCtl::DispInfo dispInfo;
+        dispInfo.isExpanded = false;
+        (*map)[fullPath] = dispInfo;
+    }
+
 }
 
 
 void AutoVarCtl::setConfig(Settings *cfg)
 {
     m_cfg = *cfg;
+}
+
+
+void AutoVarCtl::onDisplayAsDec()
+{
+    selectedChangeDisplayFormat(VarCtl::DISP_DEC);
+}
+
+void AutoVarCtl::onDisplayAsHex()
+{
+    selectedChangeDisplayFormat(VarCtl::DISP_HEX);
+}
+
+void AutoVarCtl::onDisplayAsBin()
+{
+    selectedChangeDisplayFormat(VarCtl::DISP_BIN);
+}
+
+void AutoVarCtl::onDisplayAsChar()
+{
+    selectedChangeDisplayFormat(VarCtl::DISP_CHAR);
+}
+
+
+/**
+ * @brief Change display format for the currently selected items.
+ */
+void AutoVarCtl::selectedChangeDisplayFormat(VarCtl::DispFormat fmt)
+{
+    // Loop through the selected items.
+    QList<QTreeWidgetItem *> items = m_autoWidget->selectedItems();
+    for(int i =0;i < items.size();i++)
+    {
+        QTreeWidgetItem *item = items[i];
+    
+        QString varName = getTreeWidgetItemPath(item);
+        if(m_autoVarDispInfo.contains(varName))
+        {
+            VarCtl::DispInfo &dispInfo = m_autoVarDispInfo[varName];
+            if(dispInfo.orgFormat == VarCtl::DISP_DEC)
+            {
+                QString valStr = dispInfo.orgValue;
+                
+                dispInfo.dispFormat = fmt;
+                
+                QString valueText = VarCtl::valueDisplay(valStr, dispInfo.dispFormat);
+
+                item->setText(COLUMN_VALUE, valueText);
+            }
+        }
+    }
+
 }
 
 

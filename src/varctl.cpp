@@ -8,6 +8,8 @@
 
 #include "varctl.h"
 
+#include <assert.h>
+
 
 VarCtl::DispFormat VarCtl::findVarType(QString dataString)
 {
@@ -40,10 +42,15 @@ VarCtl::DispFormat VarCtl::findVarType(QString dataString)
 /**
  * @brief Formats a string (Eg: 0x2) that represents a decimal value.
  */
-QString VarCtl::valueDisplay(long long val, DispFormat format)
+QString VarCtl::valueDisplay(QString valueStr, DispFormat format)
 {
     QString valueText;
-    if(format == DISP_BIN)
+    long long val = valueStr.toLongLong(0,0);
+    if(format == DISP_NATIVE)
+    {
+        valueText = valueStr;
+    }
+    else if(format == DISP_BIN)
     {
         QString subText;
         QString reverseText;

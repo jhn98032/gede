@@ -274,7 +274,12 @@ int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
 
         // Was the previous token only an address and the next token is the actual data? (Eg: '0x0001 "string"' )
         if(tokenList->isEmpty())
-            return -1;
+        {
+            if(token->getType() == Token::C_STRING)
+                defValueStr = "\"" + token->getString() + "\"";
+            thisNode->setData(defValueStr);
+            return 0;
+        }
         Token *nextTok = tokenList->first();
         while( nextTok->getType() == Token::VAR || nextTok->getType() == Token::C_STRING)
         {

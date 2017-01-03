@@ -429,9 +429,7 @@ void MainWindow::ICore_onStopped(ICore::StopReason reason, QString path, int lin
 
 void MainWindow::ICore_onLocalVarReset()
 {
-    QTreeWidget *autoWidget = m_ui.autoWidget;
-
-    autoWidget->clear();
+    m_autoVarCtl.ICore_onLocalVarReset();
 }
 
 /**

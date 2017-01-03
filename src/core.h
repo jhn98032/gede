@@ -72,9 +72,8 @@ class CoreVarValue
 public:
     CoreVarValue(QString str) { m_str = str; };
 
-    QString toString();
-    
     Tree *toTree();
+
     QString m_str;
 };
 

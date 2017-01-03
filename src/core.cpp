@@ -28,20 +28,6 @@ bool VarWatch::hasChildren()
 }
 
 
-QString CoreVarValue::toString()
-{
-    if(m_str.startsWith("{<"))
-    {
-        // Is it a message? Eg: "{<No data fields>}".
-        return m_str.mid(1,m_str.length()-2);
-    }
-    
-    return m_str;
-}
-
-
-
-
 Tree* CoreVarValue::toTree()
 {
     Tree *tree = NULL;
@@ -50,41 +36,12 @@ Tree* CoreVarValue::toTree()
 
     QList<Token*> orgList = tokenList;
 
-    if(tokenList.size() > 1)
-    {
-        Token* token;
-        token = tokenList.front();
-
-        if(token)
-        {
-            TreeNode *rootNode;
-            tree = new Tree;
-            rootNode = tree->getRoot();
-
-            // Is it a "@0x2202:" type?
-            if(token->getType() == Token::KEY_SNABEL)
-            {
-                Token *extraNameTok;
-                token = tokenList.takeFirst();
-                
-                extraNameTok = tokenList.takeFirst();
-                if(extraNameTok)
-                {
-                 
-                    rootNode->setAddress(extraNameTok->getString().toInt(0,0)); 
-                }
-            }
+    TreeNode *rootNode;
+    tree = new Tree;
+    rootNode = tree->getRoot();
 
 
-            GdbMiParser::parseVariableData(rootNode, &tokenList);
-
-        }
-        
-    }
-    else
-    {
-        //errorMsg("Unknown token ('%s')", stringToCStr(token->getString()));
-    }
+    GdbMiParser::parseVariableData(rootNode, &tokenList);
 
     for(int i = 0;i < orgList.size();i++)
     {
