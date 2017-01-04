@@ -183,15 +183,15 @@ void AutoVarCtl::ICore_onLocalVarReset()
 }
 
 
-void AutoVarCtl::ICore_onLocalVarChanged(QString name, CoreVarValue varValue)
+void AutoVarCtl::ICore_onLocalVarChanged(CoreVarValue *varValue)
 {
-    Tree *valueTree = varValue.toTree();
+    QString name = varValue->getName();
 
-    assert(valueTree != NULL);
+    assert(varValue != NULL);
 
-    createTreeWidgetItem(NULL, &m_autoVarDispInfo, name, name, valueTree ? valueTree->getRoot() : NULL);
+
+    createTreeWidgetItem(NULL, &m_autoVarDispInfo, name, varValue);
    
-    delete valueTree;
 }
 
 
@@ -206,17 +206,13 @@ void AutoVarCtl::createTreeWidgetItem(
                     QTreeWidgetItem *parentItem,
                     VarCtl::DispInfoMap *map,
                     QString fullPath,
-                    QString name,
-                    TreeNode *valueTree)
+                    CoreVarValue *varValue)
 {
+    QString name = varValue->getName();
     QTreeWidget *autoWidget = m_autoWidget;
 
     // Get the text to display
-    QString value;
-    if(valueTree)
-    {
-        value = valueTree->getData();
-    }
+    QString value = varValue->getData();
 
     VarCtl::DispFormat orgFormat = VarCtl::findVarType(value);
     QString displayValue = value;
@@ -228,7 +224,7 @@ void AutoVarCtl::createTreeWidgetItem(
         dispInfo.orgValue = value;
 
         // Update the variable value
-        if(orgFormat == VarCtl::DISP_DEC)
+        if(orgFormat == VarCtl::DISP_DEC && dispInfo.dispFormat != VarCtl::DISP_NATIVE)
         {
             displayValue = VarCtl::valueDisplay(value, dispInfo.dispFormat);
         }
@@ -252,11 +248,8 @@ void AutoVarCtl::createTreeWidgetItem(
     item = new QTreeWidgetItem(names);
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
-    if(valueTree)
-        item->setData(1, Qt::UserRole, QVariant((qlonglong)valueTree->getAddress()));
+    item->setData(1, Qt::UserRole, QVariant((qlonglong)varValue->getAddress()));
 
-
-    QString parentPath = fullPath;
 
 
     if(parentItem)
@@ -265,17 +258,16 @@ void AutoVarCtl::createTreeWidgetItem(
         autoWidget->insertTopLevelItem(0, item);
     
 
-    for(int i = 0;i < valueTree->getChildCount();i++)
+    for(int i = 0;i < varValue->getChildCount();i++)
     {
-        TreeNode *child = valueTree->getChild(i);
+        CoreVarValue *child = varValue->getChild(i);
 
-        QString varPath = parentPath + "/" + child->getName();
+        QString varPath = fullPath + "/" + child->getName();
 
         createTreeWidgetItem(
                 item,
                 map,
                 varPath,
-                child->getName(),
                 child);
     }
 

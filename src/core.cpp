@@ -28,28 +28,79 @@ bool VarWatch::hasChildren()
 }
 
 
-Tree* CoreVarValue::toTree()
+
+CoreVarValue::CoreVarValue(QString name)
+    : m_name(name)
 {
-    Tree *tree = NULL;
-    
-    QList<Token*> tokenList = GdbMiParser::tokenizeVarString(m_str);
+
+}
+
+CoreVarValue::~CoreVarValue()
+{
+    clear();
+}
+
+long long CoreVarValue::getAddress()
+{
+    return m_address;
+}
+
+void CoreVarValue::clear()
+{
+    for(int j = 0;j < m_children.size();j++)
+    {
+        CoreVarValue* child = m_children[j];
+        delete child;
+    }
+    m_children.clear();
+}
+
+void CoreVarValue::fromGdbString(QString data)
+{
+    QList<Token*> tokenList = GdbMiParser::tokenizeVarString(data);
 
     QList<Token*> orgList = tokenList;
 
-    TreeNode *rootNode;
-    tree = new Tree;
-    rootNode = tree->getRoot();
-
+    Tree *tree = new Tree;
+    TreeNode *rootNode = tree->getRoot();
 
     GdbMiParser::parseVariableData(rootNode, &tokenList);
+
+    // tree->dump();
 
     for(int i = 0;i < orgList.size();i++)
     {
         Token *tok = orgList[i];
         delete tok;
     }
-    return tree;
+
+    fromTree(tree->getRoot());
+
+    delete tree;
+
 }
+
+
+void CoreVarValue::fromTree(TreeNode *treeNode)
+{
+    m_address = treeNode->getAddress();
+    m_data = treeNode->getData();
+
+    // Create children
+    for(int j = 0;j < treeNode->getChildCount();j++)
+    {
+        TreeNode *treeChildNode = treeNode->getChild(j);
+        
+        CoreVarValue* child = new CoreVarValue();
+        child->m_name = treeChildNode->getName();
+        m_children.push_back(child);
+
+        child->fromTree(treeChildNode);
+    }
+    
+}
+
+
 
 
 
@@ -779,7 +830,7 @@ void Core::onNotifyAsyncOut(Tree &tree, AsyncClass ac)
     {
         m_scanSources = true;
     }
-    tree.dump();
+    //tree.dump();
 }
 
 
@@ -1222,8 +1273,9 @@ void Core::onResult(Tree &tree)
                     path.sprintf("locals/%d/value", j+1);
                     QString varData = tree.getString(path);
 
-                    CoreVarValue val(varData);
-                    m_inf->ICore_onLocalVarChanged(varName, val);
+                    CoreVarValue val(varName);
+                    val.fromGdbString(varData);
+                    m_inf->ICore_onLocalVarChanged(&val);
                     
                 }
             }

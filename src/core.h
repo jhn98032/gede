@@ -15,6 +15,8 @@
 #include <QHash>
 #include <QSocketNotifier>
 #include <QObject>
+#include <QVector>
+
 
 #include "settings.h"
 
@@ -70,11 +72,32 @@ private:
 class CoreVarValue
 {
 public:
-    CoreVarValue(QString str) { m_str = str; };
+    CoreVarValue(){};
+    CoreVarValue(QString name);
+    virtual ~CoreVarValue();
 
-    Tree *toTree();
 
-    QString m_str;
+    QString getName() const { return m_name; };
+    QString getData() const { return m_data; };
+    long long getAddress();
+
+    int getChildCount() { return m_children.size(); };
+    CoreVarValue* getChild(int idx) { return m_children[idx]; };
+
+    void fromGdbString(QString data);
+    
+private:
+    void clear();
+
+    Tree *toTree(QString m_str);
+    void fromTree(TreeNode *tree);
+
+private:
+
+    QString m_name;
+    QVector <CoreVarValue*> m_children;
+    QString m_data;
+    long long m_address;
 };
 
 
@@ -146,7 +169,7 @@ class ICore
     virtual void ICore_onStateChanged(TargetState state) = 0;
     virtual void ICore_onSignalReceived(QString signalName) = 0;
     virtual void ICore_onLocalVarReset() = 0;
-    virtual void ICore_onLocalVarChanged(QString name, CoreVarValue value) = 0;
+    virtual void ICore_onLocalVarChanged(CoreVarValue* value) = 0;
     virtual void ICore_onFrameVarReset() = 0;
     virtual void ICore_onFrameVarChanged(QString name, QString value) = 0;
     virtual void ICore_onWatchVarChanged(VarWatch &watch) = 0;

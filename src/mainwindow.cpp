@@ -652,9 +652,9 @@ void MainWindow::insertSourceFiles()
 
     
     
-void MainWindow::ICore_onLocalVarChanged(QString name, CoreVarValue varValue)
+void MainWindow::ICore_onLocalVarChanged(CoreVarValue *varValue)
 {
-    m_autoVarCtl.ICore_onLocalVarChanged(name, varValue);
+    m_autoVarCtl.ICore_onLocalVarChanged(varValue);
 }
 
 
