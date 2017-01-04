@@ -10,6 +10,7 @@
 #include "util.h"
 #include "log.h"
 #include <assert.h>
+#include "core.h"
 
 
 
@@ -163,10 +164,9 @@ QList<Token*> GdbMiParser::tokenizeVarString(QString str)
 /**
  * @brief Parses a variable assignment block.
  */
-int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
+int GdbMiParser::parseVariableData(CoreVarValue *var, QList<Token*> *tokenList)
 {
     Token *token;
-    TreeNode *childNode = NULL;
     int rc = 0;
 
     if(tokenList->isEmpty())
@@ -191,7 +191,7 @@ int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
             if(token2->getType() == Token::KEY_LEFT_BRACE)
             {
                 
-                rc = parseVariableData(thisNode, tokenList);
+                rc = parseVariableData(var, tokenList);
 
                 token = tokenList->takeFirst();
             }
@@ -226,13 +226,11 @@ int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
             {
                 eqToken = tokenList->takeFirst();
 
-                // Create treenode
-                childNode = new TreeNode;
-                childNode->setName(name);
-                thisNode->addChild(childNode);
+                // Create variable
+                CoreVarValue *childVar = var->addChild(name);
 
                 // Get variable data
-                rc = parseVariableData(childNode, tokenList);
+                rc = parseVariableData(childVar, tokenList);
 
                 // End of the data
                 token = tokenList->takeFirst();
@@ -243,8 +241,8 @@ int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
             }
             else if(eqToken->getType() == Token::KEY_RIGHT_BRACE)
             {
-                if(thisNode->getChildCount() == 0)
-                    thisNode->setData(nameTok->getString());
+                if(var->getChildCount() == 0)
+                    var->setData(nameTok->getString());
                 // Triggered by for example: "'{','<No data fields>', '}'"
                 token = tokenList->isEmpty() ? NULL : tokenList->takeFirst();
             }
@@ -269,7 +267,7 @@ int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
     {
         QString valueStr;
         QString defValueStr = token->getString();
-        thisNode->setAddress(defValueStr.toLongLong(0,0));
+        var->setAddress(defValueStr.toLongLong(0,0));
 
 
         // Was the previous token only an address and the next token is the actual data? (Eg: '0x0001 "string"' )
@@ -277,7 +275,7 @@ int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
         {
             if(token->getType() == Token::C_STRING)
                 defValueStr = "\"" + token->getString() + "\"";
-            thisNode->setData(defValueStr);
+            var->setData(defValueStr);
             return 0;
         }
         Token *nextTok = tokenList->first();
@@ -298,7 +296,7 @@ int GdbMiParser::parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList)
         }
         if(valueStr.isEmpty())
             valueStr = defValueStr;
-        thisNode->setData(valueStr);
+        var->setData(valueStr);
     }
     
     return rc;

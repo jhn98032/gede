@@ -79,18 +79,19 @@ public:
 
     QString getName() const { return m_name; };
     QString getData() const { return m_data; };
+    void setData(QString data) { m_data = data; };
     long long getAddress();
+    void setAddress(long long addr) { m_address = addr; };
 
     int getChildCount() { return m_children.size(); };
     CoreVarValue* getChild(int idx) { return m_children[idx]; };
-
+    CoreVarValue* addChild(QString name);
+    
     void fromGdbString(QString data);
     
 private:
     void clear();
 
-    Tree *toTree(QString m_str);
-    void fromTree(TreeNode *tree);
 
 private:
 

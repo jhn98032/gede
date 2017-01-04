@@ -40,6 +40,13 @@ CoreVarValue::~CoreVarValue()
     clear();
 }
 
+CoreVarValue* CoreVarValue::addChild(QString name)
+{
+    CoreVarValue* child = new CoreVarValue(name);
+    m_children.push_back(child);
+    return child; 
+}
+    
 long long CoreVarValue::getAddress()
 {
     return m_address;
@@ -58,15 +65,9 @@ void CoreVarValue::clear()
 void CoreVarValue::fromGdbString(QString data)
 {
     QList<Token*> tokenList = GdbMiParser::tokenizeVarString(data);
-
     QList<Token*> orgList = tokenList;
 
-    Tree *tree = new Tree;
-    TreeNode *rootNode = tree->getRoot();
-
-    GdbMiParser::parseVariableData(rootNode, &tokenList);
-
-    // tree->dump();
+    GdbMiParser::parseVariableData(this, &tokenList);
 
     for(int i = 0;i < orgList.size();i++)
     {
@@ -74,31 +75,9 @@ void CoreVarValue::fromGdbString(QString data)
         delete tok;
     }
 
-    fromTree(tree->getRoot());
-
-    delete tree;
-
 }
 
 
-void CoreVarValue::fromTree(TreeNode *treeNode)
-{
-    m_address = treeNode->getAddress();
-    m_data = treeNode->getData();
-
-    // Create children
-    for(int j = 0;j < treeNode->getChildCount();j++)
-    {
-        TreeNode *treeChildNode = treeNode->getChild(j);
-        
-        CoreVarValue* child = new CoreVarValue();
-        child->m_name = treeChildNode->getName();
-        m_children.push_back(child);
-
-        child->fromTree(treeChildNode);
-    }
-    
-}
 
 
 

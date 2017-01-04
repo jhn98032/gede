@@ -12,6 +12,7 @@
 #include "tree.h"
 #include <QList>
 #include "com.h"
+#include "core.h"
 
 
 class GdbMiParser
@@ -20,7 +21,7 @@ class GdbMiParser
     
     GdbMiParser(){};
 
-    static int parseVariableData(TreeNode *thisNode, QList<Token*> *tokenList);
+    static int parseVariableData(CoreVarValue *var, QList<Token*> *tokenList);
     static QList<Token*> tokenizeVarString(QString str);
 
 };
