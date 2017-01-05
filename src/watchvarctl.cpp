@@ -105,7 +105,7 @@ void WatchVarCtl::sync(QTreeWidgetItem* parentItem, VarWatch &watch)
     QString watchId = watch.getWatchId();
     QString name = watch.getName();
     QString varType = watch.getVarType();
-    QString valueString = watch.m_varValue;
+    QString valueString = watch.getValue();
     bool inScope = watch.inScope();
 
         
@@ -182,23 +182,6 @@ void WatchVarCtl::sync(QTreeWidgetItem* parentItem, VarWatch &watch)
     }
 
     // Update the text
-    if(m_watchVarDispInfo.contains(watchId))
-    {
-        VarCtl::DispInfo &dispInfo = m_watchVarDispInfo[watchId];
-        dispInfo.orgValue = valueString;
-
-        
-
-        VarCtl::DispFormat orgFormat = VarCtl::findVarType(valueString);
-
-        dispInfo.orgFormat = orgFormat;
-        
-        // Update the variable value
-        if(orgFormat == VarCtl::DISP_DEC)
-        {
-            valueString = VarCtl::valueDisplay(valueString, dispInfo.dispFormat);
-        }
-    }
     if(!inScope)
         treeItem->setDisabled(true);
     else
@@ -207,13 +190,12 @@ void WatchVarCtl::sync(QTreeWidgetItem* parentItem, VarWatch &watch)
     // Add display info
     if(m_watchVarDispInfo.contains(watchId) == false)
     {
-                VarCtl::DispInfo dispInfo;
-            dispInfo.orgValue = valueString;
-            dispInfo.orgFormat = VarCtl::findVarType(valueString);
-            dispInfo.dispFormat = dispInfo.orgFormat;
-            m_watchVarDispInfo[watchId] = dispInfo;
+        VarCtl::DispInfo dispInfo;
+        dispInfo.dispFormat = DISP_NATIVE;
+        m_watchVarDispInfo[watchId] = dispInfo;
     }
 
+    valueString = getDisplayString(watchId);
     treeItem->setText(COLUMN_VALUE, valueString);
     treeItem->setText(COLUMN_TYPE, varType);
     if(watch.hasChildren())
@@ -239,7 +221,7 @@ void WatchVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
     QString name = watch.getName();
     QString varType = watch.getVarType();
     
-    QString valueString = watch.m_varValue;
+    QString valueString = watch.getValue();
     bool hasChildren  = watch.hasChildren();
     bool inScope = watch.inScope();
 
@@ -305,25 +287,12 @@ void WatchVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
             if(m_watchVarDispInfo.contains(thisWatchId) == false)
             {
                 VarCtl::DispInfo dispInfo;
-                dispInfo.orgValue = valueString;
-                dispInfo.orgFormat = VarCtl::findVarType(valueString);
-                dispInfo.dispFormat = dispInfo.orgFormat;
+                dispInfo.dispFormat = DISP_NATIVE;
                 m_watchVarDispInfo[watchId] = dispInfo;
             }
             else
             {
-                VarCtl::DispInfo &dispInfo = m_watchVarDispInfo[thisWatchId];
-                dispInfo.orgValue = valueString;
-
-                VarCtl::DispFormat orgFormat = VarCtl::findVarType(valueString);
-
-                dispInfo.orgFormat = orgFormat;
-                
-                // Update the variable value
-                if(orgFormat == VarCtl::DISP_DEC)
-                {
-                    valueString = VarCtl::valueDisplay(valueString, dispInfo.dispFormat);
-                }
+                valueString = getDisplayString(thisWatchId);
             }
 
             bool enable = inScope;
@@ -339,6 +308,50 @@ void WatchVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
     }
 }
 
+
+
+/**
+ * @brief Returns the value text to show for an item.
+ */
+QString WatchVarCtl::getDisplayString(QString watchId)
+{
+    QString displayValue;
+    Core &core = Core::getInstance();
+    VarWatch *watch = core.getVarWatchInfo(watchId);
+    if(watch)
+    {
+        if(m_watchVarDispInfo.contains(watchId))
+        {
+            VarCtl::DispInfo &dispInfo = m_watchVarDispInfo[watchId];
+
+            switch(dispInfo.dispFormat)
+            {
+                default:
+                case DISP_NATIVE:
+                    displayValue = watch->getValue(CoreVar::FMT_NATIVE);break;
+                case DISP_DEC:
+                    displayValue = watch->getValue(CoreVar::FMT_DEC);break;
+                case DISP_BIN:
+                    displayValue = watch->getValue(CoreVar::FMT_BIN);break;
+                case DISP_HEX:
+                    displayValue = watch->getValue(CoreVar::FMT_HEX);break;
+                case DISP_CHAR:
+                    displayValue = watch->getValue(CoreVar::FMT_CHAR);break;
+            }
+
+        }
+        else
+        {
+            displayValue = watch->getValue(CoreVar::FMT_NATIVE);
+
+            VarCtl::DispInfo dispInfo;
+            dispInfo.dispFormat = DISP_NATIVE;
+            dispInfo.isExpanded = false;
+            m_watchVarDispInfo[watchId] = dispInfo;
+        }
+    }
+    return displayValue;
+}
 
 /**
  * @brief Change display format for the currently selected items.
@@ -358,15 +371,16 @@ void WatchVarCtl::selectedChangeDisplayFormat(VarCtl::DispFormat fmt)
         QString varName = item->text(COLUMN_NAME);
         QString watchId = item->data(DATA_COLUMN, Qt::UserRole).toString();
 
+        Core &core = Core::getInstance();
+        VarWatch *watch = core.getVarWatchInfo(watchId);
         
-        if(m_watchVarDispInfo.contains(watchId))
+        if(watch != NULL && m_watchVarDispInfo.contains(watchId))
         {
             VarCtl::DispInfo &dispInfo = m_watchVarDispInfo[watchId];
-            if(dispInfo.orgFormat == VarCtl::DISP_DEC)
             {
                 dispInfo.dispFormat = fmt;
                 
-                QString valueText = VarCtl::valueDisplay(dispInfo.orgValue, dispInfo.dispFormat);
+                QString valueText = getDisplayString(watchId);
 
                 item->setText(COLUMN_VALUE, valueText);
             }
@@ -460,22 +474,21 @@ WatchVarCtl::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int col
             current->setText(COLUMN_VALUE, "");
         else
         {
-        watch = core.getVarWatchInfo(oldKey);
-        if(watch)
-        {
-        QString oldValue  = watch->getValue();
-        QString newValue = current->text(COLUMN_VALUE);
-
-            VarCtl::DispInfo dispInfo = m_watchVarDispInfo[oldKey];
-            if (dispInfo.orgValue != newValue)
+            watch = core.getVarWatchInfo(oldKey);
+            if(watch)
             {
+                QString oldValue  = watch->getValue();
+                QString newValue = current->text(COLUMN_VALUE);
 
-                if(core.changeWatchVariable(oldKey, newValue))
-                    current->setText(COLUMN_VALUE, oldValue);
+                if (oldValue != newValue)
+                {
+                    if(core.changeWatchVariable(oldKey, newValue))
+                    {
+                        current->setText(COLUMN_VALUE, oldValue);
+                    }
+                }
             }
         }
-         }   
-        
     }
 
     // Only allow changes to 'Value' and 'Name' column
@@ -532,9 +545,7 @@ WatchVarCtl::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int col
                 current->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
 
             VarCtl::DispInfo dispInfo;
-            dispInfo.orgValue = value;
-            dispInfo.orgFormat = VarCtl::findVarType(value);
-            dispInfo.dispFormat = dispInfo.orgFormat;
+            dispInfo.dispFormat = DISP_NATIVE;
             m_watchVarDispInfo[watchId] = dispInfo;
 
             current->setData(DATA_COLUMN, Qt::UserRole, watchId);
@@ -597,9 +608,7 @@ WatchVarCtl::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int col
             
             // Add display information
             VarCtl::DispInfo dispInfo;
-            dispInfo.orgValue = value;
-            dispInfo.orgFormat = VarCtl::findVarType(value);
-            dispInfo.dispFormat = dispInfo.orgFormat;
+            dispInfo.dispFormat = DISP_NATIVE;
             m_watchVarDispInfo[watchId] = dispInfo;
             
         }
@@ -654,9 +663,7 @@ void WatchVarCtl::onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int colu
         if(m_watchVarDispInfo.contains(watchId))
         {
             VarCtl::DispInfo &dispInfo = m_watchVarDispInfo[watchId];
-            if(dispInfo.orgFormat == VarCtl::DISP_DEC)
             {
-                QString valStr = dispInfo.orgValue;
                 
                 if(dispInfo.dispFormat == VarCtl::DISP_DEC)
                 {
@@ -675,8 +682,8 @@ void WatchVarCtl::onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int colu
                     dispInfo.dispFormat = VarCtl::DISP_DEC;
                 }
 
-                QString valueText = VarCtl::valueDisplay(valStr, dispInfo.dispFormat);
-
+                QString valueText = getDisplayString(watchId);
+                
                 item->setText(1, valueText);
             }
         }

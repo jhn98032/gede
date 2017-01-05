@@ -72,7 +72,7 @@ private:
 class CoreVar
 {
 public:
-    CoreVar(){};
+    CoreVar();
     CoreVar(QString name);
     virtual ~CoreVar();
 
@@ -89,7 +89,7 @@ public:
     CoreVar* getChild(int idx) { return m_children[idx]; };
     CoreVar* addChild(QString name);
     
-    void fromGdbString(QString data);
+    void valueFromGdbString(QString data);
     
 private:
     void clear();
@@ -109,21 +109,18 @@ private:
 class VarWatch
 {
     public:
-        VarWatch() {  };
-        VarWatch(QString watchId_, QString name_)
-        : watchId(watchId_),
-            name(name_)
-         {  };
-
+        VarWatch();
+        VarWatch(QString watchId_, QString name_);
+        
         QString getName() { return name; };
         QString getWatchId() { return watchId; };
 
         bool hasChildren();
         bool inScope() { return m_inScope;};
         QString getVarType() { return m_varType; };
-        QString getValue() { return m_varValue; };
+        QString getValue(CoreVar::DispFormat fmt = CoreVar::FMT_NATIVE) { return m_var.getData(fmt); };
 
-        void setValue(QString value) { m_varValue = value; };
+        void setValue(QString value);
     private:
 
         QString watchId;
@@ -131,7 +128,9 @@ class VarWatch
 
     public:
         bool m_inScope;
-        QString m_varValue;
+    private:
+        CoreVar m_var;
+    public:
         QString m_varType;
         bool m_hasChildren;
         

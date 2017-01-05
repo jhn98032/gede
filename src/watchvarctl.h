@@ -40,6 +40,7 @@ private:
 
     void selectedChangeDisplayFormat(VarCtl::DispFormat fmt);
 
+    QString getDisplayString(QString watchId);
     
     void sync(QTreeWidgetItem * parentItem, VarWatch &watch);
     

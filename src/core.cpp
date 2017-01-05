@@ -22,14 +22,41 @@
 #include <fcntl.h> //  O_RDWR
 #include <ctype.h>
 
+VarWatch::VarWatch()
+    : m_inScope(true)
+    ,m_hasChildren(false)
+{
+}
+
+VarWatch::VarWatch(QString watchId_, QString name_)
+  : watchId(watchId_)
+    ,name(name_)
+    ,m_inScope(true)
+    ,m_hasChildren(false)
+{
+
+}
+
 
 bool VarWatch::hasChildren()
 {
     return m_hasChildren;
 }
 
+void VarWatch::setValue(QString value)
+{
+    m_var.valueFromGdbString(value);
+}
 
 
+CoreVar::CoreVar()
+ : m_address(0)
+   ,m_type(TYPE_UNKNOWN)
+{
+
+}
+
+    
 CoreVar::CoreVar(QString name)
     : m_name(name)
     ,m_address(0)
@@ -65,7 +92,7 @@ void CoreVar::clear()
     m_children.clear();
 }
 
-void CoreVar::fromGdbString(QString data)
+void CoreVar::valueFromGdbString(QString data)
 {
     QList<Token*> tokenList = GdbMiParser::tokenizeVarString(data);
     QList<Token*> orgList = tokenList;
@@ -85,8 +112,14 @@ void CoreVar::setData(QString data)
     m_data = data;
 
 
+    // A parent?
+    if(data == "...")
+    {
+        m_data = "{...}";
+        m_type = TYPE_UNKNOWN;
+    }
     // String?
-    if(data.startsWith('"'))
+    else if(data.startsWith('"'))
     {
         if(data.endsWith('"'))
             data = data.mid(1, data.length()-2);
@@ -786,7 +819,7 @@ int Core::gdbAddVarWatch(QString varName, VarWatch** watchPtr)
 
     VarWatch *w = new VarWatch(watchId,varName);
     w->m_varType = varType2;
-    w->m_varValue = varValue2;
+    w->setValue(varValue2);
     w->m_hasChildren = numChild > 0 ? true : false;
     m_watchList.append(w);
     
@@ -842,7 +875,7 @@ int Core::gdbExpandVarWatchChildren(QString watchId)
         {
             watch = new VarWatch(childWatchId,childExp);
             watch->m_inScope = true;
-            watch->m_varValue = childValue;
+            watch->setValue(childValue);
             watch->m_varType = childType;
             watch->m_hasChildren = hasChildren;
             watch->m_parentWatchId = watchId;
@@ -1229,7 +1262,7 @@ void Core::onResult(Tree &tree)
                     {
                         gdbRemoveVarWatch(removeList[cidx]->getWatchId());
                     }
-                    watch->m_varValue = "";
+                    watch->setValue("");
                     path.sprintf("changelist/%d/new_type", j+1);
                     watch->m_varType = tree.getString(path);
                     path.sprintf("changelist/%d/new_num_children", j+1);
@@ -1242,7 +1275,7 @@ void Core::onResult(Tree &tree)
                 {
                     
                 path.sprintf("changelist/%d/value", j+1);
-                watch->m_varValue = tree.getString(path);
+                watch->setValue(tree.getString(path));
                 path.sprintf("changelist/%d/in_scope", j+1);
                 QString inScopeStr = tree.getString(path);
                 if(inScopeStr == "true" || inScopeStr.isEmpty())
@@ -1252,7 +1285,7 @@ void Core::onResult(Tree &tree)
 
                 
 
-                if (watch->m_varValue == "{...}" && watch->hasChildren() == false)
+                if (watch->getValue() == "{...}" && watch->hasChildren() == false)
                     watch->m_hasChildren = true;
                 
 //                printf("in_scope:%s -> %d\n", stringToCStr(inScopeStr), inScope);
@@ -1389,7 +1422,7 @@ void Core::onResult(Tree &tree)
                 QString varData = tree.getString(path);
 
                 CoreVar *val = new CoreVar(varName);
-                val->fromGdbString(varData);
+                val->valueFromGdbString(varData);
 
                 m_localVars.push_back(val);
             }

@@ -33,8 +33,6 @@ public:
     };
     typedef struct
     {
-        QString orgValue;
-        DispFormat orgFormat;
         DispFormat dispFormat;
         bool isExpanded;
     }DispInfo;
@@ -42,8 +40,6 @@ public:
     typedef QMap<QString, DispInfo>  DispInfoMap;
 
 
-    static DispFormat findVarType(QString dataString);
-    static QString valueDisplay(QString value, DispFormat format);
 
 };
 
