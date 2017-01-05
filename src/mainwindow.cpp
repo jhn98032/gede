@@ -652,7 +652,7 @@ void MainWindow::insertSourceFiles()
 
     
     
-void MainWindow::ICore_onLocalVarChanged(CoreVarValue *varValue)
+void MainWindow::ICore_onLocalVarChanged(CoreVar *varValue)
 {
     m_autoVarCtl.ICore_onLocalVarChanged(varValue);
 }

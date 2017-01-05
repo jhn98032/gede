@@ -177,7 +177,7 @@ void AutoVarCtl::onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column
         }
         
 
-        CoreVarValue *var = getVar(*item);
+        CoreVar *var = getVar(*item);
         if(var)
         {
             QString valueText = getDisplayString(var, varName);
@@ -197,7 +197,7 @@ void AutoVarCtl::ICore_onLocalVarReset()
 }
 
 
-void AutoVarCtl::ICore_onLocalVarChanged(CoreVarValue *varValue)
+void AutoVarCtl::ICore_onLocalVarChanged(CoreVar *varValue)
 {
     QString name = varValue->getName();
 
@@ -212,7 +212,7 @@ void AutoVarCtl::ICore_onLocalVarChanged(CoreVarValue *varValue)
 /**
  * @brief Returns the value text to show for an item.
  */
-QString AutoVarCtl::getDisplayString(CoreVarValue *var, QString fullPath)
+QString AutoVarCtl::getDisplayString(CoreVar *var, QString fullPath)
 {
     QString displayValue;
     if(m_autoVarDispInfo.contains(fullPath))
@@ -223,21 +223,21 @@ QString AutoVarCtl::getDisplayString(CoreVarValue *var, QString fullPath)
         {
             default:
             case DISP_NATIVE:
-                displayValue = var->getData(CoreVarValue::FMT_NATIVE);break;
+                displayValue = var->getData(CoreVar::FMT_NATIVE);break;
             case DISP_DEC:
-                displayValue = var->getData(CoreVarValue::FMT_DEC);break;
+                displayValue = var->getData(CoreVar::FMT_DEC);break;
             case DISP_BIN:
-                displayValue = var->getData(CoreVarValue::FMT_BIN);break;
+                displayValue = var->getData(CoreVar::FMT_BIN);break;
             case DISP_HEX:
-                displayValue = var->getData(CoreVarValue::FMT_HEX);break;
+                displayValue = var->getData(CoreVar::FMT_HEX);break;
             case DISP_CHAR:
-                displayValue = var->getData(CoreVarValue::FMT_CHAR);break;
+                displayValue = var->getData(CoreVar::FMT_CHAR);break;
         }
 
     }
     else
     {
-        displayValue = var->getData(CoreVarValue::FMT_NATIVE);
+        displayValue = var->getData(CoreVar::FMT_NATIVE);
 
         VarCtl::DispInfo dispInfo;
         dispInfo.dispFormat = DISP_NATIVE;
@@ -255,7 +255,7 @@ void AutoVarCtl::createTreeWidgetItem(
                     QTreeWidgetItem *parentItem,
                     VarCtl::DispInfoMap *map,
                     QString fullPath,
-                    CoreVarValue *varValue)
+                    CoreVar *varValue)
 {
     QString name = varValue->getName();
     QTreeWidget *autoWidget = m_autoWidget;
@@ -287,7 +287,7 @@ void AutoVarCtl::createTreeWidgetItem(
 
     for(int i = 0;i < varValue->getChildCount();i++)
     {
-        CoreVarValue *child = varValue->getChild(i);
+        CoreVar *child = varValue->getChild(i);
 
         QString varPath = fullPath + "/" + child->getName();
 
@@ -349,26 +349,26 @@ void AutoVarCtl::onDisplayAsChar()
 /**
  * @brief Get the variable associated with the item.
  */
-CoreVarValue *AutoVarCtl::getVar(QTreeWidgetItem &item)
+CoreVar *AutoVarCtl::getVar(QTreeWidgetItem &item)
 {
     QTreeWidgetItem *parentTreeItem = item.parent();
     if(parentTreeItem == NULL)
     {
         Core &core = Core::getInstance();
-        QVector <CoreVarValue*> list = core.getLocalVars();
+        QVector <CoreVar*> list = core.getLocalVars();
         for(int j = 0;j < list.size();j++)
         {
-            CoreVarValue* var = list[j];
+            CoreVar* var = list[j];
             if(var->getName() == item.text(0))
                 return var;
         }
     }
     else
     {
-        CoreVarValue *parentVar = getVar(*parentTreeItem);
+        CoreVar *parentVar = getVar(*parentTreeItem);
         for(int j = 0;j < parentVar->getChildCount();j++)
         {
-            CoreVarValue* var = parentVar->getChild(j);
+            CoreVar* var = parentVar->getChild(j);
             if(var->getName() == item.text(0))
                 return var;
         }
@@ -390,7 +390,7 @@ void AutoVarCtl::selectedChangeDisplayFormat(VarCtl::DispFormat fmt)
         QTreeWidgetItem *item = items[i];
     
         QString varPath = getTreeWidgetItemPath(item);
-        CoreVarValue *var = getVar(*item);
+        CoreVar *var = getVar(*item);
         if(var != NULL)
         {
             if(!m_autoVarDispInfo.contains(varPath))

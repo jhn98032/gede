@@ -21,7 +21,7 @@ class GdbMiParser
     
     GdbMiParser(){};
 
-    static int parseVariableData(CoreVarValue *var, QList<Token*> *tokenList);
+    static int parseVariableData(CoreVar *var, QList<Token*> *tokenList);
     static QList<Token*> tokenizeVarString(QString str);
 
 };

@@ -29,7 +29,7 @@ public:
 
     void setWidget(QTreeWidget *autoWidget);
 
-    void ICore_onLocalVarChanged(CoreVarValue *varValue);
+    void ICore_onLocalVarChanged(CoreVar *varValue);
     void ICore_onLocalVarReset();
     
     void setConfig(Settings *cfg);
@@ -39,12 +39,12 @@ private:
                     QTreeWidgetItem *parentItem,
                     VarCtl::DispInfoMap *map,
                     QString fullPath,
-                    CoreVarValue *varValue);
+                    CoreVar *varValue);
     void selectedChangeDisplayFormat(VarCtl::DispFormat fmt);
     QString getTreeWidgetItemPath(QTreeWidgetItem *item);
 
-    QString getDisplayString(CoreVarValue *var, QString fullPath);
-    CoreVarValue *getVar(QTreeWidgetItem &item);
+    QString getDisplayString(CoreVar *var, QString fullPath);
+    CoreVar *getVar(QTreeWidgetItem &item);
     
 public slots:
 

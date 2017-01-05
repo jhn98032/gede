@@ -164,7 +164,7 @@ QList<Token*> GdbMiParser::tokenizeVarString(QString str)
 /**
  * @brief Parses a variable assignment block.
  */
-int GdbMiParser::parseVariableData(CoreVarValue *var, QList<Token*> *tokenList)
+int GdbMiParser::parseVariableData(CoreVar *var, QList<Token*> *tokenList)
 {
     Token *token;
     int rc = 0;
@@ -227,7 +227,7 @@ int GdbMiParser::parseVariableData(CoreVarValue *var, QList<Token*> *tokenList)
                 eqToken = tokenList->takeFirst();
 
                 // Create variable
-                CoreVarValue *childVar = var->addChild(name);
+                CoreVar *childVar = var->addChild(name);
 
                 // Get variable data
                 rc = parseVariableData(childVar, tokenList);

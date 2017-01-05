@@ -69,12 +69,12 @@ private:
 /**
  * @brief The value of a variable.
  */
-class CoreVarValue
+class CoreVar
 {
 public:
-    CoreVarValue(){};
-    CoreVarValue(QString name);
-    virtual ~CoreVarValue();
+    CoreVar(){};
+    CoreVar(QString name);
+    virtual ~CoreVar();
 
     typedef enum { FMT_HEX, FMT_DEC, FMT_BIN, FMT_CHAR, FMT_NATIVE } DispFormat;
 
@@ -86,8 +86,8 @@ public:
     void setAddress(long long addr) { m_address = addr; };
 
     int getChildCount() { return m_children.size(); };
-    CoreVarValue* getChild(int idx) { return m_children[idx]; };
-    CoreVarValue* addChild(QString name);
+    CoreVar* getChild(int idx) { return m_children[idx]; };
+    CoreVar* addChild(QString name);
     
     void fromGdbString(QString data);
     
@@ -98,7 +98,7 @@ private:
 private:
 
     QString m_name;
-    QVector <CoreVarValue*> m_children;
+    QVector <CoreVar*> m_children;
     QVariant m_data;
     long long m_address;
     enum { TYPE_INT = 0, TYPE_FLOAT, TYPE_STRING, TYPE_ERROR_MSG, TYPE_CHAR, TYPE_UNKNOWN } m_type;
@@ -174,7 +174,7 @@ class ICore
     virtual void ICore_onStateChanged(TargetState state) = 0;
     virtual void ICore_onSignalReceived(QString signalName) = 0;
     virtual void ICore_onLocalVarReset() = 0;
-    virtual void ICore_onLocalVarChanged(CoreVarValue* value) = 0;
+    virtual void ICore_onLocalVarChanged(CoreVar* value) = 0;
     virtual void ICore_onFrameVarReset() = 0;
     virtual void ICore_onFrameVarChanged(QString name, QString value) = 0;
     virtual void ICore_onWatchVarChanged(VarWatch &watch) = 0;
@@ -246,7 +246,7 @@ public:
 
     int changeWatchVariable(QString variable, QString newValue);
     
-    QVector <CoreVarValue*>& getLocalVars() { return m_localVars; };
+    QVector <CoreVar*>& getLocalVars() { return m_localVars; };
 
 
     int gdbSetBreakpoint(QString filename, int lineNo);
@@ -298,7 +298,7 @@ private:
     bool m_scanSources; //!< True if the source filelist may have changed
     QSocketNotifier  *m_ptsListener;
 
-    QVector <CoreVarValue*> m_localVars;
+    QVector <CoreVar*> m_localVars;
     
 };
 

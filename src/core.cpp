@@ -30,7 +30,7 @@ bool VarWatch::hasChildren()
 
 
 
-CoreVarValue::CoreVarValue(QString name)
+CoreVar::CoreVar(QString name)
     : m_name(name)
     ,m_address(0)
       ,m_type(TYPE_UNKNOWN)
@@ -38,34 +38,34 @@ CoreVarValue::CoreVarValue(QString name)
 
 }
 
-CoreVarValue::~CoreVarValue()
+CoreVar::~CoreVar()
 {
     clear();
 }
 
-CoreVarValue* CoreVarValue::addChild(QString name)
+CoreVar* CoreVar::addChild(QString name)
 {
-    CoreVarValue* child = new CoreVarValue(name);
+    CoreVar* child = new CoreVar(name);
     m_children.push_back(child);
     return child; 
 }
     
-long long CoreVarValue::getAddress()
+long long CoreVar::getAddress()
 {
     return m_address;
 }
 
-void CoreVarValue::clear()
+void CoreVar::clear()
 {
     for(int j = 0;j < m_children.size();j++)
     {
-        CoreVarValue* child = m_children[j];
+        CoreVar* child = m_children[j];
         delete child;
     }
     m_children.clear();
 }
 
-void CoreVarValue::fromGdbString(QString data)
+void CoreVar::fromGdbString(QString data)
 {
     QList<Token*> tokenList = GdbMiParser::tokenizeVarString(data);
     QList<Token*> orgList = tokenList;
@@ -80,7 +80,7 @@ void CoreVarValue::fromGdbString(QString data)
 
 }
 
-void CoreVarValue::setData(QString data)
+void CoreVar::setData(QString data)
 {
     m_data = data;
 
@@ -132,7 +132,7 @@ void CoreVarValue::setData(QString data)
 }
 
 
-QString CoreVarValue::getData(DispFormat fmt) const
+QString CoreVar::getData(DispFormat fmt) const
 {
     QString valueText;
 
@@ -241,7 +241,7 @@ Core::~Core()
     // Clear the local var array
     for(int j = 0;j < m_localVars.size();j++)
     {
-        CoreVarValue *val = m_localVars[j];
+        CoreVar *val = m_localVars[j];
         delete val;
     }
     m_localVars.clear();
@@ -1373,7 +1373,7 @@ void Core::onResult(Tree &tree)
             // Clear the local var array
             for(int j = 0;j < m_localVars.size();j++)
             {
-                CoreVarValue *val = m_localVars[j];
+                CoreVar *val = m_localVars[j];
                 delete val;
             }
             m_localVars.clear();
@@ -1388,7 +1388,7 @@ void Core::onResult(Tree &tree)
                 path.sprintf("locals/%d/value", j+1);
                 QString varData = tree.getString(path);
 
-                CoreVarValue *val = new CoreVarValue(varName);
+                CoreVar *val = new CoreVar(varName);
                 val->fromGdbString(varData);
 
                 m_localVars.push_back(val);
@@ -1400,7 +1400,7 @@ void Core::onResult(Tree &tree)
                 
                 for(int j = 0;j < m_localVars.size();j++)
                 {
-                    CoreVarValue *val = m_localVars[j];
+                    CoreVar *val = m_localVars[j];
                     m_inf->ICore_onLocalVarChanged(val);
                 }
             }
