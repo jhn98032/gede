@@ -27,7 +27,7 @@
    <item>
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Copyright (C) 2014-2015</string>
+      <string>Copyright (C) 2014-2017</string>
      </property>
     </widget>
    </item>

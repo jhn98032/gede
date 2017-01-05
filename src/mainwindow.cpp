@@ -1,7 +1,7 @@
 //#define ENABLE_DEBUGMSG
 
 /*
- * Copyright (C) 2014-2015 Johan Henriksson.
+ * Copyright (C) 2014-2017 Johan Henriksson.
  * All rights reserved.
  *
  * This software may be modified and distributed under the terms
