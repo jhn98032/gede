@@ -19,6 +19,7 @@ enum
     COLUMN_VALUE = 1,
 };
 
+#define DATA_COLUMN  (COLUMN_VALUE)
 
 AutoVarCtl::AutoVarCtl()
     : m_autoWidget(0)
@@ -30,9 +31,9 @@ QString AutoVarCtl::getTreeWidgetItemPath(QTreeWidgetItem *item)
 {
     QTreeWidgetItem *parent = item->parent();
     if(parent)
-        return getTreeWidgetItemPath(parent) + "/" + item->text(0);
+        return getTreeWidgetItemPath(parent) + "/" + item->text(COLUMN_NAME);
     else
-        return item->text(0);
+        return item->text(COLUMN_NAME);
 }
 
 
@@ -45,7 +46,7 @@ void AutoVarCtl::setWidget(QTreeWidget *autoWidget)
 
     //
     m_autoWidget->setColumnCount(2);
-    m_autoWidget->setColumnWidth(0, 120);
+    m_autoWidget->setColumnWidth(COLUMN_NAME, 120);
     QStringList names;
     names.clear();
     names += "Name";
@@ -96,8 +97,8 @@ void AutoVarCtl::onShowMemory()
     {
         QTreeWidgetItem *item = selectedItems[0];
 
-        long long addr = item->data(1, Qt::UserRole).toLongLong(0);
-        debugMsg("%s addr:%llx\n", stringToCStr(item->text(0)), addr);
+        long long addr = item->data(DATA_COLUMN, Qt::UserRole).toLongLong(0);
+
         if(addr != 0)
         {
             
@@ -182,7 +183,7 @@ void AutoVarCtl::onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column
         {
             QString valueText = getDisplayString(var, varName);
         
-            item->setText(1, valueText);
+            item->setText(COLUMN_VALUE, valueText);
         }
 
     
@@ -275,7 +276,7 @@ void AutoVarCtl::createTreeWidgetItem(
     item = new QTreeWidgetItem(names);
     item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
 
-    item->setData(1, Qt::UserRole, QVariant((qlonglong)varValue->getAddress()));
+    item->setData(DATA_COLUMN, Qt::UserRole, QVariant((qlonglong)varValue->getAddress()));
 
 
 
@@ -359,7 +360,7 @@ CoreVar *AutoVarCtl::getVar(QTreeWidgetItem &item)
         for(int j = 0;j < list.size();j++)
         {
             CoreVar* var = list[j];
-            if(var->getName() == item.text(0))
+            if(var->getName() == item.text(COLUMN_NAME))
                 return var;
         }
     }
@@ -369,7 +370,7 @@ CoreVar *AutoVarCtl::getVar(QTreeWidgetItem &item)
         for(int j = 0;j < parentVar->getChildCount();j++)
         {
             CoreVar* var = parentVar->getChild(j);
-            if(var->getName() == item.text(0))
+            if(var->getName() == item.text(COLUMN_NAME))
                 return var;
         }
     }
@@ -407,7 +408,7 @@ void AutoVarCtl::selectedChangeDisplayFormat(VarCtl::DispFormat fmt)
 
             QString valueText = getDisplayString(var, varPath);
             
-            item->setText(1, valueText);
+            item->setText(COLUMN_VALUE, valueText);
         }
     }
 
