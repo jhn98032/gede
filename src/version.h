@@ -9,8 +9,8 @@
 #ifndef FILE__VERSION_H
 #define FILE__VERSION_H
 
-#define GD_MAJOR 1
-#define GD_MINOR 15
+#define GD_MAJOR 2
+#define GD_MINOR 0
 #define GD_PATCH 1
 
 
