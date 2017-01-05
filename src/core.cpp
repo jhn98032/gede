@@ -20,6 +20,7 @@
 #include <signal.h>
 #include <stdlib.h> // posix_openpt()
 #include <fcntl.h> //  O_RDWR
+#include <ctype.h>
 
 
 bool VarWatch::hasChildren()
@@ -140,10 +141,11 @@ QString CoreVarValue::getData(DispFormat fmt) const
         if((fmt == FMT_NATIVE && m_type == TYPE_CHAR) || fmt == FMT_CHAR)
         {
             QChar c = m_data.toInt();
-            if(c.isPrint())
-                valueText.sprintf("'%c'", c.toLatin1());
+            char clat = c.toLatin1();
+            if(isprint(clat))
+                valueText.sprintf("%d '%c'", (int)m_data.toInt(), clat);
             else
-                valueText.sprintf("' '");
+                valueText.sprintf("%d ' '", (int)m_data.toInt());
         }
         else if(fmt == FMT_BIN)
         {
