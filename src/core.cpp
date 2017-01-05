@@ -31,6 +31,8 @@ bool VarWatch::hasChildren()
 
 CoreVarValue::CoreVarValue(QString name)
     : m_name(name)
+    ,m_address(0)
+      ,m_type(TYPE_UNKNOWN)
 {
 
 }
@@ -77,8 +79,128 @@ void CoreVarValue::fromGdbString(QString data)
 
 }
 
+void CoreVarValue::setData(QString data)
+{
+    m_data = data;
 
 
+    // String?
+    if(data.startsWith('"'))
+    {
+        if(data.endsWith('"'))
+            data = data.mid(1, data.length()-2);
+        m_data = data;
+        m_type = TYPE_STRING;
+    }
+    // Character?
+    else if(data.startsWith('\''))
+    {
+        if(data.endsWith('\''))
+            data = data.mid(1, data.length()-2);
+        if(data.startsWith("\\0"))
+            m_data = (int)data.mid(2).toInt();
+        else
+            m_data = (int)data[0].toAscii();
+        
+        m_type = TYPE_CHAR;
+    }
+    // Gdb Error message?
+    else if(data.startsWith("<"))
+    {
+        m_data = data;
+        m_type = TYPE_ERROR_MSG;
+    }
+    // Float?
+    else if(data.contains("."))
+    {
+        m_data = data;
+        m_type = TYPE_FLOAT;
+    }
+    // Integer?
+    else if(data.length() > 0)
+    {
+        if(data.startsWith("0x"))
+            m_data = (qulonglong)data.toULongLong(0,0);
+        else
+            m_data = data.toLongLong(0,0);
+        m_type = TYPE_INT;
+    }
+    else
+        m_type = TYPE_UNKNOWN;
+
+}
+
+
+QString CoreVarValue::getData(DispFormat fmt) const
+{
+    QString valueText;
+
+    if(m_type == TYPE_CHAR || m_type == TYPE_INT)
+    {
+        if((fmt == FMT_NATIVE && m_type == TYPE_CHAR) || fmt == FMT_CHAR)
+        {
+            QChar c = m_data.toInt();
+            if(c.isPrint())
+                valueText.sprintf("'%c'", c.toLatin1());
+            else
+                valueText.sprintf("' '");
+        }
+        else if(fmt == FMT_BIN)
+        {
+            QString subText;
+            QString reverseText;
+            qlonglong val = m_data.toULongLong();
+            do
+            {
+                subText.sprintf("%d", (int)(val & 0x1));
+                reverseText = subText + reverseText;
+                val = val>>1;
+            }
+            while(val > 0 || reverseText.length()%8 != 0);
+            for(int i = 0;i < reverseText.length();i++)
+            {
+                valueText += reverseText[i];
+                if(i%4 == 3 && i+1 != reverseText.length())
+                    valueText += "_";
+            }
+
+            valueText = "0b" + valueText;
+        }
+        else if(fmt == FMT_HEX)
+        {
+            QString text;
+            text.sprintf("%llx", m_data.toLongLong());
+
+            // Prefix the string with suitable number of zeroes
+            while(text.length()%4 != 0 && text.length() > 4)
+                text = "0" + text;
+            if(text.length()%2 != 0)
+                text = "0" + text;
+                
+            for(int i = 0;i < text.length();i++)
+            {
+                valueText = valueText + text[i];
+                if(i%4 == 3 && i+1 != text.length())
+                    valueText += "_";
+            }
+            valueText = "0x" + valueText;
+        }
+        else// if(fmt == FMT_DEC)
+        {
+            valueText = m_data.toString();
+        }
+    }
+    else if(m_type == TYPE_STRING)
+    {
+          valueText = '"' + m_data.toString() + '"';
+    }
+    else
+        valueText = m_data.toString();
+
+    return valueText;
+}
+
+    
 
 
 
@@ -114,6 +236,14 @@ Core::Core()
 
 Core::~Core()
 {
+    // Clear the local var array
+    for(int j = 0;j < m_localVars.size();j++)
+    {
+        CoreVarValue *val = m_localVars[j];
+        delete val;
+    }
+    m_localVars.clear();
+
     for(int i = 0;i < m_watchList.size();i++)
     {
         VarWatch* watch = m_watchList[i];
@@ -1238,24 +1368,38 @@ void Core::onResult(Tree &tree)
         // Local variables?
         else if(rootName == "locals")
         {
+            // Clear the local var array
+            for(int j = 0;j < m_localVars.size();j++)
+            {
+                CoreVarValue *val = m_localVars[j];
+                delete val;
+            }
+            m_localVars.clear();
+                
+            //
+            int cnt = tree.getChildCount("locals");
+            for(int j = 0;j < cnt;j++)
+            {
+                QString path;
+                path.sprintf("locals/%d/name", j+1);
+                QString varName = tree.getString(path);
+                path.sprintf("locals/%d/value", j+1);
+                QString varData = tree.getString(path);
+
+                CoreVarValue *val = new CoreVarValue(varName);
+                val->fromGdbString(varData);
+
+                m_localVars.push_back(val);
+            }
+
             if(m_inf)
             {
                 m_inf->ICore_onLocalVarReset();
                 
-
-                int cnt = tree.getChildCount("locals");
-                for(int j = 0;j < cnt;j++)
+                for(int j = 0;j < m_localVars.size();j++)
                 {
-                    QString path;
-                    path.sprintf("locals/%d/name", j+1);
-                    QString varName = tree.getString(path);
-                    path.sprintf("locals/%d/value", j+1);
-                    QString varData = tree.getString(path);
-
-                    CoreVarValue val(varName);
-                    val.fromGdbString(varData);
-                    m_inf->ICore_onLocalVarChanged(&val);
-                    
+                    CoreVarValue *val = m_localVars[j];
+                    m_inf->ICore_onLocalVarChanged(val);
                 }
             }
         }

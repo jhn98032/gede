@@ -43,6 +43,9 @@ private:
     void selectedChangeDisplayFormat(VarCtl::DispFormat fmt);
     QString getTreeWidgetItemPath(QTreeWidgetItem *item);
 
+    QString getDisplayString(CoreVarValue *var, QString fullPath);
+    CoreVarValue *getVar(QTreeWidgetItem &item);
+    
 public slots:
 
     void onContextMenu ( const QPoint &pos);

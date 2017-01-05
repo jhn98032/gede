@@ -76,10 +76,12 @@ public:
     CoreVarValue(QString name);
     virtual ~CoreVarValue();
 
+    typedef enum { FMT_HEX, FMT_DEC, FMT_BIN, FMT_CHAR, FMT_NATIVE } DispFormat;
 
     QString getName() const { return m_name; };
-    QString getData() const { return m_data; };
-    void setData(QString data) { m_data = data; };
+    QString getData(DispFormat fmt) const;
+    
+    void setData(QString data);
     long long getAddress();
     void setAddress(long long addr) { m_address = addr; };
 
@@ -97,8 +99,10 @@ private:
 
     QString m_name;
     QVector <CoreVarValue*> m_children;
-    QString m_data;
+    QVariant m_data;
     long long m_address;
+    enum { TYPE_INT = 0, TYPE_FLOAT, TYPE_STRING, TYPE_ERROR_MSG, TYPE_CHAR, TYPE_UNKNOWN } m_type;
+
 };
 
 
@@ -242,6 +246,8 @@ public:
 
     int changeWatchVariable(QString variable, QString newValue);
     
+    QVector <CoreVarValue*>& getLocalVars() { return m_localVars; };
+
 
     int gdbSetBreakpoint(QString filename, int lineNo);
     void gdbGetThreadList();
@@ -292,6 +298,8 @@ private:
     bool m_scanSources; //!< True if the source filelist may have changed
     QSocketNotifier  *m_ptsListener;
 
+    QVector <CoreVarValue*> m_localVars;
+    
 };
 
 

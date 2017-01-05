@@ -143,35 +143,49 @@ void AutoVarCtl::onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column
     else if(column == 1)
     {
         QString varName = getTreeWidgetItemPath(item);
-        if(m_autoVarDispInfo.contains(varName))
+        if(!m_autoVarDispInfo.contains(varName))
         {
-            VarCtl::DispInfo &dispInfo = m_autoVarDispInfo[varName];
-            if(dispInfo.orgFormat == VarCtl::DISP_DEC)
-            {
-                QString valStr = dispInfo.orgValue;
-
-                if(dispInfo.dispFormat == VarCtl::DISP_DEC)
-                {
-                    dispInfo.dispFormat = VarCtl::DISP_HEX;
-                }
-                else if(dispInfo.dispFormat == VarCtl::DISP_HEX)
-                {
-                    dispInfo.dispFormat = VarCtl::DISP_BIN;
-                }
-                else if(dispInfo.dispFormat == VarCtl::DISP_BIN)
-                {
-                    dispInfo.dispFormat = VarCtl::DISP_CHAR;
-                }
-                else if(dispInfo.dispFormat == VarCtl::DISP_CHAR)
-                {
-                    dispInfo.dispFormat = VarCtl::DISP_DEC;
-                }
-
-                QString valueText = VarCtl::valueDisplay(valStr, dispInfo.dispFormat);
-
-                item->setText(1, valueText);
-            }
+            VarCtl::DispInfo dispInfo;
+            dispInfo.dispFormat = VarCtl::DISP_DEC;
+            dispInfo.isExpanded = false;
+            m_autoVarDispInfo[varName] = dispInfo;
         }
+        
+        
+        VarCtl::DispInfo &dispInfo = m_autoVarDispInfo[varName];
+
+
+        if(dispInfo.dispFormat == VarCtl::DISP_DEC)
+        {
+            dispInfo.dispFormat = VarCtl::DISP_HEX;
+        }
+        else if(dispInfo.dispFormat == VarCtl::DISP_HEX)
+        {
+            dispInfo.dispFormat = VarCtl::DISP_BIN;
+        }
+        else if(dispInfo.dispFormat == VarCtl::DISP_BIN)
+        {
+            dispInfo.dispFormat = VarCtl::DISP_CHAR;
+        }
+        else if(dispInfo.dispFormat == VarCtl::DISP_CHAR)
+        {
+            dispInfo.dispFormat = VarCtl::DISP_DEC;
+        }
+        else
+        {
+            dispInfo.dispFormat = VarCtl::DISP_HEX;
+        }
+        
+
+        CoreVarValue *var = getVar(*item);
+        if(var)
+        {
+            QString valueText = getDisplayString(var, varName);
+        
+            item->setText(1, valueText);
+        }
+
+    
     }
 }
 
@@ -195,8 +209,43 @@ void AutoVarCtl::ICore_onLocalVarChanged(CoreVarValue *varValue)
 }
 
 
+/**
+ * @brief Returns the value text to show for an item.
+ */
+QString AutoVarCtl::getDisplayString(CoreVarValue *var, QString fullPath)
+{
+    QString displayValue;
+    if(m_autoVarDispInfo.contains(fullPath))
+    {
+        VarCtl::DispInfo &dispInfo = m_autoVarDispInfo[fullPath];
 
+        switch(dispInfo.dispFormat)
+        {
+            default:
+            case DISP_NATIVE:
+                displayValue = var->getData(CoreVarValue::FMT_NATIVE);break;
+            case DISP_DEC:
+                displayValue = var->getData(CoreVarValue::FMT_DEC);break;
+            case DISP_BIN:
+                displayValue = var->getData(CoreVarValue::FMT_BIN);break;
+            case DISP_HEX:
+                displayValue = var->getData(CoreVarValue::FMT_HEX);break;
+            case DISP_CHAR:
+                displayValue = var->getData(CoreVarValue::FMT_CHAR);break;
+        }
 
+    }
+    else
+    {
+        displayValue = var->getData(CoreVarValue::FMT_NATIVE);
+
+        VarCtl::DispInfo dispInfo;
+        dispInfo.dispFormat = DISP_NATIVE;
+        dispInfo.isExpanded = false;
+        m_autoVarDispInfo[fullPath] = dispInfo;
+    }
+    return displayValue;
+}
 
 
 /**
@@ -211,34 +260,12 @@ void AutoVarCtl::createTreeWidgetItem(
     QString name = varValue->getName();
     QTreeWidget *autoWidget = m_autoWidget;
 
-    // Get the text to display
-    QString value = varValue->getData();
-
-    VarCtl::DispFormat orgFormat = VarCtl::findVarType(value);
-    QString displayValue = value;
-
+    
     //
-    if(map->contains(fullPath))
-    {
-        VarCtl::DispInfo &dispInfo = (*map)[fullPath];
-        dispInfo.orgValue = value;
-
-        // Update the variable value
-        if(orgFormat == VarCtl::DISP_DEC && dispInfo.dispFormat != VarCtl::DISP_NATIVE)
-        {
-            displayValue = VarCtl::valueDisplay(value, dispInfo.dispFormat);
-        }
-    }
-    else
-    {
-        VarCtl::DispInfo dispInfo;
-        dispInfo.orgValue = value;
-        dispInfo.orgFormat = orgFormat;
-        dispInfo.dispFormat = dispInfo.orgFormat;
-        dispInfo.isExpanded = false;
-        (*map)[fullPath] = dispInfo;
-    }
-
+    
+    //
+    QString displayValue = getDisplayString(varValue, fullPath);
+    
     //
     QStringList names;
     names.clear();
@@ -320,30 +347,67 @@ void AutoVarCtl::onDisplayAsChar()
 
 
 /**
+ * @brief Get the variable associated with the item.
+ */
+CoreVarValue *AutoVarCtl::getVar(QTreeWidgetItem &item)
+{
+    QTreeWidgetItem *parentTreeItem = item.parent();
+    if(parentTreeItem == NULL)
+    {
+        Core &core = Core::getInstance();
+        QVector <CoreVarValue*> list = core.getLocalVars();
+        for(int j = 0;j < list.size();j++)
+        {
+            CoreVarValue* var = list[j];
+            if(var->getName() == item.text(0))
+                return var;
+        }
+    }
+    else
+    {
+        CoreVarValue *parentVar = getVar(*parentTreeItem);
+        for(int j = 0;j < parentVar->getChildCount();j++)
+        {
+            CoreVarValue* var = parentVar->getChild(j);
+            if(var->getName() == item.text(0))
+                return var;
+        }
+    }
+    return NULL;
+}
+
+        
+/**
  * @brief Change display format for the currently selected items.
  */
 void AutoVarCtl::selectedChangeDisplayFormat(VarCtl::DispFormat fmt)
 {
+    
     // Loop through the selected items.
     QList<QTreeWidgetItem *> items = m_autoWidget->selectedItems();
     for(int i =0;i < items.size();i++)
     {
         QTreeWidgetItem *item = items[i];
     
-        QString varName = getTreeWidgetItemPath(item);
-        if(m_autoVarDispInfo.contains(varName))
+        QString varPath = getTreeWidgetItemPath(item);
+        CoreVarValue *var = getVar(*item);
+        if(var != NULL)
         {
-            VarCtl::DispInfo &dispInfo = m_autoVarDispInfo[varName];
-            if(dispInfo.orgFormat == VarCtl::DISP_DEC)
+            if(!m_autoVarDispInfo.contains(varPath))
             {
-                QString valStr = dispInfo.orgValue;
-                
-                dispInfo.dispFormat = fmt;
-                
-                QString valueText = VarCtl::valueDisplay(valStr, dispInfo.dispFormat);
-
-                item->setText(COLUMN_VALUE, valueText);
+                VarCtl::DispInfo dispInfo;
+                dispInfo.dispFormat = DISP_HEX;
+                dispInfo.isExpanded = false;
+                m_autoVarDispInfo[varPath] = dispInfo;
             }
+        
+            VarCtl::DispInfo &dispInfo = m_autoVarDispInfo[varPath];
+
+            dispInfo.dispFormat = fmt;
+
+            QString valueText = getDisplayString(var, varPath);
+            
+            item->setText(1, valueText);
         }
     }
 
