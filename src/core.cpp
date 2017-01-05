@@ -317,7 +317,11 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
     
     QString ptsDevPath = ptsname(m_ptsFd);
     
-    com.commandF(&resultData, "-inferior-tty-set %s", stringToCStr(ptsDevPath));
+    if(com.commandF(&resultData, "-inferior-tty-set %s", stringToCStr(ptsDevPath)))
+    {
+        rc = 1;
+        errorMsg("Failed to set inferior tty");
+    }
 
     if(com.commandF(&resultData, "-file-exec-and-symbols %s", stringToCStr(programPath)) == GDB_ERROR)
     {

@@ -861,10 +861,14 @@ void Com::readTokens()
     }
 }
 
-    
-void Com::readFromGdb(GdbResult *m_result, Tree *m_resultData)
+
+/**
+ * @brief Reads response from GDB
+ * @return 0 on success otherwise an errorcode.
+ */
+int Com::readFromGdb(GdbResult *m_result, Tree *m_resultData)
 {
-    
+    int rc = 0;
     //debugMsg("## '%s'",stringToCStr(row));
 
     Resp *resp = NULL;
@@ -876,8 +880,16 @@ void Com::readFromGdb(GdbResult *m_result, Tree *m_resultData)
         // Parse any data received from GDB
         resp = parseOutput();
         if(resp == NULL)
-            m_process.waitForReadyRead(100);
-       
+        {
+            if(!m_process.waitForReadyRead(100))
+            {
+                QProcess::ProcessState  state = m_process.QProcess::state();
+                if(state == QProcess::NotRunning)
+                {
+                    rc = -1;
+                }
+            }
+        }
         
         while(!m_freeTokens.isEmpty())
         {
@@ -900,6 +912,8 @@ void Com::readFromGdb(GdbResult *m_result, Tree *m_resultData)
     }
     else
     {
+        *m_result = GDB_DONE;
+    
     do
     {
         
@@ -908,8 +922,19 @@ void Com::readFromGdb(GdbResult *m_result, Tree *m_resultData)
         {
             resp = parseOutput();
             if(resp == NULL)
-                m_process.waitForReadyRead(100);
-        }while(resp == NULL);
+            {
+                if(!m_process.waitForReadyRead(100))
+                {
+                    QProcess::ProcessState  state = m_process.QProcess::state();
+                    if(state == QProcess::NotRunning)
+                    {
+                        assert(0);
+                        
+                        rc = -1;
+                    }
+                }
+            }
+        }while(resp == NULL && rc == 0);
        
         
         while(!m_freeTokens.isEmpty())
@@ -919,10 +944,11 @@ void Com::readFromGdb(GdbResult *m_result, Tree *m_resultData)
         }
 
 
-        m_respQueue.push_back(resp);
+        if(resp != NULL)
+            m_respQueue.push_back(resp);
 
         
-        if(resp->getType() == Resp::RESULT)
+        if(resp != NULL && resp->getType() == Resp::RESULT)
         {
             assert(m_resultData != NULL);
             
@@ -931,7 +957,10 @@ void Com::readFromGdb(GdbResult *m_result, Tree *m_resultData)
             m_resultData->copy(resp->tree);
         }
 
-    }while(m_result != NULL && resp->getType() != Resp::TERMINATION);
+    }while(m_result != NULL && resp != NULL && resp->getType() != Resp::TERMINATION);
+
+    if(resp == NULL && m_result != NULL)
+        *m_result = GDB_ERROR;
 }
 
     //  debugMsg("# ---<< \n");
@@ -955,13 +984,16 @@ void Com::readFromGdb(GdbResult *m_result, Tree *m_resultData)
             if(!row.isEmpty())
                 debugMsg("GDB|E>%s", stringToCStr(row));
         }
-    } 
+    }
+
+    return rc;
 }
 
 
 GdbResult Com::command(Tree *resultData, QString text)
 {
     Tree resultDataNull;
+    int rc = 0;
 
     assert(m_busy == 0);
     
@@ -1001,9 +1033,11 @@ GdbResult Com::command(Tree *resultData, QString text)
 
     do
     {
-        readFromGdb(&result,resultData);
-
-    }while(!m_pending.isEmpty());
+        if(readFromGdb(&result,resultData))
+        {
+                rc = -1;
+        }
+    }while(!m_pending.isEmpty() && rc == 0);
 
     
     while(!m_list.isEmpty())
@@ -1018,11 +1052,17 @@ GdbResult Com::command(Tree *resultData, QString text)
     dispatchResp();
 
     onReadyReadStandardOutput();
-    
+
+    if(rc)
+        return GDB_ERROR;
     return result;
 }
 
 
+/**
+ * @brief Starts gdb
+ * @return 0 on success and gdb was started.
+ */
 int Com::init(QString gdbPath, bool enableDebugLog)
 {
     QString commandLine;
@@ -1039,11 +1079,12 @@ int Com::init(QString gdbPath, bool enableDebugLog)
         writeLogEntry(logStr);
     }
 
-    m_process.start(commandLine);//gdb ./testapp/test");
-    m_process.waitForStarted();
+    m_process.start(commandLine);
+    m_process.waitForStarted(6000);
 
     if(m_process.state() == QProcess::NotRunning)
     {
+        assert(0);
         return 1;
     }
 

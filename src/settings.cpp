@@ -79,7 +79,7 @@ void Settings::loadGlobalConfig()
     QString globalConfigFilename = QDir::homePath() + "/"  GLOBAL_CONFIG_DIR + "/" + GLOBAL_CONFIG_FILENAME;
     Ini tmpIni;
     if(tmpIni.appendLoad(globalConfigFilename))
-        infoMsg("Failed to global ini '%s'. File will be created.", stringToCStr(globalConfigFilename));
+        infoMsg("Failed to load global ini '%s'. File will be created.", stringToCStr(globalConfigFilename));
 
     loadDefaultsGui();
     loadDefaultsAdvanced();

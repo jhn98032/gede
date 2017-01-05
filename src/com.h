@@ -206,7 +206,7 @@ class Com : public QObject
 
 
     private:
-        void readFromGdb(GdbResult *m_result, Tree *m_resultData);
+        int readFromGdb(GdbResult *m_result, Tree *m_resultData);
         void decodeGdbResponse();
         Token* pop_token();
         Token* peek_token();
