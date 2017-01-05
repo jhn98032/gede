@@ -139,7 +139,7 @@ void CoreVar::setData(QString data)
         m_type = TYPE_CHAR;
     }
     // Gdb Error message?
-    else if(data.startsWith("<"))
+    else if(data.endsWith(">"))
     {
         m_data = data;
         m_type = TYPE_ERROR_MSG;

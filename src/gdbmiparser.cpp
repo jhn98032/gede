@@ -287,8 +287,9 @@ int GdbMiParser::parseVariableData(CoreVar *var, QList<Token*> *tokenList)
                 valueStr = "\"" + nextTok->getString() + "\"";
             else
             {
-                if(valueStr.isEmpty())
-                    valueStr = nextTok->getString();
+                valueStr = nextTok->getString();
+                if(valueStr.startsWith("<"))
+                    valueStr = defValueStr + " " + valueStr;
             }
             nextTok = tokenList->isEmpty() ? NULL : tokenList->first();
             if(nextTok == NULL)
