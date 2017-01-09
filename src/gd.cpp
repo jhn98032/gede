@@ -18,6 +18,7 @@
 #include "tree.h"
 #include "opendialog.h"
 #include "settings.h"
+#include "version.h"
 
 #include <QDir>
 
@@ -29,13 +30,29 @@ static int dumpUsage()
                     "Usage: gd --args PROGRAM_NAME",
                     QMessageBox::Ok, QMessageBox::Ok);
       */
-    printf("Usage: gd [OPTIONS] [--args PROGRAM_NAME [PROGRAM_ARGUMENTS...]]\n"
-                "--no-show-config / --show-config   Shows the configuration window at startup."
-           "\n"
-           );
+    printf("Usage: gede [OPTIONS] [--args PROGRAM_NAME [PROGRAM_ARGUMENTS...]]\n");
+    printf("\n");
+    printf("Where OPTIONS are:\n");
+    printf("  --no-show-config / --show-config   Shows the configuration window at startup.\n");
+    printf("  --help                             Displays this text.\n");
+    printf("  --version                          Displays the version of gede.\n");
+    printf("\n");
+    printf("Examples:\n");
+    printf("\n");
+    printf("  To start to debug the application \"my_application\":\n");
+    printf("  $ gede --args my_application\n");
+    printf("\n");
     
     return -1;  
 }
+
+static int dumpVersion()
+{
+    printf("gede %d.%d.%d\n", GD_MAJOR, GD_MINOR, GD_PATCH);
+    
+    return -1;  
+}
+
 
 
 /**
@@ -64,6 +81,20 @@ int main(int argc, char *argv[])
     // Ensure that the config dir exist
     QDir d;
     d.mkdir(QDir::homePath() + "/" + GLOBAL_CONFIG_DIR);
+
+    //
+    for(int i = 1;i < argc;i++)
+    {
+        const char *curArg = argv[i];
+        if(strcmp(curArg, "--version") == 0)
+        {
+            return dumpVersion();
+        }
+        else if(strcmp(curArg, "--help") == 0)
+        {
+            return dumpUsage();
+        }
+    }
     
     // Load default config
     cfg.load();
@@ -87,7 +118,11 @@ int main(int argc, char *argv[])
             showConfigDialog = true;
         else if(strcmp(curArg, "--no-show-config") == 0)
             showConfigDialog = false;
-        else if(strcmp(curArg, "--help") == 0)
+        else if(strcmp(curArg, "--version") == 0)
+        {
+            return dumpVersion();
+        }
+        else // if(strcmp(curArg, "--help") == 0)
         {
             return dumpUsage();
         }
