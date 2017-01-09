@@ -134,7 +134,7 @@ void CoreVar::setData(QString data)
         if(data.startsWith("\\0"))
             m_data = (int)data.mid(2).toInt();
         else
-            m_data = (int)data[0].toAscii();
+            m_data = (int)data[0].toLatin1();
         
         m_type = TYPE_CHAR;
     }
