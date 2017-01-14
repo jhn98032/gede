@@ -251,6 +251,7 @@ Core::Core()
     ,m_isRemote(false)
     ,m_ptsFd(0)
     ,m_scanSources(false)
+    ,m_memDepth(32)
 {
     
     Com& com = Com::getInstance();
@@ -301,6 +302,36 @@ Core::~Core()
 }
 
 
+/**
+ * @brief Returns the memory depth.
+ * @return 32 or 64.
+ */
+int Core::getMemoryDepth()
+{
+    return m_memDepth;
+}
+
+
+/**
+ * @brief Detects memory depth of target by communicating with Gdb.
+ */
+void Core::detectMemoryDepth()
+{
+    Tree resultData;
+    Com& com = Com::getInstance();
+    if(com.commandF(&resultData, "-data-evaluate-expression \"sizeof(void *)\""))
+    {
+        warnMsg("Failed to detect memory depth");    
+    }
+    else
+    {
+        int byteDepth = resultData.getInt("value");
+        m_memDepth = byteDepth*8;
+    }
+
+}
+
+
 int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QStringList argumentList)
 {
     Com& com = Com::getInstance();
@@ -327,6 +358,11 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
     {
         errorMsg("Failed to load '%s'", stringToCStr(programPath));
     }
+
+
+    // Get memory depth (32 or 64)
+    detectMemoryDepth();
+
 
     QString commandStr;
     if(argumentList.size() > 0)
@@ -412,6 +448,8 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
             com.commandF(&resultData, "-target-download");
     }
     
+    // Get memory depth (32 or 64)
+    detectMemoryDepth();
 
     gdbSetBreakpointAtFunc(cfg->m_initialBreakpoint);
     
