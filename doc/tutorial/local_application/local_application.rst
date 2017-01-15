@@ -24,8 +24,8 @@ Our sample program takes a single argument so for this tutorial we will enter "2
 
 Gede uses two config files. One global configuration file and one project specific configuration file.
 The global configuration file holds settings like for example the GUI while
-the project file holds settings like the program name and number of arguments.
-The project configuration file is saved in the current directory.
+the project file holds target settings like the program name and number of arguments.
+The project configuration file ("gede2.ini") is saved in the current directory.
 This means that any changes done in the dialog will be saved for the next time the program is being debugged.
 It is there fore recommended to stand in the same directory as the program being debugged.
 
