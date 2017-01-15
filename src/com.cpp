@@ -110,12 +110,14 @@ Com::~Com()
     // Send the command to gdb to exit cleanly
     QString text = "-gdb-exit\n";
     m_process.write((const char*)text.toLatin1());
-    
-    
-    m_process.terminate();
 
-    m_process.waitForFinished();
-    
+    if(!m_process.waitForFinished(1000))
+    {
+        m_process.terminate();
+
+        m_process.waitForFinished();
+    }
+
     // Free tokens
     while(!m_freeTokens.isEmpty())
     {
