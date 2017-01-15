@@ -79,7 +79,7 @@ bool SyntaxHighlighter::isSpecialChar(char c) const
                     c == '=' ||
                     c == '(' || c == ')' ||
                     c == '[' || c == ']' ||
-                    c == '*' || c == '-' || c == '+' ||
+                    c == '*' || c == '-' || c == '+' || c == '%' ||
                     c == '?' ||
                     c == '#' ||
                     c == '{' || c == '}' ||
