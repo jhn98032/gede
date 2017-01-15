@@ -683,13 +683,17 @@ void Core::stop()
 
         // Send 'kill' to interrupt gdbserver
         debugMsg("sending INTR to %d", m_pid);
-        if(m_pid == 0)
-            m_pid = com.getPid();
+        int gdbPid = com.getPid();
             
-        if(m_pid != 0)
-            kill(m_pid, SIGINT);
+        if(gdbPid != 0)
+        {
+            debugMsg("Sending SIGINT to %d", gdbPid);
+            kill(gdbPid, SIGINT);
+        }
         else
-            errorMsg("Failed to stop since PID not known");
+        {
+            errorMsg("Failed to stop since PID of Gdb not known");
+        }
 
 
         com.command(NULL, "-exec-interrupt --all");
@@ -1094,11 +1098,18 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
             if(reason == ICore::SIGNAL_RECEIVED)
             {
                 QString signalName = tree.getString("signal-name");
-                if(signalName == "SIGSEGV")
+                if(signalName == "SIGTRAP" && m_isRemote)
                 {
-                    m_targetState = ICore::TARGET_FINISHED;
+                    m_inf->ICore_onStopped(reason, p, lineNo);
                 }
-                m_inf->ICore_onSignalReceived(signalName);  
+                else
+                {
+                    if(signalName == "SIGSEGV")
+                    {
+                        m_targetState = ICore::TARGET_FINISHED;
+                    }
+                    m_inf->ICore_onSignalReceived(signalName);  
+                }
             }
             else
                 m_inf->ICore_onStopped(reason, p, lineNo);
