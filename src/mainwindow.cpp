@@ -744,8 +744,8 @@ void MainWindow::onStackWidgetSelectionChanged()
         
     int selectedFrame = -1;
     // Get the new selected frame
-    QTreeWidget *threadWidget = m_ui.treeWidget_stack;
-    QList <QTreeWidgetItem *> selectedItems = threadWidget->selectedItems();
+    QTreeWidget *stackWidget = m_ui.treeWidget_stack;
+    QList <QTreeWidgetItem *> selectedItems = stackWidget->selectedItems();
     if(selectedItems.size() > 0)
     {
         QTreeWidgetItem * currentItem;
@@ -1128,7 +1128,7 @@ void MainWindow::ICore_onStackFrameChange(QList<StackFrameEntry> stackFrameList)
 */
 void MainWindow::ICore_onCurrentFrameChanged(int frameIdx)
 {
-    QTreeWidget *threadWidget = m_ui.treeWidget_stack;
+    QTreeWidget *stackWidget = m_ui.treeWidget_stack;
 
     // Update the sourceview (with the current row).
     if(frameIdx >= 0 && frameIdx < m_stackFrameList.size())
@@ -1140,8 +1140,8 @@ void MainWindow::ICore_onCurrentFrameChanged(int frameIdx)
     }
 
     // Update the selection of the current thread
-    QTreeWidgetItem *rootItem = threadWidget->invisibleRootItem();
-    threadWidget->clearSelection();
+    QTreeWidgetItem *rootItem = stackWidget->invisibleRootItem();
+    stackWidget->clearSelection();
     QTreeWidgetItem *selectItem = NULL;
     for(int i = 0;i < rootItem->childCount();i++)
     {
@@ -1153,7 +1153,7 @@ void MainWindow::ICore_onCurrentFrameChanged(int frameIdx)
         }
     }
     if(selectItem)
-        threadWidget->setCurrentItem(selectItem);
+        stackWidget->setCurrentItem(selectItem);
     
 }
 
