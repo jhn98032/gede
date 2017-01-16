@@ -233,6 +233,7 @@ private:
 
     void dispatchBreakpointTree(Tree &tree);
     static ICore::StopReason parseReasonString(QString string);
+    void detectMemoryDepth();
     
 public:
     int gdbSetBreakpointAtFunc(QString func);
@@ -242,6 +243,8 @@ public:
     void gdbContinue();
     void gdbRun();
     bool gdbGetFiles();
+
+    int getMemoryDepth();
 
     int changeWatchVariable(QString variable, QString newValue);
     
@@ -298,7 +301,7 @@ private:
     QSocketNotifier  *m_ptsListener;
 
     QVector <CoreVar*> m_localVars;
-    
+    int m_memDepth; //!< The memory depth. (Either 64 or 32).
 };
 
 

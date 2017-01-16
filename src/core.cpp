@@ -251,6 +251,7 @@ Core::Core()
     ,m_isRemote(false)
     ,m_ptsFd(0)
     ,m_scanSources(false)
+    ,m_memDepth(32)
 {
     
     Com& com = Com::getInstance();
@@ -301,6 +302,36 @@ Core::~Core()
 }
 
 
+/**
+ * @brief Returns the memory depth.
+ * @return 32 or 64.
+ */
+int Core::getMemoryDepth()
+{
+    return m_memDepth;
+}
+
+
+/**
+ * @brief Detects memory depth of target by communicating with Gdb.
+ */
+void Core::detectMemoryDepth()
+{
+    Tree resultData;
+    Com& com = Com::getInstance();
+    if(com.commandF(&resultData, "-data-evaluate-expression \"sizeof(void *)\""))
+    {
+        warnMsg("Failed to detect memory depth");    
+    }
+    else
+    {
+        int byteDepth = resultData.getInt("value");
+        m_memDepth = byteDepth*8;
+    }
+
+}
+
+
 int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QStringList argumentList)
 {
     Com& com = Com::getInstance();
@@ -327,6 +358,11 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
     {
         errorMsg("Failed to load '%s'", stringToCStr(programPath));
     }
+
+
+    // Get memory depth (32 or 64)
+    detectMemoryDepth();
+
 
     QString commandStr;
     if(argumentList.size() > 0)
@@ -412,6 +448,8 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
             com.commandF(&resultData, "-target-download");
     }
     
+    // Get memory depth (32 or 64)
+    detectMemoryDepth();
 
     gdbSetBreakpointAtFunc(cfg->m_initialBreakpoint);
     
@@ -645,13 +683,17 @@ void Core::stop()
 
         // Send 'kill' to interrupt gdbserver
         debugMsg("sending INTR to %d", m_pid);
-        if(m_pid == 0)
-            m_pid = com.getPid();
+        int gdbPid = com.getPid();
             
-        if(m_pid != 0)
-            kill(m_pid, SIGINT);
+        if(gdbPid != 0)
+        {
+            debugMsg("Sending SIGINT to %d", gdbPid);
+            kill(gdbPid, SIGINT);
+        }
         else
-            errorMsg("Failed to stop since PID not known");
+        {
+            errorMsg("Failed to stop since PID of Gdb not known");
+        }
 
 
         com.command(NULL, "-exec-interrupt --all");
@@ -1056,11 +1098,18 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
             if(reason == ICore::SIGNAL_RECEIVED)
             {
                 QString signalName = tree.getString("signal-name");
-                if(signalName == "SIGSEGV")
+                if(signalName == "SIGTRAP" && m_isRemote)
                 {
-                    m_targetState = ICore::TARGET_FINISHED;
+                    m_inf->ICore_onStopped(reason, p, lineNo);
                 }
-                m_inf->ICore_onSignalReceived(signalName);  
+                else
+                {
+                    if(signalName == "SIGSEGV")
+                    {
+                        m_targetState = ICore::TARGET_FINISHED;
+                    }
+                    m_inf->ICore_onSignalReceived(signalName);  
+                }
             }
             else
                 m_inf->ICore_onStopped(reason, p, lineNo);
