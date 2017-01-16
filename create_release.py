@@ -33,6 +33,8 @@ os.system("tar --delete -f %s 'gede-%s/create_release.py'" % (filename, version)
 os.system("tar --delete -f %s 'gede-%s/tagit.py'" % (filename, version))
 os.system("tar --delete -f %s 'gede-%s/.gitignore'" % (filename, version))
 os.system("tar --delete -f %s 'gede-%s/startpage'" % (filename, version))
+os.system("tar --delete -f %s 'gede-%s/doc'" % (filename, version))
+
 
 
 os.system("xz -9 %s" % (filename))

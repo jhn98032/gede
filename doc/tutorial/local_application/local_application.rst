@@ -1,10 +1,10 @@
-==========================
-Local application tutorial
-==========================
+==============================
+Debugging an local application
+==============================
 
 This tutorial covers debugging a local application.
 
-For this tutorial I will be using a simple program written in C called "myprogram".
+For this tutorial I will be using a simple program written in C called "test".
 Source code is listed at the end of this article.
 
 Start the debugger

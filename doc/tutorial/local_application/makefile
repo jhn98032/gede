@@ -1,8 +1,8 @@
-OUTPUT=local_application.html
+OUTPUT=index.html
 
 all: $(OUTPUT)
 
-%.html: %.rst
+index.html: local_application.rst
 	rst2html $^ $@
 
 %.odt: %.rst
