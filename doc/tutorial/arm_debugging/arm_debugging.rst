@@ -44,6 +44,23 @@ After the target application has been downloaded into the target
 Gede will behave the same way as if debugging a local running
 application.
 
+There is however one thing that may be useful to know.
+
+If we look in the file tree in gede we will see that my application
+includes some files in *"/home/tin"* that where automaticly added by the compiler.
+These directories takes up a lot of space in the treeview.
+
+.. image:: images/mainwindow.png
+
+Lets hide these by opening up the settings dialog using the menu entry *"File->Settings"*.
+
+.. image:: images/settings_advanced.png
+
+By adding *"/home/tin"* to the list of directories Gede will hide the files and folders for us and
+the file tree will be a lot cleaner.
+
+
+
 
 
 
