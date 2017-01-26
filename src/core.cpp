@@ -471,7 +471,9 @@ void Core::onGdbOutput(int socketFd)
     {
         buff[n] = '\0';
     }
-    m_inf->ICore_onTargetOutput(buff);
+    QString str = buff;
+    str.replace("\r","");
+    m_inf->ICore_onTargetOutput(str);
 }
 
 
@@ -1519,6 +1521,7 @@ void Core::onStatusAsyncOut(Tree &tree, AsyncClass ac)
 
 void Core::onConsoleStreamOutput(QString str)
 {
+    str.replace("\r","");
     QStringList list = str.split('\n');
     for(int i = 0;i < list.size();i++)
     {
@@ -1526,7 +1529,7 @@ void Core::onConsoleStreamOutput(QString str)
         if(text.isEmpty() && i+1 == list.size())
             continue;
             
-        debugMsg("GDB | Console-stream | %s", stringToCStr(text));
+        debugMsg("GDB | Console-stream | '%s'", stringToCStr(text));
 
         if(m_inf)
             m_inf->ICore_onConsoleStream(text);
@@ -1536,6 +1539,7 @@ void Core::onConsoleStreamOutput(QString str)
 
 void Core::onTargetStreamOutput(QString str)
 {
+    str.replace("\r","");
     QStringList list = str.split('\n');
     for(int i = 0;i < list.size();i++)
         infoMsg("GDB | Target-stream | %s", stringToCStr(list[i]));
