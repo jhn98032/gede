@@ -98,12 +98,12 @@ if __name__ == "__main__":
             print("Start it by running gede") 
 
     except IOError as e:
-        print "I/O error({0}): {1}".format(e.errno, e.strerror)
+        print("I/O error({0}): {1}".format(e.errno, e.strerror))
     except SystemExit as e:
         pass
         raise e
     except:
-        print "Error occured"
+        print("Error occured")
         raise
 
 
