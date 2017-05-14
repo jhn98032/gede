@@ -193,7 +193,10 @@ int GdbMiParser::parseVariableData(CoreVar *var, QList<Token*> *tokenList)
                 
                 rc = parseVariableData(var, tokenList);
 
-                token = tokenList->takeFirst();
+                if(tokenList->isEmpty())
+                    token = NULL;
+                else
+                    token = tokenList->takeFirst();
             }
             else
             {
@@ -233,7 +236,11 @@ int GdbMiParser::parseVariableData(CoreVar *var, QList<Token*> *tokenList)
                 rc = parseVariableData(childVar, tokenList);
 
                 // End of the data
-                token = tokenList->takeFirst();
+                if(tokenList->isEmpty())
+                    token = NULL;
+                else
+                    token = tokenList->takeFirst();
+
             }
             else if(eqToken->getType() == Token::KEY_COMMA)
             {
