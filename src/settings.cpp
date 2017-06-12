@@ -298,6 +298,8 @@ QStringList Settings::getDefaultKeywordList()
     keywordList += "do";
     keywordList += "false";
     keywordList += "true";
+
+    keywordList += "sizeof";
     
     keywordList += "unsigned";
     keywordList += "bool";
