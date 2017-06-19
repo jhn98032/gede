@@ -80,17 +80,19 @@ public:
 
     QString getName() const { return m_name; };
     QString getData(DispFormat fmt) const;
-    
+
+    void setVarType(QString varType) { m_varType = varType; };
+    QString getVarType() { return m_varType; };
     void setData(QString data);
     long long getAddress();
     void setAddress(long long addr) { m_address = addr; };
 
-    int getChildCount() { return m_children.size(); };
-    CoreVar* getChild(int idx) { return m_children[idx]; };
-    CoreVar* addChild(QString name);
+
+    bool hasChildren() { return m_hasChildren; };
     
     void valueFromGdbString(QString data);
-    
+
+    bool m_hasChildren;
 private:
     void clear();
 
@@ -98,11 +100,10 @@ private:
 private:
 
     QString m_name;
-    QVector <CoreVar*> m_children;
     QVariant m_data;
     long long m_address;
-    enum { TYPE_INT = 0, TYPE_FLOAT, TYPE_STRING, TYPE_ERROR_MSG, TYPE_CHAR, TYPE_UNKNOWN } m_type;
-
+    enum { TYPE_INT = 0, TYPE_FLOAT, TYPE_STRING, TYPE_ENUM, TYPE_ERROR_MSG, TYPE_CHAR, TYPE_UNKNOWN } m_type;
+    QString m_varType;
 };
 
 

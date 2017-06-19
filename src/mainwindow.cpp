@@ -662,6 +662,7 @@ void MainWindow::ICore_onLocalVarChanged(CoreVar *varValue)
 void MainWindow::ICore_onWatchVarChanged(VarWatch &watch)
 {
     m_watchVarCtl.ICore_onWatchVarChanged(watch);
+    m_autoVarCtl.ICore_onWatchVarChanged(watch);
     
 }
 
@@ -669,6 +670,7 @@ void MainWindow::ICore_onWatchVarChanged(VarWatch &watch)
 void MainWindow::ICore_onWatchVarChildAdded(VarWatch &watch)
 {
     m_watchVarCtl.ICore_onWatchVarChildAdded(watch);
+    m_autoVarCtl.ICore_onWatchVarChildAdded(watch);
 }
 
 
@@ -1551,8 +1553,8 @@ void MainWindow::ICore_onStateChanged(TargetState state)
     if(state == TARGET_STARTING || state == TARGET_RUNNING)
     {
         m_ui.treeWidget_stack->clear();
-        m_ui.autoWidget->clear();
     }
+    m_autoVarCtl.ICore_onStateChanged(state);
 }
 
 

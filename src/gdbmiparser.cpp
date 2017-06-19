@@ -177,98 +177,12 @@ int GdbMiParser::parseVariableData(CoreVar *var, QList<Token*> *tokenList)
     assert(token != NULL);
     if(token == NULL)
         return -1;
+
+
         
     if(token->getType() == Token::KEY_LEFT_BRACE)
     {
         
-        do
-        {
-            // Double braces?
-            if(tokenList->isEmpty())
-                return -1;
-            Token *token2 = tokenList->first();
-                
-            if(token2->getType() == Token::KEY_LEFT_BRACE)
-            {
-                
-                rc = parseVariableData(var, tokenList);
-
-                if(tokenList->isEmpty())
-                    token = NULL;
-                else
-                    token = tokenList->takeFirst();
-            }
-            else
-            {
-            
-            // Get name
-            QString name;
-            if(tokenList->isEmpty())
-                return -1;
-            Token *nameTok = tokenList->takeFirst();
-            assert(nameTok != NULL);
-            name = nameTok->getString();
-
-
-            // Is it a "static varType" type?
-            if(tokenList->isEmpty())
-                return -1;
-            Token *extraNameTok = tokenList->first();
-            if(extraNameTok->getType() == Token::VAR)
-            {
-                extraNameTok = tokenList->takeFirst();
-                name += " " + extraNameTok->getString();
-            }
-        
-            // Get equal sign
-            if(tokenList->isEmpty())
-                return -1;
-            Token *eqToken = tokenList->first();
-            assert(eqToken != NULL);
-            if(eqToken->getType() == Token::KEY_EQUAL)
-            {
-                eqToken = tokenList->takeFirst();
-
-                // Create variable
-                CoreVar *childVar = var->addChild(name);
-
-                // Get variable data
-                rc = parseVariableData(childVar, tokenList);
-
-                // End of the data
-                if(tokenList->isEmpty())
-                    token = NULL;
-                else
-                    token = tokenList->takeFirst();
-
-            }
-            else if(eqToken->getType() == Token::KEY_COMMA)
-            {
-                token = tokenList->isEmpty() ? NULL : tokenList->takeFirst();
-            }
-            else if(eqToken->getType() == Token::KEY_RIGHT_BRACE)
-            {
-                if(var->getChildCount() == 0)
-                    var->setData(nameTok->getString());
-                // Triggered by for example: "'{','<No data fields>', '}'"
-                token = tokenList->isEmpty() ? NULL : tokenList->takeFirst();
-            }
-            else
-            {
-                errorMsg("Unknown token. Expected '=', Got:'%s'", stringToCStr(eqToken->getString()));
-
-                // End of the data
-                token = tokenList->isEmpty() ? NULL : tokenList->takeFirst();
-            }
-            }
-            
-        }while(token != NULL && token->getType() == Token::KEY_COMMA);
-
-        //
-        if(token == NULL)
-            errorMsg("Unexpected end of token");
-        else if (token->getType() != Token::KEY_RIGHT_BRACE)
-            errorMsg("Unknown token. Expected '}', Got:'%s'", stringToCStr(token->getString()));
     }
     else
     {

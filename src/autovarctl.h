@@ -9,57 +9,70 @@
 #ifndef FILE__AUTO_VAR_CTL_H
 #define FILE__AUTO_VAR_CTL_H
 
-#include "tree.h"
-#include "core.h"
+#include <QString>
 #include <QTreeWidget>
-#include "varctl.h"
 #include <QMenu>
+#include <QKeyEvent>
 
+
+#include "core.h"
+#include "varctl.h"
 #include "settings.h"
 
+/**
+* @brief Displays local variables (on the stack).
+*/
 class AutoVarCtl : public VarCtl
 {
     Q_OBJECT
-public:
-
 
 public:
     AutoVarCtl();
-
-
+    
     void setWidget(QTreeWidget *autoWidget);
+
+    void ICore_onWatchVarChanged(VarWatch &watch);
+    void ICore_onWatchVarChildAdded(VarWatch &watch);
+    void addNewWatch(QString varName);
+
+
+    void setConfig(Settings *cfg);
 
     void ICore_onLocalVarChanged(CoreVar *varValue);
     void ICore_onLocalVarReset();
-    
-    void setConfig(Settings *cfg);
 
+    void onKeyPress(QKeyEvent *keyEvent);
+
+    void ICore_onStateChanged(ICore::TargetState state);
 private:
-    void createTreeWidgetItem(
-                    QTreeWidgetItem *parentItem,
-                    VarCtl::DispInfoMap *map,
-                    QString fullPath,
-                    CoreVar *varValue);
+    QString getWatchId(QTreeWidgetItem* item);
+
     void selectedChangeDisplayFormat(VarCtl::DispFormat fmt);
     QString getTreeWidgetItemPath(QTreeWidgetItem *item);
 
-    QString getDisplayString(CoreVar *var, QString fullPath);
-    CoreVar *getVar(QTreeWidgetItem &item);
+    QString getDisplayString(QString watchId, QString varPath);
+    
+    void sync(QTreeWidgetItem * parentItem, VarWatch &watch);
     
 public slots:
+    void onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
+    void onAutoWidgetCurrentItemChanged ( QTreeWidgetItem * current, int column );
+    void onAutoWidgetItemExpanded(QTreeWidgetItem *item );
+    void onAutoWidgetItemCollapsed(QTreeWidgetItem *item);
 
     void onContextMenu ( const QPoint &pos);
-    void onAutoWidgetItemCollapsed(QTreeWidgetItem *item);
-    void onAutoWidgetItemExpanded(QTreeWidgetItem *item);
-    void onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
     void onShowMemory();
+
 
     void onDisplayAsDec();
     void onDisplayAsHex();
     void onDisplayAsBin();
     void onDisplayAsChar();
-    
-    
+
+private:
+    void fillInVars();
+    void clear();
+
 private:
     QTreeWidget *m_autoWidget;
     QMenu m_popupMenu;

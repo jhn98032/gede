@@ -84,13 +84,20 @@ void WatchVarCtl::ICore_onWatchVarChanged(VarWatch &watch)
 
     // Find the watch item
     QStringList watchIdParts = watch.getWatchId().split('.');
-    QTreeWidgetItem* rootItem = varWidget->invisibleRootItem();
     VarWatch *rootWatch = core.getVarWatchInfo(watchIdParts[0]);
     assert(rootWatch != NULL);
-
+    // Do we own this watch?
+    if(!m_watchVarDispInfo.contains(watchIdParts[0]))
+    {
+        return;
+    }
+ 
     // Sync it
     if(rootWatch)
+    {
+        QTreeWidgetItem* rootItem = varWidget->invisibleRootItem();
         sync(rootItem, *rootWatch);
+    }
 }
 
 QString WatchVarCtl::getWatchId(QTreeWidgetItem* item)
@@ -227,9 +234,15 @@ void WatchVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
 
     AutoSignalBlocker autoBlocker(m_varWidget);
 
+    // Do we own this watch?
+    QStringList watchIdParts = watchId.split('.');
+    if(!m_watchVarDispInfo.contains(watchIdParts[0]))
+    {
+        return;
+    }
+
     //
     QTreeWidgetItem * rootItem = varWidget->invisibleRootItem();
-    QStringList watchIdParts = watchId.split('.');
     QString thisWatchId;
     for(int partIdx = 0; partIdx < watchIdParts.size();partIdx++)
     {

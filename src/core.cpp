@@ -70,12 +70,6 @@ CoreVar::~CoreVar()
     clear();
 }
 
-CoreVar* CoreVar::addChild(QString name)
-{
-    CoreVar* child = new CoreVar(name);
-    m_children.push_back(child);
-    return child; 
-}
     
 long long CoreVar::getAddress()
 {
@@ -84,12 +78,6 @@ long long CoreVar::getAddress()
 
 void CoreVar::clear()
 {
-    for(int j = 0;j < m_children.size();j++)
-    {
-        CoreVar* child = m_children[j];
-        delete child;
-    }
-    m_children.clear();
 }
 
 void CoreVar::valueFromGdbString(QString data)
@@ -150,14 +138,23 @@ void CoreVar::setData(QString data)
         m_data = data;
         m_type = TYPE_FLOAT;
     }
-    // Integer?
     else if(data.length() > 0)
     {
-        if(data.startsWith("0x"))
-            m_data = (qulonglong)data.toULongLong(0,0);
+        // Integer?
+        if(data[0].isDigit() || data[0] == '-')
+        {
+            if(data.startsWith("0x"))
+                m_data = (qulonglong)data.toULongLong(0,0);
+            else
+                m_data = data.toLongLong(0,0);
+            m_type = TYPE_INT;
+        }
         else
-            m_data = data.toLongLong(0,0);
-        m_type = TYPE_INT;
+        {
+            m_data = data;
+            m_type = TYPE_ENUM;
+        }
+            
     }
     else
         m_type = TYPE_UNKNOWN;
@@ -169,7 +166,9 @@ QString CoreVar::getData(DispFormat fmt) const
 {
     QString valueText;
 
-    if(m_type == TYPE_CHAR || m_type == TYPE_INT)
+    if(m_type == TYPE_ENUM)
+        return m_data.toString();
+    else if(m_type == TYPE_CHAR || m_type == TYPE_INT)
     {
         if((fmt == FMT_NATIVE && m_type == TYPE_CHAR) || fmt == FMT_CHAR)
         {
@@ -894,7 +893,7 @@ int Core::gdbExpandVarWatchChildren(QString watchId)
 
     
     // Request its children
-    res = com.commandF(&resultData, "-var-list-children --all-values %s", stringToCStr(watchId));
+    res = com.commandF(&resultData, "-var-list-children --simple-values %s", stringToCStr(watchId));
 
     if(res != 0)
     {
@@ -1068,7 +1067,7 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
         com.commandF(NULL, "-thread-info");
 
         com.commandF(NULL, "-var-update --all-values *");
-        com.commandF(NULL, "-stack-list-locals 1");
+        com.commandF(NULL, "-stack-list-variables --simple-values");
 
         if(m_scanSources)
         {
@@ -1456,7 +1455,7 @@ void Core::onResult(Tree &tree)
             }
         }
         // Local variables?
-        else if(rootName == "locals")
+        else if(rootName == "variables")
         {
             // Clear the local var array
             for(int j = 0;j < m_localVars.size();j++)
@@ -1467,18 +1466,27 @@ void Core::onResult(Tree &tree)
             m_localVars.clear();
                 
             //
-            int cnt = tree.getChildCount("locals");
+            int cnt = tree.getChildCount("variables");
             for(int j = 0;j < cnt;j++)
             {
                 QString path;
-                path.sprintf("locals/%d/name", j+1);
+                path.sprintf("variables/%d/name", j+1);
                 QString varName = tree.getString(path);
-                path.sprintf("locals/%d/value", j+1);
+                path.sprintf("variables/%d/value", j+1);
                 QString varData = tree.getString(path);
-
+                path.sprintf("variables/%d/type", j+1);
+                QString varType = tree.getString(path);
+        
                 CoreVar *val = new CoreVar(varName);
                 val->valueFromGdbString(varData);
+                val->setVarType(varType);
 
+                if(varType == "struct {...}")
+                    val->m_hasChildren = true;
+                else
+                    val->m_hasChildren = false;
+
+                
                 m_localVars.push_back(val);
             }
 
@@ -1510,7 +1518,7 @@ void Core::onResult(Tree &tree)
         
      }
     
-    tree.dump();
+    //tree.dump();
 }
 
 void Core::onStatusAsyncOut(Tree &tree, AsyncClass ac)
@@ -1627,7 +1635,7 @@ void Core::selectFrame(int selectedFrameIdx)
 
         com.commandF(&resultData, "-stack-info-frame");
 
-        com.commandF(NULL, "-stack-list-locals 1");
+        com.commandF(NULL, "-stack-list-variables --simple-values");
     }
 
 }
