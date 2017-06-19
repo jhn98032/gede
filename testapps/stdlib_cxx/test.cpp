@@ -24,6 +24,7 @@ int main(int argc,char *argv[])
     }j_struct;
    double k_double = 1.2;
 
+    i_vec = (const int*)0x10;
     g_vectorInt.push_back(1);
     g_vectorInt.push_back(2);
     

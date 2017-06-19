@@ -1,18 +1,37 @@
 #include <stdio.h>
 
+void func()
+{
+    volatile int a;
+    a++;
+    a++;
+    a++;
+}
+
 int main(int argc,char *argv[])
 {
-    int int_a;
-    enum {ENUM1,ENUM2} enum_a = ENUM1;
-
-    enum_a = ENUM1;
-    enum_a = ENUM2;
-    
-    if(enum_a == ENUM2)
+    struct
     {
-
+        int a;
+        struct
+        {
+            int b;
+        }s2;
+    }s; 
+    char *varStr;
+    enum {ENUM1, ENUM2}varEnum;
+    s.a = 0;
+    varEnum = ENUM1;
+    varEnum = ENUM2;
+    while(1)
+    {
+        func();
+        s.a++;
+        s.s2.b++;
+        s.s2.b++;
+        s.a++;
+        
     }
-
     return 0;
 }
 
