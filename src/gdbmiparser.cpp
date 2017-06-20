@@ -179,7 +179,20 @@ int GdbMiParser::parseVariableData(CoreVar *var, QList<Token*> *tokenList)
         return -1;
 
 
-        
+    if(token->getType() == Token::KEY_LEFT_BAR)
+    {
+        QString data;
+        data = "[";
+        while(!tokenList->isEmpty())
+        {
+            token = tokenList->takeFirst();
+            if(token)
+                data += token->getString();
+        }
+        var->setData(data);
+        return 0; 
+    }
+
     if(token->getType() == Token::KEY_LEFT_BRACE)
     {
         
