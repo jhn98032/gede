@@ -246,22 +246,7 @@ void AutoVarCtl::onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column
 
 void AutoVarCtl::ICore_onWatchVarChanged(VarWatch &watch)
 {
-    QTreeWidget *varWidget = m_autoWidget;
-    Core &core = Core::getInstance();
-
-    debugMsg("%s()",__func__);
-
-    AutoSignalBlocker autoBlocker(m_autoWidget);
-
-    // Find the watch item
-    QStringList watchIdParts = watch.getWatchId().split('.');
-    QTreeWidgetItem* rootItem = varWidget->invisibleRootItem();
-    VarWatch *rootWatch = core.getVarWatchInfo(watchIdParts[0]);
-    assert(rootWatch != NULL);
-
-    // Sync it
-    if(rootWatch)
-        sync(rootItem, *rootWatch);
+    Q_UNUSED(watch);
 }
 
 QString AutoVarCtl::getWatchId(QTreeWidgetItem* item)
@@ -270,119 +255,6 @@ QString AutoVarCtl::getWatchId(QTreeWidgetItem* item)
 }
 
 
-void AutoVarCtl::sync(QTreeWidgetItem* parentItem, VarWatch &watch)
-{
-    Core &core = Core::getInstance();
-    QString watchId = watch.getWatchId();
-    QString name = watch.getName();
-    QString varType = watch.getVarType();
-    QString valueString = watch.getValue();
-    bool inScope = watch.inScope();
-
-    // Look for the item with the specified watchId
-    QTreeWidgetItem* foundTreeItem = NULL;
-    for(int i = 0;foundTreeItem == NULL && i < parentItem->childCount();i++)
-    {
-        QTreeWidgetItem* treeItem =  parentItem->child(i);
-        QString itemKey = getWatchId(treeItem);
-        if(watchId == itemKey)
-        {
-            foundTreeItem = treeItem;
-        }
-    }
-
-    // Add if we did not find one
-    QTreeWidgetItem *treeItem = foundTreeItem;
-    if(foundTreeItem == NULL)
-    {
-        debugMsg("Adding %s=%s", stringToCStr(name), stringToCStr(valueString));
-
-        // Create the item
-        QStringList nameList;
-        nameList += name;
-        nameList += valueString;
-        nameList += varType;
-        treeItem = new QTreeWidgetItem(nameList);
-        treeItem->setData(DATA_COLUMN, Qt::UserRole, watchId);
-        treeItem->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-        parentItem->addChild(treeItem);
-        
-        if(watch.hasChildren())
-            treeItem->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
-
-    }
-    else
-    {
-        debugMsg("Found %s='%s'", stringToCStr(name), stringToCStr(valueString));
-    }
-
-    // Remove treeitems that does not exist anymore
-    QList <VarWatch*> watchList = core.getWatchChildren(watch);
-    for(int i = 0;i < treeItem->childCount();i++)
-    {
-        QTreeWidgetItem* childTreeItem =  treeItem->child(i);
-        QString childItemKey = getWatchId(childTreeItem);
-        
-        bool found = false;
-        for(int j = 0;j < watchList.size();j++)
-        {
-            VarWatch* watchChild = watchList[j];
-            if(watchChild->getWatchId() == childItemKey)
-            {
-                found = true;
-                watchList.removeAt(j--);
-            }
-        }
-
-        debugMsg("child '%s' %s", stringToCStr(childItemKey), found ? "found" : "not found");
-            
-        if(found == false)
-        {
-            debugMsg("removing watchId:'%s'", stringToCStr(watchId));
-            if(m_autoVarDispInfo.contains(childItemKey))
-            {
-                debugMsg("removing watchId:'%s' from dispinfo", stringToCStr(watchId));
-
-                m_autoVarDispInfo.remove(childItemKey);
-            
-            }
-            treeItem->removeChild(childTreeItem);
-            i = 0;
-        }
-    }
-
-    // Update the text
-    if(!inScope)
-        treeItem->setDisabled(true);
-    else
-        treeItem->setDisabled(false);
-
-    QString varPath = getTreeWidgetItemPath(treeItem);
-
-    // Add display info
-    if(m_autoVarDispInfo.contains(varPath) == false)
-    {
-        VarCtl::DispInfo dispInfo;
-        dispInfo.dispFormat = DISP_NATIVE;
-        m_autoVarDispInfo[varPath] = dispInfo;
-    }
-
-    valueString = getDisplayString(watchId, varPath);
-    treeItem->setText(COLUMN_VALUE, valueString);
-    treeItem->setText(COLUMN_TYPE, varType);
-    if(watch.hasChildren())
-        treeItem->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
-    else
-        treeItem->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
-
-
-    QList <VarWatch*> watchList2 = core.getWatchChildren(watch);
-    for(int j = 0;j < watchList2.size();j++)
-    {
-        VarWatch* childWatch = watchList2[j];
-        sync(treeItem, *childWatch);
-    }
-}
 
 
 void AutoVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)

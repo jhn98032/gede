@@ -52,7 +52,6 @@ private:
 
     QString getDisplayString(QString watchId, QString varPath);
     
-    void sync(QTreeWidgetItem * parentItem, VarWatch &watch);
     
 public slots:
     void onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);
