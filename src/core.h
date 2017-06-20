@@ -76,7 +76,7 @@ public:
     CoreVar(QString name);
     virtual ~CoreVar();
 
-    typedef enum { FMT_HEX, FMT_DEC, FMT_BIN, FMT_CHAR, FMT_NATIVE } DispFormat;
+    typedef enum { FMT_HEX = 1, FMT_DEC, FMT_BIN, FMT_CHAR, FMT_NATIVE } DispFormat;
 
     QString getName() const { return m_name; };
     QString getData(DispFormat fmt) const;
@@ -102,7 +102,7 @@ private:
     QString m_name;
     QVariant m_data;
     long long m_address;
-    enum { TYPE_INT = 0, TYPE_FLOAT, TYPE_STRING, TYPE_ENUM, TYPE_ERROR_MSG, TYPE_CHAR, TYPE_UNKNOWN } m_type;
+    enum { TYPE_HEX_INT = 1, TYPE_DEC_INT, TYPE_FLOAT, TYPE_STRING, TYPE_ENUM, TYPE_ERROR_MSG, TYPE_CHAR, TYPE_UNKNOWN } m_type;
     QString m_varType;
 };
 
@@ -122,6 +122,8 @@ class VarWatch
         QString getValue(CoreVar::DispFormat fmt = CoreVar::FMT_NATIVE) { return m_var.getData(fmt); };
 
         void setValue(QString value);
+        long long getAddress() { return m_var.getAddress(); };
+    
     private:
 
         QString watchId;

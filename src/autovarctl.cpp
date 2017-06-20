@@ -137,18 +137,21 @@ void AutoVarCtl::onContextMenu ( const QPoint &pos)
 void AutoVarCtl::onShowMemory()
 {
     QList<QTreeWidgetItem *> selectedItems = m_autoWidget->selectedItems();
+    Core &core = Core::getInstance();
     if(!selectedItems.empty())
     {
         QTreeWidgetItem *item = selectedItems[0];
 
-        long long addr = item->data(DATA_COLUMN, Qt::UserRole).toLongLong(0);
-
-        if(addr != 0)
+        QString watchId = item->data(DATA_COLUMN, Qt::UserRole).toString();
+        VarWatch *watch = NULL;
+        if(!watchId.isEmpty())
+            watch = core.getVarWatchInfo(watchId);
+        if(watch)
         {
             
             MemoryDialog dlg;
             dlg.setConfig(&m_cfg);
-            dlg.setStartAddress(addr);
+            dlg.setStartAddress(watch->getAddress());
             dlg.exec();
         }
     }
@@ -521,7 +524,7 @@ void AutoVarCtl::ICore_onLocalVarChanged(CoreVar *varValue)
 
     QString name = varValue->getName();
 
-    if(varValue->hasChildren())
+    if(varValue->hasChildren() || varValue->getData(CoreVar::FMT_NATIVE) == "")
     {
         addNewWatch(varValue->getName());
 

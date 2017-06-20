@@ -54,7 +54,10 @@ void CodeViewTab::fillInFunctions(QList<Tag> tagList)
         {
             QString text;
             if(m_cfg->m_tagShowLineNumbers)
+            {
                 text.sprintf("L%d: ", tag.getLineNo());
+                text = text.leftJustified(6, ' ');
+            }
             text += tag.getLongName();
             m_ui.comboBox_funcList->addItem(text, QVariant(tag.getLineNo()));
         }

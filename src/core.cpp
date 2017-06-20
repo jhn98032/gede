@@ -138,16 +138,28 @@ void CoreVar::setData(QString data)
         m_data = data;
         m_type = TYPE_FLOAT;
     }
+    // Vector?
+    else if(data.startsWith("["))
+    {
+        m_data = data;
+        m_type = TYPE_UNKNOWN;
+    }
     else if(data.length() > 0)
     {
         // Integer?
         if(data[0].isDigit() || data[0] == '-')
         {
             if(data.startsWith("0x"))
+            {
                 m_data = (qulonglong)data.toULongLong(0,0);
+                m_type = TYPE_HEX_INT;
+            }
             else
+            {
                 m_data = data.toLongLong(0,0);
-            m_type = TYPE_INT;
+                m_type = TYPE_DEC_INT;
+            }
+            
         }
         else
         {
@@ -166,11 +178,19 @@ QString CoreVar::getData(DispFormat fmt) const
 {
     QString valueText;
 
+    if(fmt == FMT_NATIVE)
+    {
+        if(m_type == TYPE_HEX_INT)
+            fmt = FMT_HEX;
+        if(m_type == TYPE_CHAR)
+            fmt = FMT_CHAR;
+    }
+
     if(m_type == TYPE_ENUM)
         return m_data.toString();
-    else if(m_type == TYPE_CHAR || m_type == TYPE_INT)
+    else if(m_type == TYPE_CHAR || m_type == TYPE_HEX_INT || m_type == TYPE_DEC_INT)
     {
-        if((fmt == FMT_NATIVE && m_type == TYPE_CHAR) || fmt == FMT_CHAR)
+        if(fmt == FMT_CHAR)
         {
             QChar c = m_data.toInt();
             char clat = c.toLatin1();
