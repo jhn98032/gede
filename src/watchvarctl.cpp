@@ -11,6 +11,7 @@
 #include "log.h"
 #include "util.h"
 #include "core.h"
+#include "autosignalblocker.h"
 
 enum
 {
@@ -19,26 +20,6 @@ enum
     COLUMN_TYPE = 2
 };
 #define DATA_COLUMN         (COLUMN_NAME) 
-
-class AutoSignalBlocker
-{
-public:
-    bool m_signalBlocked;
-    QObject *m_obj;
-    AutoSignalBlocker(QObject *obj)
-        :m_obj(obj)
-    {
-         m_signalBlocked = m_obj->blockSignals(true);
-    };
-    virtual ~AutoSignalBlocker()
-    {
-         m_obj->blockSignals(m_signalBlocked);
-    }
-
-    private:
-        AutoSignalBlocker(){};
-    
-};
 
 WatchVarCtl::WatchVarCtl()
 {
