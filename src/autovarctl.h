@@ -68,7 +68,6 @@ public slots:
     void onDisplayAsChar();
 
 private:
-    void fillInVars();
     void clear();
 
 private:

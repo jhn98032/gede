@@ -1,3 +1,6 @@
+
+//#define ENABLE_DEBUGMSG
+
 /*
  * Copyright (C) 2014-2017 Johan Henriksson.
  * All rights reserved.
@@ -76,8 +79,6 @@ void AutoVarCtl::setWidget(QTreeWidget *autoWidget)
 
 
 
-   // fillInVars();
-
 
 }
 
@@ -124,7 +125,7 @@ void AutoVarCtl::onShowMemory()
     {
         QTreeWidgetItem *item = selectedItems[0];
 
-        QString watchId = item->data(DATA_COLUMN, Qt::UserRole).toString();
+        QString watchId = getWatchId(item);
         VarWatch *watch = NULL;
         if(!watchId.isEmpty())
             watch = core.getVarWatchInfo(watchId);
@@ -170,8 +171,8 @@ void AutoVarCtl::onAutoWidgetItemExpanded(QTreeWidgetItem *item)
     //QTreeWidget *varWidget = m_autoWidget;
 
     // Get watchid of the item
-    QString watchId = item->data(DATA_COLUMN, Qt::UserRole).toString();
-
+    QString watchId = getWatchId(item);
+    
 
     // Get the children
     //if(!watchId.isEmpty())
@@ -192,7 +193,7 @@ void AutoVarCtl::onAutoWidgetItemDoubleClicked(QTreeWidgetItem *item, int column
         AutoSignalBlocker autoBlocker(m_autoWidget);
 
         QString varName = item->text(COLUMN_NAME);
-        QString watchId = item->data(DATA_COLUMN, Qt::UserRole).toString();
+        QString watchId = getWatchId(item);
         QString varPath = getTreeWidgetItemPath(item);
              
         if(m_autoVarDispInfo.contains(varPath))
@@ -274,7 +275,7 @@ void AutoVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
         for(int i = 0;foundItem == NULL && i < rootItem->childCount();i++)
         {
             QTreeWidgetItem* item =  rootItem->child(i);
-            QString itemKey = item->data(DATA_COLUMN, Qt::UserRole).toString();
+            QString itemKey = getWatchId(item);
 
             if(thisWatchId == itemKey)
             {
@@ -427,8 +428,7 @@ void AutoVarCtl::clear()
 
     debugMsg("%s()", __func__);
 
-    debugMsg("c:%d", rootItem->childCount());
-    // Get the root item for each item in the list
+    // Get all items
     QList<QTreeWidgetItem *>items;
     for(int i =0;i < rootItem->childCount();i++)
     {
@@ -436,20 +436,18 @@ void AutoVarCtl::clear()
 
         items.push_back(item);
     }
+    
 
     // Loop through the items
-    QSet<QTreeWidgetItem *> itemSet = items.toSet();
-    QSet<QTreeWidgetItem *>::const_iterator setItr = itemSet.constBegin();
-    for (;setItr != itemSet.constEnd();++setItr)
+    while(!items.isEmpty())
     {
-        QTreeWidgetItem *item = *setItr;
+        QTreeWidgetItem *item = items.takeFirst();
     
         // Delete the item
         Core &core = Core::getInstance();
-        QString watchId = item->data(DATA_COLUMN, Qt::UserRole).toString();
+        QString watchId = getWatchId(item);
         if(watchId != "")
         {
-            rootItem->removeChild(item);
             core.gdbRemoveVarWatch(watchId);
         }
     }
@@ -497,7 +495,7 @@ AutoVarCtl::onAutoWidgetCurrentItemChanged( QTreeWidgetItem * current, int colum
 {
     //QTreeWidget *varWidget = m_autoWidget;
     Core &core = Core::getInstance();
-    QString oldKey = current->data(DATA_COLUMN, Qt::UserRole).toString();
+    QString oldKey = getWatchId(current);
     
     if(column != COLUMN_VALUE)
         return;
@@ -543,8 +541,8 @@ void AutoVarCtl::selectedChangeDisplayFormat(VarCtl::DispFormat fmt)
     
         QString varPath = getTreeWidgetItemPath(item);
         QString varName = item->text(COLUMN_NAME);
-        QString watchId = item->data(DATA_COLUMN, Qt::UserRole).toString();
-
+        QString watchId = getWatchId(item);
+        
         Core &core = Core::getInstance();
         
         if(m_autoVarDispInfo.contains(varPath))
@@ -571,25 +569,6 @@ void AutoVarCtl::selectedChangeDisplayFormat(VarCtl::DispFormat fmt)
 
 
 
-     
-void AutoVarCtl::fillInVars()
-{
-    QTreeWidget *varWidget = m_autoWidget;
-    QTreeWidgetItem *item;
-    QStringList names;
-    
-    varWidget->clear();
-
-assert(0);
-
-    names.clear();
-    names += "...";
-    item = new QTreeWidgetItem(names);
-    item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
-    varWidget->insertTopLevelItem(0, item);
-   
-
-}
 
 
 /**
