@@ -175,8 +175,7 @@ class ICore
     virtual void ICore_onStopped(StopReason reason, QString path, int lineNo) = 0;
     virtual void ICore_onStateChanged(TargetState state) = 0;
     virtual void ICore_onSignalReceived(QString signalName) = 0;
-    virtual void ICore_onLocalVarReset() = 0;
-    virtual void ICore_onLocalVarChanged(CoreVar* value) = 0;
+    virtual void ICore_onLocalVarChanged(QStringList varNames) = 0;
     virtual void ICore_onFrameVarReset() = 0;
     virtual void ICore_onFrameVarChanged(QString name, QString value) = 0;
     virtual void ICore_onWatchVarChanged(VarWatch &watch) = 0;
@@ -251,7 +250,7 @@ public:
 
     int changeWatchVariable(QString variable, QString newValue);
     
-    QVector <CoreVar*>& getLocalVars() { return m_localVars; };
+    QStringList getLocalVars() { return m_localVars; };
 
 
     int gdbSetBreakpoint(QString filename, int lineNo);
@@ -303,7 +302,7 @@ private:
     bool m_scanSources; //!< True if the source filelist may have changed
     QSocketNotifier  *m_ptsListener;
 
-    QVector <CoreVar*> m_localVars;
+    QStringList m_localVars;
     int m_memDepth; //!< The memory depth. (Either 64 or 32).
 };
 

@@ -49,8 +49,7 @@ public:
     
 public:
     void ICore_onStopped(ICore::StopReason reason, QString path, int lineNo);
-    void ICore_onLocalVarReset();
-    void ICore_onLocalVarChanged(CoreVar *varValue);
+    void ICore_onLocalVarChanged(QStringList varNames);
     void ICore_onWatchVarChanged(VarWatch &watch);
     void ICore_onConsoleStream(QString text);
     void ICore_onBreakpointsChanged();

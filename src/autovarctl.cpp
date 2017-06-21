@@ -381,55 +381,17 @@ void AutoVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
     
 }
 
-void AutoVarCtl::ICore_onLocalVarReset()
+
+
+void AutoVarCtl::ICore_onLocalVarChanged(QStringList varNames)
 {
-    clear();
-
-}
-
-
-void AutoVarCtl::ICore_onLocalVarChanged(CoreVar *varValue)
-{
-    assert(varValue != NULL);
-
     debugMsg("%s()", __func__);
 
-    QString name = varValue->getName();
+    clear();
 
-    if(varValue->hasChildren() || varValue->getData(CoreVar::FMT_NATIVE) == "")
-    {
-        addNewWatch(varValue->getName());
+    for(int i = 0;i < varNames.size();i++)
+        addNewWatch(varNames[i]);
 
-  
-    }
-    else
-    {
-            QString varType = varValue->getVarType();
-            QString value  = varValue->getData(CoreVar::FMT_NATIVE);
-            
-            VarCtl::DispInfo dispInfo;
-            dispInfo.dispFormat = DISP_NATIVE;
-            m_autoVarDispInfo[varValue->getName()] = dispInfo;
-
-            
-
-
-
-            // Create a new dummy item
-            QTreeWidgetItem *item;
-            QStringList names;
-            names += varValue->getName();
-            names += value;
-            names += varType;
-            item = new QTreeWidgetItem(names);
-            item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable);
-            m_autoWidget->addTopLevelItem(item);
-
-   
-
-    }
-//    createTreeWidgetItem(NULL, &m_autoVarDispInfo, name, varValue);
-   
 }
 
 
@@ -472,43 +434,6 @@ QString AutoVarCtl::getDisplayString(QString watchId, QString varPath)
                 displayValue = watch->getValue(CoreVar::FMT_CHAR);break;
         }
 
-    }
-    else
-    {
-        VarCtl::DispInfo &dispInfo = m_autoVarDispInfo[varPath];
-
-        // Find the local variable
-        QVector <CoreVar*> localVars;
-        localVars = core.getLocalVars();
-        CoreVar* var = NULL;
-        for(int j = 0;j < localVars.size();j++)
-        {
-            CoreVar* testvar = localVars[j];
-            if(testvar->getName() == varPath)
-            {
-                var = testvar;
-            }
-            
-        }
-        if(var)
-        {
-            // Get the value
-            switch(dispInfo.dispFormat)
-            {
-                default:
-                case DISP_NATIVE:
-                    displayValue = var->getData(CoreVar::FMT_NATIVE);break;
-                case DISP_DEC:
-                    displayValue = var->getData(CoreVar::FMT_DEC);break;
-                case DISP_BIN:
-                    displayValue = var->getData(CoreVar::FMT_BIN);break;
-                case DISP_HEX:
-                    displayValue = var->getData(CoreVar::FMT_HEX);break;
-                case DISP_CHAR:
-                    displayValue = var->getData(CoreVar::FMT_CHAR);break;
-            }
-        }
-    
     }
     return displayValue;
 }

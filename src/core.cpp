@@ -291,12 +291,6 @@ Core::Core()
 
 Core::~Core()
 {
-    // Clear the local var array
-    for(int j = 0;j < m_localVars.size();j++)
-    {
-        CoreVar *val = m_localVars[j];
-        delete val;
-    }
     m_localVars.clear();
 
     for(int i = 0;i < m_watchList.size();i++)
@@ -1087,7 +1081,7 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
         com.commandF(NULL, "-thread-info");
 
         com.commandF(NULL, "-var-update --all-values *");
-        com.commandF(NULL, "-stack-list-variables --simple-values");
+        com.commandF(NULL, "-stack-list-variables --no-values");
 
         if(m_scanSources)
         {
@@ -1478,11 +1472,6 @@ void Core::onResult(Tree &tree)
         else if(rootName == "variables")
         {
             // Clear the local var array
-            for(int j = 0;j < m_localVars.size();j++)
-            {
-                CoreVar *val = m_localVars[j];
-                delete val;
-            }
             m_localVars.clear();
                 
             //
@@ -1492,33 +1481,13 @@ void Core::onResult(Tree &tree)
                 QString path;
                 path.sprintf("variables/%d/name", j+1);
                 QString varName = tree.getString(path);
-                path.sprintf("variables/%d/value", j+1);
-                QString varData = tree.getString(path);
-                path.sprintf("variables/%d/type", j+1);
-                QString varType = tree.getString(path);
         
-                CoreVar *val = new CoreVar(varName);
-                val->valueFromGdbString(varData);
-                val->setVarType(varType);
-
-                if(varType == "struct {...}")
-                    val->m_hasChildren = true;
-                else
-                    val->m_hasChildren = false;
-
-                
-                m_localVars.push_back(val);
+                m_localVars.push_back(varName);
             }
 
             if(m_inf)
             {
-                m_inf->ICore_onLocalVarReset();
-                
-                for(int j = 0;j < m_localVars.size();j++)
-                {
-                    CoreVar *val = m_localVars[j];
-                    m_inf->ICore_onLocalVarChanged(val);
-                }
+                m_inf->ICore_onLocalVarChanged(m_localVars);
             }
         }
         else if(rootName == "msg")
@@ -1655,7 +1624,7 @@ void Core::selectFrame(int selectedFrameIdx)
 
         com.commandF(&resultData, "-stack-info-frame");
 
-        com.commandF(NULL, "-stack-list-variables --simple-values");
+        com.commandF(NULL, "-stack-list-variables --no-values");
     }
 
 }

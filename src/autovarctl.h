@@ -38,8 +38,7 @@ public:
 
     void setConfig(Settings *cfg);
 
-    void ICore_onLocalVarChanged(CoreVar *varValue);
-    void ICore_onLocalVarReset();
+    void ICore_onLocalVarChanged(QStringList varNames);
 
     void onKeyPress(QKeyEvent *keyEvent);
 

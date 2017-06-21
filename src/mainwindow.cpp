@@ -427,10 +427,6 @@ void MainWindow::ICore_onStopped(ICore::StopReason reason, QString path, int lin
 }
 
 
-void MainWindow::ICore_onLocalVarReset()
-{
-    m_autoVarCtl.ICore_onLocalVarReset();
-}
 
 /**
  * @brief Finds a child to a treewidget node.
@@ -647,14 +643,9 @@ void MainWindow::insertSourceFiles()
 
 
 
-
-
-
-    
-    
-void MainWindow::ICore_onLocalVarChanged(CoreVar *varValue)
+void MainWindow::ICore_onLocalVarChanged(QStringList varNames)
 {
-    m_autoVarCtl.ICore_onLocalVarChanged(varValue);
+    m_autoVarCtl.ICore_onLocalVarChanged(varNames);
 }
 
 
