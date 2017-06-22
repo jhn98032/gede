@@ -42,12 +42,15 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     //
-    m_ui.treeWidget_breakpoints->setColumnCount(2);
-    m_ui.treeWidget_breakpoints->setColumnWidth(0, 80);
+    m_ui.treeWidget_breakpoints->setColumnCount(4);
+    m_ui.treeWidget_breakpoints->setColumnWidth(0, 120);
+    m_ui.treeWidget_breakpoints->setColumnWidth(1, 40);
+    m_ui.treeWidget_breakpoints->setColumnWidth(2, 200);
+    m_ui.treeWidget_breakpoints->setColumnWidth(3, 140);
     names.clear();
     names += "Filename";
-    names += "Func";
     names += "Line";
+    names += "Func";
     names += "Addr";
     m_ui.treeWidget_breakpoints->setHeaderLabels(names);
     connect(m_ui.treeWidget_breakpoints, SIGNAL(itemDoubleClicked ( QTreeWidgetItem * , int  )), this, SLOT(onBreakpointsWidgetItemDoubleClicked(QTreeWidgetItem * ,int)));
@@ -1044,9 +1047,9 @@ void MainWindow::ICore_onBreakpointsChanged()
         QStringList nameList;
         QString name;
         nameList.append(getFilenamePart(bk->fullname));
-        nameList.append(bk->m_funcName);
         name.sprintf("%d", bk->lineNo);
         nameList.append(name);
+        nameList.append(bk->m_funcName);
         nameList.append(longLongToHexString(bk->m_addr));
         
         

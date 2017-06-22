@@ -6,6 +6,8 @@
  * of the BSD license.  See the LICENSE file for details.
  */
 
+//#define ENABLE_DEBUGMSG
+
 #include "core.h"
 
 #include "ini.h"
@@ -1389,8 +1391,18 @@ void Core::onResult(Tree &tree)
                 QString threadId = tree.getString(treePath + "/id");
                 QString targetId = tree.getString(treePath + "/target-id");
                 QString funcName = tree.getString(treePath + "/frame/func");
+                QString lineNo  = tree.getString(treePath + "/frame/line");
                 QString details = tree.getString(treePath + "/details");
 
+                if(details.isEmpty())
+                {
+                    if(!funcName.isEmpty())
+                    {
+                        details = QString("Executing %1()").arg(funcName);
+                        if(!lineNo.isEmpty())
+                            details += QString(" @ L%1").arg(lineNo);
+                    }
+                }
                 
                 ThreadInfo tinfo;
                 tinfo.id = atoi(stringToCStr(threadId));
