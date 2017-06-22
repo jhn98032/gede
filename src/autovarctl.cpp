@@ -60,6 +60,7 @@ void AutoVarCtl::setWidget(QTreeWidget *autoWidget)
         //
     m_autoWidget->setColumnCount(3);
     m_autoWidget->setColumnWidth(COLUMN_NAME, 120);
+    m_autoWidget->setColumnWidth(COLUMN_VALUE, 140);
     QStringList names;
     names += "Name";
     names += "Value";
