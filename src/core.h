@@ -20,6 +20,8 @@
 
 #include "settings.h"
 
+class Core;
+
 struct ThreadInfo
 {
     int id;             //!< The numeric id assigned to the thread by GDB.
@@ -92,7 +94,6 @@ public:
     
     void valueFromGdbString(QString data);
 
-    bool m_hasChildren;
 private:
     void clear();
 
@@ -104,6 +105,7 @@ private:
     long long m_address;
     enum { TYPE_HEX_INT = 1, TYPE_DEC_INT, TYPE_FLOAT, TYPE_STRING, TYPE_ENUM, TYPE_ERROR_MSG, TYPE_CHAR, TYPE_UNKNOWN } m_type;
     QString m_varType;
+    bool m_hasChildren;
 };
 
 
@@ -128,16 +130,14 @@ class VarWatch
 
         QString watchId;
         QString name;
-
-    public:
         bool m_inScope;
-    private:
         CoreVar m_var;
-    public:
         QString m_varType;
         bool m_hasChildren;
         
         QString m_parentWatchId;
+
+    friend Core;
 };
 
 
