@@ -74,6 +74,8 @@ FORMS += opendialog.ui
 SOURCES+=colorbutton.cpp
 HEADERS+=colorbutton.h
 
+HEADERS+=autosignalblocker.h
+
 RESOURCES += resource.qrc
 
 #QMAKE_CXXFLAGS += -I./  -g
