@@ -245,6 +245,12 @@ void WatchVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
             }
         }
 
+        // This watch belonged to the AutoWidget?
+        if(partIdx == 0 && foundItem == NULL)
+        {
+            return;
+        }
+        
         // Did not find one?
         QTreeWidgetItem *item;
         if(foundItem == NULL)
