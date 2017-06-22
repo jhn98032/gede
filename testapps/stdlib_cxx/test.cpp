@@ -3,9 +3,19 @@
 #include <vector>
 #include <list>
 
+class MyClass
+{
+    public:
+        MyClass() {};
+    
+        int a;
+        char *str;
+};
+
 using namespace std;
 int main(int argc,char *argv[])
 {
+    MyClass myclass1;
     vector<int> g_vectorInt;
     list<int> g_listInt;
     struct {
