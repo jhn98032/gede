@@ -29,6 +29,17 @@ Settings::Settings()
     m_viewWindowGdbOutput = true;
     m_viewWindowFileBrowser = true;
     m_enableDebugLog = false;
+
+    // Set cleanlooks as default on Debian
+    DistroType distroType = DISTRO_UNKNOWN;
+    detectDistro(&distroType, NULL);
+    if(distroType == DISTRO_DEBIAN)
+        m_guiStyleName = "cleanlooks";
+    else
+        m_guiStyleName = "";
+    
+
+    
 }
 
 void Settings::loadDefaultsGui()
@@ -86,6 +97,7 @@ void Settings::loadGlobalConfig()
 
     m_enableDebugLog = tmpIni.getBool("General/EnableDebugLog", false);
     
+    m_guiStyleName = tmpIni.getString("Gui/Style", m_guiStyleName);
     m_fontFamily = tmpIni.getString("Gui/CodeFont", m_fontFamily);
     m_fontSize = tmpIni.getInt("Gui/CodeFontSize", m_fontSize);
     m_memoryFontFamily = tmpIni.getString("Gui/MemoryFont", m_memoryFontFamily);
@@ -231,6 +243,8 @@ void Settings::saveGlobalConfig()
 
     tmpIni.setBool("General/EnableDebugLog", m_enableDebugLog);
 
+    tmpIni.setString("Gui/Style", m_guiStyleName);
+ 
     tmpIni.setString("Gui/CodeFont", m_fontFamily);
     tmpIni.setInt("Gui/CodeFontSize", m_fontSize);
 

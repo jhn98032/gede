@@ -1462,6 +1462,8 @@ void MainWindow::onCodeViewContextMenuAddWatch()
  */
 void MainWindow::setConfig()
 {
+    qApp->setStyle(m_cfg.m_guiStyleName);
+
     for(int tabIdx = 0;tabIdx <  m_ui.editorTabWidget->count();tabIdx++)
     {
         CodeViewTab* codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
@@ -1481,7 +1483,8 @@ void MainWindow::setConfig()
 
 void MainWindow::onSettings()
 {
-    
+    QString oldStyleName = m_cfg.m_guiStyleName;
+
     SettingsDialog dlg(this, &m_cfg);
     if(dlg.exec() == QDialog::Accepted)
     {
@@ -1491,6 +1494,17 @@ void MainWindow::onSettings()
         
         
         m_cfg.save();
+
+        if(m_cfg.m_guiStyleName.isEmpty() && !oldStyleName.isEmpty())
+        {
+            //
+            QString msgText;
+            msgText.sprintf("Style will be changed after gede has been restarted.");
+            QString title = "Style changed";
+            QMessageBox::warning(this, title, msgText);
+   
+        }
+            
     }
    
 }

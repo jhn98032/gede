@@ -108,6 +108,7 @@ class Settings
         bool m_tagShowLineNumbers;
 
         bool m_enableDebugLog;
+        QString m_guiStyleName; // The GUI style to use (Eg: "cleanlooks").
 };
 
 

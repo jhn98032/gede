@@ -26,7 +26,6 @@ public:
     void getConfig(Settings *cfg);
     
 private:    
-    void saveConfig();
     void loadConfig();
     void updateGui();
     

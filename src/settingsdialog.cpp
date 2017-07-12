@@ -11,7 +11,7 @@
 #include "log.h"
 #include "util.h"
 
-
+#include <QStyleFactory>
 #include <QFontDialog>
 
 
@@ -29,7 +29,14 @@ SettingsDialog::SettingsDialog(QWidget *parent, Settings *cfg)
 
     QObject::connect(m_ui.buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(onButtonBoxClicked(QAbstractButton*)));
 
+    QStyleFactory sf;
 
+    QStringList styleList = sf.keys();
+    for(int i = 0;i < styleList.size();i++)
+    {
+        m_ui.comboBox_guiStyle->insertItem(i, styleList[i], QVariant(styleList[i]));
+    }
+    m_ui.comboBox_guiStyle->insertItem(0, "Qt default", QVariant(QString("")));
 
     loadConfig();
     
@@ -93,18 +100,17 @@ void SettingsDialog::loadConfig()
 
     m_ui.checkBox_enableDebugLog->setCheckState(m_cfg->m_enableDebugLog ? Qt::Checked : Qt::Unchecked);
 
+    int guiStyleIdx = m_ui.comboBox_guiStyle->findData(QVariant(m_cfg->m_guiStyleName));
+    if(guiStyleIdx != -1)
+        m_ui.comboBox_guiStyle->setCurrentIndex(guiStyleIdx);
 
+        
     int comboIdx = 0;
     if(m_cfg->m_tagSortByName)
         comboIdx = 1;
     else
         comboIdx = 0;
     m_ui.comboBox_sortTags->setCurrentIndex(comboIdx);
-}
-
-void SettingsDialog::saveConfig()
-{
-    getConfig(m_cfg);
 }
 
 void SettingsDialog::getConfig(Settings *cfg)
@@ -126,7 +132,13 @@ void SettingsDialog::getConfig(Settings *cfg)
     cfg->m_tagShowLineNumbers = (m_ui.checkBox_showLineNumbers->checkState() == Qt::Unchecked) ? false : true;
 
     cfg->m_enableDebugLog = (m_ui.checkBox_enableDebugLog->checkState() == Qt::Unchecked) ? false : true;
+
+    int guiStyleIdx = m_ui.comboBox_guiStyle->currentIndex();
+    if(guiStyleIdx != -1)
+        m_cfg->m_guiStyleName = m_ui.comboBox_guiStyle->itemData(guiStyleIdx).toString();
     
+
+
     cfg->m_clrBackground = m_ui.pushButton_clr_background->getColor();
     cfg->m_clrComment = m_ui.pushButton_clr_comment->getColor();
     cfg->m_clrString = m_ui.pushButton_clr_string->getColor();
