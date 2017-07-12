@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>282</width>
-    <height>203</height>
+    <width>376</width>
+    <height>237</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -63,6 +63,13 @@
     <widget class="QLabel" name="label_gdbPath">
      <property name="text">
       <string>&lt;Gdb Path&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_os">
+     <property name="text">
+      <string>&lt;OS&gt;</string>
      </property>
     </widget>
    </item>

@@ -1184,6 +1184,11 @@ void Com::enableLog(bool enable)
             logStr.sprintf("# Gede version: %d.%d.%d \r\n", GD_MAJOR,GD_MINOR,GD_PATCH);
             writeLogEntry(logStr);
 
+            QString distroDesc;
+            detectDistro(NULL, &distroDesc);
+            logStr = "# Host: " + distroDesc + "\r\n";
+            writeLogEntry(logStr);
+
         }
         else
             warnMsg("Failed to create log file %s", (const char*)GDB_LOG_FILE);

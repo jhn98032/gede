@@ -41,7 +41,11 @@ AboutDialog::AboutDialog(QWidget *parent, Settings *cfg)
     
     QString gdbPath = "Gdb: " + cfg->m_gdbPath + " ('" + getGdbVersion(cfg->m_gdbPath) + "')";
     m_ui.label_gdbPath->setText(gdbPath);
-    
+
+    QString distroName;
+    detectDistro(NULL, &distroName);
+    QString osText = "Running on " + distroName;
+    m_ui.label_os->setText(osText);
 
 }
 
