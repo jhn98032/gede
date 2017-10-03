@@ -35,6 +35,7 @@ public:
     {
         DispFormat dispFormat;
         bool isExpanded;
+        QString lastData;
     }DispInfo;
 
     typedef QMap<QString, DispInfo>  DispInfoMap;

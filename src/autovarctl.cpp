@@ -248,8 +248,6 @@ void AutoVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
     QString watchId = watch.getWatchId();
     QString name = watch.getName();
     QString varType = watch.getVarType();
-
-    QString valueString = watch.getValue();
     bool hasChildren  = watch.hasChildren();
     bool inScope = watch.inScope();
 
@@ -294,12 +292,12 @@ void AutoVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
         QTreeWidgetItem *item;
         if(foundItem == NULL)
         {
-            debugMsg("Adding %s=%s", stringToCStr(name), stringToCStr(valueString));
+            debugMsg("Adding '%s'", stringToCStr(name));
 
             // Create the item
             QStringList nameList;
             nameList += name;
-            nameList += valueString;
+            nameList += "";
             nameList += varType;
             item = new QTreeWidgetItem(nameList);
             item->setData(DATA_COLUMN, Qt::UserRole, thisWatchId);
@@ -339,10 +337,9 @@ void AutoVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
             else
             {
                 dispInfo = m_autoVarDispInfo[varPath];
-                 QString varPath = getTreeWidgetItemPath(item);
-                valueString = getDisplayString(watchId, varPath);
             }
-
+            QString valueString = getDisplayString(watchId, varPath);
+  
             bool enable = inScope;
 
             if(!enable)
@@ -353,7 +350,15 @@ void AutoVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
 
             item->setText(COLUMN_VALUE, valueString);
 
-
+            // Color the text based on if the value is different
+            VarCtl::DispInfo &newDispInfo = m_autoVarDispInfo[varPath];
+            QBrush b;
+            if(newDispInfo.lastData != valueString)
+                b = QBrush(Qt::red);
+            else
+                b = QBrush(Qt::black);
+            item->setForeground(COLUMN_VALUE,b);
+            newDispInfo.lastData = valueString;
 
 
             if(dispInfo.isExpanded && hasChildren)
@@ -618,17 +623,28 @@ void AutoVarCtl::addNewWatch(QString varName)
             QString value  = getDisplayString(watchId, varPath);
             if(!m_autoVarDispInfo.contains(varPath))
             {
-                VarCtl::DispInfo dispInfo;
-                dispInfo.dispFormat = DISP_NATIVE;
+                VarCtl::DispInfo newDispInfo;
+                newDispInfo.dispFormat = DISP_NATIVE;
 
                 debugMsg("Adding '%s'", stringToCStr(varPath));
-                m_autoVarDispInfo[varPath] = dispInfo;
+                m_autoVarDispInfo[varPath] = newDispInfo;
             }
+
+            VarCtl::DispInfo &dispInfo = m_autoVarDispInfo[varPath];
+                
         
             current->setData(DATA_COLUMN, Qt::UserRole, watchId);
             current->setText(COLUMN_VALUE, value);
             current->setText(COLUMN_TYPE, varType);
 
+            // Set color based on if the value has changed
+            QBrush b;
+            if(dispInfo.lastData != value)
+                b = QBrush(Qt::red);
+            else
+                b = QBrush(Qt::black);
+            current->setForeground(COLUMN_VALUE,b);
+            dispInfo.lastData = value;
 
             
 
