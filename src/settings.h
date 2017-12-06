@@ -17,6 +17,7 @@
 enum ConnectionMode
 {
     MODE_LOCAL = 0,
+    MODE_COREDUMP,
     MODE_TCP
     
 };
