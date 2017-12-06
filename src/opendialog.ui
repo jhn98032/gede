@@ -294,6 +294,29 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>lineEdit_gdbCommand</tabstop>
+  <tabstop>radioButton_localProgram</tabstop>
+  <tabstop>lineEdit_program</tabstop>
+  <tabstop>lineEdit_arguments</tabstop>
+  <tabstop>pushButton_selectFile</tabstop>
+  <tabstop>radioButton_gdbServerTcp</tabstop>
+  <tabstop>lineEdit_tcpProgram</tabstop>
+  <tabstop>lineEdit_tcpHost</tabstop>
+  <tabstop>lineEdit_tcpPort</tabstop>
+  <tabstop>pushButton_selectTcpProgram</tabstop>
+  <tabstop>checkBox_download</tabstop>
+  <tabstop>radioButton_openCoreDump</tabstop>
+  <tabstop>lineEdit_coreProgram</tabstop>
+  <tabstop>lineEdit_coreFile</tabstop>
+  <tabstop>pushButton_selectCoreProgram</tabstop>
+  <tabstop>pushButton_selectCoreFile</tabstop>
+  <tabstop>lineEdit_initialBreakpoint</tabstop>
+  <tabstop>checkBox_reloadBreakpoints</tabstop>
+  <tabstop>buttonBox</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>plainTextEdit_initCommands</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>
