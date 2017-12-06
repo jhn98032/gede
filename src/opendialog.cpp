@@ -62,8 +62,21 @@ ConnectionMode OpenDialog::getMode()
 {
     if(m_ui.radioButton_gdbServerTcp->isChecked())    
         return MODE_TCP;
+    else if(m_ui.radioButton_openCoreDump->isChecked())    
+        return MODE_COREDUMP;
     else
         return MODE_LOCAL;
+}
+
+QString OpenDialog::getCoreDumpFile()
+{
+    return m_ui.lineEdit_coreFile->text();
+}
+
+
+QString OpenDialog::getCoreDumpProgram()
+{
+    return m_ui.lineEdit_coreProgram->text();
 }
 
 QString OpenDialog::getProgram()
@@ -77,11 +90,19 @@ QString OpenDialog::getArguments()
 }
     
 
+void OpenDialog::setCoreDumpProgram(QString coreProgram)
+{
+    m_ui.lineEdit_coreProgram->setText(coreProgram);
+}
+
+void OpenDialog::setCoreDumpFile(QString coreDumpFile)
+{
+    m_ui.lineEdit_coreFile->setText(coreDumpFile);
+}
+
 void OpenDialog::setProgram(QString program)
 {
     m_ui.lineEdit_program->setText(program);
-    m_ui.lineEdit_coreProgram->setText(program);
-
 }
 
 void OpenDialog::setInitCommands(QStringList commandList)
@@ -254,6 +275,8 @@ void OpenDialog::setGdbPath(QString path)
 void OpenDialog::saveConfig(Settings *cfg)
 {
     OpenDialog &dlg = *this;
+    cfg->m_coreDumpProgram = dlg.getCoreDumpProgram();
+    cfg->m_coreDumpFile = dlg.getCoreDumpFile();
     cfg->m_lastProgram = dlg.getProgram();
     cfg->m_argumentList = dlg.getArguments().split(' ');
     cfg->m_connectionMode = dlg.getMode();
@@ -299,6 +322,10 @@ void OpenDialog::loadConfig(Settings &cfg)
 
     dlg.m_ui.checkBox_reloadBreakpoints->setChecked(cfg.m_reloadBreakpoints);
 
+    dlg.setCoreDumpProgram(cfg.m_coreDumpProgram);
+    dlg.setCoreDumpFile(cfg.m_coreDumpFile);
+
+    
     dlg.setProgram(cfg.m_lastProgram);
     QStringList defList;
     dlg.setArguments(cfg.m_argumentList.join(" "));

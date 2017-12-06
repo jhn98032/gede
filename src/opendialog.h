@@ -29,6 +29,12 @@ public:
     QString getProgram();
     QString getArguments();
 
+    QString getCoreDumpFile();
+    QString getCoreDumpProgram();
+
+    void setCoreDumpProgram(QString coreProgram);
+    void setCoreDumpFile(QString coreDumpFile);
+
     void setInitialBreakpoint(QString list);
     QString getInitialBreakpoint();
     

@@ -419,6 +419,57 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
     return 0;
 }
 
+
+
+/**
+ * @brief Init gdb with a core dumpfile.
+ */
+int Core::initCoreDump(Settings *cfg, QString gdbPath, QString programPath, QString coreDumpFile)
+{
+    Com& com = Com::getInstance();
+    Tree resultData;
+    int rc = 0;
+
+    m_isRemote = false;
+
+
+    if(com.init(gdbPath, cfg->m_enableDebugLog))
+    {
+        errorMsg("Failed to start gdb ('%s')", stringToCStr(gdbPath));
+        return -1;
+    }
+
+    // Load the symbols
+    if(!programPath.isEmpty())
+    {
+        com.commandF(&resultData, "-file-exec-and-symbols %s", stringToCStr(programPath));
+    }
+
+    // Load the coredump file
+    com.commandF(&resultData, "-target-select core %s", stringToCStr(coreDumpFile)); 
+
+    
+    QString ptsDevPath = ptsname(m_ptsFd);
+    
+    if(com.commandF(&resultData, "-inferior-tty-set %s", stringToCStr(ptsDevPath)))
+    {
+        rc = 1;
+        errorMsg("Failed to set inferior tty");
+    }
+
+
+    // Get memory depth (32 or 64)
+    detectMemoryDepth();
+
+
+    gdbGetFiles();
+
+
+    return rc;
+}
+
+    
+
 int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QString tcpHost, int tcpPort)
 {
     Com& com = Com::getInstance();
@@ -683,8 +734,7 @@ void Core::gdbContinue()
  */ 
 void Core::stop()
 {
-    Com& com = Com::getInstance();
-
+    
     if(m_targetState != ICore::TARGET_RUNNING)
     {
         if(m_inf)

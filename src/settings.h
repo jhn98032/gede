@@ -16,9 +16,9 @@
 
 enum ConnectionMode
 {
-    MODE_LOCAL = 0,
-    MODE_COREDUMP,
-    MODE_TCP
+    MODE_LOCAL = 0,  //!< Local program
+    MODE_COREDUMP,   //!< Core dump file
+    MODE_TCP         //!< TCP/IP connection to a gdbserver
     
 };
 
@@ -62,6 +62,8 @@ class Settings
         QStringList m_initCommands;
         QString m_gdbPath;
         QString m_lastProgram;
+        QString m_coreDumpFile;
+        QString m_coreDumpProgram;
         bool m_download;
 
         QString m_fontFamily;

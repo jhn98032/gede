@@ -141,7 +141,13 @@ void Settings::loadProjectConfig()
 
 
     m_download = tmpIni.getBool("Download", true);
-    m_connectionMode = tmpIni.getInt("Mode", MODE_LOCAL) == MODE_LOCAL ? MODE_LOCAL : MODE_TCP;
+    switch(tmpIni.getInt("Mode", MODE_LOCAL))
+    {
+        default:
+        case MODE_LOCAL: m_connectionMode = MODE_LOCAL;break;
+        case MODE_TCP: m_connectionMode = MODE_TCP;break;
+        case MODE_COREDUMP: m_connectionMode = MODE_COREDUMP;break;
+    }
     m_tcpPort = tmpIni.getInt("TcpPort", 2000);
     m_tcpHost = tmpIni.getString("TcpHost", "localhost");
     m_tcpProgram = tmpIni.getString("TcpProgram", "");
@@ -353,6 +359,10 @@ QString Settings::getProgramPath()
     if(m_connectionMode == MODE_LOCAL)
     {
         return m_lastProgram;
+    }
+    else if(m_connectionMode == MODE_COREDUMP)
+    {
+        return m_coreDumpProgram;
     }
     else
     {

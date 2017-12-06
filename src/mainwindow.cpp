@@ -1589,6 +1589,10 @@ void MainWindow::setStatusLine(Settings &cfg)
         }
         statusText.sprintf("[%s] [%s]", stringToCStr(cfg.m_lastProgram), stringToCStr(argumentText));
     }
+    else if(cfg.m_connectionMode == MODE_COREDUMP)
+    {
+        statusText.sprintf("[%s] [%s]", stringToCStr(cfg.m_coreDumpProgram), stringToCStr(cfg.m_coreDumpFile));
+    }
     else
         statusText.sprintf("[%s] [%s:%d]", stringToCStr(cfg.m_tcpProgram), stringToCStr(cfg.m_tcpHost), (int)cfg.m_tcpPort);
     w.m_statusLineWidget.setText(statusText);
