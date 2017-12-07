@@ -320,7 +320,9 @@ QStringList Settings::getDefaultKeywordList()
     keywordList += "true";
 
     keywordList += "sizeof";
+    keywordList += "typedef";
     
+    keywordList += "enum";
     keywordList += "unsigned";
     keywordList += "bool";
     keywordList += "int";
