@@ -555,7 +555,6 @@ void AutoVarCtl::selectedChangeDisplayFormat(VarCtl::DispFormat fmt)
         QString varName = item->text(COLUMN_NAME);
         QString watchId = getWatchId(item);
         
-        Core &core = Core::getInstance();
         
         if(m_autoVarDispInfo.contains(varPath))
         {

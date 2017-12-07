@@ -203,7 +203,7 @@ void WatchVarCtl::sync(QTreeWidgetItem* parentItem, VarWatch &watch)
 
 void WatchVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
 {
-    Core &core = Core::getInstance();
+    //Core &core = Core::getInstance();
     QTreeWidget *varWidget = m_varWidget;
     QString watchId = watch.getWatchId();
     QString name = watch.getName();
