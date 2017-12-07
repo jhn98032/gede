@@ -156,6 +156,10 @@ void Settings::loadProjectConfig()
     m_lastProgram = tmpIni.getString("LastProgram", "");
     m_argumentList = tmpIni.getStringList("LastProgramArguments", m_argumentList);
 
+    m_coreDumpFile = tmpIni.getString("CoreDumpFile", "./core");
+    m_coreDumpProgram = tmpIni.getString("CoreDumpProgram", "");
+
+        
     m_reloadBreakpoints = tmpIni.getBool("ReuseBreakpoints", false);
 
     m_initialBreakpoint = tmpIni.getString("InitialBreakpoint","main");
@@ -207,6 +211,9 @@ void Settings::saveProjectConfig()
     tmpIni.setString("TcpProgram", m_tcpProgram);
     tmpIni.setStringList("InitCommands", m_initCommands);
     tmpIni.setString("GdpPath", m_gdbPath);
+    tmpIni.setString("CoreDumpFile", m_coreDumpFile);
+    tmpIni.setString("CoreDumpProgram", m_coreDumpProgram);
+
     QStringList tmpArgs;
     tmpArgs = m_argumentList;
     tmpIni.setStringList("LastProgramArguments", tmpArgs);
