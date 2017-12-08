@@ -464,6 +464,9 @@ int Core::initCoreDump(Settings *cfg, QString gdbPath, QString programPath, QStr
 
     gdbGetFiles();
 
+    m_targetState = ICore::TARGET_FINISHED;
+    if(m_inf)
+        m_inf->ICore_onStateChanged(ICore::TARGET_FINISHED);
 
     return rc;
 }
