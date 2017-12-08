@@ -223,6 +223,9 @@ void OpenDialog::onConnectionTypeCoreDump(bool checked)
     m_ui.pushButton_selectCoreProgram->setEnabled(checked);
     m_ui.lineEdit_coreFile->setEnabled(checked);
     m_ui.lineEdit_coreProgram->setEnabled(checked);
+
+    m_ui.lineEdit_initialBreakpoint->setEnabled(checked ? false : true);
+    m_ui.checkBox_reloadBreakpoints->setEnabled(checked ? false : true);
 }
 
 
