@@ -186,6 +186,9 @@ MainWindow::~MainWindow()
 }
 
 
+/**
+ * @brief Displays all the widgets (Eg: stack, breakpoints).
+ */
 void MainWindow::showWidgets()
 {
 
@@ -792,6 +795,9 @@ void MainWindow::onCodeViewTab_tabCloseRequested ( int tabIdx)
 }
 
 
+/**
+ * @brief Opens a source file in the sourcecode viewer.
+ */
 CodeViewTab* MainWindow::open(QString filename)
 {
     if(filename.isEmpty())
