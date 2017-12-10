@@ -60,14 +60,12 @@ def detectQt():
 
 # Main entry
 if __name__ == "__main__":
-    qmakeName = ""
     try:
         os.chdir("src")
         do_clean = False
         do_install = False
         do_build = True
         
-        qmakeName = detectQt();
         for arg in sys.argv[1:]:
             if arg == "clean":
                 do_build = False
@@ -94,6 +92,7 @@ if __name__ == "__main__":
         if do_build:
             if not os.path.exists("Makefile"):
                 print("Generating makefile")
+                qmakeName = detectQt();
                 if subprocess.call([qmakeName]):
                     exit(1)
 
