@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Written by Johan Henriksson. Copyright (C) 2014.
+# Written by Johan Henriksson. Copyright (C) 2014-2017.
 #
 import sys
 import os
@@ -37,14 +37,37 @@ def dump_usage():
     return 1
 
 
+def exeExist(name):
+    pathEnv = os.environ["PATH"]
+    for path in pathEnv.split(":"):
+        if os.path.isfile(path + "/" + name):
+            return path
+    return ""
+    
+def detectQt():
+    if exeExist("qmake-qt4"):
+        print("Qt4 found");
+        return "qmake-qt4";
+    elif exeExist("qmake-qt5"):
+        print("Qt5 found");
+        return "qmake-qt5";
+    elif exeExist("qmake"):
+        print("Qt? found (qmake)");
+        return "qmake";
+    print("No Qt found");
+    return "qmake";
+
 
 # Main entry
 if __name__ == "__main__":
+    qmakeName = ""
     try:
         os.chdir("src")
         do_clean = False
         do_install = False
         do_build = True
+        
+        qmakeName = detectQt();
         for arg in sys.argv[1:]:
             if arg == "clean":
                 do_build = False
@@ -71,7 +94,7 @@ if __name__ == "__main__":
         if do_build:
             if not os.path.exists("Makefile"):
                 print("Generating makefile")
-                if subprocess.call(['qmake-qt4']):
+                if subprocess.call([qmakeName]):
                     exit(1)
 
             print("Compiling (please wait)")
@@ -88,7 +111,7 @@ if __name__ == "__main__":
                 exit(1)
             try:
                 shutil.copyfile("gede", g_dest_path + "/bin/gede")
-                os.chmod(g_dest_path + "/bin/gede", 0775);
+                os.chmod(g_dest_path + "/bin/gede", 0o775);
             except:
                 print("Failed to install files to " + g_dest_path)
                 raise
