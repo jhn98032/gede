@@ -468,6 +468,9 @@ int Core::initCoreDump(Settings *cfg, QString gdbPath, QString programPath, QStr
     if(m_inf)
         m_inf->ICore_onStateChanged(ICore::TARGET_FINISHED);
 
+
+    com.commandF(NULL, "-stack-list-variables --no-values");
+    
     return rc;
 }
 
