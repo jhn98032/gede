@@ -43,8 +43,21 @@ def exeExist(name):
         if os.path.isfile(path + "/" + name):
             return path
     return ""
-    
+
+def ensureExist(name):
+    """ Checks if an executable exist in the PATH. """
+    sys.stdout.write("Checking for " + name + "... "),
+    foundPath = exeExist(name)
+    if foundPath:
+        print(" found in " + foundPath)
+    else:
+        print(" not found!!")
+
 def detectQt():
+    """ @brief Detects the Qt version installed in the system.
+        @return The name of the qmake executable. 
+    """
+    sys.stdout.write("Detecting Qt version... "),
     if exeExist("qmake-qt4"):
         print("Qt4 found");
         return "qmake-qt4";
@@ -91,11 +104,12 @@ if __name__ == "__main__":
                 os.system("rm -f *.o")
         if do_build:
             if not os.path.exists("Makefile"):
-                print("Generating makefile")
+                ensureExist("make")
+                ensureExist("gcc")
                 qmakeName = detectQt();
+                print("Generating makefile")
                 if subprocess.call([qmakeName]):
                     exit(1)
-
             print("Compiling (please wait)")
             if run_make([]):
                 exit(1)
