@@ -7,6 +7,14 @@ Seé LICENSE file for license information.
 The icons used are from the NetBeans project and licensed under the
 terms of the NetBeans License Agreement.
 
+Building
+========
+
+Make sure that you have all dependencies installed. On Debian/Ubuntu:
+
+  # sudo apt-get install exuberant-ctags
+  # sudo apt-get install qt4-designer qt4-qmake libqt4-dev libssl-dev
+
 
 ctags
 =====
