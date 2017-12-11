@@ -44,6 +44,11 @@ def exeExist(name):
             return path
     return ""
 
+def printRed(textString):
+    """ Print in red text """
+    CSI="\x1B["
+    print(CSI+"1;31;40m" + textString + CSI + "0m")
+        
 def ensureExist(name):
     """ Checks if an executable exist in the PATH. """
     sys.stdout.write("Checking for " + name + "... "),
@@ -51,7 +56,7 @@ def ensureExist(name):
     if foundPath:
         print(" found in " + foundPath)
     else:
-        print(" not found!!")
+        printRed(" not found!!")
 
 def detectQt():
     """ @brief Detects the Qt version installed in the system.
@@ -106,6 +111,7 @@ if __name__ == "__main__":
             if not os.path.exists("Makefile"):
                 ensureExist("make")
                 ensureExist("gcc")
+                ensureExist("ctags")
                 qmakeName = detectQt();
                 print("Generating makefile")
                 if subprocess.call([qmakeName]):
