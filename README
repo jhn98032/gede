@@ -15,6 +15,10 @@ Make sure that you have all dependencies installed. On Debian/Ubuntu:
   # sudo apt-get install exuberant-ctags
   # sudo apt-get install qt4-designer qt4-qmake libqt4-dev libssl-dev
 
+Start the build then by running:
+
+  # ./build.py install
+
 
 ctags
 =====

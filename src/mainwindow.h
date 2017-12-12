@@ -28,8 +28,8 @@
 class FileInfo
 {
 public:
-    QString name;
-    QString fullName;
+    QString name; //!< The name of the file (Eg: "main.c").
+    QString fullName; //!< The full path (Eg: "/a/dir/main.c").
 };
 
 
