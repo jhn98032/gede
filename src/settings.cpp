@@ -129,6 +129,17 @@ void Settings::loadGlobalConfig()
     m_viewWindowFileBrowser = tmpIni.getBool("GuiState/EnableWindowFileBrowser", m_viewWindowFileBrowser);
 
 
+    m_clrBackground = tmpIni.getColor("GuiColor/ColorBackground", Qt::black);
+    m_clrComment = tmpIni.getColor("GuiColor/ColorComment", Qt::green);
+    m_clrString = tmpIni.getColor("GuiColor/ColorString", QColor(0,125, 250));
+    m_clrIncString = tmpIni.getColor("GuiColor/ColorIncString", QColor(0,125, 250));
+    m_clrKeyword = tmpIni.getColor("GuiColor/ColorKeyword", Qt::yellow);
+    m_clrCppKeyword = tmpIni.getColor("GuiColor/ColorCppKeyword", QColor(240,110,110));
+    m_clrNumber = tmpIni.getColor("GuiColor/ColorNumber", Qt::magenta);
+    m_clrForeground = tmpIni.getColor("GuiColor/ColorForeGround", Qt::white);
+
+
+
 }
 
 void Settings::loadProjectConfig()
@@ -289,6 +300,15 @@ void Settings::saveGlobalConfig()
     tmpIni.setBool("GuiState/EnableWindowGdbOutput", m_viewWindowGdbOutput);
     tmpIni.setBool("GuiState/EnableWindowFileBrowser", m_viewWindowFileBrowser);
 
+
+    tmpIni.setColor("GuiColor/ColorBackground", m_clrBackground);
+    tmpIni.setColor("GuiColor/ColorComment", m_clrComment);
+    tmpIni.setColor("GuiColor/ColorString", m_clrString);
+    tmpIni.setColor("GuiColor/ColorIncString", m_clrIncString);
+    tmpIni.setColor("GuiColor/ColorKeyword", m_clrKeyword);
+    tmpIni.setColor("GuiColor/ColorCppKeyword", m_clrCppKeyword);
+    tmpIni.setColor("GuiColor/ColorNumber", m_clrNumber);
+    tmpIni.setColor("GuiColor/ColorForeGround", m_clrForeground);
 
     if(tmpIni.save(globalConfigFilename))
         infoMsg("Failed to save '%s'", stringToCStr(globalConfigFilename));
