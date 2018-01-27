@@ -28,6 +28,7 @@ CodeView::CodeView()
     m_font = QFont("Monospace", 8);
     m_fontInfo = new QFontMetrics(m_font);
     m_cursorY = 0;
+    m_highlighter = &m_highlighterCxx;
 }
 
 
@@ -42,11 +43,11 @@ void CodeView::setPlainText(QString text)
     text.replace("\r", "");
 
     m_text = text;
-    m_highlighter.colorize(text);
+    m_highlighter->colorize(text);
 
 //    m_rows = text.split("\n");
 
-    setMinimumSize(4000,getRowHeight()*m_highlighter.getRowCount());
+    setMinimumSize(4000,getRowHeight()*m_highlighter->getRowCount());
 
     update();
 }
@@ -97,7 +98,7 @@ void CodeView::paintEvent ( QPaintEvent * event )
     
     // Draw content
     painter.setFont(m_font);
-    for(size_t rowIdx = 0;rowIdx < m_highlighter.getRowCount();rowIdx++)
+    for(size_t rowIdx = 0;rowIdx < m_highlighter->getRowCount();rowIdx++)
     {
         //int x = BORDER_WIDTH+10;
         int y = rowHeight*rowIdx;
@@ -118,7 +119,7 @@ void CodeView::paintEvent ( QPaintEvent * event )
         painter.drawText(4, fontY, nrText);
 
         // Draw text
-        QVector<TextField*> cols = m_highlighter.getRow(rowIdx);
+        QVector<TextField*> cols = m_highlighter->getRow(rowIdx);
         
         int x = BORDER_WIDTH+10;
         for(int j = 0;j < cols.size();j++)
@@ -175,10 +176,10 @@ void CodeView::mousePressEvent( QMouseEvent * event )
         int rowHeight = getRowHeight();
         int rowIdx = event->pos().y() / rowHeight;
         int lineNo = rowIdx+1;
-        if(rowIdx >= 0 && rowIdx < (int)m_highlighter.getRowCount())
+        if(rowIdx >= 0 && rowIdx < (int)m_highlighter->getRowCount())
         {
             // Get the words in the line
-            QVector<TextField*> cols = m_highlighter.getRow(rowIdx);
+            QVector<TextField*> cols = m_highlighter->getRow(rowIdx);
             
             // Find the word under the cursor
             int x = BORDER_WIDTH+10;
@@ -201,8 +202,8 @@ void CodeView::mousePressEvent( QMouseEvent * event )
                 while(foundPos >= 0)
                 {
                     if(cols[foundPos]->isSpaces() ||
-                        m_highlighter.isKeyword(cols[foundPos]->m_text)
-                        || m_highlighter.isSpecialChar(cols[foundPos]))
+                        m_highlighter->isKeyword(cols[foundPos]->m_text)
+                        || m_highlighter->isSpecialChar(cols[foundPos]))
                     {
                         foundPos--;
                     }
@@ -304,9 +305,9 @@ void CodeView::setConfig(Settings *cfg)
 {
     m_cfg = cfg;
 
-    m_highlighter.setConfig(cfg);
+    m_highlighter->setConfig(cfg);
 
-    m_highlighter.colorize(m_text);
+    m_highlighter->colorize(m_text);
     
     assert(cfg != NULL);
 

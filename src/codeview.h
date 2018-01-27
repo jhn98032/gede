@@ -11,7 +11,7 @@
 
 #include <QWidget>
 #include <QStringList>
-#include "syntaxhighlighter.h"
+#include "syntaxhighlightercxx.h"
 #include "settings.h"
 
 class ICodeView
@@ -61,7 +61,8 @@ public:
     int m_cursorY;
     ICodeView *m_inf;
     QVector<int> m_breakpointList;
-    SyntaxHighlighter m_highlighter;
+    SyntaxHighlighter *m_highlighter;
+    SyntaxHighlighterCxx m_highlighterCxx;
     Settings *m_cfg;
     QString m_text;
 };
