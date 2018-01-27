@@ -29,7 +29,8 @@ Settings::Settings()
     m_viewWindowGdbOutput = true;
     m_viewWindowFileBrowser = true;
     m_enableDebugLog = false;
-
+    m_tabIndentCount = 4;
+    
     // Set cleanlooks as default on Debian
     DistroType distroType = DISTRO_UNKNOWN;
     detectDistro(&distroType, NULL);
@@ -65,6 +66,8 @@ void Settings::loadDefaultsGui()
 
     m_tagSortByName = false;
     m_tagShowLineNumbers = true;
+
+    m_tabIndentCount = 4;
 }
 
 void Settings::loadDefaultsAdvanced()
@@ -109,7 +112,9 @@ void Settings::loadGlobalConfig()
 
     m_tagSortByName = tmpIni.getBool("Gui/TagsSortByName", false);
     m_tagShowLineNumbers = tmpIni.getBool("Gui/TagsShowLinenumber", true);
-    
+
+    m_tabIndentCount = tmpIni.getInt("Gui/TabIndentCount", m_tabIndentCount);
+
     m_sourceIgnoreDirs = tmpIni.getStringList("General/ScannerIgnoreDirs", m_sourceIgnoreDirs);
 
     tmpIni.getByteArray("GuiState/MainWindowState", &m_gui_mainwindowState);
@@ -281,7 +286,10 @@ void Settings::saveGlobalConfig()
 
     tmpIni.setBool("Gui/TagsSortByName", m_tagSortByName);
     tmpIni.setBool("Gui/TagsShowLinenumber", m_tagShowLineNumbers);
-    
+
+    tmpIni.setInt("Gui/TabIndentCount", m_tabIndentCount);
+
+
     tmpIni.setStringList("General/ScannerIgnoreDirs", m_sourceIgnoreDirs);
 
     tmpIni.setByteArray("GuiState/MainWindowState", m_gui_mainwindowState);

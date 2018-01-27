@@ -104,17 +104,20 @@ void CodeView::paintEvent ( QPaintEvent * event )
         QString nrText;
 
 
+    // Draw cursor
     if((int)rowIdx == m_cursorY-1)
     {
         QRect rect2(BORDER_WIDTH,y,event->rect().width()-1,rowHeight);
         painter.fillRect(rect2, darkRed);
     }
 
+    // Draw line number
         int fontY = y+(rowHeight-(m_fontInfo->ascent()+m_fontInfo->descent()))/2+m_fontInfo->ascent();
         painter.setPen(Qt::white);
         nrText = QString("%1").arg(rowIdx+1);
         painter.drawText(4, fontY, nrText);
 
+        // Draw text
         QVector<TextField*> cols = m_highlighter.getRow(rowIdx);
         
         int x = BORDER_WIDTH+10;

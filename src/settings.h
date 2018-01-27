@@ -45,6 +45,8 @@ class Settings
         static QStringList getDefaultCppKeywordList();
 
         QString getProgramPath();
+
+        int getTabIndentCount() const { return m_tabIndentCount; };
         
     private:
         void loadProjectConfig();
@@ -112,6 +114,8 @@ class Settings
 
         bool m_enableDebugLog;
         QString m_guiStyleName; // The GUI style to use (Eg: "cleanlooks").
+
+        int m_tabIndentCount;
 };
 
 

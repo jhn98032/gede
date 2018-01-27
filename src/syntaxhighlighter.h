@@ -25,6 +25,7 @@ struct TextField
 
     bool isHash() const { return m_text == "#" ? true : false; };
     bool isSpaces() const { return m_type == SPACES ? true : false; };
+    int getLength() { return m_text.length(); };
 };
 
 
@@ -54,6 +55,7 @@ private:
 
         TextField *getLastNonSpaceField();
         void appendField(TextField* field);
+        int getCharCount();
         
         bool isCppRow;
         QVector<TextField*>  m_fields;

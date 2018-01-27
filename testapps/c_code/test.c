@@ -1,4 +1,10 @@
 #include <stdio.h>
+	 	//rad1
+   	//kalle
+	//tab1
+    //kalle
+  	//nisse
+
 
 void func()
 {

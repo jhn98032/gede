@@ -85,6 +85,9 @@ void SettingsDialog::loadConfig()
     m_settingsGdbOutputFontFamily = m_cfg->m_gdbOutputFontFamily;
     m_settingsGdbOutputFontSize = m_cfg->m_gdbOutputFontSize;
 
+    m_ui.spinBox_tabIndent->setValue(m_cfg->getTabIndentCount());
+
+
     m_ui.lineEdit_sourceIgnoreDirs->setText(m_cfg->m_sourceIgnoreDirs.join(";"));
 
     m_ui.pushButton_clr_background->setColor(m_cfg->m_clrBackground);
@@ -126,6 +129,8 @@ void SettingsDialog::getConfig(Settings *cfg)
 
     cfg->m_gdbOutputFontFamily = m_settingsGdbOutputFontFamily;
     cfg->m_gdbOutputFontSize = m_settingsGdbOutputFontSize;
+
+    m_cfg->m_tabIndentCount = m_ui.spinBox_tabIndent->value();
 
     cfg->m_sourceIgnoreDirs = m_ui.lineEdit_sourceIgnoreDirs->text().split(';');
 
