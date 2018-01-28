@@ -23,26 +23,35 @@ static const int BORDER_WIDTH = 50;
 
 
 CodeView::CodeView()
-  : m_cfg(0)
+  : m_highlighter(0)
+    ,m_cfg(0)
  {
     m_font = QFont("Monospace", 8);
     m_fontInfo = new QFontMetrics(m_font);
     m_cursorY = 0;
-    m_highlighter = &m_highlighterCxx;
 }
 
 
 CodeView::~CodeView()
 {
     delete m_fontInfo;
+    delete m_highlighter;
 }
 
 
-void CodeView::setPlainText(QString text)
+void CodeView::setPlainText(QString text, CodeType type)
 {
     text.replace("\r", "");
 
     m_text = text;
+
+    delete m_highlighter;
+    if(type == CODE_BASIC)
+        m_highlighter = new SyntaxHighlighterBasic();
+    else
+        m_highlighter = new SyntaxHighlighterCxx();
+    m_highlighter->setConfig(m_cfg);
+
     m_highlighter->colorize(text);
 
 //    m_rows = text.split("\n");
@@ -70,7 +79,9 @@ void CodeView::paintEvent ( QPaintEvent * event )
     QPainter painter(this);
     assert(m_cfg != NULL);
 
-
+    if(!m_highlighter)
+        return;
+        
     // Draw background
     if(m_cfg)
     painter.fillRect(event->rect(), m_cfg->m_clrBackground);
@@ -167,6 +178,9 @@ void CodeView::mousePressEvent( QMouseEvent * event )
 {
     Q_UNUSED(event);
     int j;
+
+    if(!m_highlighter)
+        return;
     
     if(event->button() == Qt::RightButton)
     {
@@ -305,9 +319,13 @@ void CodeView::setConfig(Settings *cfg)
 {
     m_cfg = cfg;
 
-    m_highlighter->setConfig(cfg);
+    if(m_highlighter)
+    {
+    
+        m_highlighter->setConfig(cfg);
 
-    m_highlighter->colorize(m_text);
+        m_highlighter->colorize(m_text);
+    }
     
     assert(cfg != NULL);
 

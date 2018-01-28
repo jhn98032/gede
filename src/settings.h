@@ -41,8 +41,9 @@ class Settings
         void loadDefaultsGui();
         void loadDefaultsAdvanced();
         
-        static QStringList getDefaultKeywordList();
+        static QStringList getDefaultCxxKeywordList();
         static QStringList getDefaultCppKeywordList();
+        static QStringList getDefaultBasicKeywordList();
 
         QString getProgramPath();
 

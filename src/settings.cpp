@@ -341,7 +341,7 @@ QStringList Settings::getDefaultCppKeywordList()
     return keywordList;
 }
 
-QStringList Settings::getDefaultKeywordList()
+QStringList Settings::getDefaultCxxKeywordList()
 {
     QStringList keywordList;
     keywordList += "if";
@@ -383,6 +383,20 @@ QStringList Settings::getDefaultKeywordList()
     keywordList += "int32_t";
     keywordList += "int16_t";
     keywordList += "int8_t";
+    
+    return keywordList;
+}
+
+
+QStringList Settings::getDefaultBasicKeywordList()
+{
+    QStringList keywordList;
+    keywordList += "print";
+
+    keywordList += "dim";
+    
+    keywordList += "double";
+    keywordList += "integer";
     
     return keywordList;
 }

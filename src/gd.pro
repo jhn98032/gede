@@ -35,8 +35,8 @@ HEADERS+=tree.h
 SOURCES+=aboutdialog.cpp
 HEADERS+=aboutdialog.h
 
-SOURCES+=syntaxhighlighter.cpp syntaxhighlightercxx.cpp
-HEADERS+=syntaxhighlighter.h syntaxhighlightercxx.h
+SOURCES+=syntaxhighlighter.cpp syntaxhighlighterbasic.cpp syntaxhighlightercxx.cpp
+HEADERS+=syntaxhighlighter.h syntaxhighlighterbasic.h syntaxhighlightercxx.h
 
 
 SOURCES+=ini.cpp
