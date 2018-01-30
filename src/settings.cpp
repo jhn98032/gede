@@ -391,8 +391,13 @@ QStringList Settings::getDefaultCxxKeywordList()
 QStringList Settings::getDefaultBasicKeywordList()
 {
     QStringList keywordList;
-    keywordList += "print";
 
+    keywordList += "print";
+    keywordList += "sleep";
+
+    keywordList += "function";
+    keywordList += "as";
+    keywordList += "end";
     keywordList += "dim";
     
     keywordList += "double";
