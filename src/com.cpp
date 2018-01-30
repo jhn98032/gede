@@ -885,7 +885,7 @@ int Com::readFromGdb(GdbResult *m_result, Tree *m_resultData)
         {
             if(!m_process.waitForReadyRead(100))
             {
-                QProcess::ProcessState  state = m_process.QProcess::state();
+                QProcess::ProcessState  state = m_process.state();
                 if(state == QProcess::NotRunning)
                 {
                     rc = -1;
@@ -927,7 +927,7 @@ int Com::readFromGdb(GdbResult *m_result, Tree *m_resultData)
             {
                 if(!m_process.waitForReadyRead(100))
                 {
-                    QProcess::ProcessState  state = m_process.QProcess::state();
+                    QProcess::ProcessState  state = m_process.state();
                     if(state == QProcess::NotRunning)
                     {
                         assert(0);
@@ -1080,6 +1080,9 @@ int Com::init(QString gdbPath, bool enableDebugLog)
         logStr = "# Gdb commandline: '" + commandLine + "'\r\n";
         writeLogEntry(logStr);
     }
+
+    // Make sure that gdb understands that we can't handle color output
+    setenv("TERM", "",1);
 
     m_process.start(commandLine);
     m_process.waitForStarted(6000);
