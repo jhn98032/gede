@@ -96,6 +96,7 @@ void SettingsDialog::loadConfig()
     m_ui.pushButton_clr_incString->setColor(m_cfg->m_clrIncString);
     m_ui.pushButton_clr_keyword->setColor(m_cfg->m_clrKeyword);
     m_ui.pushButton_clr_cppKeyword->setColor(m_cfg->m_clrCppKeyword);
+    m_ui.pushButton_clr_curLine->setColor(m_cfg->m_clrCurrentLine);
     m_ui.pushButton_clr_number->setColor(m_cfg->m_clrNumber);
     m_ui.pushButton_clr_foreground->setColor(m_cfg->m_clrForeground);
 
@@ -150,6 +151,7 @@ void SettingsDialog::getConfig(Settings *cfg)
     cfg->m_clrIncString = m_ui.pushButton_clr_incString->getColor();
     cfg->m_clrKeyword = m_ui.pushButton_clr_keyword->getColor();
     cfg->m_clrCppKeyword = m_ui.pushButton_clr_cppKeyword->getColor();
+    cfg->m_clrCurrentLine = m_ui.pushButton_clr_curLine->getColor();
     cfg->m_clrNumber = m_ui.pushButton_clr_number->getColor();
     cfg->m_clrForeground = m_ui.pushButton_clr_foreground->getColor();
 

@@ -91,6 +91,7 @@ class Settings
         QColor m_clrIncString;
         QColor m_clrKeyword;
         QColor m_clrCppKeyword;
+        QColor m_clrCurrentLine;
         QColor m_clrNumber;
         QColor m_clrForeground;
        

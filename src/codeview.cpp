@@ -75,7 +75,6 @@ int CodeView::getRowHeight()
 void CodeView::paintEvent ( QPaintEvent * event )
 {
     int rowHeight = getRowHeight();
-    QColor darkRed(100,0,0);
     QPainter painter(this);
     assert(m_cfg != NULL);
 
@@ -120,7 +119,7 @@ void CodeView::paintEvent ( QPaintEvent * event )
     if((int)rowIdx == m_cursorY-1)
     {
         QRect rect2(BORDER_WIDTH,y,event->rect().width()-1,rowHeight);
-        painter.fillRect(rect2, darkRed);
+        painter.fillRect(rect2, m_cfg->m_clrCurrentLine);
     }
 
     // Draw line number

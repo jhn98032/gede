@@ -61,6 +61,7 @@ void Settings::loadDefaultsGui()
     m_clrIncString = QColor(0,125, 250);
     m_clrKeyword = Qt::yellow;
     m_clrCppKeyword = QColor(240,110,110);
+    m_clrCurrentLine = QColor(100,0,0);
     m_clrNumber = Qt::magenta;
     m_clrForeground = Qt::white;
 
@@ -140,6 +141,7 @@ void Settings::loadGlobalConfig()
     m_clrIncString = tmpIni.getColor("GuiColor/ColorIncString", QColor(0,125, 250));
     m_clrKeyword = tmpIni.getColor("GuiColor/ColorKeyword", Qt::yellow);
     m_clrCppKeyword = tmpIni.getColor("GuiColor/ColorCppKeyword", QColor(240,110,110));
+    m_clrCurrentLine= tmpIni.getColor("GuiColor/ColorCurrentLine", m_clrCurrentLine);
     m_clrNumber = tmpIni.getColor("GuiColor/ColorNumber", Qt::magenta);
     m_clrForeground = tmpIni.getColor("GuiColor/ColorForeGround", Qt::white);
 
@@ -315,6 +317,7 @@ void Settings::saveGlobalConfig()
     tmpIni.setColor("GuiColor/ColorIncString", m_clrIncString);
     tmpIni.setColor("GuiColor/ColorKeyword", m_clrKeyword);
     tmpIni.setColor("GuiColor/ColorCppKeyword", m_clrCppKeyword);
+    tmpIni.setColor("GuiColor/ColorCurrentLine", m_clrCurrentLine);
     tmpIni.setColor("GuiColor/ColorNumber", m_clrNumber);
     tmpIni.setColor("GuiColor/ColorForeGround", m_clrForeground);
 
