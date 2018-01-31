@@ -203,6 +203,7 @@ class Com : public QObject
 
     public slots:
         void onReadyReadStandardOutput ();
+        void onReadyReadStandardError();
 
 
     private:

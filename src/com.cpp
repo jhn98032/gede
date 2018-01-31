@@ -100,6 +100,7 @@ Com::Com()
 */
 
 
+    connect(&m_process, SIGNAL(readyReadStandardError ()), this, SLOT(onReadyReadStandardError()));
 
     connect(&m_process, SIGNAL(readyReadStandardOutput ()), this, SLOT(onReadyReadStandardOutput()));
 
@@ -974,19 +975,6 @@ int Com::readFromGdb(GdbResult *m_result, Tree *m_resultData)
 }
 
  
-    // Dump all stderr content
-    QByteArray stderrBuffer = m_process.readAllStandardError();
-    if(!stderrBuffer.isEmpty())
-    {
-        QString respString = QString(stderrBuffer);
-        QStringList respList = respString.split("\n");
-        for(int r = 0;r < respList.size();r++)
-        {
-            QString row = respList[r];
-            if(!row.isEmpty())
-                debugMsg("GDB|E>%s", stringToCStr(row));
-        }
-    }
 
     return rc;
 }
@@ -1109,6 +1097,26 @@ Com& Com::getInstance()
     return core;
 }
 
+
+
+void Com::onReadyReadStandardError ()
+{
+    // Dump all stderr content
+    QByteArray stderrBuffer = m_process.readAllStandardError();
+    if(!stderrBuffer.isEmpty())
+    {
+        QString respString = QString(stderrBuffer);
+        QStringList respList = respString.split("\n");
+        for(int r = 0;r < respList.size();r++)
+        {
+            QString row = respList[r];
+            if(!row.isEmpty())
+                debugMsg("GDB|E>%s", stringToCStr(row));
+        }
+    }
+
+
+}
 
 void Com::onReadyReadStandardOutput ()
 {
