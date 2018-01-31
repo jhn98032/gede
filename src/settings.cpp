@@ -394,15 +394,38 @@ QStringList Settings::getDefaultBasicKeywordList()
 
     keywordList += "print";
     keywordList += "sleep";
+    keywordList += "return";
 
+    keywordList += "do";
+    keywordList += "loop";
+    keywordList += "until";
+    keywordList += "declare";
+
+    keywordList += "cls";
     keywordList += "function";
     keywordList += "as";
     keywordList += "end";
     keywordList += "dim";
     
+    keywordList += "byte";
+    keywordList += "const";
     keywordList += "double";
+    keywordList += "enum";
     keywordList += "integer";
-    
+    keywordList += "long";
+    keywordList += "longint";
+    keywordList += "short";
+    keywordList += "string";
+    keywordList += "ubyte";
+    keywordList += "uinteger";
+    keywordList += "ulongint";
+    keywordList += "union";
+    keywordList += "unsigned";
+    keywordList += "ushort";
+    keywordList += "wstring";
+    keywordList += "zstring";
+
+
     return keywordList;
 }
 
