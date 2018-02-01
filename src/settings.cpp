@@ -40,6 +40,7 @@ Settings::Settings()
         m_guiStyleName = "";
     
 
+    m_currentLineStyle = FILLED_RECT;
     
 }
 
@@ -69,6 +70,8 @@ void Settings::loadDefaultsGui()
     m_tagShowLineNumbers = true;
 
     m_tabIndentCount = 4;
+
+    m_currentLineStyle = FILLED_RECT;
 }
 
 void Settings::loadDefaultsAdvanced()
@@ -100,6 +103,13 @@ void Settings::loadGlobalConfig()
     loadDefaultsAdvanced();
 
     m_enableDebugLog = tmpIni.getBool("General/EnableDebugLog", false);
+
+    switch(tmpIni.getInt("Gui/CurrentLineStyle", m_currentLineStyle))
+    {
+        case HOLLOW_RECT: m_currentLineStyle = HOLLOW_RECT;break;
+        default:
+        case FILLED_RECT: m_currentLineStyle = FILLED_RECT;break;
+    };
     
     m_guiStyleName = tmpIni.getString("Gui/Style", m_guiStyleName);
     m_fontFamily = tmpIni.getString("Gui/CodeFont", m_fontFamily);
@@ -274,6 +284,8 @@ void Settings::saveGlobalConfig()
 
     tmpIni.setBool("General/EnableDebugLog", m_enableDebugLog);
 
+    tmpIni.setInt("Gui/CurrentLineStyle", m_currentLineStyle);
+    
     tmpIni.setString("Gui/Style", m_guiStyleName);
  
     tmpIni.setString("Gui/CodeFont", m_fontFamily);

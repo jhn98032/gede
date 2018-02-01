@@ -38,6 +38,10 @@ SettingsDialog::SettingsDialog(QWidget *parent, Settings *cfg)
     }
     m_ui.comboBox_guiStyle->insertItem(0, "Qt default", QVariant(QString("")));
 
+    m_ui.comboBox_currentLineStyle->insertItem(0, "Hollow rectangle", QVariant((int)Settings::HOLLOW_RECT));
+    m_ui.comboBox_currentLineStyle->insertItem(1, "Filled rectangle", QVariant((int)Settings::FILLED_RECT));
+   
+
     loadConfig();
     
     updateGui();
@@ -108,6 +112,10 @@ void SettingsDialog::loadConfig()
     if(guiStyleIdx != -1)
         m_ui.comboBox_guiStyle->setCurrentIndex(guiStyleIdx);
 
+    int lineStyleIdx = m_ui.comboBox_currentLineStyle->findData(QVariant((int)m_cfg->m_currentLineStyle));
+    if(lineStyleIdx != -1)
+        m_ui.comboBox_currentLineStyle->setCurrentIndex(lineStyleIdx);
+
         
     int comboIdx = 0;
     if(m_cfg->m_tagSortByName)
@@ -142,7 +150,15 @@ void SettingsDialog::getConfig(Settings *cfg)
     int guiStyleIdx = m_ui.comboBox_guiStyle->currentIndex();
     if(guiStyleIdx != -1)
         m_cfg->m_guiStyleName = m_ui.comboBox_guiStyle->itemData(guiStyleIdx).toString();
+
+    int lineStyleIdx = m_ui.comboBox_currentLineStyle->currentIndex();
+    if(lineStyleIdx != -1)
+    {
+        int intLineStyle = m_ui.comboBox_currentLineStyle->itemData(lineStyleIdx).toInt();
+        m_cfg->m_currentLineStyle = (Settings::CurrentLineStyle)intLineStyle;
+    }
     
+
 
 
     cfg->m_clrBackground = m_ui.pushButton_clr_background->getColor();

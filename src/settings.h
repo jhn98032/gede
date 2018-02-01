@@ -118,6 +118,8 @@ class Settings
         QString m_guiStyleName; // The GUI style to use (Eg: "cleanlooks").
 
         int m_tabIndentCount;
+        typedef enum { HOLLOW_RECT = 0, FILLED_RECT } CurrentLineStyle;
+        CurrentLineStyle m_currentLineStyle;
 };
 
 

@@ -119,7 +119,19 @@ void CodeView::paintEvent ( QPaintEvent * event )
     if((int)rowIdx == m_cursorY-1)
     {
         QRect rect2(BORDER_WIDTH,y,event->rect().width()-1,rowHeight);
+        if(m_cfg->m_currentLineStyle == Settings::HOLLOW_RECT)
+        {
+            QPen pen(m_cfg->m_clrCurrentLine);
+            pen.setWidth(2);
+            painter.setPen(pen);
+            painter.setBrush(Qt::NoBrush);
+            painter.drawRect(rect2);
+        }
+        else
+        {
         painter.fillRect(rect2, m_cfg->m_clrCurrentLine);
+
+        }
     }
 
     // Draw line number
