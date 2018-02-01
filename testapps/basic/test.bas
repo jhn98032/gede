@@ -1,5 +1,10 @@
 Declare Function func(ByVal arg1 As Double) As Double
 
+/' Multiline comment. Row1
+   Row2.
+'/
+rem Single line program
+Dim C aS InteGer
 'Start of program
 Dim A As Integer
 Dim D As Double
