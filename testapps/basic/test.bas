@@ -9,6 +9,12 @@ Dim C aS InteGer
 Dim A As Integer
 Dim D As Double
 CLS
+
+
+sub example_sub()
+    print "Hello"
+end sub
+
 PRINT "Looping"
 
 A=0
@@ -25,6 +31,22 @@ SLEEP
 End
 
 Function func(ByVal arg1 As Double) As Double
+   Dim res As Double
+   res = arg1 * 1.123
+   arg1 = arg1 * 3.45
+   return res
+End Function
+
+Function func2(ByVal arg1 As Double) As Double
+   Dim res As Double
+   res = arg1 * 1.123
+   arg1 = arg1 * 3.45
+   print res
+   return res
+End Function
+
+
+Function func3(ByVal arg1 As Double) As Double
    Dim res As Double
    res = arg1 * 1.123
    arg1 = arg1 * 3.45

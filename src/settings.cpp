@@ -418,6 +418,7 @@ QStringList Settings::getDefaultBasicKeywordList()
 
     keywordList += "cls";
     keywordList += "function";
+    keywordList += "sub";
     keywordList += "as";
     keywordList += "end";
     keywordList += "dim";
