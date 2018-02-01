@@ -1,11 +1,10 @@
 /*
- * Copyright (C) 2014-2017 Johan Henriksson.
+ * Copyright (C) 2014-2018 Johan Henriksson.
  * All rights reserved.
  *
  * This software may be modified and distributed under the terms
  * of the BSD license.  See the LICENSE file for details.
  */
-
 
 #include "syntaxhighlighterbasic.h"
 
@@ -234,6 +233,7 @@ void SyntaxHighlighterBasic::colorize(QString text)
                     field->m_text = c;
                     field->m_type = TextField::COMMENT;
                     field->m_color = Qt::green;
+                    currentRow->appendField(field);
                     state = COMMENT;
                 }
                 else if(c == ' ' || c == '\t')
@@ -376,7 +376,7 @@ void SyntaxHighlighterBasic::colorize(QString text)
                     currentRow->appendField(field);
                     
                 }
-                else if(text[i-1].toLatin1() == '*' && c == '/')
+                else if(text[i-1].toLatin1() == '\'' && c == '/')
                 {
                     field->m_text += c;
                     state = IDLE;
@@ -475,11 +475,20 @@ void SyntaxHighlighterBasic::colorize(QString text)
                 {
                     i--;
 
-                    if(isKeyword(field->m_text))
-                        field->m_type = TextField::KEYWORD;
-    
-                    field = NULL;
-                    state = IDLE;
+                    if(field->m_text.compare("rem",Qt::CaseInsensitive) == 0)
+                    {
+                        field->m_type = TextField::COMMENT;
+                        state = COMMENT;
+                    }
+                    else
+                    {
+                        if(isKeyword(field->m_text))
+                            field->m_type = TextField::KEYWORD;
+                    
+                    
+                        field = NULL;
+                        state = IDLE;
+                    }
                 }
                 else
                 {
