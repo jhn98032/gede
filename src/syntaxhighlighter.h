@@ -32,42 +32,19 @@ struct TextField
 class SyntaxHighlighter
 {
 public:
-    SyntaxHighlighter();
-    virtual ~SyntaxHighlighter();
+    SyntaxHighlighter(){};
+    virtual ~SyntaxHighlighter(){};
     
-    void colorize(QString text);
+    virtual void colorize(QString text) = 0;
 
-    QVector<TextField*> getRow(unsigned int rowIdx);
-    unsigned int getRowCount() { return m_rows.size(); };
-    void reset();
+    virtual QVector<TextField*> getRow(unsigned int rowIdx) = 0;
+    virtual unsigned int getRowCount() = 0;
+    virtual void reset() = 0;
 
-    bool isCppKeyword(QString text) const;
-    bool isKeyword(QString text) const;
-    bool isSpecialChar(char c) const;
-    bool isSpecialChar(TextField *field) const;
-    void setConfig(Settings *cfg);
-
-private:
-    class Row
-    {
-    public:
-        Row();
-
-        TextField *getLastNonSpaceField();
-        void appendField(TextField* field);
-        int getCharCount();
-        
-        bool isCppRow;
-        QVector<TextField*>  m_fields;
-    };
-private:
-    void pickColor(TextField *field);
-
-private:
-    Settings *m_cfg;
-    QVector <Row*> m_rows;
-    QHash <QString, bool> m_keywords;
-    QHash <QString, bool> m_cppKeywords;
+    virtual bool isKeyword(QString text) const = 0;
+    virtual bool isSpecialChar(char c) const = 0;
+    virtual bool isSpecialChar(TextField *field) const = 0;
+    virtual void setConfig(Settings *cfg) = 0;
 };
 
 #endif // #ifndef FILE__SYNTAXHIGHLIGHTER

@@ -15,7 +15,17 @@
 
 static QMutex g_mutex;
 
-
+#ifdef WIN32
+#define YELLOW_CODE ""
+#define GREEN_CODE  ""
+#define RED_CODE    ""
+#define NO_CODE     ""
+#else
+#define YELLOW_CODE "\033[1;33m"
+#define GREEN_CODE  "\033[1;32m"
+#define RED_CODE    "\033[1;31m"
+#define NO_CODE     "\033[1;0m"
+#endif
 
 void debugMsg_(const char *filename, int lineNo, const char *fmt, ...)
 {
@@ -52,7 +62,7 @@ void errorMsg(const char *fmt, ...)
 
     va_end(ap);
 
-    printf("%2d.%03d| ERROR | %s\n",
+    printf(RED_CODE "%2d.%03d| ERROR | %s" NO_CODE "\n",
         curTime.second()%100, curTime.msec(),
         buffer);
 }
@@ -72,7 +82,7 @@ void warnMsg(const char *fmt, ...)
 
     va_end(ap);
 
-    printf("%2d.%03d| WARN  | %s\n",
+    printf(YELLOW_CODE "%2d.%03d| WARN  | %s" NO_CODE "\n",
         curTime.second()%100, curTime.msec(),
         buffer);
 }

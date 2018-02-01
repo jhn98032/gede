@@ -69,7 +69,7 @@ void CodeViewTab::fillInFunctions(QList<Tag> tagList)
 int CodeViewTab::open(QString filename, QList<Tag> tagList)
 {
     m_filepath = filename;
-    
+    QString extension = getExtensionPart(filename);
     QString text;
 // Read file content
     QFile file(filename);
@@ -84,7 +84,10 @@ int CodeViewTab::open(QString filename, QList<Tag> tagList)
          text += line;
     }
 
-    m_ui.codeView->setPlainText(text);
+    if(extension.toLower() == ".bas")
+        m_ui.codeView->setPlainText(text, CodeView::CODE_BASIC);
+    else
+        m_ui.codeView->setPlainText(text, CodeView::CODE_CXX);
 
     m_ui.scrollArea_codeView->setWidgetResizable(true);
 

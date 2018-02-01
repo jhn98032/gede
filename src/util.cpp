@@ -51,6 +51,20 @@ QString getFilenamePart(QString fullPath)
 }
 
 
+/**
+ * @brief Returns the extension of a file.
+ * @return The extension including the dot (Eg: ".txt").
+ */
+QString getExtensionPart(QString filename)
+{
+    int idx = filename.lastIndexOf('.');
+    if(idx == -1)
+        return QString("");
+    return filename.mid(idx);
+}
+
+
+
 long long stringToLongLong(const char* str)
 {
     unsigned long long num = 0;

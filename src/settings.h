@@ -41,8 +41,9 @@ class Settings
         void loadDefaultsGui();
         void loadDefaultsAdvanced();
         
-        static QStringList getDefaultKeywordList();
+        static QStringList getDefaultCxxKeywordList();
         static QStringList getDefaultCppKeywordList();
+        static QStringList getDefaultBasicKeywordList();
 
         QString getProgramPath();
 
@@ -90,6 +91,7 @@ class Settings
         QColor m_clrIncString;
         QColor m_clrKeyword;
         QColor m_clrCppKeyword;
+        QColor m_clrCurrentLine;
         QColor m_clrNumber;
         QColor m_clrForeground;
        
@@ -116,6 +118,8 @@ class Settings
         QString m_guiStyleName; // The GUI style to use (Eg: "cleanlooks").
 
         int m_tabIndentCount;
+        typedef enum { HOLLOW_RECT = 0, FILLED_RECT } CurrentLineStyle;
+        CurrentLineStyle m_currentLineStyle;
 };
 
 

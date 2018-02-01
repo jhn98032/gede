@@ -23,7 +23,8 @@ static const int BORDER_WIDTH = 50;
 
 
 CodeView::CodeView()
-  : m_cfg(0)
+  : m_highlighter(0)
+    ,m_cfg(0)
  {
     m_font = QFont("Monospace", 8);
     m_fontInfo = new QFontMetrics(m_font);
@@ -34,19 +35,28 @@ CodeView::CodeView()
 CodeView::~CodeView()
 {
     delete m_fontInfo;
+    delete m_highlighter;
 }
 
 
-void CodeView::setPlainText(QString text)
+void CodeView::setPlainText(QString text, CodeType type)
 {
     text.replace("\r", "");
 
     m_text = text;
-    m_highlighter.colorize(text);
+
+    delete m_highlighter;
+    if(type == CODE_BASIC)
+        m_highlighter = new SyntaxHighlighterBasic();
+    else
+        m_highlighter = new SyntaxHighlighterCxx();
+    m_highlighter->setConfig(m_cfg);
+
+    m_highlighter->colorize(text);
 
 //    m_rows = text.split("\n");
 
-    setMinimumSize(4000,getRowHeight()*m_highlighter.getRowCount());
+    setMinimumSize(4000,getRowHeight()*m_highlighter->getRowCount());
 
     update();
 }
@@ -65,11 +75,12 @@ int CodeView::getRowHeight()
 void CodeView::paintEvent ( QPaintEvent * event )
 {
     int rowHeight = getRowHeight();
-    QColor darkRed(100,0,0);
     QPainter painter(this);
     assert(m_cfg != NULL);
 
-
+    if(!m_highlighter)
+        return;
+        
     // Draw background
     if(m_cfg)
     painter.fillRect(event->rect(), m_cfg->m_clrBackground);
@@ -97,7 +108,7 @@ void CodeView::paintEvent ( QPaintEvent * event )
     
     // Draw content
     painter.setFont(m_font);
-    for(size_t rowIdx = 0;rowIdx < m_highlighter.getRowCount();rowIdx++)
+    for(size_t rowIdx = 0;rowIdx < m_highlighter->getRowCount();rowIdx++)
     {
         //int x = BORDER_WIDTH+10;
         int y = rowHeight*rowIdx;
@@ -108,7 +119,19 @@ void CodeView::paintEvent ( QPaintEvent * event )
     if((int)rowIdx == m_cursorY-1)
     {
         QRect rect2(BORDER_WIDTH,y,event->rect().width()-1,rowHeight);
-        painter.fillRect(rect2, darkRed);
+        if(m_cfg->m_currentLineStyle == Settings::HOLLOW_RECT)
+        {
+            QPen pen(m_cfg->m_clrCurrentLine);
+            pen.setWidth(2);
+            painter.setPen(pen);
+            painter.setBrush(Qt::NoBrush);
+            painter.drawRect(rect2);
+        }
+        else
+        {
+        painter.fillRect(rect2, m_cfg->m_clrCurrentLine);
+
+        }
     }
 
     // Draw line number
@@ -118,7 +141,7 @@ void CodeView::paintEvent ( QPaintEvent * event )
         painter.drawText(4, fontY, nrText);
 
         // Draw text
-        QVector<TextField*> cols = m_highlighter.getRow(rowIdx);
+        QVector<TextField*> cols = m_highlighter->getRow(rowIdx);
         
         int x = BORDER_WIDTH+10;
         for(int j = 0;j < cols.size();j++)
@@ -166,6 +189,9 @@ void CodeView::mousePressEvent( QMouseEvent * event )
 {
     Q_UNUSED(event);
     int j;
+
+    if(!m_highlighter)
+        return;
     
     if(event->button() == Qt::RightButton)
     {
@@ -175,10 +201,10 @@ void CodeView::mousePressEvent( QMouseEvent * event )
         int rowHeight = getRowHeight();
         int rowIdx = event->pos().y() / rowHeight;
         int lineNo = rowIdx+1;
-        if(rowIdx >= 0 && rowIdx < (int)m_highlighter.getRowCount())
+        if(rowIdx >= 0 && rowIdx < (int)m_highlighter->getRowCount())
         {
             // Get the words in the line
-            QVector<TextField*> cols = m_highlighter.getRow(rowIdx);
+            QVector<TextField*> cols = m_highlighter->getRow(rowIdx);
             
             // Find the word under the cursor
             int x = BORDER_WIDTH+10;
@@ -201,8 +227,8 @@ void CodeView::mousePressEvent( QMouseEvent * event )
                 while(foundPos >= 0)
                 {
                     if(cols[foundPos]->isSpaces() ||
-                        m_highlighter.isKeyword(cols[foundPos]->m_text)
-                        || m_highlighter.isSpecialChar(cols[foundPos]))
+                        m_highlighter->isKeyword(cols[foundPos]->m_text)
+                        || m_highlighter->isSpecialChar(cols[foundPos]))
                     {
                         foundPos--;
                     }
@@ -304,9 +330,13 @@ void CodeView::setConfig(Settings *cfg)
 {
     m_cfg = cfg;
 
-    m_highlighter.setConfig(cfg);
+    if(m_highlighter)
+    {
+    
+        m_highlighter->setConfig(cfg);
 
-    m_highlighter.colorize(m_text);
+        m_highlighter->colorize(m_text);
+    }
     
     assert(cfg != NULL);
 

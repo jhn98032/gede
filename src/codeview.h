@@ -11,7 +11,8 @@
 
 #include <QWidget>
 #include <QStringList>
-#include "syntaxhighlighter.h"
+#include "syntaxhighlightercxx.h"
+#include "syntaxhighlighterbasic.h"
 #include "settings.h"
 
 class ICodeView
@@ -35,8 +36,10 @@ public:
 
     CodeView();
     virtual ~CodeView();
+
+    typedef enum {CODE_CXX,CODE_BASIC} CodeType;
     
-    void setPlainText(QString text);
+    void setPlainText(QString content, CodeType type);
 
     void setConfig(Settings *cfg);
     void paintEvent ( QPaintEvent * event );
@@ -61,7 +64,7 @@ public:
     int m_cursorY;
     ICodeView *m_inf;
     QVector<int> m_breakpointList;
-    SyntaxHighlighter m_highlighter;
+    SyntaxHighlighter *m_highlighter;
     Settings *m_cfg;
     QString m_text;
 };
