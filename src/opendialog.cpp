@@ -275,6 +275,9 @@ void OpenDialog::setGdbPath(QString path)
     return m_ui.lineEdit_gdbCommand->setText(path);
 }
 
+/**
+ * @brief Returns the settings selected by the user.
+ */
 void OpenDialog::saveConfig(Settings *cfg)
 {
     OpenDialog &dlg = *this;
