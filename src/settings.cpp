@@ -363,6 +363,10 @@ QStringList Settings::getDefaultCppKeywordList()
     keywordList += "endif";
     keywordList += "ifndef";
     keywordList += "include";
+    keywordList += "error";
+    keywordList += "elif";
+    keywordList += "warning";
+
     return keywordList;
 }
 
