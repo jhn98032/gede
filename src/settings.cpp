@@ -13,6 +13,7 @@
 #include "config.h"
 
 #include <QDir>
+#include <QStyleFactory>
 
 
 
@@ -35,7 +36,7 @@ Settings::Settings()
     DistroType distroType = DISTRO_UNKNOWN;
     detectDistro(&distroType, NULL);
     if(distroType == DISTRO_DEBIAN)
-        m_guiStyleName = "cleanlooks";
+        m_guiStyleName = "Cleanlooks";
     else
         m_guiStyleName = "";
     
@@ -112,6 +113,15 @@ void Settings::loadGlobalConfig()
     };
     
     m_guiStyleName = tmpIni.getString("Gui/Style", m_guiStyleName);
+    // Verify that the style name is valid
+    QStyleFactory sf;
+    QStringList styleList = sf.keys();
+    if(!styleList.contains(m_guiStyleName) && !m_guiStyleName.isEmpty())
+    {
+        warnMsg("Invalid style name '%s'", stringToCStr(m_guiStyleName));
+        m_guiStyleName = "";
+    }
+       
     m_fontFamily = tmpIni.getString("Gui/CodeFont", m_fontFamily);
     m_fontSize = tmpIni.getInt("Gui/CodeFontSize", m_fontSize);
     m_memoryFontFamily = tmpIni.getString("Gui/MemoryFont", m_memoryFontFamily);
