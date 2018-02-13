@@ -73,7 +73,7 @@ void Settings::loadDefaultsGui()
     m_tabIndentCount = 4;
 
     m_currentLineStyle = FILLED_RECT;
-    m_showLineNo = false;
+    m_showLineNo = true;
     
 }
 
