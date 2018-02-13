@@ -73,6 +73,8 @@ void Settings::loadDefaultsGui()
     m_tabIndentCount = 4;
 
     m_currentLineStyle = FILLED_RECT;
+    m_showLineNo = false;
+    
 }
 
 void Settings::loadDefaultsAdvanced()
@@ -111,7 +113,8 @@ void Settings::loadGlobalConfig()
         default:
         case FILLED_RECT: m_currentLineStyle = FILLED_RECT;break;
     };
-    
+
+    m_showLineNo = tmpIni.getBool("Gui/ShowLineNo", m_showLineNo);
     m_guiStyleName = tmpIni.getString("Gui/Style", m_guiStyleName);
     // Verify that the style name is valid
     QStyleFactory sf;
@@ -295,6 +298,8 @@ void Settings::saveGlobalConfig()
     tmpIni.setBool("General/EnableDebugLog", m_enableDebugLog);
 
     tmpIni.setInt("Gui/CurrentLineStyle", m_currentLineStyle);
+
+    tmpIni.setBool("Gui/ShowLineNo", m_showLineNo);
     
     tmpIni.setString("Gui/Style", m_guiStyleName);
  

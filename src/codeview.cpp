@@ -18,7 +18,6 @@
 #include "util.h"
 
 
-static const int BORDER_WIDTH = 50;
  
 
 
@@ -38,6 +37,17 @@ CodeView::~CodeView()
     delete m_highlighter;
 }
 
+/**
+ * @brief Returns the width of the border in pixels.
+ */
+int CodeView::getBorderWidth()
+{
+    static const int BORDER_WIDTH = 50;
+    if(m_cfg->m_showLineNo)
+        return BORDER_WIDTH;
+    else
+        return 20;
+}
 
 void CodeView::setPlainText(QString text, CodeType type)
 {
@@ -83,13 +93,13 @@ void CodeView::paintEvent ( QPaintEvent * event )
         
     // Draw background
     if(m_cfg)
-    painter.fillRect(event->rect(), m_cfg->m_clrBackground);
+        painter.fillRect(event->rect(), m_cfg->m_clrBackground);
 
 
 
     // Border
     QRect rect = event->rect();
-    rect.setRight(BORDER_WIDTH);
+    rect.setRight(getBorderWidth());
     QColor borderColor;
     borderColor = QColor(60,60,60);
     painter.fillRect(rect, borderColor);
@@ -101,7 +111,7 @@ void CodeView::paintEvent ( QPaintEvent * event )
         int lineNo = m_breakpointList[j];
         int rowIdx = lineNo-1;
         int y = rowHeight*rowIdx;
-        QRect rect2(5,y,BORDER_WIDTH-10,rowHeight);
+        QRect rect2(2,y,getBorderWidth()-3,rowHeight);
         painter.fillRect(rect2, Qt::blue);
     }
 
@@ -115,10 +125,10 @@ void CodeView::paintEvent ( QPaintEvent * event )
         QString nrText;
 
 
-    // Draw cursor
+    // Draw current line cursor
     if((int)rowIdx == m_cursorY-1)
     {
-        QRect rect2(BORDER_WIDTH,y,event->rect().width()-1,rowHeight);
+        QRect rect2(getBorderWidth()+1, y, event->rect().width()-1, rowHeight);
         if(m_cfg->m_currentLineStyle == Settings::HOLLOW_RECT)
         {
             QPen pen(m_cfg->m_clrCurrentLine);
@@ -129,21 +139,23 @@ void CodeView::paintEvent ( QPaintEvent * event )
         }
         else
         {
-        painter.fillRect(rect2, m_cfg->m_clrCurrentLine);
-
+            painter.fillRect(rect2, m_cfg->m_clrCurrentLine);
         }
     }
 
     // Draw line number
-        int fontY = y+(rowHeight-(m_fontInfo->ascent()+m_fontInfo->descent()))/2+m_fontInfo->ascent();
+    int fontY = y+(rowHeight-(m_fontInfo->ascent()+m_fontInfo->descent()))/2+m_fontInfo->ascent();
+    if(m_cfg->m_showLineNo)
+    {
         painter.setPen(Qt::white);
         nrText = QString("%1").arg(rowIdx+1);
         painter.drawText(4, fontY, nrText);
+    }
 
-        // Draw text
+        // Draw line text
         QVector<TextField*> cols = m_highlighter->getRow(rowIdx);
         
-        int x = BORDER_WIDTH+10;
+        int x = getBorderWidth()+10;
         for(int j = 0;j < cols.size();j++)
         {
 
@@ -207,7 +219,7 @@ void CodeView::mousePressEvent( QMouseEvent * event )
             QVector<TextField*> cols = m_highlighter->getRow(rowIdx);
             
             // Find the word under the cursor
-            int x = BORDER_WIDTH+10;
+            int x = getBorderWidth()+10;
             int foundPos = -1;
             for(j = 0;j < cols.size() && foundPos == -1;j++)
             {
@@ -310,7 +322,7 @@ void CodeView::mouseDoubleClickEvent( QMouseEvent * event )
 {
     int rowHeight = m_fontInfo->lineSpacing()+2;
 
-    if(event->x() < BORDER_WIDTH)
+    if(event->x() < getBorderWidth())
     {
         int lineNo = (event->y()/rowHeight)+1;
 

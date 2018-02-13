@@ -114,6 +114,8 @@ class Settings
         bool m_tagSortByName;
         bool m_tagShowLineNumbers;
 
+        bool m_showLineNo;
+
         bool m_enableDebugLog;
         QString m_guiStyleName; // The GUI style to use (Eg: "cleanlooks").
 

@@ -54,6 +54,7 @@ public:
     int getRowHeight();
     
 private:
+    int getBorderWidth();
     void mouseReleaseEvent( QMouseEvent * event );
     void mouseDoubleClickEvent( QMouseEvent * event );
     void mousePressEvent(QMouseEvent * event);

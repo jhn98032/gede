@@ -104,6 +104,8 @@ void SettingsDialog::loadConfig()
     m_ui.pushButton_clr_number->setColor(m_cfg->m_clrNumber);
     m_ui.pushButton_clr_foreground->setColor(m_cfg->m_clrForeground);
 
+    m_ui.checkBox_showLineNo->setCheckState(m_cfg->m_showLineNo ? Qt::Checked : Qt::Unchecked);
+
     m_ui.checkBox_showLineNumbers->setCheckState(m_cfg->m_tagShowLineNumbers ? Qt::Checked : Qt::Unchecked);
 
     m_ui.checkBox_enableDebugLog->setCheckState(m_cfg->m_enableDebugLog ? Qt::Checked : Qt::Unchecked);
@@ -139,9 +141,11 @@ void SettingsDialog::getConfig(Settings *cfg)
     cfg->m_gdbOutputFontFamily = m_settingsGdbOutputFontFamily;
     cfg->m_gdbOutputFontSize = m_settingsGdbOutputFontSize;
 
-    m_cfg->m_tabIndentCount = m_ui.spinBox_tabIndent->value();
+    cfg->m_tabIndentCount = m_ui.spinBox_tabIndent->value();
 
     cfg->m_sourceIgnoreDirs = m_ui.lineEdit_sourceIgnoreDirs->text().split(';');
+
+    cfg->m_showLineNo = (m_ui.checkBox_showLineNo->checkState() == Qt::Unchecked) ? false : true;
 
     cfg->m_tagShowLineNumbers = (m_ui.checkBox_showLineNumbers->checkState() == Qt::Unchecked) ? false : true;
 
