@@ -87,6 +87,7 @@ SyntaxHighlighterCxx::~SyntaxHighlighterCxx()
 bool SyntaxHighlighterCxx::isSpecialChar(char c) const
 {
     if(             c == '\t' ||
+                    c == ':' ||
                     c == ',' ||
                     c == ';' ||
                     c == '|' ||

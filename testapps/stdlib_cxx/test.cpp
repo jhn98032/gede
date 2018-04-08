@@ -10,6 +10,15 @@ class MyClass
     
         int a;
         char *str;
+
+        static void func2()
+        {
+            printf("hello global!\n");
+        };
+
+        
+
+
 };
 
 using namespace std;
@@ -33,6 +42,8 @@ int main(int argc,char *argv[])
         int j_struct_int;
     }j_struct;
    double k_double = 1.2;
+
+    MyClass::func2();
 
     i_vec = (const int*)0x10;
     g_vectorInt.push_back(1);

@@ -39,6 +39,16 @@ int main(int argc,char *argv[])
     s.s2.b = 1;
     varEnum = ENUM1;
     varEnum = ENUM2;
+
+    switch(s.a)
+    {
+        case 0:
+            {
+                printf("Hej!\n");
+            };break;
+        default:;break;
+    }
+    
     while(1)
     {
         f1 += 0.1;
