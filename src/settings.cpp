@@ -470,6 +470,17 @@ QStringList Settings::getDefaultRustKeywordList()
     keywordList += "println";
     keywordList += "println!";
     
+    keywordList += "i64";
+    keywordList += "i32";
+    keywordList += "i8";
+    keywordList += "i16";
+    keywordList += "u64";
+    keywordList += "u32";
+    keywordList += "u8";
+    keywordList += "u16";
+
+    keywordList += "bool";
+
     return keywordList;
 }
 
