@@ -327,6 +327,20 @@ void SyntaxHighlighterRust::colorize(QString text)
                     currentRow->appendField(field);
                     field->m_text = c;
                 }
+                // An '->' token?
+                else if(c == '>' && field != NULL)
+                {
+                    if(field->m_text == "-")
+                        field->m_text += ">";
+                    else
+                    {
+                        field = new TextField;
+                        field->m_type = TextField::WORD;
+                        field->m_color = Qt::white;
+                        currentRow->appendField(field);
+                        field->m_text = c;
+                    }
+                }
                 else if(isSpecialChar(c))
                 {
                     field = new TextField;
