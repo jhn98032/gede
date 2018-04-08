@@ -1,4 +1,9 @@
-QT += gui core
+lessThan(QT_MAJOR_VERSION, 5) {
+    QT += gui core
+}
+else {
+    QT += gui core widgets
+}
 
 TEMPLATE = app
 

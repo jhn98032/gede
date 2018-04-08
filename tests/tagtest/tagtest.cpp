@@ -2,6 +2,10 @@
 #include "tagscanner.h"
 #include "log.h"
 
+#include <QtGlobal>
+#if QT_VERSION < 0x050000
+#include <QtGui/QApplication>
+#endif
 #include <QApplication>
 
 int dummy;
