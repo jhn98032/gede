@@ -58,6 +58,8 @@ void CodeView::setPlainText(QString text, CodeType type)
     delete m_highlighter;
     if(type == CODE_BASIC)
         m_highlighter = new SyntaxHighlighterBasic();
+    else if(type == CODE_RUST)
+        m_highlighter = new SyntaxHighlighterRust();
     else
         m_highlighter = new SyntaxHighlighterCxx();
     m_highlighter->setConfig(m_cfg);

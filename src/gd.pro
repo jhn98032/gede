@@ -36,8 +36,9 @@ SOURCES+=aboutdialog.cpp
 HEADERS+=aboutdialog.h
 
 SOURCES+=syntaxhighlighter.cpp syntaxhighlighterbasic.cpp syntaxhighlightercxx.cpp
+SOURCES+=syntaxhighlighterrust.cpp
 HEADERS+=syntaxhighlighter.h syntaxhighlighterbasic.h syntaxhighlightercxx.h
-
+HEADERS+=syntaxhighlighterrust.h
 
 SOURCES+=ini.cpp
 HEADERS+=ini.h

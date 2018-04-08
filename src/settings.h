@@ -44,6 +44,7 @@ class Settings
         static QStringList getDefaultCxxKeywordList();
         static QStringList getDefaultCppKeywordList();
         static QStringList getDefaultBasicKeywordList();
+        static QStringList getDefaultRustKeywordList();
 
         QString getProgramPath();
 

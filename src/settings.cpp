@@ -426,6 +426,53 @@ QStringList Settings::getDefaultCxxKeywordList()
 }
 
 
+QStringList Settings::getDefaultRustKeywordList()
+{
+    QStringList keywordList;
+
+    //
+    keywordList += "as";
+    keywordList += "break";
+    keywordList += "const";
+    keywordList += "continue";
+    keywordList += "crate";
+    keywordList += "else";
+    keywordList += "enum";
+    keywordList += "extern";
+    keywordList += "false";
+    keywordList += "fn";
+    keywordList += "for";
+    keywordList += "if";
+    keywordList += "impl";
+    keywordList += "in";
+    keywordList += "let";
+    keywordList += "loop";
+    keywordList += "match";
+    keywordList += "mod";
+    keywordList += "move";
+    keywordList += "mut";
+    keywordList += "pub";
+    keywordList += "ref";
+    keywordList += "return";
+    keywordList += "Self";
+    keywordList += "self";
+    keywordList += "static";
+    keywordList += "struct";
+    keywordList += "super";
+    keywordList += "trait";
+    keywordList += "true";
+    keywordList += "type";
+    keywordList += "unsafe";
+    keywordList += "use";
+    keywordList += "where";
+    keywordList += "while";
+
+    keywordList += "println";
+    keywordList += "println!";
+    
+    return keywordList;
+}
+
 QStringList Settings::getDefaultBasicKeywordList()
 {
     QStringList keywordList;
