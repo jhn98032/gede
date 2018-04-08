@@ -1,11 +1,18 @@
-QT += gui core
+lessThan(QT_MAJOR_VERSION, 5) {
+    QT += gui core
+}
+else {
+    QT += gui core widgets
+}
 
 TEMPLATE = app
 
 SOURCES+=hltest.cpp
 
-SOURCES+=../../src/syntaxhighlighter.cpp
-HEADERS+=../../src/syntaxhighlighter.h
+SOURCES+=../../src/syntaxhighlighter.cpp ../../src/syntaxhighlighterbasic.cpp ../../src/syntaxhighlightercxx.cpp
+HEADERS+=../../src/syntaxhighlighter.h ../../src/syntaxhighlighterbasic.h ../../src/syntaxhighlightercxx.h
+
+
 
 SOURCES+=../../src/settings.cpp ../../src/ini.cpp
 HEADERS+=../../src/settings.h ../../src/ini.h
