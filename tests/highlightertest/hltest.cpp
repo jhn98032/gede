@@ -1,4 +1,5 @@
 
+#include "syntaxhighlighterrust.h"
 #include "syntaxhighlightercxx.h"
 #include "syntaxhighlighterbasic.h"
 #include "log.h"
@@ -58,7 +59,9 @@ int main(int argc, char *argv[])
     Settings cfg;
     
     SyntaxHighlighter *scanner = NULL;
-    if(inputFilename.endsWith(".bas"))
+    if(inputFilename.endsWith(".rs"))
+        scanner = new SyntaxHighlighterRust();
+    else if(inputFilename.endsWith(".bas"))
         scanner = new SyntaxHighlighterBasic();
     else
         scanner = new SyntaxHighlighterCxx();

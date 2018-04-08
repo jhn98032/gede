@@ -10,7 +10,9 @@ TEMPLATE = app
 SOURCES+=hltest.cpp
 
 SOURCES+=../../src/syntaxhighlighter.cpp ../../src/syntaxhighlighterbasic.cpp ../../src/syntaxhighlightercxx.cpp
+SOURCES+=../../src/syntaxhighlighterrust.cpp
 HEADERS+=../../src/syntaxhighlighter.h ../../src/syntaxhighlighterbasic.h ../../src/syntaxhighlightercxx.h
+HEADERS+=../../src/syntaxhighlighterrust.h
 
 
 
