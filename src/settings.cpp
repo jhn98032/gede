@@ -387,6 +387,7 @@ QStringList Settings::getDefaultCxxKeywordList()
     keywordList += "do";
     keywordList += "false";
     keywordList += "true";
+    keywordList += "default";
 
     keywordList += "sizeof";
     keywordList += "typedef";
@@ -406,9 +407,12 @@ QStringList Settings::getDefaultCxxKeywordList()
     keywordList += "class";
     keywordList += "static";
     keywordList += "volatile";
-    keywordList += "return";
     keywordList += "new";
     keywordList += "const";
+
+    keywordList += "return";
+    keywordList += "break";
+    keywordList += "continue";
     
 
     keywordList += "uint32_t";
