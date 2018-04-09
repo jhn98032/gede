@@ -22,7 +22,7 @@ MColorButton::~MColorButton()
 void MColorButton::setColor ( QColor clr)
 {
     m_clr = clr;
-    repaint();
+    update();
 }
 
 /**
