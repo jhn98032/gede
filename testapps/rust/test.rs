@@ -1,4 +1,16 @@
 
+// A single line comment
+
+#[cfg(feature = "test")]
+fn test() -> u8 {
+    return 99;
+}
+
+
+/*
+* a multi line comment
+*/
+
 fn main2() -> i32 {
     let mut a = 2;
     while a <= 10 {

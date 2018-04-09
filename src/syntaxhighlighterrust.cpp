@@ -17,7 +17,6 @@
 
 
 SyntaxHighlighterRust::Row::Row()
-    : isCppRow(0)
 {
 };
 
@@ -114,20 +113,6 @@ bool SyntaxHighlighterRust::isSpecialChar(TextField *field) const
 }
 
 
-bool SyntaxHighlighterRust::isCppKeyword(QString text) const
-{
-    if(text.size() == 0)
-        return false;
-
-    if(m_cppKeywords.contains(text))
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
 
 
 bool SyntaxHighlighterRust::isKeyword(QString text) const
@@ -269,61 +254,7 @@ void SyntaxHighlighterRust::colorize(QString text)
                 {
                     state = STRING;
                     field = new TextField;
-                    if(currentRow->isCppRow)
-                        field->m_type = TextField::INC_STRING;
-                    else
-                        field->m_type = TextField::STRING;
-                    currentRow->appendField(field);
-                    field->m_text = c;
-                }
-                else if(c == '<' && currentRow->isCppRow)
-                {
-                    // Is it a include string?
-                    bool isIncString = false;
-                    TextField *lastField = currentRow->getLastNonSpaceField();
-                    if(lastField)
-                    {
-                        if(lastField->m_text == "include")
-                            isIncString = true;
-                    }
-
-                    // Add the field
-                    field = new TextField;
-                    field->m_text = c;
-                    if(isIncString)
-                    {
-                        state = INC_STRING;
-                        field->m_type = TextField::INC_STRING;
-                    }
-                    else
-                    {
-                        field->m_type = TextField::WORD;
-                        field->m_color = Qt::white;
-                    }
-                    currentRow->appendField(field);
-                
-                }
-                else if(c == '#')
-                {
-                    // Only spaces before the '#' at the line?
-                    bool onlySpaces = true;
-                    for(int j = 0;onlySpaces == true && j < currentRow->m_fields.size();j++)
-                    {
-                        if(currentRow->m_fields[j]->m_type != TextField::SPACES &&
-                            currentRow->m_fields[j]->m_type != TextField::COMMENT)
-                        {
-                            onlySpaces = false;
-                        }
-                    }
-                    currentRow->isCppRow = onlySpaces ? true : false;
-
-                    // Create a new field structure
-                    field = new TextField;
-                    if(currentRow->isCppRow)
-                        field->m_type = TextField::CPP_KEYWORD;
-                    else
-                        field->m_type = TextField::WORD;
-                    field->m_color = Qt::white;
+                    field->m_type = TextField::STRING;
                     currentRow->appendField(field);
                     field->m_text = c;
                 }
@@ -501,16 +432,9 @@ void SyntaxHighlighterRust::colorize(QString text)
                 if(isSpecialChar(c) || c == ' ' || c == '\t' || c == '\n')
                 {
                     i--;
-                    if(currentRow->isCppRow)
-                    {
-                        if(isCppKeyword(field->m_text))
-                            field->m_type = TextField::CPP_KEYWORD;
-                    }
-                    else
-                    {
-                        if(isKeyword(field->m_text))
-                            field->m_type = TextField::KEYWORD;
-                    }
+
+                    if(isKeyword(field->m_text))
+                        field->m_type = TextField::KEYWORD;
     
                     field = NULL;
                     state = IDLE;
