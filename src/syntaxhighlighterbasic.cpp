@@ -185,7 +185,7 @@ void SyntaxHighlighterBasic::colorize(QString text)
     enum {IDLE,
         MULTI_COMMENT,
         SPACES,
-        WORD, GLOBAL_INCLUDE_FILE, COMMENT1,COMMENT,
+        WORD, COMMENT1,COMMENT,
         STRING,
         ESCAPED_CHAR,
         INC_STRING
@@ -277,7 +277,7 @@ void SyntaxHighlighterBasic::colorize(QString text)
                     TextField *lastField = currentRow->getLastNonSpaceField();
                     if(lastField)
                     {
-                        if(lastField->m_text == "include")
+                        if(lastField->m_text.compare("include",Qt::CaseInsensitive) == 0)
                             isIncString = true;
                     }
 
@@ -416,21 +416,6 @@ void SyntaxHighlighterBasic::colorize(QString text)
                     field = NULL;
                     state = IDLE;
                 }  
-            };break;
-            case GLOBAL_INCLUDE_FILE:
-            {
-                if(!isEscaped && c == '\n')
-                {
-                    state = IDLE;
-                }
-                else
-                {
-                    field->m_text += c;
-                    if(c == '>')
-                    {
-                        state = IDLE;
-                    }
-                }
             };break;
             case ESCAPED_CHAR:
             {
