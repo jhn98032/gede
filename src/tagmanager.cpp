@@ -12,7 +12,6 @@ ScannerWorker::ScannerWorker()
     m_dbgMainThread = QThread::currentThreadId ();
 #endif
     m_quit = false;
-    m_scanner.init();
 }
 
 
@@ -31,6 +30,10 @@ void ScannerWorker::abort()
 void ScannerWorker::run()
 {
     assert(m_dbgMainThread != QThread::currentThreadId ());
+
+    m_cfg.load();
+    
+    m_scanner.init(&m_cfg);
 
     while(m_quit == false)
     {
@@ -93,11 +96,14 @@ TagManager::TagManager()
     m_dbgMainThread = QThread::currentThreadId ();
 #endif
 
+    m_cfg.load();
+    
     m_worker.start();
     
     connect(&m_worker, SIGNAL(onScanDone(QString, QList<Tag>* )), this, SLOT(onScanDone(QString, QList<Tag>* )));
     
-    m_tagScanner.init();
+
+    m_tagScanner.init(&m_cfg);
 
 }
 

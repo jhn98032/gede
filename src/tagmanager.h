@@ -52,6 +52,7 @@ class ScannerWorker : public QThread
         QWaitCondition m_doneCond;
         QList<QString> m_workQueue;
         bool m_quit;
+        Settings m_cfg;
 
 };
 
@@ -86,6 +87,8 @@ private:
     Qt::HANDLE m_dbgMainThread;
 #endif
     QMap<QString, ScannerResult*> m_db;
+
+    Settings m_cfg;
 };
 
 

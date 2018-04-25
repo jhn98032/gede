@@ -18,6 +18,11 @@ SOURCES+=../../src/util.cpp
 HEADERS+=../../src/util.h
 
 
+SOURCES += ../../src/rusttagscanner.cpp
+HEADERS += ../../src/rusttagscanner.h
+
+SOURCES += ../../src/ini.cpp ../../src/settings.cpp
+HEADERS += ../../src/ini.h ../../src/settings.h
 
 QMAKE_CXXFLAGS += -I../../src  -g
 

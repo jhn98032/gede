@@ -52,6 +52,9 @@ HEADERS+=settings.h
 SOURCES+=tagscanner.cpp tagmanager.cpp
 HEADERS+=tagscanner.h   tagmanager.h
 
+SOURCES+=rusttagscanner.cpp
+HEADERS+=rusttagscanner.h
+
 HEADERS+=config.h
 
 SOURCES+=varctl.cpp watchvarctl.cpp autovarctl.cpp

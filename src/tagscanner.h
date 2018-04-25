@@ -11,6 +11,7 @@
 
 #include <QString>
 #include <QList>
+#include "settings.h"
 
 
 
@@ -43,7 +44,7 @@ class TagScanner
         TagScanner();
         ~TagScanner();
 
-        void init();
+        void init(Settings *cfg);
 
         int scan(QString filepath, QList<Tag> *taglist);
         void dump(const QList<Tag> &taglist);
@@ -58,6 +59,7 @@ class TagScanner
 
 
         bool m_ctagsExist;
+        Settings *m_cfg;
 };
 
 

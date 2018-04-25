@@ -19,16 +19,23 @@ void dummyfunc()
 
 int main(int argc, char *argv[])
 {
+    Settings cfg;
+    QString filename = "tagtest.cpp";
     QApplication app(argc,argv);
     TagScanner scanner;
 
-    Q_UNUSED(argc);
-    Q_UNUSED(argv);
+    for(int i = 1;i < argc;i++)
+    {
+        const char *curArg = argv[i];
+        if(curArg[0] != '-')
+            filename = curArg;
+    }
+    scanner.init(&cfg);
 
-    scanner.init();
+    
 
     QList<Tag> taglist;
-    if(scanner.scan("tagtest.cpp", &taglist))
+    if(scanner.scan(filename, &taglist))
         errorMsg("Failed to scan"); 
 
     scanner.dump(taglist);

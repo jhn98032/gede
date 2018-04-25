@@ -10,6 +10,7 @@
 
 #include "log.h"
 #include "util.h"
+#include "rusttagscanner.h"
 
 #include <QMessageBox>
 #include <QProcess>
@@ -67,6 +68,7 @@ void Tag::dump() const
  */
 
 TagScanner::TagScanner()
+ : m_cfg(0)
 {
 
 }
@@ -106,8 +108,9 @@ int TagScanner::execProgram(QString name, QStringList argList,
 }
 
 
-void TagScanner::init()
+void TagScanner::init(Settings *cfg)
 {
+    m_cfg = cfg;
 
     // Check if ctags exists?
     QStringList argList;
@@ -136,10 +139,21 @@ void TagScanner::init()
     else
         m_ctagsExist = true;
 }
- 
+
 
 int TagScanner::scan(QString filepath, QList<Tag> *taglist)
 {
+    
+    // Rust file?
+    QString extension = getExtensionPart(filepath);
+    if(extension.toLower() == ".rs")
+    {
+        RustTagScanner rs;
+        rs.setConfig(m_cfg);
+        return rs.scan(filepath, taglist);
+    }
+    
+
     if(!m_ctagsExist)
         return 0;
 
