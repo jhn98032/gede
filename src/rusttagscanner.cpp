@@ -26,6 +26,31 @@
 #include "settings.h"
 #include "log.h"
 
+
+RustTagScanner::RustTagScanner()
+    : m_cfg(NULL)
+
+{
+    QStringList keywordList = Settings::getDefaultRustKeywordList();
+    for(int u = 0;u < keywordList.size();u++)
+    {
+        m_keywords[keywordList[u]] = true;
+    }
+
+    QStringList cppKeywordList = Settings::getDefaultCppKeywordList();
+    for(int u = 0;u < cppKeywordList.size();u++)
+    {
+        m_cppKeywords[cppKeywordList[u]] = true;
+    }
+
+
+}
+
+RustTagScanner::~RustTagScanner()
+{
+    clearTokenList();
+}
+
     
 int RustTagScanner::scan(QString filepath, QList<Tag> *taglist)
 {
@@ -48,7 +73,11 @@ int RustTagScanner::scan(QString filepath, QList<Tag> *taglist)
     tokenize(text);
 
     parse(taglist);
-    
+
+
+    clearTokenList();
+
+
     return 0;
 }
 
@@ -77,8 +106,6 @@ RustTagScanner::Token* RustTagScanner::popToken()
     if(m_tokens.isEmpty())
         return NULL;
     Token* tok = m_tokens.takeFirst();
-    if(tok)
-        m_freeTokens.append(tok);
     return tok;
 }
 
@@ -140,90 +167,25 @@ void RustTagScanner::parse(QList<Tag> *taglist)
                 };break;
                 default:;break;
             }
+            delete tok;
         }
     }while(tok);
 
 }
     
-RustTagScanner::Row::Row()
+
+
+
+
+void RustTagScanner::clearTokenList()
 {
-};
-
-
-/**
- * @brief Returns the last nonspace field in the row.
- */
-TextField *RustTagScanner::Row::getLastNonSpaceField()
-{
-    for(int j = m_fields.size()-1;j >= 0;j--)
-    {
-        TextField *thisField = m_fields[j];
-        if(thisField->m_type != TextField::SPACES &&
-            thisField->m_type != TextField::COMMENT)
-        {
-            return thisField;
-        }
-    }
-    return NULL;
-}
-
-
-int RustTagScanner::Row::getCharCount()
-{
-    int len = 0;
-    for(int j = m_fields.size()-1;j >= 0;j--)
-    {
-        TextField *thisField = m_fields[j];
-        len += thisField->getLength();
-
-    }
-    return len;
-}
-
-        
-void RustTagScanner::Row::appendField(TextField* field)
-{
-    m_fields.push_back(field);
-}
-
-
-RustTagScanner::RustTagScanner()
-    : m_cfg(NULL)
-
-{
-    QStringList keywordList = Settings::getDefaultRustKeywordList();
-    for(int u = 0;u < keywordList.size();u++)
-    {
-        m_keywords[keywordList[u]] = true;
-    }
-
-    QStringList cppKeywordList = Settings::getDefaultCppKeywordList();
-    for(int u = 0;u < cppKeywordList.size();u++)
-    {
-        m_cppKeywords[cppKeywordList[u]] = true;
-    }
-
-
-}
-
-RustTagScanner::~RustTagScanner()
-{
-    reset();
-
-
     for(int i = 0;i < m_tokens.size();i++)
     {
         Token* tok = m_tokens[i];
         delete tok;
     }
     m_tokens.clear();
-    for(int i = 0;i < m_freeTokens.size();i++)
-    {
-        Token* tok = m_freeTokens[i];
-        delete tok;
-    }
-    m_freeTokens.clear();
-    
+
 
 
 }
@@ -276,24 +238,6 @@ bool RustTagScanner::isKeyword(QString text) const
 }
 
 
-void RustTagScanner::reset()
-{
-/*
-    for(int r = 0;r < m_rows.size();r++)
-    {
-        Row *currentRow = m_rows[r];
-
-        assert(currentRow != NULL);
-        for(int j = 0;j < currentRow->m_fields.size();j++)
-        {
-            delete currentRow->m_fields[j];
-        }
-        delete currentRow;
-    }
-    m_rows.clear();
-
-*/
-}
 
 void RustTagScanner::setConfig(Settings *cfg)
 {
@@ -319,8 +263,8 @@ void RustTagScanner::tokenize(QString text2)
     bool isEscaped = false;
     QString text;
 
-    reset();
 
+    clearTokenList();
     
 
     for(int i = 0;i < text2.size();i++)

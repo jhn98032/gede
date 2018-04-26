@@ -39,17 +39,6 @@ private:
         QString text;
         int m_lineNr;
     };
-    class Row
-    {
-    public:
-        Row();
-
-        TextField *getLastNonSpaceField();
-        void appendField(TextField* field);
-        int getCharCount();
-        
-        QVector<TextField*>  m_fields;
-    };
 
     void parse(QList<Tag> *taglist);
     QString tokenToDesc(Token *tok);
@@ -59,11 +48,7 @@ private:
     Token* peekToken();
     Token* pushToken(QString text, Token::Type type, int lineNr);
     Token* pushToken(char text, Token::Type type, int lineNr);
-    
-    QList<Token*> m_tokens;
-    QList<Token*> m_freeTokens;
-private:
-
+    void clearTokenList();
     
 private:
     Settings *m_cfg;
@@ -71,6 +56,7 @@ private:
     QHash <QString, bool> m_keywords;
     QHash <QString, bool> m_cppKeywords;
     QString m_filepath;
+    QList<Token*> m_tokens;
 };
 
 #endif // FILE__RUSTTAGS_H
