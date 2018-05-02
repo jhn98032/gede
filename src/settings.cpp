@@ -454,7 +454,6 @@ QStringList Settings::getDefaultRustKeywordList()
     keywordList += "pub";
     keywordList += "ref";
     keywordList += "return";
-    keywordList += "Self";
     keywordList += "self";
     keywordList += "static";
     keywordList += "struct";
@@ -466,6 +465,8 @@ QStringList Settings::getDefaultRustKeywordList()
     keywordList += "use";
     keywordList += "where";
     keywordList += "while";
+    keywordList += "yield";
+
 
     keywordList += "println";
     keywordList += "println!";
@@ -478,6 +479,8 @@ QStringList Settings::getDefaultRustKeywordList()
     keywordList += "u32";
     keywordList += "u8";
     keywordList += "u16";
+    keywordList += "f32";
+    keywordList += "f64";
 
     keywordList += "bool";
 
