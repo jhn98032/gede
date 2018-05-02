@@ -5,6 +5,11 @@
 #include "syntaxhighlighter.h"
 
 
+/**
+ * @brief Tag scanner for the Rust language.
+ *
+ * This class scans a rust language file and extract function definitions from it.
+ */
 class RustTagScanner
 {
 public:
@@ -34,6 +39,8 @@ private:
         public:
         Token(int lineNr) : m_lineNr(lineNr) {};
 
+        QString getText() const { return text;};
+
         typedef enum {STRING, COMMENT, NUMBER,WORD, KEYWORD} Type;
         Type m_type;
         QString text;
@@ -44,6 +51,7 @@ private:
     QString tokenToDesc(Token *tok);
 
 private:
+    bool eatToken(QString text);
     Token* popToken();
     Token* peekToken();
     Token* pushToken(QString text, Token::Type type, int lineNr);

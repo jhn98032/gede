@@ -136,6 +136,24 @@ QString RustTagScanner::tokenToDesc(Token *tok)
 }
 
 
+/**
+ * @brief Removes a token if it matches.
+ * @return false if a token was poped. 
+ */
+bool RustTagScanner::eatToken(QString text)
+{
+   Token *tok = peekToken();
+    if(!tok)
+        return true;
+    if(tok->text == text)
+    {
+        tok = popToken();
+        delete tok;
+        return false;
+    }
+    return true;
+}
+
 void RustTagScanner::parse(QList<Tag> *taglist)
 {
     
@@ -159,11 +177,43 @@ void RustTagScanner::parse(QList<Tag> *taglist)
                     debugMsg("found: '%s' at L%d", qPrintable(tok->text), tok->m_lineNr);
                     Tag tag;
                     tag.setLineNo(tok->m_lineNr);
-                    tag.m_name = tok->text;
+                    tag.m_name = tok->getText();
                     tag.filepath = m_filepath;
                     tag.type = Tag::TAG_FUNC;
-                    taglist->append(tag);
                     state = IDLE;
+
+                    // Parse signature
+                    if(eatToken("("))
+                    {
+                    }
+                    else
+                    {
+                        QString tokText;
+                        QString signature;
+                        signature += "(";
+                        do
+                        {
+                            Token *tok2 = popToken();
+                            if(tok2)
+                            {
+                                tokText = tok2->getText();
+                                signature += tokText;
+                                if(tokText == ",")
+                                    signature += " ";
+                                delete tok2;
+                            }
+                            else
+                                tokText = "";
+                            
+                        }while(tokText != ")");
+
+                        debugMsg("Found signature:%s", qPrintable(signature));
+                        tag.setSignature(signature);
+                    }
+
+                    // Add the tag to the list
+                    taglist->append(tag);
+                
                 };break;
                 default:;break;
             }
