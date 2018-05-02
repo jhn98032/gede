@@ -11,7 +11,7 @@
 
 #define GD_MAJOR 2
 #define GD_MINOR 7
-#define GD_PATCH 1
+#define GD_PATCH 2
 
 
 #endif // FILE__VERSION_H
