@@ -39,6 +39,9 @@ TextField *SyntaxHighlighterBasic::Row::getLastNonSpaceField()
 }
 
 
+/**
+ * @brief Returns the number of characters in the row.
+ */
 int SyntaxHighlighterBasic::Row::getCharCount()
 {
     int len = 0;
@@ -51,7 +54,9 @@ int SyntaxHighlighterBasic::Row::getCharCount()
     return len;
 }
 
-        
+/**
+ * @brief Appends a field to the row.
+ */
 void SyntaxHighlighterBasic::Row::appendField(TextField* field)
 {
     m_fields.push_back(field);
@@ -83,6 +88,10 @@ SyntaxHighlighterBasic::~SyntaxHighlighterBasic()
 }
 
 
+/**
+ * @brief Checks if a character is a special character.
+ * @return Returns true if the character is a special character (Eg: '\t').
+*/
 bool SyntaxHighlighterBasic::isSpecialChar(char c) const
 {
     if(             c == '\t' ||
@@ -103,6 +112,9 @@ bool SyntaxHighlighterBasic::isSpecialChar(char c) const
         return false;
 }
 
+/**
+ * @brief Checks if a field is a special character (eg: '>').
+ */
 bool SyntaxHighlighterBasic::isSpecialChar(TextField *field) const
 {
     if(field->m_text.size() == 1)
@@ -114,10 +126,13 @@ bool SyntaxHighlighterBasic::isSpecialChar(TextField *field) const
 
 
 
+/**
+ * @brief Checks if a string is a keyword.
+ */
 bool SyntaxHighlighterBasic::isKeyword(QString text) const
 {
     text = text.toLower();
-    if(text.size() == 0)
+    if(text.isEmpty())
         return false;
     if(m_keywords.contains(text))
     {
@@ -129,6 +144,10 @@ bool SyntaxHighlighterBasic::isKeyword(QString text) const
     }
 }
 
+
+/**
+ * @brief Picks a color for a specific field.
+ */
 void SyntaxHighlighterBasic::pickColor(TextField *field)
 {
     assert(field != NULL);
@@ -156,6 +175,9 @@ void SyntaxHighlighterBasic::pickColor(TextField *field)
 }
 
 
+/**
+ * @brief Deallocates all the rows.
+ */
 void SyntaxHighlighterBasic::reset()
 {
     for(int r = 0;r < m_rows.size();r++)
@@ -172,12 +194,18 @@ void SyntaxHighlighterBasic::reset()
     m_rows.clear();
 }
 
+/**
+ * @brief Deallocates all the rows.
+ */
 void SyntaxHighlighterBasic::setConfig(Settings *cfg)
 {
     m_cfg = cfg;
 
 }
 
+/**
+ * @brief Creates the row for a number of lines of text.
+ */
 void SyntaxHighlighterBasic::colorize(QString text)
 {
     Row *currentRow;
@@ -499,6 +527,11 @@ void SyntaxHighlighterBasic::colorize(QString text)
 
 
 
+/**
+ * @brief Returns a text row.
+ * @return rowIdx   The row to get (0=first row).
+ * @return The fields of the row.
+ */
 QVector<TextField*> SyntaxHighlighterBasic::getRow(unsigned int rowIdx)
 {
     assert(rowIdx < getRowCount());
@@ -506,3 +539,4 @@ QVector<TextField*> SyntaxHighlighterBasic::getRow(unsigned int rowIdx)
     Row *row = m_rows[rowIdx];
     return row->m_fields;
 }
+

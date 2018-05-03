@@ -39,6 +39,9 @@ TextField *SyntaxHighlighterRust::Row::getLastNonSpaceField()
 }
 
 
+/**
+ * @brief Returns the number of characters in the row.
+ */
 int SyntaxHighlighterRust::Row::getCharCount()
 {
     int len = 0;
@@ -51,7 +54,10 @@ int SyntaxHighlighterRust::Row::getCharCount()
     return len;
 }
 
-        
+
+/**
+ * @brief Appends a field to the row.
+ */
 void SyntaxHighlighterRust::Row::appendField(TextField* field)
 {
     m_fields.push_back(field);
@@ -68,11 +74,6 @@ SyntaxHighlighterRust::SyntaxHighlighterRust()
         m_keywords[keywordList[u]] = true;
     }
 
-    QStringList cppKeywordList = Settings::getDefaultCppKeywordList();
-    for(int u = 0;u < cppKeywordList.size();u++)
-    {
-        m_cppKeywords[cppKeywordList[u]] = true;
-    }
 
 
 }
@@ -83,6 +84,10 @@ SyntaxHighlighterRust::~SyntaxHighlighterRust()
 }
 
 
+/**
+ * @brief Checks if a character is a special character.
+ * @return Returns true if the character is a special character (Eg: '\t').
+*/
 bool SyntaxHighlighterRust::isSpecialChar(char c) const
 {
     if(             c == '\t' ||
@@ -103,6 +108,10 @@ bool SyntaxHighlighterRust::isSpecialChar(char c) const
         return false;
 }
 
+
+/**
+ * @brief Checks if a field is a special character (eg: '>').
+ */
 bool SyntaxHighlighterRust::isSpecialChar(TextField *field) const
 {
     if(field->m_text.size() == 1)
@@ -114,10 +123,12 @@ bool SyntaxHighlighterRust::isSpecialChar(TextField *field) const
 
 
 
-
+/**
+ * @brief Checks if a string is a keyword.
+ */
 bool SyntaxHighlighterRust::isKeyword(QString text) const
 {
-    if(text.size() == 0)
+    if(text.isEmpty())
         return false;
     if(m_keywords.contains(text))
     {
@@ -129,6 +140,10 @@ bool SyntaxHighlighterRust::isKeyword(QString text) const
     }
 }
 
+
+/**
+ * @brief Picks a color for a specific field.
+ */
 void SyntaxHighlighterRust::pickColor(TextField *field)
 {
     assert(field != NULL);
@@ -156,6 +171,9 @@ void SyntaxHighlighterRust::pickColor(TextField *field)
 }
 
 
+/**
+ * @brief Deallocates all the rows.
+ */
 void SyntaxHighlighterRust::reset()
 {
     for(int r = 0;r < m_rows.size();r++)
@@ -172,12 +190,20 @@ void SyntaxHighlighterRust::reset()
     m_rows.clear();
 }
 
+
+/**
+ * @brief Sets the configuration to use.
+ */
 void SyntaxHighlighterRust::setConfig(Settings *cfg)
 {
     m_cfg = cfg;
 
 }
 
+
+/**
+ * @brief Creates the row for a number of lines of text.
+ */
 void SyntaxHighlighterRust::colorize(QString text)
 {
     Row *currentRow;
@@ -462,7 +488,11 @@ void SyntaxHighlighterRust::colorize(QString text)
 }
 
 
-
+/**
+ * @brief Returns a text row.
+ * @return rowIdx   The row to get (0=first row).
+ * @return The fields of the row.
+ */
 QVector<TextField*> SyntaxHighlighterRust::getRow(unsigned int rowIdx)
 {
     assert(rowIdx < getRowCount());
@@ -470,3 +500,4 @@ QVector<TextField*> SyntaxHighlighterRust::getRow(unsigned int rowIdx)
     Row *row = m_rows[rowIdx];
     return row->m_fields;
 }
+

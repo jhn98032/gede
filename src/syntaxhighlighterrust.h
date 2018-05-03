@@ -56,7 +56,6 @@ private:
     Settings *m_cfg;
     QVector <Row*> m_rows;
     QHash <QString, bool> m_keywords;
-    QHash <QString, bool> m_cppKeywords;
 };
 
 #endif // #ifndef FILE__SYNTAXHIGHLIGHTER_H
