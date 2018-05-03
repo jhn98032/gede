@@ -37,11 +37,6 @@ RustTagScanner::RustTagScanner()
         m_keywords[keywordList[u]] = true;
     }
 
-    QStringList cppKeywordList = Settings::getDefaultCppKeywordList();
-    for(int u = 0;u < cppKeywordList.size();u++)
-    {
-        m_cppKeywords[cppKeywordList[u]] = true;
-    }
 
 
 }
@@ -56,13 +51,15 @@ int RustTagScanner::scan(QString filepath, QList<Tag> *taglist)
 {
     m_filepath = filepath;
     
-// Read file content
+    // Open file
     QFile file(filepath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         errorMsg("Failed to open '%s'", stringToCStr(filepath));
         return -1;
     }
+
+    // Read file content
     QString text;
     while (!file.atEnd())
     {
@@ -91,9 +88,8 @@ RustTagScanner::Token* RustTagScanner::pushToken(char c, Token::Type type, int l
 
 RustTagScanner::Token* RustTagScanner::pushToken(QString text, Token::Type type, int lineNr)
 {
-    Token *tok = new Token(lineNr);
-    tok->m_type = type;
-    tok->text = text;
+    Token *tok = new Token(lineNr, type);
+    tok->setText(text);
     m_tokens.append(tok);
     return tok;
 }
@@ -118,10 +114,11 @@ RustTagScanner::Token* RustTagScanner::peekToken()
 
 
 
-QString RustTagScanner::tokenToDesc(Token *tok)
+QString RustTagScanner::Token::toDesc()
 {
+    Token *tok = this;
     QString typeStr;
-    switch(tok->m_type)
+    switch(tok->getType())
     {
         case Token::STRING: typeStr = "STRING";break;
         case Token::NUMBER: typeStr = "NUMBER";break;
@@ -145,7 +142,7 @@ bool RustTagScanner::eatToken(QString text)
    Token *tok = peekToken();
     if(!tok)
         return true;
-    if(tok->text == text)
+    if(tok->getText() == text)
     {
         tok = popToken();
         delete tok;
@@ -169,14 +166,14 @@ void RustTagScanner::parse(QList<Tag> *taglist)
                 case IDLE:
                 {
                     debugMsg("tok: %s", qPrintable(tokenToDesc(tok)));
-                    if(tok->text == "fn")
+                    if(tok->getText() == "fn")
                         state = FN_KW;
                 };break;
                 case FN_KW:
                 {
                     debugMsg("found: '%s' at L%d", qPrintable(tok->text), tok->m_lineNr);
                     Tag tag;
-                    tag.setLineNo(tok->m_lineNr);
+                    tag.setLineNo(tok->getLineNr());
                     tag.m_name = tok->getText();
                     tag.filepath = m_filepath;
                     tag.type = Tag::TAG_FUNC;

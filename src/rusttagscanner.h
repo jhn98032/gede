@@ -20,28 +20,38 @@ public:
     int scan(QString filepath, QList<Tag> *taglist);
        
 
+    void setConfig(Settings *cfg);
 
-
+private:
 
     void tokenize(QString text);
 
-    //unsigned int getRowCount() { return m_rows.size(); };
     void reset();
 
     bool isKeyword(QString text) const;
     bool isSpecialChar(char c) const;
     bool isSpecialChar(TextField *field) const;
-    void setConfig(Settings *cfg);
 
 private:
     class Token
     {
-        public:
+    public:
+        typedef enum {STRING, COMMENT, NUMBER,WORD, KEYWORD} Type;
+
         Token(int lineNr) : m_lineNr(lineNr) {};
+        Token(int lineNr, Type t) : m_type(t), m_lineNr(lineNr) {};
 
         QString getText() const { return text;};
+        void setText(QString txt) { text = txt;};
 
-        typedef enum {STRING, COMMENT, NUMBER,WORD, KEYWORD} Type;
+        QString toDesc();
+        
+        void setType(Type t) { m_type = t; };
+        Type getType() const { return m_type; };
+
+        int getLineNr() const { return m_lineNr; };
+
+    private:
         Type m_type;
         QString text;
         int m_lineNr;
@@ -60,9 +70,7 @@ private:
     
 private:
     Settings *m_cfg;
-    //QVector <Row*> m_rows;
     QHash <QString, bool> m_keywords;
-    QHash <QString, bool> m_cppKeywords;
     QString m_filepath;
     QList<Token*> m_tokens;
 };
