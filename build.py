@@ -33,16 +33,24 @@ def removeFile(filename):
 
 # Do a cleanup
 def doClean():
-    print("Cleaning")
-    if os.path.exists("Makefile"):
-        if run_make(["clean"]):
-            exit(1)
-    else:
-        os.system("rm -f *.o")
-    removeFile(g_exeName)
-    removeFile("Makefile")
-    removeFile(".qmake.stash")
-    
+    for p in ["./src",
+            "./tests/tagtest",
+            "./tests/highlightertest",
+            "./tests/ini"
+            ]:
+        print("Cleaning up in %s" % (p))
+        oldP = os.getcwd()
+        os.chdir(p)
+        if os.path.exists("Makefile"):
+            if run_make(["clean"]):
+                exit(1)
+        else:
+            os.system("rm -f *.o")
+        removeFile(g_exeName)
+        removeFile("Makefile")
+        removeFile(".qmake.stash")
+        os.chdir(oldP)
+
     
 # Show usage
 def dump_usage():
@@ -99,7 +107,6 @@ def detectQt():
 # Main entry
 if __name__ == "__main__":
     try:
-        os.chdir("src")
         do_clean = False
         do_install = False
         do_build = True
@@ -123,6 +130,7 @@ if __name__ == "__main__":
         if do_clean:
             doClean();
         if do_build:
+            os.chdir("src")
             if not os.path.exists("Makefile"):
                 ensureExist("make")
                 ensureExist("gcc")
@@ -135,6 +143,7 @@ if __name__ == "__main__":
             if run_make([]):
                 exit(1)
         if do_install:
+            os.chdir("src")
             print("Installing to '%s'" % (g_dest_path) )
             try:
                 os.makedirs(g_dest_path + "/bin")
