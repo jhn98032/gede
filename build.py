@@ -10,6 +10,7 @@ import shutil
 
 g_dest_path = "/usr/local"
 g_verbose = False
+g_exeName = "gede"
 
 # Run the make command
 def run_make(a_list):
@@ -23,7 +24,26 @@ def run_make(a_list):
             print(err)
     return errcode
 
+# Remove a file
+def removeFile(filename):
+    try:
+        os.remove(filename)
+    except OSError:
+        pass
 
+# Do a cleanup
+def doClean():
+    print("Cleaning")
+    if os.path.exists("Makefile"):
+        if run_make(["clean"]):
+            exit(1)
+    else:
+        os.system("rm -f *.o")
+    removeFile(g_exeName)
+    removeFile("Makefile")
+    removeFile(".qmake.stash")
+    
+    
 # Show usage
 def dump_usage():
     print("./build.py [OPTIONS]... COMMAND")
@@ -101,12 +121,7 @@ if __name__ == "__main__":
                 exit(dump_usage())
 
         if do_clean:
-            print("Cleaning")
-            if os.path.exists("Makefile"):
-                if run_make(["clean"]):
-                    exit(1)
-            else:
-                os.system("rm -f *.o")
+            doClean();
         if do_build:
             if not os.path.exists("Makefile"):
                 ensureExist("make")
