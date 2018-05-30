@@ -398,6 +398,8 @@ QString AutoVarCtl::getDisplayString(QString watchId, QString varPath)
     QString displayValue;
     Core &core = Core::getInstance();
 
+    //debugMsg("%s(watchId:'%s' varPath:'%s')", __func__, qPrintable(watchId), qPrintable(varPath));
+
     // Create value if not exist
     if(!m_autoVarDispInfo.contains(varPath))
     {
@@ -514,16 +516,19 @@ AutoVarCtl::onAutoWidgetCurrentItemChanged( QTreeWidgetItem * current, int colum
         
     AutoSignalBlocker autoBlocker(m_autoWidget);
 
-
+    //debugMsg("%s(key:'%s')", __func__, qPrintable(oldKey));
+    
     
     VarWatch *watch = NULL;
     watch = core.getVarWatchInfo(oldKey);
     if(watch)
     {
         QString oldValue  = watch->getValue();
+        QString varPath = getTreeWidgetItemPath(current);
+        QString oldValueText = getDisplayString(oldKey, varPath);
         QString newValue = current->text(COLUMN_VALUE);
 
-        if (oldValue != newValue)
+        if (oldValueText != newValue)
         {
             if(core.changeWatchVariable(oldKey, newValue))
             {
@@ -561,8 +566,6 @@ void AutoVarCtl::selectedChangeDisplayFormat(VarCtl::DispFormat fmt)
             VarCtl::DispInfo &dispInfo = m_autoVarDispInfo[varPath];
             {
                 dispInfo.dispFormat = fmt;
-
-                QString varPath = getTreeWidgetItemPath(item);
            
                 QString valueText = getDisplayString(watchId, varPath);
 
