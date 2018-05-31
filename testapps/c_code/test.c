@@ -28,18 +28,23 @@ int main(int argc,char *argv[])
         {
             int b;
         }s2;
-    }s; 
+    }s;
+    char c = 'Z';
     float f1;
     char *varStr;
     enum {ENUM1, ENUM2}varEnum;
+    unsigned char d = 0;
     CustomEnum customEnum1;
 
+    varStr = "stri\n\r\t\03ng1";
+    varStr = "string2";
     f1 = 0.0;
     s.a = 0;
     s.s2.b = 1;
     varEnum = ENUM1;
     varEnum = ENUM2;
-
+    c = '\'';
+    
     switch(s.a)
     {
         case 0:
@@ -51,13 +56,14 @@ int main(int argc,char *argv[])
     
     while(1)
     {
+        c++;
         f1 += 0.1;
         func();
         s.a++;
         s.s2.b++;
         s.s2.b++;
         s.a++;
-        
+        d++;
     }
     return 0;
 }

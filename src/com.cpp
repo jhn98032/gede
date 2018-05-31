@@ -60,6 +60,7 @@ const char *Token::typeToString(Type type)
     {
         case UNKNOWN: str = "unknown";break;
         case C_STRING:str = "c_string";break;
+        case C_CHAR: str = "c_char";break;
         case KEY_EQUAL:str = "=";break;
         case KEY_LEFT_BRACE:str = "{";break;
         case KEY_RIGHT_BRACE:str = "}";break;
@@ -167,6 +168,18 @@ QList<Token*> Com::tokenize(QString str)
     for(int i = 0;i < str.size();i++)
     {
         QChar c = str[i];
+        bool isEscaped = false;
+        if(c == '\\' && prevC == '\\')
+        {
+        }
+        else if(prevC == '\\')
+            isEscaped = true;
+        else if(c == '\\')
+        {
+            prevC = c;
+            continue;
+        }
+        
         switch(state)
         {
             case IDLE:
@@ -246,18 +259,14 @@ QList<Token*> Com::tokenize(QString str)
             };break;
             case STRING:
             {
-                if(prevC != '\\' && c == '\\')
+                if(c == '"' && isEscaped == false)
                 {
-                }
-                else if(prevC == '\\')
-                {
-                    if(c == 'n')
-                        cur->text += '\n';
-                    else
-                        cur->text += c;
-                }
-                else if(c == '"')
                     state = IDLE;
+                }
+                else if(isEscaped)
+                {
+                    cur->text += c;
+                }
                 else
                     cur->text += c;
             };break;

@@ -134,12 +134,6 @@ void CoreVar::setData(QString data)
         m_data = data;
         m_type = TYPE_ERROR_MSG;
     }
-    // Float?
-    else if(data.contains("."))
-    {
-        m_data = data;
-        m_type = TYPE_FLOAT;
-    }
     // Vector?
     else if(data.startsWith("["))
     {
@@ -151,17 +145,28 @@ void CoreVar::setData(QString data)
         // Integer?
         if(data[0].isDigit() || data[0] == '-')
         {
-            if(data.startsWith("0x"))
+            // Float?
+            if(data.contains("."))
             {
-                m_data = (qulonglong)data.toULongLong(0,0);
-                m_type = TYPE_HEX_INT;
+                m_data = data;
+                m_type = TYPE_FLOAT;
             }
-            else
+            else // or integer?
             {
-                m_data = data.toLongLong(0,0);
-                m_type = TYPE_DEC_INT;
-            }
-            
+                if(data.startsWith("0x"))
+                {
+                    m_data = (qulonglong)data.toULongLong(0,0);
+                    m_type = TYPE_HEX_INT;
+                }
+                else
+                {
+                    int firstSpacePos = data.indexOf(' ');
+                    if(firstSpacePos != -1)
+                        data = data.left(firstSpacePos);
+                    m_data = data.toLongLong(0,0);
+                    m_type = TYPE_DEC_INT;
+                }
+            }           
         }
         else
         {

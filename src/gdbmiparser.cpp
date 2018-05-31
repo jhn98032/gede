@@ -19,17 +19,34 @@
  */
 QList<Token*> GdbMiParser::tokenizeVarString(QString str)
 {
-    enum { IDLE, BLOCK, BLOCK_COLON, STRING, VAR} state = IDLE;
+    enum { IDLE, BLOCK, BLOCK_COLON, STRING, VAR, CHAR} state = IDLE;
     QList<Token*> list;
     Token *cur = NULL;
     QChar prevC = ' ';
-    
+    bool isEscaped = false;
+
     if(str.isEmpty())
         return list;
 
     for(int i = 0;i < str.size();i++)
     {
         QChar c = str[i];
+
+        if(c == '\\' && prevC == '\\')
+        {
+        }
+        else if(prevC == '\\')
+            isEscaped = true;
+        else if(c == '\\')
+        {
+            isEscaped = false;
+            prevC = c;
+            continue;
+        }
+        else
+            isEscaped = false;
+        
+
         switch(state)
         {
             case IDLE:
@@ -39,6 +56,12 @@ QList<Token*> GdbMiParser::tokenizeVarString(QString str)
                     cur = new Token(Token::C_STRING);
                     list.push_back(cur);
                     state = STRING;
+                }
+                else if(c == '\'')
+                {
+                    cur = new Token(Token::C_CHAR);
+                    list.push_back(cur);
+                    state = CHAR;
                 }
                 else if(c == '<')
                 {
@@ -97,30 +120,38 @@ QList<Token*> GdbMiParser::tokenizeVarString(QString str)
                 }
                 
             };break;
+            case CHAR:
+            {
+                if(isEscaped)
+                {
+                    cur->text += '\\';
+                    cur->text += c;
+                }
+                else if(c == '\'')
+                {
+                    state = IDLE;
+                }
+                else
+                    cur->text += c;
+            };break;
             case STRING:
             {
-                if(prevC != '\\' && c == '\\')
+                if(isEscaped)
                 {
-                }
-                else if(prevC == '\\')
-                {
-                    if(c == 'n')
-                        cur->text += '\n';
-                    else
-                        cur->text += c;
+                    cur->text += '\\';
+                    cur->text += c;
                 }
                 else if(c == '"')
+                {
                     state = IDLE;
+                }
                 else
                     cur->text += c;
             };break;
             case BLOCK_COLON:
             case BLOCK:
             {
-                if(prevC != '\\' && c == '\\')
-                {
-                }
-                else if(prevC == '\\')
+                if(isEscaped)
                 {
                     if(c == 'n')
                         cur->text += '\n';
@@ -213,6 +244,12 @@ int GdbMiParser::parseVariableData(CoreVar *var, QList<Token*> *tokenList)
             return 0;
         }
         Token *nextTok = tokenList->first();
+        if(nextTok->getType() == Token::C_CHAR)
+        {
+            var->setData(defValueStr);
+        }
+        else
+        {
         while( nextTok->getType() == Token::VAR || nextTok->getType() == Token::C_STRING)
         {
             nextTok = tokenList->takeFirst();
@@ -232,6 +269,7 @@ int GdbMiParser::parseVariableData(CoreVar *var, QList<Token*> *tokenList)
         if(valueStr.isEmpty())
             valueStr = defValueStr;
         var->setData(valueStr);
+        }
     }
     
     return rc;

@@ -25,6 +25,7 @@ class Token
         enum Type{
             UNKNOWN,
             C_STRING,
+            C_CHAR,
             KEY_EQUAL,
             KEY_LEFT_BRACE,
             KEY_RIGHT_BRACE,
