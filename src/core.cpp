@@ -34,6 +34,7 @@ VarWatch::VarWatch(QString watchId_, QString name_)
   : watchId(watchId_)
     ,name(name_)
     ,m_inScope(true)
+    ,m_var(name_)
     ,m_hasChildren(false)
 {
 
@@ -121,6 +122,9 @@ void CoreVar::setData(QString data)
     {
         if(data.endsWith('\''))
             data = data.mid(1, data.length()-2);
+        else
+            data = data.mid(1);
+        
         if(data.startsWith("\\0"))
             m_data = (int)data.mid(2).toInt();
         else

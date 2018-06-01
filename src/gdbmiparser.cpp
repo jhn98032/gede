@@ -246,7 +246,7 @@ int GdbMiParser::parseVariableData(CoreVar *var, QList<Token*> *tokenList)
         Token *nextTok = tokenList->first();
         if(nextTok->getType() == Token::C_CHAR)
         {
-            var->setData(defValueStr);
+            var->setData("'\\0" + defValueStr + "\'");
         }
         else
         {
