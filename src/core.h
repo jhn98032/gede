@@ -79,13 +79,15 @@ public:
     virtual ~CoreVar();
 
     typedef enum { FMT_HEX = 1, FMT_DEC, FMT_BIN, FMT_CHAR, FMT_NATIVE } DispFormat;
+    typedef enum { TYPE_HEX_INT = 1, TYPE_DEC_INT, TYPE_FLOAT, TYPE_STRING, TYPE_ENUM, TYPE_ERROR_MSG, TYPE_CHAR, TYPE_UNKNOWN }
+    Type;
 
     QString getName() const { return m_name; };
     QString getData(DispFormat fmt) const;
 
     void setVarType(QString varType) { m_varType = varType; };
     QString getVarType() { return m_varType; };
-    void setData(QString data);
+    void setData(Type type, QVariant data);
     long long getAddress();
     void setAddress(long long addr) { m_address = addr; };
 
@@ -103,7 +105,7 @@ private:
     QString m_name;
     QVariant m_data;
     long long m_address;
-    enum { TYPE_HEX_INT = 1, TYPE_DEC_INT, TYPE_FLOAT, TYPE_STRING, TYPE_ENUM, TYPE_ERROR_MSG, TYPE_CHAR, TYPE_UNKNOWN } m_type;
+    Type m_type;
     QString m_varType;
     bool m_hasChildren;
 };

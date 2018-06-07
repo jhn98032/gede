@@ -98,90 +98,10 @@ void CoreVar::valueFromGdbString(QString data)
 
 }
 
-void CoreVar::setData(QString data)
+void CoreVar::setData(Type type, QVariant data)
 {
+    m_type = type;
     m_data = data;
-
-
-    // A parent?
-    if(data == "...")
-    {
-        m_data = "{...}";
-        m_type = TYPE_UNKNOWN;
-    }
-    // String?
-    else if(data.startsWith('"'))
-    {
-        if(data.endsWith('"'))
-            data = data.mid(1, data.length()-2);
-        m_data = data;
-        m_type = TYPE_STRING;
-    }
-    // Character?
-    else if(data.startsWith('\''))
-    {
-        if(data.endsWith('\''))
-            data = data.mid(1, data.length()-2);
-        else
-            data = data.mid(1);
-        
-        if(data.startsWith("\\0"))
-            m_data = (int)data.mid(2).toInt();
-        else
-            m_data = (int)data[0].toLatin1();
-        
-        m_type = TYPE_CHAR;
-    }
-    // Gdb Error message?
-    else if(data.endsWith(">"))
-    {
-        m_data = data;
-        m_type = TYPE_ERROR_MSG;
-    }
-    // Vector?
-    else if(data.startsWith("["))
-    {
-        m_data = data;
-        m_type = TYPE_UNKNOWN;
-    }
-    else if(data.length() > 0)
-    {
-        // Integer?
-        if(data[0].isDigit() || data[0] == '-')
-        {
-            // Float?
-            if(data.contains("."))
-            {
-                m_data = data;
-                m_type = TYPE_FLOAT;
-            }
-            else // or integer?
-            {
-                if(data.startsWith("0x"))
-                {
-                    m_data = (qulonglong)data.toULongLong(0,0);
-                    m_type = TYPE_HEX_INT;
-                }
-                else
-                {
-                    int firstSpacePos = data.indexOf(' ');
-                    if(firstSpacePos != -1)
-                        data = data.left(firstSpacePos);
-                    m_data = data.toLongLong(0,0);
-                    m_type = TYPE_DEC_INT;
-                }
-            }           
-        }
-        else
-        {
-            m_data = data;
-            m_type = TYPE_ENUM;
-        }
-            
-    }
-    else
-        m_type = TYPE_UNKNOWN;
-
 }
 
 
