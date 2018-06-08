@@ -2,6 +2,8 @@
 
 #include <vector>
 #include <list>
+#include <string>
+
 
 class MyClass
 {
@@ -25,6 +27,7 @@ using namespace std;
 int main(int argc,char *argv[])
 {
     MyClass myclass1;
+    string cxx_str;
     vector<int> g_vectorInt;
     list<int> g_listInt;
     struct {
@@ -44,6 +47,9 @@ int main(int argc,char *argv[])
    double k_double = 1.2;
 
     MyClass::func2();
+
+    cxx_str = "ett";
+    cxx_str = "tva";
 
     i_vec = (const int*)0x10;
     g_vectorInt.push_back(1);

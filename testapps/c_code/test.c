@@ -21,6 +21,9 @@ void func()
 typedef enum {CUSTOM_ENUM1, CUSTOM_ENUM2} CustomEnum;
 int main(int argc,char *argv[])
 {
+    const char **strList;
+    const char *strListData[] = {"hej", "kalle"};
+    int i3[] = { 111,222};
     struct
     {
         int a;
@@ -45,6 +48,8 @@ int main(int argc,char *argv[])
     varEnum = ENUM2;
     c = '\'';
     
+    strList = strListData;
+
     switch(s.a)
     {
         case 0:
