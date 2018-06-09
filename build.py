@@ -142,6 +142,7 @@ if __name__ == "__main__":
             print("Compiling (please wait)")
             if run_make([]):
                 exit(1)
+            os.chdir("..")
         if do_install:
             os.chdir("src")
             print("Installing to '%s'" % (g_dest_path) )
