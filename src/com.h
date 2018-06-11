@@ -24,20 +24,20 @@ class Token
 
         enum Type{
             UNKNOWN,
-            C_STRING,
-            C_CHAR,
-            KEY_EQUAL,
-            KEY_LEFT_BRACE,
-            KEY_RIGHT_BRACE,
-            KEY_LEFT_BAR,
-            KEY_RIGHT_BAR,
-            KEY_UP,
-            KEY_PLUS,
-            KEY_COMMA,
-            KEY_TILDE,
-            KEY_SNABEL,
-            KEY_STAR,
-            KEY_AND,
+            C_STRING,         // "string"
+            C_CHAR,           // 'c'
+            KEY_EQUAL,        // '='
+            KEY_LEFT_BRACE,   // '{'
+            KEY_RIGHT_BRACE,  // '}'
+            KEY_LEFT_BAR,     // '['
+            KEY_RIGHT_BAR,    // ']'
+            KEY_UP,           // '^'
+            KEY_PLUS,         // '-'
+            KEY_COMMA,        // ','
+            KEY_TILDE,        // '~'
+            KEY_SNABEL,       // '@'
+            KEY_STAR,         // '*'
+            KEY_AND,          // '&'
             END_CODE,
             VAR
         };
