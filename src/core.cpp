@@ -461,6 +461,15 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
     return 0;
 }
 
+/**
+ * @brief Writes to stdin of the program being debugged.
+ */
+void Core::writeTargetStdin(QString text)
+{
+    QByteArray rawData = text.toLocal8Bit();
+    write(m_ptsFd, rawData.constData(), rawData.size());
+    fsync(m_ptsFd);
+}
 
 void Core::onGdbOutput(int socketFd)
 {

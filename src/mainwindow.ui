@@ -74,7 +74,11 @@
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <widget class="QPlainTextEdit" name="targetOutputView"/>
+           <widget class="ConsoleWidget" name="targetOutputView">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -189,7 +193,7 @@
      <x>0</x>
      <y>0</y>
      <width>881</width>
-     <height>24</height>
+     <height>18</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -428,6 +432,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ConsoleWidget</class>
+   <extends>QPlainTextEdit</extends>
+   <header location="global">consolewidget.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>treeWidget_file</tabstop>
  </tabstops>

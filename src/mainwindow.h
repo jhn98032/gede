@@ -14,6 +14,7 @@
 #include <QMap>
 #include <QLabel>
 
+#include "consolewidget.h"
 #include "ui_mainwindow.h"
 #include "core.h"
 #include "codeview.h"

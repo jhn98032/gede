@@ -1534,15 +1534,9 @@ void MainWindow::ICore_onSignalReceived(QString signalName)
 
 void MainWindow::ICore_onTargetOutput(QString message)
 {
-    if(message.endsWith("\n"))
-    {
-        message = message.left(message.length()-1);
-    }
-    if(message.endsWith("\r"))
-    {
-        message = message.left(message.length()-1);
-    }
-    m_ui.targetOutputView->appendPlainText(message);    
+
+    m_ui.targetOutputView->append(message);
+
 }
 
 
