@@ -408,6 +408,7 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
 
 /**
  * @brief Execution has stopped.
+ * @param path     Path of the source file last executed. 
  * @param lineNo   The line which is about to execute (1=first).
  */
 void MainWindow::ICore_onStopped(ICore::StopReason reason, QString path, int lineNo)
@@ -941,8 +942,10 @@ void MainWindow::onAbout()
 void MainWindow::onRun()
 {
     Core &core = Core::getInstance();
-    core.gdbRun();
 
+    m_ui.targetOutputView->clearAll();
+
+    core.gdbRun();
 }
 
 

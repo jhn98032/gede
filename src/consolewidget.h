@@ -20,6 +20,7 @@ public:
     virtual ~ConsoleWidget();
 
     void append(QString text);
+    void clearAll();
     
 protected:
 

@@ -41,3 +41,10 @@ void ConsoleWidget::keyPressEvent ( QKeyEvent * event )
     core.writeTargetStdin(text); 
 }
     
+
+void ConsoleWidget::clearAll()
+{
+    clear();
+}
+
+
