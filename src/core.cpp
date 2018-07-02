@@ -201,6 +201,7 @@ Core::Core()
     ,m_isRemote(false)
     ,m_ptsFd(0)
     ,m_scanSources(false)
+    ,m_ptsListener(NULL)
     ,m_memDepth(32)
 {
     
@@ -215,8 +216,6 @@ Core::Core()
         errorMsg("Failed to unlock pt");
     infoMsg("Using: %s", ptsname(m_ptsFd));
     
-    m_ptsListener = new QSocketNotifier(m_ptsFd, QSocketNotifier::Read);
-    connect(m_ptsListener, SIGNAL(activated(int)), this, SLOT(onGdbOutput(int)));
 
 }
 
@@ -231,7 +230,7 @@ Core::~Core()
     }
 
     delete m_ptsListener;
-    
+    m_ptsListener = NULL;
     Com& com = Com::getInstance();
     com.setListener(NULL);
 
@@ -480,10 +479,17 @@ void Core::onGdbOutput(int socketFd)
     if(n > 0)
     {
         buff[n] = '\0';
-    }
+    
     QString str = buff;
     str.replace("\r","");
     m_inf->ICore_onTargetOutput(str);
+    }
+    else
+    {
+        delete m_ptsListener;
+        m_ptsListener = NULL;
+    }
+
 }
 
 
@@ -635,12 +641,20 @@ void Core::gdbRun()
     Tree resultData;
     ICore::TargetState oldState;
 
+
     if(m_targetState == ICore::TARGET_STARTING || m_targetState == ICore::TARGET_RUNNING)
     {
         if(m_inf)
             m_inf->ICore_onMessage("Program is currently running");
         return;
     }
+
+    //
+    if(m_ptsListener)
+        delete m_ptsListener;
+    m_ptsListener = new QSocketNotifier(m_ptsFd, QSocketNotifier::Read);
+    connect(m_ptsListener, SIGNAL(activated(int)), this, SLOT(onGdbOutput(int)));
+
 
     m_pid = 0;
     oldState = m_targetState;
