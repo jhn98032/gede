@@ -1078,8 +1078,8 @@ int Com::init(QString gdbPath, bool enableDebugLog)
         writeLogEntry(logStr);
     }
 
-    // Make sure that gdb understands that we can't handle color output
-    setenv("TERM", "",1);
+    // Make sure that gdb understands that we can handle color output
+    setenv("TERM", "xterm",1);
 
     m_process.start(commandLine);
     m_process.waitForStarted(6000);

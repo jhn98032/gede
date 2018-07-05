@@ -38,7 +38,8 @@ MainWindow::MainWindow(QWidget *parent)
     m_fileIcon.addFile(QString::fromUtf8(":/images/res/file.png"), QSize(), QIcon::Normal, QIcon::Off);
     m_folderIcon.addFile(QString::fromUtf8(":/images/res/folder.png"), QSize(), QIcon::Normal, QIcon::Off);
 
-    
+    m_ui.scrollArea->setWidgetResizable(true);
+    m_ui.scrollArea->setBackgroundRole(QPalette::Base);
 
 
     //
@@ -226,7 +227,7 @@ void MainWindow::showWidgets()
     currentSelection = m_ui.tabWidget_2->currentWidget();
     m_ui.tabWidget_2->clear();
     if(m_cfg.m_viewWindowTargetOutput)
-        m_ui.tabWidget_2->insertTab(0, m_ui.targetOutputView, "Target Output");
+        m_ui.tabWidget_2->insertTab(0, m_ui.scrollArea, "Target Output");
     if(m_cfg.m_viewWindowGdbOutput)
         m_ui.tabWidget_2->insertTab(0, m_ui.logView, "GDB Output");
     selectionIdx = m_ui.tabWidget_2->indexOf(currentSelection);
@@ -1538,7 +1539,8 @@ void MainWindow::ICore_onSignalReceived(QString signalName)
 void MainWindow::ICore_onTargetOutput(QString message)
 {
 
-    m_ui.targetOutputView->append(message);
+    m_ui.targetOutputView->appendLog(message);
+    m_ui.scrollArea->verticalScrollBar()->setSliderPosition(m_ui.scrollArea->verticalScrollBar()->maximum());
 
 }
 

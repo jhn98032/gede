@@ -239,6 +239,7 @@ private:
     void dispatchBreakpointTree(Tree &tree);
     static ICore::StopReason parseReasonString(QString string);
     void detectMemoryDepth();
+    static int openPseudoTerminal();
     
 public:
     int gdbSetBreakpointAtFunc(QString func);
