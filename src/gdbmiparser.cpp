@@ -6,6 +6,8 @@
  * of the BSD license.  See the LICENSE file for details.
  */
 
+//#define ENABLE_DEBUGMSG
+
 #include "gdbmiparser.h"
 #include "util.h"
 #include "log.h"
@@ -67,14 +69,12 @@ QList<Token*> GdbMiParser::tokenizeVarString(QString str)
                 {
                     cur = new Token(Token::VAR);
                     list.push_back(cur);
-                    cur->text += c;
                     state = BLOCK;
                 }
                 else if(c == '(')
                 {
                     cur = new Token(Token::VAR);
                     list.push_back(cur);
-                    cur->text += c;
                     state = BLOCK_COLON;
                 }
                 else if(c == '=' || c == '{' || c == '}' || c == ',' ||
@@ -161,7 +161,12 @@ QList<Token*> GdbMiParser::tokenizeVarString(QString str)
                 else if((c == '>' && state == BLOCK) ||
                         (c == ')' && state == BLOCK_COLON))
                 {
-                    cur->text += c;
+                    if(state == BLOCK_COLON)
+                    {
+                        int barIdx = cur->text.indexOf('|');
+                        if(barIdx != -1)
+                            cur->text = cur->text.mid(barIdx+1);
+                    }
                     state = IDLE;
                 }
                 else
@@ -311,52 +316,73 @@ int GdbMiParser::parseVariableData(CoreVar *var, QList<Token*> *tokenList)
         setData(var, data);
         return 0; 
     }
-
-    if(token->getType() == Token::KEY_LEFT_BRACE)
+    else if(token->getType() == Token::KEY_LEFT_BRACE)
     {
+        QString str;
+        while( !tokenList->isEmpty())
+        {
+            str += token->getString();
+            token = tokenList->takeFirst();
+        }
+        str += token->getString();
+        
+        var->setData(CoreVar::TYPE_UNKNOWN, str);
         
     }
     else
     {
-        QString valueStr;
-        QString defValueStr = token->getString();
-        var->setAddress(defValueStr.toLongLong(0,0));
-
-
-        // Was the previous token only an address and the next token is the actual data? (Eg: '0x0001 "string"' )
+        QString firstTokenStr = token->getString();
+            
+        // Did we not get an address followed by the data? (Eg: '0x0001 "string"' )
         if(tokenList->isEmpty())
         {
             if(token->getType() == Token::C_STRING)
-                defValueStr = "\"" + token->getString() + "\"";
-            setData(var, defValueStr);
+            {
+                debugMsg("  String");
+                var->setData(CoreVar::TYPE_STRING, token->getString());
+            }
+            else
+            {
+                debugMsg("  Var");
+                
+                setData(var, token->getString());
+            }
             return 0;
         }
         Token *nextTok = tokenList->first();
+
+        // A character (Eg: '90 'Z')
         if(nextTok->getType() == Token::C_CHAR)
         {
-            setData(var, "'\\0" + defValueStr + "\'");
+            var->setData(CoreVar::TYPE_CHAR, (int)token->getString().toInt());
         }
         else
         {
-        while( nextTok->getType() == Token::VAR || nextTok->getType() == Token::C_STRING)
-        {
-            nextTok = tokenList->takeFirst();
+            QString valueStr;
+            var->setAddress(firstTokenStr.toLongLong(0,0));
 
-            if(nextTok->getType() == Token::C_STRING)
-                valueStr = "\"" + nextTok->getString() + "\"";
-            else
+            while( nextTok->getType() == Token::VAR || nextTok->getType() == Token::C_STRING)
             {
-                valueStr = nextTok->getString();
-                if(valueStr.startsWith("<"))
-                    valueStr = defValueStr + " " + valueStr;
+                nextTok = tokenList->takeFirst();
+
+                if(nextTok->getType() == Token::C_STRING)
+                {
+                    var->setData(CoreVar::TYPE_STRING, nextTok->getString());
+                    return 0;
+                }
+                else
+                {
+                    valueStr = nextTok->getString();
+                    if(valueStr.startsWith("<"))
+                        valueStr = firstTokenStr + " " + valueStr;
+                }
+                nextTok = tokenList->isEmpty() ? NULL : tokenList->first();
+                if(nextTok == NULL)
+                    break;
             }
-            nextTok = tokenList->isEmpty() ? NULL : tokenList->first();
-            if(nextTok == NULL)
-                break;
-        }
-        if(valueStr.isEmpty())
-            valueStr = defValueStr;
-        setData(var, valueStr);
+            if(valueStr.isEmpty())
+                valueStr = firstTokenStr;
+            setData(var, valueStr);
         }
     }
     
