@@ -22,6 +22,8 @@ public:
     void appendLog(QString text);
 
     void clearAll();
+
+    void setMonoFont(QFont font);
     
 private:
     void flush();

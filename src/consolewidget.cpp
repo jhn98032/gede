@@ -26,6 +26,7 @@ static QColor red(255,0,0);
 
 ConsoleWidget::ConsoleWidget(QWidget *parent)
     : QWidget(parent)
+    ,m_fontInfo(NULL)
     ,m_ansiState(ST_IDLE)
 {
     m_cursorX = 0;
@@ -34,8 +35,7 @@ ConsoleWidget::ConsoleWidget(QWidget *parent)
     m_fgColor = Qt::black;
     m_bgColor = Qt::white;
 
-    m_font = QFont("Monospace", 8);
-    m_fontInfo = new QFontMetrics(m_font);
+    setMonoFont(QFont("Monospace", 18));
 
     setMinimumSize(100,1);
 
@@ -46,6 +46,14 @@ ConsoleWidget::~ConsoleWidget()
 {
  delete m_fontInfo;
 
+}
+
+void ConsoleWidget::setMonoFont(QFont font)
+{
+    m_font = font;
+    delete m_fontInfo;
+    m_fontInfo = new QFontMetrics(m_font);
+    setFont(m_font);
 }
 
 QString printable(QString str)
@@ -97,7 +105,7 @@ void ConsoleWidget::flush (  )
  */
 int ConsoleWidget::getRowHeight()
 {
-    int rowHeight = m_fontInfo->lineSpacing()+2;
+    int rowHeight = m_fontInfo->lineSpacing()+1;
     return rowHeight;
 }
 
@@ -109,6 +117,8 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
 
    painter.fillRect(event->rect(), clrBackground);
 
+    painter.setFont(m_font);
+    
     for(int rowIdx = 0;rowIdx < m_lines.size();rowIdx++)
     {
         Line &line = m_lines[rowIdx];
@@ -128,6 +138,14 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
         }
         
     }
+
+    QRect r;
+    int charWidth = m_fontInfo->width(" ");
+    r.setX(charWidth*m_cursorX+5);
+    r.setY(rowHeight*m_cursorY);
+    r.setWidth(10);
+    r.setHeight(rowHeight);
+    painter.fillRect(r, QBrush(Qt::black));
 
 }
 

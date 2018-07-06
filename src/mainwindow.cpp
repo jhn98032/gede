@@ -1484,7 +1484,7 @@ void MainWindow::setConfig()
     m_ui.logView->setFont(m_gdbOutputFont);
 
     m_outputFont = QFont(m_cfg.m_outputFontFamily, m_cfg.m_outputFontSize);
-    m_ui.targetOutputView->setFont(m_outputFont);
+    m_ui.targetOutputView->setMonoFont(m_outputFont);
     
     m_autoVarCtl.setConfig(&m_cfg);
 
