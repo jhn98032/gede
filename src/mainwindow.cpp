@@ -228,7 +228,7 @@ void MainWindow::showWidgets()
     currentSelection = m_ui.tabWidget_2->currentWidget();
     m_ui.tabWidget_2->clear();
     if(m_cfg.m_viewWindowTargetOutput)
-        m_ui.tabWidget_2->insertTab(0, m_ui.scrollArea, "Target Output");
+        m_ui.tabWidget_2->insertTab(0, m_ui.scrollArea, "Program Console");
     if(m_cfg.m_viewWindowGdbOutput)
         m_ui.tabWidget_2->insertTab(0, m_ui.logView, "GDB Output");
     selectionIdx = m_ui.tabWidget_2->indexOf(currentSelection);
