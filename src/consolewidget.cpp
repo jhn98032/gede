@@ -7,10 +7,13 @@
  */
 
 #include "consolewidget.h"
+
+#include <QApplication>
 #include <QKeyEvent>
 #include <QPainter>
 #include <QDebug>
 #include <QPaintEvent>
+#include <QClipboard>
 
 //#define ENABLE_DEBUGMSG
 
@@ -434,6 +437,58 @@ void ConsoleWidget::appendLog ( QString text )
 
     update();
             
+}
+
+
+/**
+ * @brief Copies content of console to clipboard.
+ */
+void ConsoleWidget::onCopyContent()
+{
+    QString text;
+    for(int i = 0;i < m_lines.size();i++)
+    {
+        Line &line = m_lines[i];
+        for(int lineIdx = 0;lineIdx < line.size();lineIdx++)
+        {
+            Block &blk = line[lineIdx];
+            text += blk.text;
+        }
+        text += "\n";
+    }
+    QClipboard * clipboard = QApplication::clipboard();
+    clipboard->setText(text);
+
+}
+
+void ConsoleWidget::onClearAll()
+{
+    clearAll();
+}
+
+void ConsoleWidget::mousePressEvent( QMouseEvent * event )
+{
+    if(event->button() == Qt::RightButton)
+    {
+        QPoint pos = event->globalPos();
+        showPopupMenu(pos);
+    }
+}
+
+
+void ConsoleWidget::showPopupMenu(QPoint pos)
+{
+    m_popupMenu.clear();
+
+    // Add 'open'
+    QAction *action;
+    action = m_popupMenu.addAction("Copy");
+    connect(action, SIGNAL(triggered()), this, SLOT(onCopyContent()));
+
+    action = m_popupMenu.addAction("Clear All");
+    connect(action, SIGNAL(triggered()), this, SLOT(onClearAll()));
+
+    m_popupMenu.popup(pos);
 }
 
 void ConsoleWidget::keyPressEvent ( QKeyEvent * event )

@@ -9,8 +9,10 @@
 #ifndef FILE__CONSOLEWIDGET_H
 #define FILE__CONSOLEWIDGET_H
 
+#include <QMenu>
 #include <QTextEdit>
 #include <QVector>
+#include <QFont>
 
 class ConsoleWidget : public QWidget
 {
@@ -24,15 +26,19 @@ public:
     void clearAll();
 
     void setMonoFont(QFont font);
-    
+
+public slots:
+    void onCopyContent();
+    void onClearAll();
+
 private:
     int getRowHeight();
     void insert(QChar c);
+    void showPopupMenu(QPoint pos);
+    void mousePressEvent( QMouseEvent * event );
     
 protected:
-  void paintEvent ( QPaintEvent * event );
-
-
+    void paintEvent ( QPaintEvent * event );
     void keyPressEvent ( QKeyEvent * event );
 
 public:
@@ -62,6 +68,7 @@ public:
 
     int m_cursorX;
     int m_cursorY;
+    QMenu m_popupMenu;
 };
 
 #endif // FILE__CONSOLEWIDGET_H
