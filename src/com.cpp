@@ -1017,7 +1017,8 @@ GdbResult Com::command(Tree *resultData, QString text)
 
     // Send the command to gdb
     text += "\n";
-    m_process.write((const char*)text.toLatin1());
+    QByteArray wtext = text.toLatin1();
+    m_process.write(wtext);
 
 
     if(m_enableLog)
