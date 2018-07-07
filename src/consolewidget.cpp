@@ -163,7 +163,8 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
     r.setY(rowHeight*m_cursorY);
     r.setWidth(charWidth);
     r.setHeight(rowHeight);
-    painter.fillRect(r, QBrush(Qt::black));
+    if(m_cfg)
+        painter.fillRect(r, QBrush(m_cfg->m_progConColorCursor));
     
     for(int rowIdx = 0;rowIdx < m_lines.size();rowIdx++)
     {
@@ -187,7 +188,7 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
                 QChar cutLetter = blk.text[cutIdx];
                 QString rightText = blk.text.mid(cutIdx+1);
                 painter.drawText(x, fontY, leftText);
-                painter.setPen(getFgColor(blk.m_bgColor));
+                painter.setPen(getBgColor(blk.m_bgColor));
                 painter.drawText(x+m_fontInfo->width(leftText), fontY, QString(cutLetter));
                 painter.setPen(getFgColor(blk.m_fgColor));
                 painter.drawText(x+m_fontInfo->width(leftText + cutLetter), fontY, rightText);
@@ -481,6 +482,30 @@ void ConsoleWidget::appendLog ( QString text )
                                         
                                 }
                             };break;
+                            case 'P': // Delete character
+                            {
+                                //int ansiParamVal = m_ansiParamStr.toInt();
+                                {
+                                    if(m_cursorY < m_lines.size())
+                                    {
+                                        Line &line = m_lines[m_cursorY];
+
+                                        int charIdx = 0;
+                                        for(int blkIdx = 0;blkIdx < line.size();blkIdx++)
+                                        {
+                                            Block *blk = &line[blkIdx];
+                                            if(charIdx <= m_cursorX && m_cursorX < charIdx+blk->text.size()) 
+                                            {
+                                                int cutIdx = m_cursorX-charIdx;
+                                                blk->text.remove(cutIdx, 1);
+                                                blkIdx = line.size();
+                                            }
+                                            charIdx += blk->text.size();
+                                        }
+                                    }
+                                        
+                                }
+                            };break;
                             default:
                             {
                                 warnMsg("Got unknown ANSI control sequence 'CSI %s %c'", qPrintable(m_ansiParamStr), c.toLatin1());
@@ -637,7 +662,7 @@ void ConsoleWidget::keyPressEvent ( QKeyEvent * event )
         {
             if(m_cfg)
             {
-                switch(m_cfg->m_progConBackspaceKey)
+                switch(m_cfg->m_progConDelKey)
                 {
                     default:
                     case 0: core.writeTargetStdin("\x7f");break;
