@@ -205,15 +205,16 @@ int Core::openPseudoTerminal()
     term_winsize.ws_ypixel = 20 * 8;
     if(ioctl(ptsFd, TIOCSWINSZ, &term_winsize) < 0)
     {
-        errorMsg("ioctl TIOCSWINSZ failed");
+        errorMsg("ioctl TIOCSWINSZ failed (%s)", strerror(errno));
     }
 
+/*
     // Set controlling
     if (ioctl(ptsFd, TIOCSCTTY, (char *)0) < 0)
     {
-        errorMsg("ioctl TIOCSCTTY failed");
+        errorMsg("ioctl TIOCSCTTY failed (%s)", strerror(errno));
     }
-
+*/
     return ptsFd;
 }
 
