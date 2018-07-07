@@ -411,6 +411,8 @@ void ConsoleWidget::appendLog ( QString text )
                             };break;
                             default:
                             {
+                                warnMsg("Got unknown ANSI control sequence 'CSI %s %c'", qPrintable(m_ansiParamStr), c.toLatin1());
+
                             };break;
                         }
                         
