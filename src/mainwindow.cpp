@@ -177,6 +177,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_gui_default_splitter3State = m_ui.splitter_3->saveState();
     m_gui_default_splitter4State = m_ui.splitter_4->saveState();
 
+    m_ui.targetOutputView->setConfig(&m_cfg);
 }
 
 

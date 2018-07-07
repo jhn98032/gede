@@ -120,6 +120,20 @@ class Settings
         bool m_enableDebugLog;
         QString m_guiStyleName; // The GUI style to use (Eg: "cleanlooks").
 
+        int m_progConScrollback; // Number of lines of console output to save
+
+        QColor m_progConColorFg;
+        QColor m_progConColorBg;
+        QColor m_progConColorCursor;
+        QColor m_progConColorNorm[8];
+        QColor m_progConColorBright[8];
+
+        int m_progConBackspaceKey;
+        int m_progConDelKey;
+        
+
+        
+
         int m_tabIndentCount;
         typedef enum { HOLLOW_RECT = 0, FILLED_RECT } CurrentLineStyle;
         CurrentLineStyle m_currentLineStyle;

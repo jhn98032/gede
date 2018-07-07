@@ -557,112 +557,112 @@ QGroupBox::title {
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
           <item row="0" column="4">
-           <widget class="MColorButton" name="pushButton_conClrBright5">
+           <widget class="MColorButton" name="pushButton_progConClrBright5">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item row="0" column="6">
-           <widget class="MColorButton" name="pushButton_conClrBright7">
+           <widget class="MColorButton" name="pushButton_progConClrBright7">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="MColorButton" name="pushButton_conClrBright3">
+           <widget class="MColorButton" name="pushButton_progConClrBright3">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="MColorButton" name="pushButton_conClrBright2">
+           <widget class="MColorButton" name="pushButton_progConClrBright2">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item row="0" column="0">
-           <widget class="MColorButton" name="pushButton_conClrBright1">
+           <widget class="MColorButton" name="pushButton_progConClrBright1">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item row="0" column="7">
-           <widget class="MColorButton" name="pushButton_conClrBright8">
+           <widget class="MColorButton" name="pushButton_progConClrBright8">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item row="0" column="5">
-           <widget class="MColorButton" name="pushButton_conClrBright6">
+           <widget class="MColorButton" name="pushButton_progConClrBright6">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item row="0" column="3">
-           <widget class="MColorButton" name="pushButton_conClrBright4">
+           <widget class="MColorButton" name="pushButton_progConClrBright4">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="MColorButton" name="pushButton_conClrNormal1">
+           <widget class="MColorButton" name="pushButton_progConClrNormal1">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="MColorButton" name="pushButton_conClrNormal2">
+           <widget class="MColorButton" name="pushButton_progConClrNormal2">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item row="1" column="2">
-           <widget class="MColorButton" name="pushButton_conClrNormal3">
+           <widget class="MColorButton" name="pushButton_progConClrNormal3">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item row="1" column="3">
-           <widget class="MColorButton" name="pushButton_conClrNormal4">
+           <widget class="MColorButton" name="pushButton_progConClrNormal4">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item row="1" column="4">
-           <widget class="MColorButton" name="pushButton_conClrNormal5">
+           <widget class="MColorButton" name="pushButton_progConClrNormal5">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item row="1" column="5">
-           <widget class="MColorButton" name="pushButton_conClrNormal6">
+           <widget class="MColorButton" name="pushButton_progConClrNormal6">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item row="1" column="6">
-           <widget class="MColorButton" name="pushButton_conClrNormal7">
+           <widget class="MColorButton" name="pushButton_progConClrNormal7">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item row="1" column="7">
-           <widget class="MColorButton" name="pushButton_conClrNormal8">
+           <widget class="MColorButton" name="pushButton_progConClrNormal8">
             <property name="text">
              <string/>
             </property>
@@ -685,10 +685,42 @@ QGroupBox::title {
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QComboBox" name="comboBox_backspaceKey"/>
+           <widget class="QComboBox" name="comboBox_backspaceKey">
+            <item>
+             <property name="text">
+              <string>ASCII DEL</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>ASCII BS</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Escape sequence</string>
+             </property>
+            </item>
+           </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QComboBox" name="comboBox_deleteKey"/>
+           <widget class="QComboBox" name="comboBox_deleteKey">
+            <item>
+             <property name="text">
+              <string>ASCII DEL</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>ASCII BS</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Escape sequence</string>
+             </property>
+            </item>
+           </widget>
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="label_22">

@@ -13,6 +13,8 @@
 #include <QTextEdit>
 #include <QVector>
 #include <QFont>
+#include "settings.h"
+
 
 class ConsoleWidget : public QWidget
 {
@@ -26,6 +28,7 @@ public:
     void clearAll();
 
     void setMonoFont(QFont font);
+    void setConfig(Settings *cfg);
 
 public slots:
     void onCopyContent();
@@ -37,7 +40,9 @@ private:
     void showPopupMenu(QPoint pos);
     void mousePressEvent( QMouseEvent * event );
     bool eventFilter(QObject *obj, QEvent *event);
-    
+    QColor getFgColor(int code);
+    QColor getBgColor(int code);
+
 protected:
     void paintEvent ( QPaintEvent * event );
     void keyPressEvent ( QKeyEvent * event );
@@ -54,14 +59,14 @@ public:
     QString m_ansiParamStr;
     QString m_ansiInter;
     QString m_ansiOscString;
-    QColor m_fgColor;
-    QColor m_bgColor;
+    int m_fgColor;
+    int m_bgColor;
 
     struct Block
     {
         public:
-        QColor m_fgColor;
-        QColor m_bgColor;
+        int m_fgColor;
+        int m_bgColor;
         QString text;
     };
     typedef QVector <Block> Line;
@@ -70,6 +75,8 @@ public:
     int m_cursorX;
     int m_cursorY;
     QMenu m_popupMenu;
+    Settings *m_cfg;
+
 };
 
 #endif // FILE__CONSOLEWIDGET_H

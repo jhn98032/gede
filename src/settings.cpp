@@ -74,7 +74,32 @@ void Settings::loadDefaultsGui()
 
     m_currentLineStyle = FILLED_RECT;
     m_showLineNo = true;
-    
+
+
+    m_progConScrollback = 1000;
+
+    m_progConColorFg = Qt::black;
+    m_progConColorBg = Qt::white;
+    m_progConColorCursor = Qt::black;
+    m_progConColorNorm[0] =   QColor(0,    0,   0);
+    m_progConColorNorm[1] =   QColor(170,  0,   0);
+    m_progConColorNorm[2] =   QColor(0,  170,   0);
+    m_progConColorNorm[3] =   QColor(170, 85,   0);
+    m_progConColorNorm[4] =   QColor(0,    0, 170);
+    m_progConColorNorm[5] =   QColor(170,  0, 170);
+    m_progConColorNorm[6] =   QColor(0,  170, 170);
+    m_progConColorNorm[7] =   QColor(170,170, 170);
+    m_progConColorBright[0] = QColor(85,  85,  85);
+    m_progConColorBright[1] = QColor(255, 85,  85);
+    m_progConColorBright[2] = QColor(85, 255,  85);
+    m_progConColorBright[3] = QColor(255,255,  85);
+    m_progConColorBright[4] = QColor(85,  85, 255);
+    m_progConColorBright[5] = QColor(255, 85, 255);
+    m_progConColorBright[6] = QColor(85, 255, 255);
+    m_progConColorBright[7] = QColor(255,255, 255);
+
+    m_progConBackspaceKey = 0;
+    m_progConDelKey = 2;
 }
 
 void Settings::loadDefaultsAdvanced()
@@ -169,7 +194,21 @@ void Settings::loadGlobalConfig()
     m_clrForeground = tmpIni.getColor("GuiColor/ColorForeGround", Qt::white);
 
 
-
+    m_progConScrollback = std::max(1, tmpIni.getInt("ProgramConsole/Scrollback", m_progConScrollback));
+    m_progConColorFg = tmpIni.getColor("ProgramConsole/ColorForeground", m_progConColorFg);
+    m_progConColorBg = tmpIni.getColor("ProgramConsole/ColorBackground", m_progConColorBg);
+    m_progConColorCursor = tmpIni.getColor("ProgramConsole/ColorCursor", m_progConColorCursor);
+    for(int clrIdx = 0;clrIdx < 8;clrIdx++)
+    {
+        QString fieldName;
+        fieldName.sprintf("ProgramConsole/ColorNorm%d", clrIdx);
+        m_progConColorNorm[clrIdx] = tmpIni.getColor(fieldName, m_progConColorNorm[clrIdx]);
+        fieldName.sprintf("ProgramConsole/ColorBright%d", clrIdx);
+        m_progConColorBright[clrIdx] = tmpIni.getColor(fieldName, m_progConColorBright[clrIdx]);
+    }
+    m_progConBackspaceKey = tmpIni.getInt("ProgramConsole/BackspaceKey", m_progConBackspaceKey);
+    m_progConDelKey = tmpIni.getInt("ProgramConsole/DelKey", m_progConDelKey);
+    
 }
 
 void Settings::loadProjectConfig()
@@ -348,6 +387,22 @@ void Settings::saveGlobalConfig()
     tmpIni.setColor("GuiColor/ColorNumber", m_clrNumber);
     tmpIni.setColor("GuiColor/ColorForeGround", m_clrForeground);
 
+    tmpIni.setInt("ProgramConsole/Scrollback", m_progConScrollback);
+
+    tmpIni.setColor("ProgramConsole/ColorForeground", m_progConColorFg);
+    tmpIni.setColor("ProgramConsole/ColorBackground", m_progConColorBg);
+    tmpIni.setColor("ProgramConsole/ColorCursor", m_progConColorCursor);
+    for(int clrIdx = 0;clrIdx < 8;clrIdx++)
+    {
+        QString fieldName;
+        fieldName.sprintf("ProgramConsole/ColorNorm%d", clrIdx);
+        tmpIni.setColor(fieldName, m_progConColorNorm[clrIdx]);
+        fieldName.sprintf("ProgramConsole/ColorBright%d", clrIdx);
+        tmpIni.setColor(fieldName, m_progConColorBright[clrIdx]);
+    }
+    tmpIni.setInt("ProgramConsole/BackspaceKey", m_progConBackspaceKey);
+    tmpIni.setInt("ProgramConsole/DelKey", m_progConDelKey);
+ 
     if(tmpIni.save(globalConfigFilename))
         infoMsg("Failed to save '%s'", stringToCStr(globalConfigFilename));
 

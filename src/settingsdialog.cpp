@@ -118,7 +118,35 @@ void SettingsDialog::loadConfig()
     if(lineStyleIdx != -1)
         m_ui.comboBox_currentLineStyle->setCurrentIndex(lineStyleIdx);
 
-        
+
+    m_ui.spinBox_progConScrollback->setValue(m_cfg->m_progConScrollback);
+
+    m_ui.pushButton_progConBgClr->setColor(m_cfg->m_progConColorBg); 
+    m_ui.pushButton_progConFgClr->setColor(m_cfg->m_progConColorFg); 
+    m_ui.pushButton_progConCursorClr->setColor(m_cfg->m_progConColorCursor); 
+
+    m_ui.pushButton_progConClrNormal1->setColor(m_cfg->m_progConColorNorm[0]);
+    m_ui.pushButton_progConClrNormal2->setColor(m_cfg->m_progConColorNorm[1]);
+    m_ui.pushButton_progConClrNormal3->setColor(m_cfg->m_progConColorNorm[2]);
+    m_ui.pushButton_progConClrNormal4->setColor(m_cfg->m_progConColorNorm[3]);
+    m_ui.pushButton_progConClrNormal5->setColor(m_cfg->m_progConColorNorm[4]);
+    m_ui.pushButton_progConClrNormal6->setColor(m_cfg->m_progConColorNorm[5]);
+    m_ui.pushButton_progConClrNormal7->setColor(m_cfg->m_progConColorNorm[6]);
+    m_ui.pushButton_progConClrNormal8->setColor(m_cfg->m_progConColorNorm[7]);
+
+    m_ui.pushButton_progConClrBright1->setColor(m_cfg->m_progConColorBright[0]);
+    m_ui.pushButton_progConClrBright2->setColor(m_cfg->m_progConColorBright[1]);
+    m_ui.pushButton_progConClrBright3->setColor(m_cfg->m_progConColorBright[2]);
+    m_ui.pushButton_progConClrBright4->setColor(m_cfg->m_progConColorBright[3]);
+    m_ui.pushButton_progConClrBright5->setColor(m_cfg->m_progConColorBright[4]);
+    m_ui.pushButton_progConClrBright6->setColor(m_cfg->m_progConColorBright[5]);
+    m_ui.pushButton_progConClrBright7->setColor(m_cfg->m_progConColorBright[6]);
+    m_ui.pushButton_progConClrBright8->setColor(m_cfg->m_progConColorBright[7]);
+
+    m_ui.comboBox_backspaceKey->setCurrentIndex(m_cfg->m_progConBackspaceKey);
+    m_ui.comboBox_deleteKey->setCurrentIndex(m_cfg->m_progConDelKey);
+
+            
     int comboIdx = 0;
     if(m_cfg->m_tagSortByName)
         comboIdx = 1;
@@ -182,7 +210,34 @@ void SettingsDialog::getConfig(Settings *cfg)
     if(comboIdx == 1)
         m_cfg->m_tagSortByName = true;
     
-    
+
+    m_cfg->m_progConScrollback = m_ui.spinBox_progConScrollback->value();
+
+    m_cfg->m_progConColorBg = m_ui.pushButton_progConBgClr->getColor(); 
+    m_cfg->m_progConColorFg = m_ui.pushButton_progConFgClr->getColor(); 
+    m_cfg->m_progConColorCursor = m_ui.pushButton_progConCursorClr->getColor(); 
+
+    m_cfg->m_progConColorNorm[0] = m_ui.pushButton_progConClrNormal1->getColor();
+    m_cfg->m_progConColorNorm[1] = m_ui.pushButton_progConClrNormal2->getColor();
+    m_cfg->m_progConColorNorm[2] = m_ui.pushButton_progConClrNormal3->getColor();
+    m_cfg->m_progConColorNorm[3] = m_ui.pushButton_progConClrNormal4->getColor();
+    m_cfg->m_progConColorNorm[4] = m_ui.pushButton_progConClrNormal5->getColor();
+    m_cfg->m_progConColorNorm[5] = m_ui.pushButton_progConClrNormal6->getColor();
+    m_cfg->m_progConColorNorm[6] = m_ui.pushButton_progConClrNormal7->getColor();
+    m_cfg->m_progConColorNorm[7] = m_ui.pushButton_progConClrNormal8->getColor();
+
+    m_cfg->m_progConColorBright[0] = m_ui.pushButton_progConClrBright1->getColor();
+    m_cfg->m_progConColorBright[1] = m_ui.pushButton_progConClrBright2->getColor();
+    m_cfg->m_progConColorBright[2] = m_ui.pushButton_progConClrBright3->getColor();
+    m_cfg->m_progConColorBright[3] = m_ui.pushButton_progConClrBright4->getColor();
+    m_cfg->m_progConColorBright[4] = m_ui.pushButton_progConClrBright5->getColor();
+    m_cfg->m_progConColorBright[5] = m_ui.pushButton_progConClrBright6->getColor();
+    m_cfg->m_progConColorBright[6] = m_ui.pushButton_progConClrBright7->getColor();
+    m_cfg->m_progConColorBright[7] = m_ui.pushButton_progConClrBright8->getColor();
+
+    m_cfg->m_progConBackspaceKey = m_ui.comboBox_backspaceKey->currentIndex();
+    m_cfg->m_progConDelKey = m_ui.comboBox_deleteKey->currentIndex();
+
 }
 
 

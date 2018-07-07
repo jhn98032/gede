@@ -31,12 +31,13 @@ ConsoleWidget::ConsoleWidget(QWidget *parent)
     : QWidget(parent)
     ,m_fontInfo(NULL)
     ,m_ansiState(ST_IDLE)
+    ,m_cfg(NULL)
 {
     m_cursorX = 0;
     m_cursorY = 0;
 
-    m_fgColor = Qt::black;
-    m_bgColor = Qt::white;
+    m_fgColor = -1;
+    m_bgColor = -1;
 
     setMonoFont(QFont("Monospace", 18));
 
@@ -100,7 +101,11 @@ void ConsoleWidget::clearAll()
     m_cursorY = 0;
 }
 
-
+void ConsoleWidget::setConfig(Settings *cfg)
+{
+    m_cfg = cfg;
+}
+    
 
 /**
  * @brief Returns the height of a text row in pixels.
@@ -111,13 +116,44 @@ int ConsoleWidget::getRowHeight()
     return rowHeight;
 }
 
+QColor ConsoleWidget::getBgColor(int code)
+{
+    QColor clr = Qt::black;
+    if(!m_cfg)
+        return clr;
+    
+    if(40 <= code && code <= 47)
+        clr = m_cfg->m_progConColorNorm[code-40];
+    else if(100 <= code && code <= 107)
+        clr = m_cfg->m_progConColorBright[code-100];
+    else
+        clr = m_cfg->m_progConColorBg;
+    return clr;
+}
+
+QColor ConsoleWidget::getFgColor(int code)
+{
+    QColor clr = Qt::black;
+    if(!m_cfg)
+        return clr;
+    
+    if(30 <= code && code <= 37)
+        clr = m_cfg->m_progConColorNorm[code-30];
+    else if(90 <= code && code <= 97)
+        clr = m_cfg->m_progConColorBright[code-90];
+    else
+        clr = m_cfg->m_progConColorFg;
+
+    return clr;
+}
+
 void ConsoleWidget::paintEvent ( QPaintEvent * event )
 {
     int rowHeight = getRowHeight();
     QPainter painter(this);
-    QColor clrBackground = m_bgColor;
 
-   painter.fillRect(event->rect(), clrBackground);
+    if(m_cfg)
+        painter.fillRect(event->rect(), m_cfg->m_progConColorBg);
 
     painter.setFont(m_font);
 
@@ -143,7 +179,7 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
         for(int blockIdx = 0;blockIdx < line.size();blockIdx++)
         {
             Block &blk = line[blockIdx];
-            painter.setPen(blk.m_fgColor);
+            painter.setPen(getFgColor(blk.m_fgColor));
             if(m_cursorY == rowIdx && curCharIdx <= m_cursorX && m_cursorX < curCharIdx+blk.text.size())
             {
                 int cutIdx = m_cursorX-curCharIdx;
@@ -151,9 +187,9 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
                 QChar cutLetter = blk.text[cutIdx];
                 QString rightText = blk.text.mid(cutIdx+1);
                 painter.drawText(x, fontY, leftText);
-                painter.setPen(blk.m_bgColor);
+                painter.setPen(getFgColor(blk.m_bgColor));
                 painter.drawText(x+m_fontInfo->width(leftText), fontY, QString(cutLetter));
-                painter.setPen(blk.m_fgColor);
+                painter.setPen(getFgColor(blk.m_fgColor));
                 painter.drawText(x+m_fontInfo->width(leftText + cutLetter), fontY, rightText);
 
             }
@@ -257,6 +293,7 @@ void ConsoleWidget::insert(QChar c)
 void ConsoleWidget::appendLog ( QString text )
 {
     debugMsg("%s(%d bytes)", __func__, text.size());
+
     for(int i = 0;i < text.size();i++)
     {
         QChar c = text[i];
@@ -360,17 +397,43 @@ void ConsoleWidget::appendLog ( QString text )
                                     {
                                         case 0:
                                         {
-                                            m_fgColor = Qt::black;
-                                            m_bgColor = Qt::white;
+                                            m_fgColor = -1;
+                                            m_bgColor = -1;
                                         };break;
-                                        case 30: m_fgColor = Qt::black;break;
-                                        case 31: m_fgColor = Qt::red;break;
-                                        case 32: m_fgColor = Qt::green;break;
-                                        case 33: m_fgColor = Qt::yellow;break;
-                                        case 34: m_fgColor = Qt::blue;break;
-                                        case 35: m_fgColor = Qt::magenta;break;
-                                        case 36: m_fgColor = Qt::cyan;break;
-                                        case 37: m_fgColor = Qt::white;break;
+                                        case 40:
+                                        case 41:
+                                        case 42:
+                                        case 43:
+                                        case 44:
+                                        case 45:
+                                        case 46:
+                                        case 47:
+                                        case 100:
+                                        case 101:
+                                        case 102:
+                                        case 103:
+                                        case 104:
+                                        case 105:
+                                        case 106:
+                                        case 107:
+                                            m_bgColor = p;break;
+                                        case 30:
+                                        case 31:
+                                        case 32:
+                                        case 33:
+                                        case 34:
+                                        case 35:
+                                        case 36:
+                                        case 37:
+                                        case 90:
+                                        case 91:
+                                        case 92:
+                                        case 93:
+                                        case 94:
+                                        case 95:
+                                        case 96:
+                                        case 97:
+                                            m_fgColor = p;break;
                                         default:;break;
                                     }
                                 }
@@ -441,8 +504,21 @@ void ConsoleWidget::appendLog ( QString text )
         }
     }
 
+    // Remove oldest history
+    if(m_cfg)
+    {
+        int linesToRemove = 0;
+        if(m_lines.size() > m_cfg->m_progConScrollback)
+            linesToRemove = m_lines.size() - std::max(2, m_cfg->m_progConScrollback);
+        if(linesToRemove > 0)
+        {
+            m_lines.remove(0, linesToRemove);
+            m_cursorY = std::max(0, m_cursorY-linesToRemove);
+            setMinimumSize(400,getRowHeight()*(m_lines.size()));
+        }
+    }
+
     update();
-            
 }
 
 
@@ -532,7 +608,8 @@ void ConsoleWidget::showPopupMenu(QPoint pos)
 void ConsoleWidget::keyPressEvent ( QKeyEvent * event )
 {
     Core &core = Core::getInstance();
-
+    assert(m_cfg != NULL);
+    
     debugMsg("%s()", __func__);
 
     switch(event->key())
@@ -543,7 +620,33 @@ void ConsoleWidget::keyPressEvent ( QKeyEvent * event )
         case Qt::Key_Right: core.writeTargetStdin("\033[C");break;
         case Qt::Key_Up: core.writeTargetStdin("\033[A");break;
         case Qt::Key_Down: core.writeTargetStdin("\033[B");break;
-        case Qt::Key_Backspace: core.writeTargetStdin("\x7f");break;
+        case Qt::Key_Backspace:
+        {
+            if(m_cfg)
+            {
+                switch(m_cfg->m_progConBackspaceKey)
+                {
+                    default:
+                    case 0: core.writeTargetStdin("\x7f");break;
+                    case 1: core.writeTargetStdin("\x08");break;
+                    case 2: core.writeTargetStdin("\033[3~");break;
+                };break;
+            }
+        };break;
+        case Qt::Key_Delete:
+        {
+            if(m_cfg)
+            {
+                switch(m_cfg->m_progConBackspaceKey)
+                {
+                    default:
+                    case 0: core.writeTargetStdin("\x7f");break;
+                    case 1: core.writeTargetStdin("\x08");break;
+                    case 2: core.writeTargetStdin("\033[3~");break;
+                };break;
+            }
+            
+        };break;
         default:
         {
             QString text = event->text();
