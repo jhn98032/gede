@@ -43,6 +43,8 @@ ConsoleWidget::ConsoleWidget(QWidget *parent)
     setMinimumSize(100,1);
 
     setFocusPolicy(Qt::StrongFocus);
+
+    installEventFilter(this);
 }
 
 ConsoleWidget::~ConsoleWidget()
@@ -374,21 +376,25 @@ void ConsoleWidget::appendLog ( QString text )
                                 }
                                 
                             };break;
-                            case 'A': // CUU – Cursor Up
+                            case 'A': // CUU - Cursor Up
                             {
                                 m_cursorY = std::max(0, m_cursorY-1);
                                 m_cursorX = 0;
                             };break;
-                            case 'B': // CUU – Cursor Down
+                            case 'B': // CUU - Cursor Down
                             {
                                 m_cursorY = std::min(m_lines.size()-1, m_cursorY+1);
                                 m_cursorX = 0;
                             };break;
-                            case 'C': // CUF – Cursor Forward 
+                            case 'C': // CUF - Cursor Forward 
                             {
                                 m_cursorX++;
                             };break;
-                            case 'K': // EL – Erase in Line
+                            case 'D': // CUB - Cursor Back
+                            {
+                                m_cursorX = std::max(0, m_cursorX-1);
+                            };break;
+                            case 'K': // EL - Erase in Line
                             {
                                 int ansiParamVal = m_ansiParamStr.toInt();
                                 if(ansiParamVal == 0) // erase from cursor and forward
@@ -475,7 +481,39 @@ void ConsoleWidget::mousePressEvent( QMouseEvent * event )
     }
 }
 
+bool ConsoleWidget::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj==this)
+    {
+        if (event->type() == QEvent::KeyPress)
+        {
 
+            QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+
+            if(keyEvent->key() == Qt::Key_Tab)
+            {
+                Core &core = Core::getInstance();
+                QString text = "\t";
+                core.writeTargetStdin(text); 
+      
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        // pass the event on to the parent class
+        return QWidget::eventFilter(obj, event);
+    }
+}
 void ConsoleWidget::showPopupMenu(QPoint pos)
 {
     m_popupMenu.clear();

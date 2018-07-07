@@ -36,6 +36,7 @@ private:
     void insert(QChar c);
     void showPopupMenu(QPoint pos);
     void mousePressEvent( QMouseEvent * event );
+    bool eventFilter(QObject *obj, QEvent *event);
     
 protected:
     void paintEvent ( QPaintEvent * event );
