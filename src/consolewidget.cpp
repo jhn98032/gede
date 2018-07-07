@@ -95,11 +95,8 @@ void ConsoleWidget::clearAll()
     m_cursorY = 0;
 }
 
-void ConsoleWidget::flush (  )
-{
-    
-            
-        }
+
+
 /**
  * @brief Returns the height of a text row in pixels.
  */
@@ -118,6 +115,14 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
    painter.fillRect(event->rect(), clrBackground);
 
     painter.setFont(m_font);
+
+    QRect r;
+    int charWidth = m_fontInfo->width(" ");
+    r.setX(charWidth*m_cursorX+5);
+    r.setY(rowHeight*m_cursorY);
+    r.setWidth(charWidth);
+    r.setHeight(rowHeight);
+    painter.fillRect(r, QBrush(Qt::black));
     
     for(int rowIdx = 0;rowIdx < m_lines.size();rowIdx++)
     {
@@ -125,6 +130,8 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
 
         int y = rowHeight*rowIdx;
         int x = 5;
+        int curCharIdx = 0;
+        
         // Draw line number
         int fontY = y+(rowHeight-(m_fontInfo->ascent()+m_fontInfo->descent()))/2+m_fontInfo->ascent();
     
@@ -132,27 +139,34 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
         {
             Block &blk = line[blockIdx];
             painter.setPen(blk.m_fgColor);
-            painter.drawText(x, fontY, blk.text);
+            if(m_cursorY == rowIdx && curCharIdx <= m_cursorX && m_cursorX < curCharIdx+blk.text.size())
+            {
+                int cutIdx = m_cursorX-curCharIdx;
+                QString leftText = blk.text.left(cutIdx);
+                QChar cutLetter = blk.text[cutIdx];
+                QString rightText = blk.text.mid(cutIdx+1);
+                painter.drawText(x, fontY, leftText);
+                painter.setPen(blk.m_bgColor);
+                painter.drawText(x+m_fontInfo->width(leftText), fontY, QString(cutLetter));
+                painter.setPen(blk.m_fgColor);
+                painter.drawText(x+m_fontInfo->width(leftText + cutLetter), fontY, rightText);
 
+            }
+            else
+                painter.drawText(x, fontY, blk.text);
             x += m_fontInfo->width(blk.text);
+            curCharIdx += blk.text.size();
         }
         
     }
 
-    QRect r;
-    int charWidth = m_fontInfo->width(" ");
-    r.setX(charWidth*m_cursorX+5);
-    r.setY(rowHeight*m_cursorY);
-    r.setWidth(10);
-    r.setHeight(rowHeight);
-    painter.fillRect(r, QBrush(Qt::black));
 
 }
 
 void ConsoleWidget::insert(QChar c)
 {
-    update();
-
+    debugMsg("%s('%s')", __func__, c == '\n' ? "\\n" : qPrintable(QString(c)));
+    
     // Insert new lines?
     while(m_lines.size() <= m_cursorY)
     {
@@ -167,13 +181,16 @@ void ConsoleWidget::insert(QChar c)
     // New line?
     if(c == '\n')
     {
-        Line line;
-        Block blk;
-        blk.m_fgColor = m_fgColor;
-        blk.m_bgColor = m_bgColor;
-        line.append(blk);
-        m_lines.append(line);
-
+        if(m_cursorY+1 == m_lines.size())
+        {
+            Line line;
+            Block blk;
+            blk.m_fgColor = m_fgColor;
+            blk.m_bgColor = m_bgColor;
+            line.append(blk);
+            m_lines.append(line);
+        }
+    
         m_cursorY++;
         m_cursorX = 0;
 
@@ -192,17 +209,19 @@ void ConsoleWidget::insert(QChar c)
             {
                 int ipos = m_cursorX - x;
 
-                // Insert right one
+                // Insert new block to the right?
                 if(ipos+1 != blk->text.size() && blk->m_fgColor != m_fgColor)
                 {
                     Block newBlk;
                     newBlk = *blk;
                     newBlk.text = newBlk.text.mid(ipos+1);
                     line.insert(blkIdx+1, newBlk);
+                    
+                    blk = &line[blkIdx];
                     blk->text = blk->text.left(ipos+1);
                 }
 
-                // Insert left one
+                // Insert new block to the left?
                 if(ipos != 0 && blk->m_fgColor != m_fgColor)
                 {
                     Block newBlk;
@@ -210,7 +229,8 @@ void ConsoleWidget::insert(QChar c)
                     newBlk.text = newBlk.text.left(ipos);
                     line.insert(blkIdx, newBlk);
 
-                    blk->text = blk->text.left(ipos);
+                    blk = &line[blkIdx+1];
+                    blk->text = blk->text.mid(ipos);
                     ipos = 0;
                 }
 
@@ -223,6 +243,7 @@ void ConsoleWidget::insert(QChar c)
                 m_cursorX++;
                 return ;
             }
+            x += blk->text.size();
         }
     }
 }
@@ -239,7 +260,6 @@ void ConsoleWidget::appendLog ( QString text )
         if(c == '\n')
         {
             insert('\n');
-            flush();
             
         }
         else
@@ -257,12 +277,7 @@ void ConsoleWidget::appendLog ( QString text )
                     }
                     else if(c == ASCII_BACKSPACE)
                     {
-                        flush();
-
                         m_cursorX = std::max(m_cursorX-1, 0);
-                        //moveCursor(QTextCursor::Left);
-                        //textCursor().deletePreviousChar();
-                        
                     }
                     else
                     {
@@ -356,7 +371,47 @@ void ConsoleWidget::appendLog ( QString text )
                                 }
                                 
                             };break;
-                            default:;break;
+                            case 'A': // CUU – Cursor Up
+                            {
+                                m_cursorY = std::max(0, m_cursorY-1);
+                                m_cursorX = 0;
+                            };break;
+                            case 'B': // CUU – Cursor Down
+                            {
+                                m_cursorY = std::min(m_lines.size()-1, m_cursorY+1);
+                                m_cursorX = 0;
+                            };break;
+                            case 'C': // CUF – Cursor Forward 
+                            {
+                                m_cursorX++;
+                            };break;
+                            case 'K': // EL – Erase in Line
+                            {
+                                int ansiParamVal = m_ansiParamStr.toInt();
+                                if(ansiParamVal == 0) // erase from cursor and forward
+                                {
+                                    if(m_cursorY < m_lines.size())
+                                    {
+                                        Line &line = m_lines[m_cursorY];
+
+                                        int charIdx = 0;
+                                        for(int blkIdx = 0;blkIdx < line.size();blkIdx++)
+                                        {
+                                            Block *blk = &line[blkIdx];
+                                            if(charIdx <= m_cursorX && m_cursorX < charIdx+blk->text.size()) 
+                                            {
+                                                int cutIdx = m_cursorX-charIdx;
+                                                blk->text = blk->text.left(cutIdx);
+                                            }
+                                            charIdx += blk->text.size();
+                                        }
+                                    }
+                                        
+                                }
+                            };break;
+                            default:
+                            {
+                            };break;
                         }
                         
                         QString ansiStr = m_ansiParamStr + m_ansiInter;
@@ -374,7 +429,8 @@ void ConsoleWidget::appendLog ( QString text )
             }
         }
     }
-    flush();
+
+    update();
             
 }
 

@@ -26,7 +26,6 @@ public:
     void setMonoFont(QFont font);
     
 private:
-    void flush();
     int getRowHeight();
     void insert(QChar c);
     
