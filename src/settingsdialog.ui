@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>366</width>
-    <height>455</height>
+    <width>515</width>
+    <height>546</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -80,34 +80,7 @@ QGroupBox::title {
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout">
-            <item>
-             <widget class="QLabel" name="label">
-              <property name="minimumSize">
-               <size>
-                <width>150</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Sourceview font:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_selectFont">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>...</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <layout class="QHBoxLayout" name="horizontalLayout"/>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -140,34 +113,7 @@ QGroupBox::title {
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
-            <item>
-             <widget class="QLabel" name="label_3">
-              <property name="minimumSize">
-               <size>
-                <width>150</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>Program output font:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_selectOutputFont">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>...</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <layout class="QHBoxLayout" name="horizontalLayout_3"/>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -200,53 +146,6 @@ QGroupBox::title {
            </layout>
           </item>
          </layout>
-        </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_9">
-         <item>
-          <widget class="QLabel" name="label_18">
-           <property name="text">
-            <string>Current Line Style</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="comboBox_currentLineStyle"/>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_8">
-         <property name="leftMargin">
-          <number>4</number>
-         </property>
-         <property name="topMargin">
-          <number>4</number>
-         </property>
-         <property name="rightMargin">
-          <number>4</number>
-         </property>
-         <property name="bottomMargin">
-          <number>4</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="label_16">
-           <property name="text">
-            <string>Tab indentation</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="spinBox_tabIndent"/>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <widget class="QCheckBox" name="checkBox_showLineNo">
-         <property name="text">
-          <string>Show linenumbers</string>
-         </property>
         </widget>
        </item>
        <item>
@@ -322,13 +221,26 @@ QGroupBox::title {
      </widget>
      <widget class="QWidget" name="tab">
       <attribute name="title">
-       <string>Sourceview Colors</string>
+       <string>Sourceview</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_4">
        <item>
-        <layout class="QGridLayout" name="gridLayout">
+        <layout class="QFormLayout" name="formLayout_3">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="minimumSize">
+            <size>
+             <width>150</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>Sourceview font:</string>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="1">
-          <widget class="MColorButton" name="pushButton_clr_background">
+          <widget class="QPushButton" name="pushButton_selectFont">
            <property name="sizePolicy">
             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -336,130 +248,470 @@ QGroupBox::title {
             </sizepolicy>
            </property>
            <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>Background</string>
+            <string>...</string>
            </property>
           </widget>
          </item>
          <item row="1" column="0">
-          <widget class="QLabel" name="label_7">
+          <widget class="QLabel" name="label_27">
            <property name="text">
-            <string>Comment</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="MColorButton" name="pushButton_clr_comment">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="MColorButton" name="pushButton_clr_string">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="MColorButton" name="pushButton_clr_incString">
-           <property name="text">
-            <string/>
+            <string>Tab indentation</string>
            </property>
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QLabel" name="label_8">
+          <widget class="QLabel" name="label_25">
            <property name="text">
-            <string>String</string>
+            <string>Current Line Style</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_9">
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="spinBox_tabIndent"/>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="comboBox_currentLineStyle"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_showLineNo">
+         <property name="text">
+          <string>Show linenumbers</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_991">
+         <property name="title">
+          <string>Colors</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout">
+          <property name="verticalSpacing">
+           <number>4</number>
+          </property>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_7">
+            <property name="text">
+             <string>Comment</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="1">
+           <widget class="MColorButton" name="pushButton_clr_foreground">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="MColorButton" name="pushButton_clr_comment">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="0">
+           <widget class="QLabel" name="label_17">
+            <property name="text">
+             <string>Current line</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="text">
+             <string>String</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="text">
+             <string>Background</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="MColorButton" name="pushButton_clr_string">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="MColorButton" name="pushButton_clr_keyword">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="MColorButton" name="pushButton_clr_number">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>Cpp keyword</string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>Number</string>
+            </property>
+           </widget>
+          </item>
+          <item row="7" column="0">
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>Foreground</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_9">
+            <property name="text">
+             <string>Inc string</string>
+            </property>
+           </widget>
+          </item>
+          <item row="8" column="1">
+           <widget class="MColorButton" name="pushButton_clr_curLine">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="MColorButton" name="pushButton_clr_cppKeyword">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="MColorButton" name="pushButton_clr_incString">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="MColorButton" name="pushButton_clr_background">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>25</height>
+             </size>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_10">
+            <property name="text">
+             <string>Keyword</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_3">
+      <attribute name="title">
+       <string>Program Console</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <item>
+        <layout class="QFormLayout" name="formLayout_2">
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_23">
            <property name="text">
-            <string>Inc string</string>
+            <string>Scrollback</string>
            </property>
           </widget>
          </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="label_12">
-           <property name="text">
-            <string>Number</string>
+         <item row="1" column="1">
+          <widget class="QSpinBox" name="spinBox_progConScrollback">
+           <property name="maximum">
+            <number>99999</number>
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
-          <widget class="MColorButton" name="pushButton_clr_keyword">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_24">
            <property name="text">
-            <string/>
+            <string>Font</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="label_11">
-           <property name="text">
-            <string>Cpp keyword</string>
+         <item row="0" column="1">
+          <widget class="QPushButton" name="pushButton_selectOutputFont">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_10">
            <property name="text">
-            <string>Keyword</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0">
-          <widget class="QLabel" name="label_13">
-           <property name="text">
-            <string>Foreground</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="MColorButton" name="pushButton_clr_cppKeyword">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="1">
-          <widget class="MColorButton" name="pushButton_clr_number">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="1">
-          <widget class="MColorButton" name="pushButton_clr_foreground">
-           <property name="text">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="0">
-          <widget class="QLabel" name="label_17">
-           <property name="text">
-            <string>Current line</string>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="1">
-          <widget class="MColorButton" name="pushButton_clr_curLine">
-           <property name="text">
-            <string/>
+            <string>...</string>
            </property>
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="title">
+          <string>Colors</string>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_8">
+          <item>
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="2" column="1">
+             <widget class="MColorButton" name="pushButton_progConCursorClr">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_19">
+              <property name="text">
+               <string>Background</string>
+              </property>
+             </widget>
+            </item>
+            <item row="2" column="0">
+             <widget class="QLabel" name="label_20">
+              <property name="text">
+               <string>Cursor color</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="MColorButton" name="pushButton_progConFgClr">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="MColorButton" name="pushButton_progConBgClr">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_26">
+              <property name="text">
+               <string>Foreground</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_4">
+         <property name="title">
+          <string>Palette</string>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="0" column="4">
+           <widget class="MColorButton" name="pushButton_conClrBright5">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="6">
+           <widget class="MColorButton" name="pushButton_conClrBright7">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="MColorButton" name="pushButton_conClrBright3">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="MColorButton" name="pushButton_conClrBright2">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="MColorButton" name="pushButton_conClrBright1">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="7">
+           <widget class="MColorButton" name="pushButton_conClrBright8">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="5">
+           <widget class="MColorButton" name="pushButton_conClrBright6">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="MColorButton" name="pushButton_conClrBright4">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="MColorButton" name="pushButton_conClrNormal1">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="MColorButton" name="pushButton_conClrNormal2">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="MColorButton" name="pushButton_conClrNormal3">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="MColorButton" name="pushButton_conClrNormal4">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="4">
+           <widget class="MColorButton" name="pushButton_conClrNormal5">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="5">
+           <widget class="MColorButton" name="pushButton_conClrNormal6">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="6">
+           <widget class="MColorButton" name="pushButton_conClrNormal7">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="7">
+           <widget class="MColorButton" name="pushButton_conClrNormal8">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="groupBox_5">
+         <property name="title">
+          <string>Compability</string>
+         </property>
+         <layout class="QFormLayout" name="formLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_21">
+            <property name="text">
+             <string>Backspace key</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="comboBox_backspaceKey"/>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="comboBox_deleteKey"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_22">
+            <property name="text">
+             <string>Delete Key</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
