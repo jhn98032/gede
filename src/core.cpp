@@ -510,7 +510,7 @@ void Core::onGdbOutput(int socketFd)
     {
         buff[n] = '\0';
 
-        QString str = buff;
+        QString str = QString::fromUtf8(buff);
         m_inf->ICore_onTargetOutput(str);
 
     }
