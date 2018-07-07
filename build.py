@@ -140,7 +140,7 @@ if __name__ == "__main__":
                 if subprocess.call([qmakeName]):
                     exit(1)
             print("Compiling (please wait)")
-            if run_make([]):
+            if run_make(["-j4"]):
                 exit(1)
             os.chdir("..")
         if do_install:
