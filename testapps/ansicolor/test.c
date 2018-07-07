@@ -10,11 +10,12 @@ int main(int argc,char *argv[])
 {
     char c;
     int i;
-    for(i = 0;i < 3;i++)
+    for(i = 0;i < 10;i++)
     {
         printf(RED_CODE "RED" NO_CODE "\n");
         printf(GREEN_CODE "GREEN" NO_CODE "\n");
         printf(YELLOW_CODE "YELLOW" NO_CODE "\n");
+        printf(RED_CODE "RED" NO_CODE "MIXED_WITH" YELLOW_CODE "YELLOW" NO_CODE "AND" GREEN_CODE "GREEN" NO_CODE "\n");
         printf("DEFAULT"  "\n");
         printf("%d Input:", i);
         do
