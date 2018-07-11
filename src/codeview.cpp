@@ -87,6 +87,7 @@ int CodeView::getRowHeight()
 void CodeView::paintEvent ( QPaintEvent * event )
 {
     int rowHeight = getRowHeight();
+    QRect paintRect = event->rect();
     QPainter painter(this);
     assert(m_cfg != NULL);
 
@@ -121,7 +122,9 @@ void CodeView::paintEvent ( QPaintEvent * event )
     // Draw content
     painter.setFont(m_font);
     int maxLineDigits = QString::number(m_highlighter->getRowCount()).length();
-    for(size_t rowIdx = 0;rowIdx < m_highlighter->getRowCount();rowIdx++)
+    int startRowIdx = std::max(0,(paintRect.top()/rowHeight) - 1);
+    size_t endRowIdx = (size_t)std::min((int)m_highlighter->getRowCount(),(int)(paintRect.bottom()/rowHeight) + 1);
+    for(size_t rowIdx = startRowIdx;rowIdx < endRowIdx;rowIdx++)
     {
         //int x = BORDER_WIDTH+10;
         int y = rowHeight*rowIdx;
