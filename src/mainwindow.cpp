@@ -837,7 +837,10 @@ CodeViewTab* MainWindow::open(QString filename)
         codeViewTab->setConfig(&m_cfg);
 
         if(codeViewTab->open(filename,tagList))
+        {
+            delete codeViewTab;
             return NULL;
+        }
 
         // Add the new codeview tab
         m_ui.editorTabWidget->addTab(codeViewTab, getFilenamePart(filename));
