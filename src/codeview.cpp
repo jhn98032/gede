@@ -120,6 +120,7 @@ void CodeView::paintEvent ( QPaintEvent * event )
     
     // Draw content
     painter.setFont(m_font);
+    int maxLineDigits = QString::number(m_highlighter->getRowCount()).length();
     for(size_t rowIdx = 0;rowIdx < m_highlighter->getRowCount();rowIdx++)
     {
         //int x = BORDER_WIDTH+10;
@@ -150,7 +151,7 @@ void CodeView::paintEvent ( QPaintEvent * event )
     if(m_cfg->m_showLineNo)
     {
         painter.setPen(Qt::white);
-        nrText = QString("%1").arg(rowIdx+1);
+        nrText = QString::number(rowIdx+1).rightJustified(maxLineDigits);
         painter.drawText(4, fontY, nrText);
     }
 
