@@ -806,17 +806,20 @@ CodeViewTab* MainWindow::open(QString filename)
     if(filename.isEmpty())
         return NULL;
 
-    // Already open
+    // Already open?
     int foundCodeViewTabIdx = -1;
     for(int tabIdx = 0;tabIdx <  m_ui.editorTabWidget->count();tabIdx++)
     {
-        CodeViewTab* codeViewTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
-        if(codeViewTab->getFilePath() == filename)
+        CodeViewTab* tab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
+        if(tab->getFilePath() == filename)
         {
             foundCodeViewTabIdx = tabIdx;
             
         }
     }
+    if(foundCodeViewTabIdx != -1 && foundCodeViewTabIdx == m_ui.editorTabWidget->currentIndex())
+         return (CodeViewTab* )m_ui.editorTabWidget->currentWidget();
+         
 
     CodeViewTab* codeViewTab = NULL;
     if(foundCodeViewTabIdx != -1)
