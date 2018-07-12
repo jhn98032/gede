@@ -6,7 +6,7 @@
  * of the BSD license.  See the LICENSE file for details.
  */
 
-#define ENABLE_DEBUGMSG
+//#define ENABLE_DEBUGMSG
 
 #include "processlistdialog.h"
 
