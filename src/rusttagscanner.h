@@ -58,7 +58,6 @@ private:
     };
 
     void parse(QList<Tag> *taglist);
-    QString tokenToDesc(Token *tok);
 
 private:
     bool eatToken(QString text);

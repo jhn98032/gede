@@ -165,13 +165,13 @@ void RustTagScanner::parse(QList<Tag> *taglist)
             {
                 case IDLE:
                 {
-                    debugMsg("tok: %s", qPrintable(tokenToDesc(tok)));
+                    debugMsg("tok: %s", qPrintable(tok->toDesc()));
                     if(tok->getText() == "fn")
                         state = FN_KW;
                 };break;
                 case FN_KW:
                 {
-                    debugMsg("found: '%s' at L%d", qPrintable(tok->text), tok->m_lineNr);
+                    debugMsg("found: '%s' at L%d", qPrintable(tok->getText()), tok->getLineNr());
                     Tag tag;
                     tag.setLineNo(tok->getLineNr());
                     tag.m_name = tok->getText();
