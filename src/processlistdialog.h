@@ -17,6 +17,7 @@
 #include "ui_processlistdialog.h"
 
 
+
 class ProcessInfo
 {
 public:
@@ -25,15 +26,29 @@ public:
     int uid;
     QDateTime mtime; // The start time of the process
 
-    QString getCmdline() { return cmdline; };
-    int getPid() { return pid;};
-    int getUid() { return uid; };
+    QString getCmdline() const { return cmdline; };
+    int getPid() const { return pid;};
+    int getUid() const { return uid; };
 };
 
 QList<ProcessInfo> getProcessListByUser(int ownerUid = -1);
 QList<ProcessInfo> getProcessListAllUsers();
 QList<ProcessInfo> getProcessListThisUser();
 
+class ProcessListWidgetItem : public QTreeWidgetItem
+{
+public:
+    ProcessListWidgetItem();
+    
+
+    ProcessListWidgetItem( const ProcessInfo &info );
+    virtual ~ProcessListWidgetItem();
+    
+
+    bool operator<(const QTreeWidgetItem &other) const;
+    
+    ProcessInfo m_prc;
+};
 
 
 class ProcessListDialog : public QDialog

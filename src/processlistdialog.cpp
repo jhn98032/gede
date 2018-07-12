@@ -23,6 +23,49 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+enum
+{
+    COLUMN_PID = 0
+    ,COLUMN_UID
+    ,COLUMN_TIME
+    ,COLUMN_CMDLINE
+};
+
+
+ProcessListWidgetItem::ProcessListWidgetItem()
+{
+
+}
+ProcessListWidgetItem::ProcessListWidgetItem( const ProcessInfo &prc)
+ : m_prc(prc)
+{
+    setText(COLUMN_PID, QString::number(prc.pid));
+    setText(COLUMN_UID, QString::number(prc.uid));
+    int secs = prc.mtime.secsTo(QDateTime::currentDateTime());
+    QString dtStr;
+    dtStr.sprintf("%02d:%02d", secs/3600, (secs/60)%60);
+    setText(COLUMN_TIME, dtStr);
+    setText(COLUMN_CMDLINE, prc.getCmdline());
+        
+}
+ProcessListWidgetItem::~ProcessListWidgetItem()
+{
+}
+
+bool ProcessListWidgetItem::operator<(const QTreeWidgetItem &other) const
+{
+    QTreeWidget * tree = treeWidget ();
+    const ProcessListWidgetItem* item1 = this;
+    const ProcessListWidgetItem* item2 = (ProcessListWidgetItem*)&other;
+    int column = tree ? tree->sortColumn() : 0;
+    if(column == COLUMN_UID)
+        return item1->m_prc.mtime < item2->m_prc.mtime;
+    else
+        return text(column) < other.text(column);
+}
+    
+
+
 
 QByteArray fileToContent(QString filename)
 {
@@ -38,14 +81,7 @@ QByteArray fileToContent(QString filename)
     return cnt;
 }
 
-/**
-  * @brief Compare two entries.
-  */
-static bool compareEntries(const ProcessInfo &v1, const ProcessInfo &v2)
-{
-     return v2.mtime < v1.mtime;
-}
- 
+
 QList<ProcessInfo> getProcessListByUser(int ownerUid)
 {
     QList<ProcessInfo> lst;
@@ -86,7 +122,6 @@ QList<ProcessInfo> getProcessListByUser(int ownerUid)
     }
     
 
-     std::sort(lst.begin(), lst.end(), compareEntries);
      
 /*
      for(int u = 0;u < lst.size();u++)
@@ -116,12 +151,6 @@ QList<ProcessInfo> getProcessListThisUser()
 //
 //---------------------------------------------------------------------------
 
-enum
-{
-    COLUMN_PID = 0
-    ,COLUMN_UID
-    ,COLUMN_CMDLINE
-};
 
 ProcessListDialog::ProcessListDialog(QWidget *parent)
     : QDialog(parent)
@@ -129,13 +158,15 @@ ProcessListDialog::ProcessListDialog(QWidget *parent)
     
     m_ui.setupUi(this);
 
-    m_ui.treeWidget->setColumnCount(3);
+    m_ui.treeWidget->setColumnCount(4);
     m_ui.treeWidget->setColumnWidth(COLUMN_PID, 80);
     m_ui.treeWidget->setColumnWidth(COLUMN_UID, 80);
+    m_ui.treeWidget->setColumnWidth(COLUMN_TIME, 80);
   
     QStringList names;
     names += "PID";
     names += "UID";
+    names += "Time";
     names += "Cmdline";
     m_ui.treeWidget->setHeaderLabels(names);
 
@@ -199,25 +230,30 @@ int ProcessListDialog::getSelectedProcess()
 void ProcessListDialog::fillInList()
 {
     m_ui.treeWidget->clear();
+
+    // Get a list of processes
     QList<ProcessInfo> list = getProcessListThisUser();
+
+    // Display the list
     for(int pIdx = 0;pIdx < list.size();pIdx++)
     {
         ProcessInfo &prc = list[pIdx];
-        QTreeWidgetItem *item;
-        QStringList names;
-        names += QString::number(prc.pid);
-        names += QString::number(prc.uid);
-        names += prc.getCmdline();
-        item = new QTreeWidgetItem(names);
+        ProcessListWidgetItem *item;
+        item = new ProcessListWidgetItem(prc);
         item->setData(0, Qt::UserRole, prc.getPid());
         m_ui.treeWidget->addTopLevelItem(item);
 
     }
 
+    // Set correct column width
     m_ui.treeWidget->resizeColumnToContents(COLUMN_PID);
     m_ui.treeWidget->resizeColumnToContents(COLUMN_UID);
+    m_ui.treeWidget->resizeColumnToContents(COLUMN_TIME);
     m_ui.treeWidget->resizeColumnToContents(COLUMN_CMDLINE);
-  
+
+    // Sort list
+    m_ui.treeWidget->sortItems(COLUMN_TIME, Qt::AscendingOrder);
 }
+
 
 
