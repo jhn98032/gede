@@ -1604,7 +1604,7 @@ void MainWindow::setStatusLine(Settings &cfg)
     }
     else if(cfg.m_connectionMode == MODE_PID)
     {
-        statusText.sprintf("[%s] [PID:%d]", stringToCStr(cfg.m_runningProgram), stringToCStr(cfg.m_runningPid));
+        statusText.sprintf("[%s] [PID:%d]", stringToCStr(cfg.m_runningProgram), cfg.m_runningPid);
     }
     else
         statusText.sprintf("[%s] [%s:%d]", stringToCStr(cfg.m_tcpProgram), stringToCStr(cfg.m_tcpHost), (int)cfg.m_tcpPort);
