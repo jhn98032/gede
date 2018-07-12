@@ -778,6 +778,13 @@ QGroupBox::title {
         </widget>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkBox_globalProjConfig">
+         <property name="text">
+          <string>Use global project file instead of one per project</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer_2">
          <property name="orientation">
           <enum>Qt::Vertical</enum>

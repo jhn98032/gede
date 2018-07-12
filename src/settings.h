@@ -59,6 +59,8 @@ class Settings
         void saveGlobalConfig();
         
     public:
+        bool m_globalProjConfig;
+
         QStringList m_argumentList;
         ConnectionMode m_connectionMode;
         int m_tcpPort;
@@ -138,6 +140,7 @@ class Settings
         int m_tabIndentCount;
         typedef enum { HOLLOW_RECT = 0, FILLED_RECT } CurrentLineStyle;
         CurrentLineStyle m_currentLineStyle;
+
 };
 
 

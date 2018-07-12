@@ -13,6 +13,8 @@
 
 #define GLOBAL_CONFIG_DIR        ".config/gede2"
 
+#define PROJECT_GLOBAL_CONFIG_FILENAME "proj_gede2.ini"
+
 #define GLOBAL_CONFIG_FILENAME    "gede2.ini"
 
 #define GDB_LOG_FILE  "gede_gdb_log.txt"

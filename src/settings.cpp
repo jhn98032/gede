@@ -18,7 +18,8 @@
 
 
 Settings::Settings()
-: m_connectionMode(MODE_LOCAL)
+: m_globalProjConfig(false),
+    m_connectionMode(MODE_LOCAL)
     ,m_tcpPort(0)
 {
     m_viewWindowStack = true;
@@ -113,8 +114,8 @@ void Settings::loadDefaultsAdvanced()
 
 void Settings::load()
 {
-    loadProjectConfig();
     loadGlobalConfig();
+    loadProjectConfig();
 }
  
 
@@ -127,6 +128,8 @@ void Settings::loadGlobalConfig()
     if(tmpIni.appendLoad(globalConfigFilename))
         infoMsg("Failed to load global ini '%s'. File will be created.", stringToCStr(globalConfigFilename));
 
+    m_globalProjConfig = tmpIni.getBool("General/GlobalProjConfig", false);
+    
     loadDefaultsGui();
     loadDefaultsAdvanced();
 
@@ -213,8 +216,14 @@ void Settings::loadGlobalConfig()
 
 void Settings::loadProjectConfig()
 {
+    // Get project config path
+    QString filepath;
+    if(m_globalProjConfig)
+        filepath = QDir::homePath() + "/"  GLOBAL_CONFIG_DIR + "/" + PROJECT_GLOBAL_CONFIG_FILENAME;
+    else
+        filepath = PROJECT_CONFIG_FILENAME;
+
     // Load from file
-    QString filepath = PROJECT_CONFIG_FILENAME;
     Ini tmpIni;
     if(tmpIni.appendLoad(filepath))
         infoMsg("Failed to load project ini '%s'. File will be created.", stringToCStr(filepath));
@@ -279,7 +288,12 @@ void Settings::save()
 void Settings::saveProjectConfig()
 {
 
-    QString filepath = PROJECT_CONFIG_FILENAME;
+    QString filepath;
+
+    if(m_globalProjConfig)
+        filepath = QDir::homePath() + "/"  GLOBAL_CONFIG_DIR + "/" + PROJECT_GLOBAL_CONFIG_FILENAME;
+    else
+        filepath = PROJECT_CONFIG_FILENAME;
     
     Ini tmpIni;
 
@@ -340,6 +354,8 @@ void Settings::saveGlobalConfig()
 
     tmpIni.appendLoad(globalConfigFilename);
 
+    tmpIni.setBool("General/GlobalProjConfig", m_globalProjConfig);
+    
     tmpIni.setBool("General/EnableDebugLog", m_enableDebugLog);
 
     tmpIni.setInt("Gui/CurrentLineStyle", m_currentLineStyle);

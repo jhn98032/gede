@@ -146,6 +146,8 @@ void SettingsDialog::loadConfig()
     m_ui.comboBox_backspaceKey->setCurrentIndex(m_cfg->m_progConBackspaceKey);
     m_ui.comboBox_deleteKey->setCurrentIndex(m_cfg->m_progConDelKey);
 
+    m_ui.checkBox_globalProjConfig->setCheckState(m_cfg->m_globalProjConfig ? Qt::Checked : Qt::Unchecked);
+    
             
     int comboIdx = 0;
     if(m_cfg->m_tagSortByName)
@@ -238,6 +240,7 @@ void SettingsDialog::getConfig(Settings *cfg)
     m_cfg->m_progConBackspaceKey = m_ui.comboBox_backspaceKey->currentIndex();
     m_cfg->m_progConDelKey = m_ui.comboBox_deleteKey->currentIndex();
 
+    m_cfg->m_globalProjConfig = (m_ui.checkBox_globalProjConfig->checkState() == Qt::Unchecked) ? false : true;
 }
 
 
