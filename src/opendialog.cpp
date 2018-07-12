@@ -219,7 +219,6 @@ void OpenDialog::onSelectCoreFile()
 
 void OpenDialog::onConnectionTypeLocal(bool checked)
 {
-    m_ui.lineEdit_program->setEnabled(checked);
     m_ui.pushButton_selectFile->setEnabled(checked);
     m_ui.lineEdit_arguments->setEnabled(checked);
 }
