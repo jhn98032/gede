@@ -38,6 +38,14 @@ QByteArray fileToContent(QString filename)
     return cnt;
 }
 
+/**
+  * @brief Compare two entries.
+  */
+static bool compareEntries(const ProcessInfo &v1, const ProcessInfo &v2)
+{
+     return v2.mtime < v1.mtime;
+}
+ 
 QList<ProcessInfo> getProcessListByUser(int ownerUid)
 {
     QList<ProcessInfo> lst;
@@ -65,7 +73,7 @@ QList<ProcessInfo> getProcessListByUser(int ownerUid)
                          ProcessInfo prc;
                          prc.uid = buf.st_uid;
                          prc.pid = pid;
-
+                         prc.mtime.setTime_t(buf.st_mtim.tv_sec);
                         
                         prc.cmdline = QString(fileToContent(procDirPath + "/cmdline")).trimmed();
 
@@ -76,6 +84,10 @@ QList<ProcessInfo> getProcessListByUser(int ownerUid)
             }
         }
     }
+    
+
+     std::sort(lst.begin(), lst.end(), compareEntries);
+     
 /*
      for(int u = 0;u < lst.size();u++)
      {

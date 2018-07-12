@@ -11,6 +11,7 @@
 
 #include <QDialog>
 #include <QList>
+#include <QDateTime>
 
 #include "settings.h"
 #include "ui_processlistdialog.h"
@@ -22,6 +23,7 @@ public:
     QString cmdline;
     int pid;
     int uid;
+    QDateTime mtime; // The start time of the process
 
     QString getCmdline() { return cmdline; };
     int getPid() { return pid;};
