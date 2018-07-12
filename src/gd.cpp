@@ -169,6 +169,8 @@ int main(int argc, char *argv[])
         rc = core.initLocal(&cfg, cfg.m_gdbPath, cfg.m_lastProgram, cfg.m_argumentList);
     else if(cfg.m_connectionMode == MODE_COREDUMP)
         rc = core.initCoreDump(&cfg, cfg.m_gdbPath, cfg.m_coreDumpProgram, cfg.m_coreDumpFile);
+    else if(cfg.m_connectionMode == MODE_PID)
+        rc = core.initPid(&cfg, cfg.m_gdbPath, cfg.m_runningProgram, cfg.m_runningPid);
     else
         rc = core.initRemote(&cfg, cfg.m_gdbPath, cfg.m_tcpProgram, cfg.m_tcpHost, cfg.m_tcpPort);
 

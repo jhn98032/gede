@@ -10,6 +10,7 @@
 #include "version.h"
 #include "log.h"
 #include "util.h"
+#include "processlistdialog.h"
 
 #include <QFileDialog>
 #include <QDir>
@@ -21,10 +22,14 @@ OpenDialog::OpenDialog(QWidget *parent)
     
     m_ui.setupUi(this);
 
+    connect(m_ui.pushButton_runningProg, SIGNAL(clicked()), SLOT(onSelectRunningProg()));
+    connect(m_ui.pushButton_runningPid, SIGNAL(clicked()), SLOT(onSelectRunningPid()));
+
     connect(m_ui.pushButton_selectFile, SIGNAL(clicked()), SLOT(onSelectProgram()));
     connect(m_ui.pushButton_selectCoreProgram, SIGNAL(clicked()), SLOT(onSelectCoreProgram()));
     connect(m_ui.pushButton_selectCoreFile, SIGNAL(clicked()), SLOT(onSelectCoreFile()));
     connect(m_ui.pushButton_selectTcpProgram, SIGNAL(clicked()), SLOT(onSelectTcpProgram()));
+    connect(m_ui.radioButton_runningProgram, SIGNAL(toggled(bool)), SLOT(onConnectionTypePid(bool)));
     connect(m_ui.radioButton_localProgram, SIGNAL(toggled(bool)), SLOT(onConnectionTypeLocal(bool)));
     connect(m_ui.radioButton_gdbServerTcp, SIGNAL(toggled(bool)), SLOT(onConnectionTypeTcp(bool)));
     connect(m_ui.radioButton_openCoreDump, SIGNAL(toggled(bool)), SLOT(onConnectionTypeCoreDump(bool)));
@@ -36,9 +41,11 @@ void OpenDialog::setMode(ConnectionMode mode)
     m_ui.radioButton_localProgram->setChecked(false);
     m_ui.radioButton_gdbServerTcp->setChecked(false);
     m_ui.radioButton_openCoreDump->setChecked(false);
+    m_ui.radioButton_runningProgram->setChecked(false);
     onConnectionTypeLocal(false);
     onConnectionTypeTcp(false);
     onConnectionTypeCoreDump(false);
+    onConnectionTypePid(false);
     
     if(mode == MODE_TCP)
     {
@@ -49,6 +56,11 @@ void OpenDialog::setMode(ConnectionMode mode)
     {
         m_ui.radioButton_openCoreDump->setChecked(true);
         onConnectionTypeCoreDump(true);
+    }
+    else if(mode == MODE_PID)
+    {
+        m_ui.radioButton_runningProgram->setChecked(true);
+        onConnectionTypePid(true);
     }
     else // if(mode == MODE_LOCAL)
     {
@@ -64,6 +76,8 @@ ConnectionMode OpenDialog::getMode()
         return MODE_TCP;
     else if(m_ui.radioButton_openCoreDump->isChecked())    
         return MODE_COREDUMP;
+    else if(m_ui.radioButton_runningProgram->isChecked())    
+        return MODE_PID;
     else
         return MODE_LOCAL;
 }
@@ -82,6 +96,28 @@ QString OpenDialog::getCoreDumpProgram()
 QString OpenDialog::getProgram()
 {
     return m_ui.lineEdit_program->text();
+}
+
+
+QString OpenDialog::getRunningProgram()
+{
+    return m_ui.lineEdit_runningProg->text();
+}
+
+void OpenDialog::setRunningProgram(QString runningProg)
+{
+    return m_ui.lineEdit_runningProg->setText(runningProg);
+}
+
+
+int OpenDialog::getRunningPid()
+{
+    return m_ui.lineEdit_pid->text().toInt();
+}
+
+void OpenDialog::setRunningPid(int pid)
+{
+    return m_ui.lineEdit_pid->setText(QString::number(pid));
 }
 
 QString OpenDialog::getArguments()
@@ -164,6 +200,24 @@ void OpenDialog::onSelectProgram()
 }
 
 
+void OpenDialog::onSelectRunningProg()
+{
+}
+
+void OpenDialog::onSelectRunningPid()
+{
+    
+    ProcessListDialog dlg;
+    dlg.selectPid(m_ui.lineEdit_pid->text().toInt());
+    if(dlg.exec() == QDialog::Accepted)
+    {
+        int selectedPid = dlg.getSelectedProcess();
+        m_ui.lineEdit_pid->setText( QString::number(selectedPid));
+        
+    }
+        
+}
+
 
 void OpenDialog::onSelectCoreProgram()
 {
@@ -215,6 +269,15 @@ void OpenDialog::onConnectionTypeTcp(bool checked)
     m_ui.lineEdit_tcpProgram->setEnabled(checked);
     m_ui.checkBox_download->setEnabled(checked);
     
+}
+
+void OpenDialog::onConnectionTypePid(bool checked)
+{
+    m_ui.pushButton_runningPid->setEnabled(checked);
+    m_ui.pushButton_runningProg->setEnabled(checked);
+    m_ui.lineEdit_runningProg->setEnabled(checked);
+    m_ui.lineEdit_pid->setEnabled(checked);
+
 }
 
 void OpenDialog::onConnectionTypeCoreDump(bool checked)
@@ -293,6 +356,9 @@ void OpenDialog::saveConfig(Settings *cfg)
     cfg->m_initCommands = dlg.getInitCommands();
     cfg->m_gdbPath = dlg.getGdbPath();
     cfg->m_initialBreakpoint = dlg.getInitialBreakpoint().trimmed();
+    cfg->m_runningPid = dlg.getRunningPid();
+    cfg->m_runningProgram = dlg.getRunningProgram();
+
     if(cfg->m_initialBreakpoint.isEmpty())
         cfg->m_initialBreakpoint = "main";
     if(dlg.m_ui.checkBox_reloadBreakpoints->checkState() == Qt::Checked)
@@ -331,6 +397,9 @@ void OpenDialog::loadConfig(Settings &cfg)
     dlg.setCoreDumpProgram(cfg.m_coreDumpProgram);
     dlg.setCoreDumpFile(cfg.m_coreDumpFile);
 
+    dlg.setRunningPid(cfg.m_runningPid);
+    dlg.setRunningProgram(cfg.m_runningProgram);
+    
     
     dlg.setProgram(cfg.m_lastProgram);
     QStringList defList;

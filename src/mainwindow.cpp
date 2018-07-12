@@ -1602,6 +1602,10 @@ void MainWindow::setStatusLine(Settings &cfg)
     {
         statusText.sprintf("[%s] [%s]", stringToCStr(cfg.m_coreDumpProgram), stringToCStr(cfg.m_coreDumpFile));
     }
+    else if(cfg.m_connectionMode == MODE_PID)
+    {
+        statusText.sprintf("[%s] [PID:%d]", stringToCStr(cfg.m_runningProgram), stringToCStr(cfg.m_runningPid));
+    }
     else
         statusText.sprintf("[%s] [%s:%d]", stringToCStr(cfg.m_tcpProgram), stringToCStr(cfg.m_tcpHost), (int)cfg.m_tcpPort);
     w.m_statusLineWidget.setText(statusText);

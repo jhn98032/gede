@@ -219,6 +219,7 @@ public:
     
 
     static Core& getInstance();
+    int initPid(Settings *cfg, QString gdbPath, QString programPath, int pid);
     int initLocal(Settings *cfg, QString gdbPath, QString programPath, QStringList argumentList);
     int initCoreDump(Settings *cfg, QString gdbPath, QString programPath, QString coreDumpFile);
     int initRemote(Settings *cfg, QString gdbPath, QString programPath, QString tcpHost, int tcpPort);

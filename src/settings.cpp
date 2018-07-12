@@ -227,6 +227,7 @@ void Settings::loadProjectConfig()
         case MODE_LOCAL: m_connectionMode = MODE_LOCAL;break;
         case MODE_TCP: m_connectionMode = MODE_TCP;break;
         case MODE_COREDUMP: m_connectionMode = MODE_COREDUMP;break;
+        case MODE_PID: m_connectionMode = MODE_PID;break;
     }
     m_tcpPort = tmpIni.getInt("TcpPort", 2000);
     m_tcpHost = tmpIni.getString("TcpHost", "localhost");
@@ -239,6 +240,8 @@ void Settings::loadProjectConfig()
     m_coreDumpFile = tmpIni.getString("CoreDumpFile", "./core");
     m_coreDumpProgram = tmpIni.getString("CoreDumpProgram", "");
 
+    m_runningProgram = tmpIni.getString("RunningProgram", "");
+    m_runningPid = tmpIni.getInt("RunningPid", 0);
         
     m_reloadBreakpoints = tmpIni.getBool("ReuseBreakpoints", false);
 
@@ -293,6 +296,9 @@ void Settings::saveProjectConfig()
     tmpIni.setString("GdpPath", m_gdbPath);
     tmpIni.setString("CoreDumpFile", m_coreDumpFile);
     tmpIni.setString("CoreDumpProgram", m_coreDumpProgram);
+
+    tmpIni.setString("RunningProgram", m_runningProgram);
+    tmpIni.setInt("RunningPid", m_runningPid);
 
     QStringList tmpArgs;
     tmpArgs = m_argumentList;
@@ -597,6 +603,10 @@ QString Settings::getProgramPath()
     else if(m_connectionMode == MODE_COREDUMP)
     {
         return m_coreDumpProgram;
+    }
+    else if(m_connectionMode == MODE_PID)
+    {
+        return m_runningProgram;
     }
     else
     {

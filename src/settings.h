@@ -18,7 +18,8 @@ enum ConnectionMode
 {
     MODE_LOCAL = 0,  //!< Local program
     MODE_COREDUMP,   //!< Core dump file
-    MODE_TCP         //!< TCP/IP connection to a gdbserver
+    MODE_TCP,        //!< TCP/IP connection to a gdbserver
+    MODE_PID         //!< Connect to a running process
     
 };
 
@@ -131,8 +132,8 @@ class Settings
         int m_progConBackspaceKey;
         int m_progConDelKey;
         
-
-        
+        int m_runningPid;
+        QString m_runningProgram;
 
         int m_tabIndentCount;
         typedef enum { HOLLOW_RECT = 0, FILLED_RECT } CurrentLineStyle;

@@ -305,6 +305,74 @@ void Core::detectMemoryDepth()
 }
 
 
+
+/**
+ * @brief Connects to a running program (with a specific PID).
+ */
+int Core::initPid(Settings *cfg, QString gdbPath, QString programPath, int pid)
+{
+    Com& com = Com::getInstance();
+    Tree resultData;
+    int rc = 0;
+
+    m_isRemote = false;
+
+    if(com.init(gdbPath, cfg->m_enableDebugLog))
+    {
+        errorMsg("Failed to start gdb ('%s')", stringToCStr(gdbPath));
+        return -1;
+    }
+    
+    QString ptsDevPath = ptsname(m_ptsFd);
+    
+    if(com.commandF(&resultData, "-inferior-tty-set %s", stringToCStr(ptsDevPath)))
+    {
+        rc = 1;
+        errorMsg("Failed to set inferior tty");
+    }
+
+    if(com.commandF(&resultData, "-file-exec-and-symbols %s", stringToCStr(programPath)) == GDB_ERROR)
+    {
+        errorMsg("Failed to load '%s'", stringToCStr(programPath));
+    }
+
+
+    // Get memory depth (32 or 64)
+    detectMemoryDepth();
+
+    if(com.commandF(NULL, "-target-attach %d", pid))
+    {
+        errorMsg("Failed to attach to %d", pid);
+        return 1;
+    }
+    
+    if(gdbSetBreakpointAtFunc(cfg->m_initialBreakpoint))
+    {
+        rc = 1;
+        errorMsg("Failed to set breakpoint at %s", stringToCStr(cfg->m_initialBreakpoint));
+    }
+
+    gdbGetFiles();
+
+    // Run the initializing commands
+    for(int i = 0;i < cfg->m_initCommands.size();i++)
+    {
+        QString cmd = cfg->m_initCommands[i];
+
+        // Remove comments
+        if(cmd.indexOf('#') != -1)
+            cmd = cmd.left(cmd.indexOf('#'));
+        cmd = cmd.trimmed();
+
+        if(!cmd.isEmpty())
+            com.commandF(NULL, "%s", stringToCStr(cmd));
+
+    }
+
+    
+    return rc;
+}
+
 int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QStringList argumentList)
 {
     Com& com = Com::getInstance();

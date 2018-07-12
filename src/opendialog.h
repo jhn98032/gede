@@ -60,9 +60,15 @@ public:
     void setGdbPath(QString path);
     QString getGdbPath();
 
+    QString getRunningProgram();
+    void setRunningProgram(QString runningProg);
+    int getRunningPid();
+    void setRunningPid(int pid);
+
+    
     void loadConfig(Settings &cfg);
     void saveConfig(Settings *cfg);
-    
+
     
 private:
     void onBrowseForProgram(QString *path);
@@ -71,12 +77,15 @@ private slots:
     void onConnectionTypeLocal(bool checked);
     void onConnectionTypeTcp(bool checked);
     void onConnectionTypeCoreDump(bool checked);
+    void onConnectionTypePid(bool checked);
     
     void onSelectTcpProgram();
     void onSelectProgram();
     void onSelectCoreProgram();
     void onSelectCoreFile();
     
+    void onSelectRunningProg();
+    void onSelectRunningPid();
 
 private:
     Ui_OpenDialog m_ui;
