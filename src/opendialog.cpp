@@ -34,7 +34,11 @@ OpenDialog::OpenDialog(QWidget *parent)
     connect(m_ui.radioButton_gdbServerTcp, SIGNAL(toggled(bool)), SLOT(onConnectionTypeTcp(bool)));
     connect(m_ui.radioButton_openCoreDump, SIGNAL(toggled(bool)), SLOT(onConnectionTypeCoreDump(bool)));
 
+
+    m_ui.comboBox_gdbCommand->setSearchAreas(ExeComboBox::UseEnvPath);
+    m_ui.comboBox_gdbCommand->setFilter(QRegExp("gdb(?!tui|server)"));
 }
+
 
 void OpenDialog::setMode(ConnectionMode mode)
 {
@@ -329,13 +333,13 @@ int OpenDialog::getTcpRemotePort()
 
 QString OpenDialog::getGdbPath()
 {
-    return m_ui.lineEdit_gdbCommand->text();
+    return m_ui.comboBox_gdbCommand->currentText();
 }
 
 
 void OpenDialog::setGdbPath(QString path)
 {
-    return m_ui.lineEdit_gdbCommand->setText(path);
+    return m_ui.comboBox_gdbCommand->setEditText(path);
 }
 
 /**

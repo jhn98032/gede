@@ -89,6 +89,9 @@ HEADERS+=colorbutton.h
 
 HEADERS+=autosignalblocker.h
 
+SOURCES+= execombobox.cpp
+HEADERS+= execombobox.h
+
 RESOURCES += resource.qrc
 
 #QMAKE_CXXFLAGS += -I./  -g

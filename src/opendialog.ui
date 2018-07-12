@@ -34,7 +34,17 @@
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QLineEdit" name="lineEdit_gdbCommand"/>
+          <widget class="ExeComboBox" name="comboBox_gdbCommand">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
@@ -339,8 +349,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>ExeComboBox</class>
+   <extends>QComboBox</extends>
+   <header>execombobox.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
-  <tabstop>lineEdit_gdbCommand</tabstop>
   <tabstop>radioButton_localProgram</tabstop>
   <tabstop>lineEdit_program</tabstop>
   <tabstop>lineEdit_arguments</tabstop>
