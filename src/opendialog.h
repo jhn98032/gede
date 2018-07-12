@@ -30,9 +30,7 @@ public:
     QString getArguments();
 
     QString getCoreDumpFile();
-    QString getCoreDumpProgram();
-
-    void setCoreDumpProgram(QString coreProgram);
+    
     void setCoreDumpFile(QString coreDumpFile);
 
     void setInitialBreakpoint(QString list);
@@ -48,8 +46,6 @@ public:
     bool getDownload();
     void setDownload(bool enable);
 
-    void setTcpRemoteProgram(QString path);
-    QString getTcpRemoteProgram();
     
     void setMode(ConnectionMode mode);
     ConnectionMode getMode();
@@ -60,8 +56,6 @@ public:
     void setGdbPath(QString path);
     QString getGdbPath();
 
-    QString getRunningProgram();
-    void setRunningProgram(QString runningProg);
     int getRunningPid();
     void setRunningPid(int pid);
 
@@ -79,12 +73,9 @@ private slots:
     void onConnectionTypeCoreDump(bool checked);
     void onConnectionTypePid(bool checked);
     
-    void onSelectTcpProgram();
     void onSelectProgram();
-    void onSelectCoreProgram();
     void onSelectCoreFile();
     
-    void onSelectRunningProg();
     void onSelectRunningPid();
 
 private:

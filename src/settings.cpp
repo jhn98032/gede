@@ -240,16 +240,13 @@ void Settings::loadProjectConfig()
     }
     m_tcpPort = tmpIni.getInt("TcpPort", 2000);
     m_tcpHost = tmpIni.getString("TcpHost", "localhost");
-    m_tcpProgram = tmpIni.getString("TcpProgram", "");
     m_initCommands = tmpIni.getStringList("InitCommands", m_initCommands);
     m_gdbPath = tmpIni.getString("GdpPath", "gdb");
     m_lastProgram = tmpIni.getString("LastProgram", "");
     m_argumentList = tmpIni.getStringList("LastProgramArguments", m_argumentList);
 
     m_coreDumpFile = tmpIni.getString("CoreDumpFile", "./core");
-    m_coreDumpProgram = tmpIni.getString("CoreDumpProgram", "");
-
-    m_runningProgram = tmpIni.getString("RunningProgram", "");
+    
     m_runningPid = tmpIni.getInt("RunningPid", 0);
         
     m_reloadBreakpoints = tmpIni.getBool("ReuseBreakpoints", false);
@@ -305,13 +302,10 @@ void Settings::saveProjectConfig()
     tmpIni.setString("TcpHost", m_tcpHost);
     tmpIni.setInt("Mode", (int)m_connectionMode);
     tmpIni.setString("LastProgram", m_lastProgram);
-    tmpIni.setString("TcpProgram", m_tcpProgram);
     tmpIni.setStringList("InitCommands", m_initCommands);
     tmpIni.setString("GdpPath", m_gdbPath);
     tmpIni.setString("CoreDumpFile", m_coreDumpFile);
-    tmpIni.setString("CoreDumpProgram", m_coreDumpProgram);
-
-    tmpIni.setString("RunningProgram", m_runningProgram);
+    
     tmpIni.setInt("RunningPid", m_runningPid);
 
     QStringList tmpArgs;
@@ -612,23 +606,7 @@ QStringList Settings::getDefaultBasicKeywordList()
  */
 QString Settings::getProgramPath()
 {
-    if(m_connectionMode == MODE_LOCAL)
-    {
-        return m_lastProgram;
-    }
-    else if(m_connectionMode == MODE_COREDUMP)
-    {
-        return m_coreDumpProgram;
-    }
-    else if(m_connectionMode == MODE_PID)
-    {
-        return m_runningProgram;
-    }
-    else
-    {
-        return m_tcpProgram;
-    }
-    return "";
+    return m_lastProgram;
 }
 
 

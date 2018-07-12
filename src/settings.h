@@ -65,12 +65,10 @@ class Settings
         ConnectionMode m_connectionMode;
         int m_tcpPort;
         QString m_tcpHost;
-        QString m_tcpProgram;
         QStringList m_initCommands;
         QString m_gdbPath;
         QString m_lastProgram;
         QString m_coreDumpFile;
-        QString m_coreDumpProgram;
         bool m_download;
 
         QString m_fontFamily;
@@ -135,8 +133,7 @@ class Settings
         int m_progConDelKey;
         
         int m_runningPid;
-        QString m_runningProgram;
-
+        
         int m_tabIndentCount;
         typedef enum { HOLLOW_RECT = 0, FILLED_RECT } CurrentLineStyle;
         CurrentLineStyle m_currentLineStyle;

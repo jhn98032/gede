@@ -22,13 +22,10 @@ OpenDialog::OpenDialog(QWidget *parent)
     
     m_ui.setupUi(this);
 
-    connect(m_ui.pushButton_runningProg, SIGNAL(clicked()), SLOT(onSelectRunningProg()));
     connect(m_ui.pushButton_runningPid, SIGNAL(clicked()), SLOT(onSelectRunningPid()));
-
     connect(m_ui.pushButton_selectFile, SIGNAL(clicked()), SLOT(onSelectProgram()));
-    connect(m_ui.pushButton_selectCoreProgram, SIGNAL(clicked()), SLOT(onSelectCoreProgram()));
     connect(m_ui.pushButton_selectCoreFile, SIGNAL(clicked()), SLOT(onSelectCoreFile()));
-    connect(m_ui.pushButton_selectTcpProgram, SIGNAL(clicked()), SLOT(onSelectTcpProgram()));
+    
     connect(m_ui.radioButton_runningProgram, SIGNAL(toggled(bool)), SLOT(onConnectionTypePid(bool)));
     connect(m_ui.radioButton_localProgram, SIGNAL(toggled(bool)), SLOT(onConnectionTypeLocal(bool)));
     connect(m_ui.radioButton_gdbServerTcp, SIGNAL(toggled(bool)), SLOT(onConnectionTypeTcp(bool)));
@@ -92,10 +89,6 @@ QString OpenDialog::getCoreDumpFile()
 }
 
 
-QString OpenDialog::getCoreDumpProgram()
-{
-    return m_ui.lineEdit_coreProgram->text();
-}
 
 QString OpenDialog::getProgram()
 {
@@ -103,15 +96,7 @@ QString OpenDialog::getProgram()
 }
 
 
-QString OpenDialog::getRunningProgram()
-{
-    return m_ui.lineEdit_runningProg->text();
-}
 
-void OpenDialog::setRunningProgram(QString runningProg)
-{
-    return m_ui.lineEdit_runningProg->setText(runningProg);
-}
 
 
 int OpenDialog::getRunningPid()
@@ -130,10 +115,6 @@ QString OpenDialog::getArguments()
 }
     
 
-void OpenDialog::setCoreDumpProgram(QString coreProgram)
-{
-    m_ui.lineEdit_coreProgram->setText(coreProgram);
-}
 
 void OpenDialog::setCoreDumpFile(QString coreDumpFile)
 {
@@ -182,15 +163,6 @@ void OpenDialog::onBrowseForProgram(QString *path)
         *path = fileName;
 }
 
-void OpenDialog::onSelectTcpProgram()
-{
-    QString path = m_ui.lineEdit_tcpProgram->text();
-
-    onBrowseForProgram(&path);
-    
-    // Fill in the selected path
-    m_ui.lineEdit_tcpProgram->setText(path);
-}
 
 void OpenDialog::onSelectProgram()
 {
@@ -199,14 +171,23 @@ void OpenDialog::onSelectProgram()
     onBrowseForProgram(&path);
     
     // Fill in the selected path
-    m_ui.lineEdit_coreProgram->setText(path);
     m_ui.lineEdit_program->setText(path);
+
+    //
+    QString coreFilePath = m_ui.lineEdit_coreFile->text();
+    if(coreFilePath.isEmpty())
+    {
+        QString filename;
+        QString folderPath;
+        
+        dividePath(path, &filename, &folderPath);
+        
+        m_ui.lineEdit_coreFile->setText(folderPath + "/core");
+    }
+
 }
 
 
-void OpenDialog::onSelectRunningProg()
-{
-}
 
 void OpenDialog::onSelectRunningPid()
 {
@@ -223,28 +204,6 @@ void OpenDialog::onSelectRunningPid()
 }
 
 
-void OpenDialog::onSelectCoreProgram()
-{
-    QString path = m_ui.lineEdit_coreProgram->text();
-
-    onBrowseForProgram(&path);
-    
-    // Fill in the selected path
-    m_ui.lineEdit_coreProgram->setText(path);
-    m_ui.lineEdit_program->setText(path);
-
-    //
-    QString coreFilePath = m_ui.lineEdit_coreFile->text();
-    if(coreFilePath.isEmpty())
-    {
-        QString filename;
-        QString folderPath;
-        
-        dividePath(path, &filename, &folderPath);
-        
-        m_ui.lineEdit_coreFile->setText(folderPath + "/core");
-    }
-}
 
 void OpenDialog::onSelectCoreFile()
 {
@@ -267,10 +226,8 @@ void OpenDialog::onConnectionTypeLocal(bool checked)
 
 void OpenDialog::onConnectionTypeTcp(bool checked)
 {
-    m_ui.pushButton_selectTcpProgram->setEnabled(checked);
     m_ui.lineEdit_tcpHost->setEnabled(checked);
     m_ui.lineEdit_tcpPort->setEnabled(checked);
-    m_ui.lineEdit_tcpProgram->setEnabled(checked);
     m_ui.checkBox_download->setEnabled(checked);
     
 }
@@ -278,8 +235,6 @@ void OpenDialog::onConnectionTypeTcp(bool checked)
 void OpenDialog::onConnectionTypePid(bool checked)
 {
     m_ui.pushButton_runningPid->setEnabled(checked);
-    m_ui.pushButton_runningProg->setEnabled(checked);
-    m_ui.lineEdit_runningProg->setEnabled(checked);
     m_ui.lineEdit_pid->setEnabled(checked);
 
 }
@@ -287,10 +242,8 @@ void OpenDialog::onConnectionTypePid(bool checked)
 void OpenDialog::onConnectionTypeCoreDump(bool checked)
 {
     m_ui.pushButton_selectCoreFile->setEnabled(checked);
-    m_ui.pushButton_selectCoreProgram->setEnabled(checked);
     m_ui.lineEdit_coreFile->setEnabled(checked);
-    m_ui.lineEdit_coreProgram->setEnabled(checked);
-
+    
     m_ui.lineEdit_initialBreakpoint->setEnabled(checked ? false : true);
     m_ui.checkBox_reloadBreakpoints->setEnabled(checked ? false : true);
 }
@@ -307,15 +260,6 @@ QString OpenDialog::getTcpRemoteHost()
 }
 
 
-void OpenDialog::setTcpRemoteProgram(QString path)
-{
-    m_ui.lineEdit_tcpProgram->setText(path);
-}
-
-QString OpenDialog::getTcpRemoteProgram()
-{
-    return m_ui.lineEdit_tcpProgram->text();
-}
 
     
 void OpenDialog::setTcpRemotePort(int port)
@@ -348,7 +292,6 @@ void OpenDialog::setGdbPath(QString path)
 void OpenDialog::saveConfig(Settings *cfg)
 {
     OpenDialog &dlg = *this;
-    cfg->m_coreDumpProgram = dlg.getCoreDumpProgram();
     cfg->m_coreDumpFile = dlg.getCoreDumpFile();
     cfg->m_lastProgram = dlg.getProgram();
     cfg->m_argumentList = dlg.getArguments().split(' ');
@@ -356,13 +299,11 @@ void OpenDialog::saveConfig(Settings *cfg)
     cfg->m_tcpPort = dlg.getTcpRemotePort();
     cfg->m_download = dlg.getDownload();
     cfg->m_tcpHost = dlg.getTcpRemoteHost();
-    cfg->m_tcpProgram = dlg.getTcpRemoteProgram();
     cfg->m_initCommands = dlg.getInitCommands();
     cfg->m_gdbPath = dlg.getGdbPath();
     cfg->m_initialBreakpoint = dlg.getInitialBreakpoint().trimmed();
     cfg->m_runningPid = dlg.getRunningPid();
-    cfg->m_runningProgram = dlg.getRunningProgram();
-
+    
     if(cfg->m_initialBreakpoint.isEmpty())
         cfg->m_initialBreakpoint = "main";
     if(dlg.m_ui.checkBox_reloadBreakpoints->checkState() == Qt::Checked)
@@ -392,17 +333,14 @@ void OpenDialog::loadConfig(Settings &cfg)
     dlg.setTcpRemotePort(cfg.m_tcpPort);
     dlg.setDownload(cfg.m_download);
     dlg.setTcpRemoteHost(cfg.m_tcpHost);
-    dlg.setTcpRemoteProgram(cfg.m_tcpProgram);
     dlg.setInitCommands(cfg.m_initCommands);
     dlg.setGdbPath(cfg.m_gdbPath);
 
     dlg.m_ui.checkBox_reloadBreakpoints->setChecked(cfg.m_reloadBreakpoints);
 
-    dlg.setCoreDumpProgram(cfg.m_coreDumpProgram);
     dlg.setCoreDumpFile(cfg.m_coreDumpFile);
 
     dlg.setRunningPid(cfg.m_runningPid);
-    dlg.setRunningProgram(cfg.m_runningProgram);
     
     
     dlg.setProgram(cfg.m_lastProgram);
