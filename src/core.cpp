@@ -1286,6 +1286,33 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
     }
 }
 
+void Core::gdbRemoveAllBreakpoints()
+{
+    // Get id for all breakpoints
+    QList <int> idList;
+    for(int i = 0;i < m_breakpoints.size();i++)
+    {
+        BreakPoint* bkpt = m_breakpoints[i];
+        idList.append(bkpt->m_number);
+        delete bkpt;
+    }
+    m_breakpoints.clear();
+
+    // Remove all
+    Com& com = Com::getInstance();
+    Tree resultData;
+    for(int u = 0;u < idList.size();u++)
+    {
+        int id = idList[u];
+        com.commandF(&resultData, "-break-delete %d", id);
+    }
+    
+    if(m_inf)
+        m_inf->ICore_onBreakpointsChanged();
+    
+
+}
+
 
 /**
  * @brief Remove a breakpoint.

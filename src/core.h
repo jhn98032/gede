@@ -273,6 +273,7 @@ public:
     BreakPoint* findBreakPoint(QString fullPath, int lineNo);
     BreakPoint* findBreakPointByNumber(int number);
     void gdbRemoveBreakpoint(BreakPoint* bkpt);
+    void gdbRemoveAllBreakpoints();
 
     QList<ThreadInfo> getThreadList();
 

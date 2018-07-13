@@ -163,6 +163,12 @@
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
            <widget class="QTreeWidget" name="treeWidget_breakpoints">
+            <property name="selectionMode">
+             <enum>QAbstractItemView::ExtendedSelection</enum>
+            </property>
+            <property name="allColumnsShowFocus">
+             <bool>true</bool>
+            </property>
             <column>
              <property name="text">
               <string notr="true">1</string>

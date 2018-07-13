@@ -55,6 +55,8 @@ MainWindow::MainWindow(QWidget *parent)
     names += "Addr";
     m_ui.treeWidget_breakpoints->setHeaderLabels(names);
     connect(m_ui.treeWidget_breakpoints, SIGNAL(itemDoubleClicked ( QTreeWidgetItem * , int  )), this, SLOT(onBreakpointsWidgetItemDoubleClicked(QTreeWidgetItem * ,int)));
+    connect(m_ui.treeWidget_breakpoints, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(onBreakpointsWidgetContextMenu(const QPoint&)));
+    m_ui.treeWidget_breakpoints->setContextMenuPolicy(Qt::CustomContextMenu);
 
 
 
@@ -1614,6 +1616,95 @@ void MainWindow::setStatusLine(Settings &cfg)
     w.m_statusLineWidget.setText(statusText);
 }
 
+
+void MainWindow::onBreakpointsRemoveAll()
+{
+    Core &core = Core::getInstance();
+    core.gdbRemoveAllBreakpoints();
+}
+
+void MainWindow::onBreakpointsRemoveSelected()
+{
+    // Get selected widget items
+    QTreeWidget *bkptWidget = m_ui.treeWidget_breakpoints;
+    QList<QTreeWidgetItem *> selectedItems = bkptWidget->selectedItems();
+
+    // Get a list of breakpoints
+    Core &core = Core::getInstance();
+    QList<BreakPoint*>  bklist = core.getBreakPoints();
+    QList <int>idList;
+    for(int u = 0;u < selectedItems.size();u++)
+    {
+        // Get the breakpoint
+        QTreeWidgetItem *item = selectedItems[u];
+        int idx = item->data(0, Qt::UserRole).toInt();
+        if(0 <= idx && idx < bklist.size())
+        {
+            BreakPoint* bkpt = bklist[idx];
+
+            // Request that it is removed
+            core.gdbRemoveBreakpoint(bkpt);
+        }
+    }
+
+}
+
+void MainWindow::onBreakpointsGoTo()
+{
+
+    // Get selected widget items
+    QTreeWidget *bkptWidget = m_ui.treeWidget_breakpoints;
+    QList<QTreeWidgetItem *> selectedItems = bkptWidget->selectedItems();
+
+    // Get a list of breakpoints
+    Core &core = Core::getInstance();
+    QList<BreakPoint*>  bklist = core.getBreakPoints();
+    QList <int>idList;
+    if(!selectedItems.empty())
+    {
+        // Get the breakpoint
+        QTreeWidgetItem *item = selectedItems[0];
+        int idx = item->data(0, Qt::UserRole).toInt();
+        if(0 <= idx && idx < bklist.size())
+        {
+            BreakPoint* bk = bklist[idx];
+
+            // Show the breakpoint
+            CodeViewTab* currentCodeViewTab = open(bk->fullname);
+            if(currentCodeViewTab)
+                currentCodeViewTab->ensureLineIsVisible(bk->lineNo);
+        }
+    }
+}
+
+void MainWindow::onBreakpointsWidgetContextMenu(const QPoint& pos)
+{
+    QString title;
+    QAction *action;
+
+    // Get position
+    QTreeWidget *bkptWidget = m_ui.treeWidget_breakpoints;
+    QPoint popupPos = bkptWidget->mapToGlobal(pos);
+    
+    m_popupMenu.clear();
+
+    // Add 'Go to'
+    title = "Go to";
+    action = m_popupMenu.addAction(title);
+    connect(action, SIGNAL(triggered()), this, SLOT(onBreakpointsGoTo()));
+    
+    // Add 'Remove all breakpoints'
+    title = "Remove all";
+    action = m_popupMenu.addAction(title);
+    connect(action, SIGNAL(triggered()), this, SLOT(onBreakpointsRemoveAll()));
+
+    // Add 'Remove selected breakpoints'
+    title = "Remove selected";
+    action = m_popupMenu.addAction(title);
+    connect(action, SIGNAL(triggered()), this, SLOT(onBreakpointsRemoveSelected()));
+    
+    m_popupMenu.popup(popupPos);
+}
 
 
     

@@ -139,6 +139,11 @@ public slots:
     void onViewFileBrowser();
     void onDefaultViewSetup();
 
+    void onBreakpointsRemoveSelected();
+    void onBreakpointsRemoveAll();
+    void onBreakpointsGoTo();
+    void onBreakpointsWidgetContextMenu(const QPoint& pt);
+
 private:
     QByteArray m_gui_default_mainwindowState;
     QByteArray m_gui_default_mainwindowGeometry;
