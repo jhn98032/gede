@@ -659,12 +659,11 @@ bool Core::gdbGetFiles()
 
         if(rootName == "files")
         {
-            QStringList childList = resultData.getChildList("files");
-            for(int j = 0;j < childList.size();j++)
+            for(int j = 0;j < rootNode->getChildCount();j++)
             {
-                QString treePath = "files/" + childList[j];
-                QString name = resultData.getString(treePath + "/file");
-                QString fullname = resultData.getString(treePath + "/fullname");
+                TreeNode *childNode = rootNode->getChild(j);
+                QString name = childNode->getChildDataString("file");
+                QString fullname = childNode->getChildDataString("fullname");
 
                 if(fullname.isEmpty())
                     continue;
@@ -694,6 +693,7 @@ bool Core::gdbGetFiles()
                         m_sourceFiles.append(sourceFile);
                     }
                 }
+                
             }
         }
     }

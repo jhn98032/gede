@@ -116,6 +116,13 @@ Tree::Tree()
 
 
 
+QString TreeNode::getChildDataString(QString childName) const
+{
+    TreeNode *child = findChild(childName);
+    if(child)
+        return child->m_data;
+    return "";
+}
 
 
     
@@ -139,7 +146,7 @@ TreeNode *TreeNode::findChild(QString path) const
         restPath = path.mid(indexPos+1);
     }
 
-    if(childName[0].toLatin1() == '#')
+    if(childName[0] == '#')
     {
         QString numStr = childName.mid(1);
         int idx = atoi(stringToCStr(numStr))-1;

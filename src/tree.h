@@ -13,7 +13,6 @@
 #include <QVector>
 #include <QList>
 #include <QStringList>
-#include <stdint.h>
 
 
 class TreeNode
@@ -32,6 +31,7 @@ public:
     TreeNode *getChild(int i) const { return m_children[i]; };
     int getChildCount() const { return m_children.size(); };
     QString getData() const { return m_data; };
+    QString getChildDataString(QString childName) const;
     void setData(QString data) { m_data = data; };
     void dump();
 
@@ -50,10 +50,10 @@ public:
     QString m_name;
     QString m_data;
     QVector<TreeNode*> m_children;
-    uint32_t m_address;
+    quint32 m_address;
 
 private:
-        TreeNode(const TreeNode &) { };
+    TreeNode(const TreeNode &) { };
 
 };
 
