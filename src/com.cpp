@@ -636,9 +636,8 @@ int Com::parseValue(TreeNode *item)
 
             do
             {
-                TreeNode *node = new TreeNode;
                 name.sprintf("%d", idx++);
-                node->setName(name);
+                TreeNode *node = new TreeNode(name);
                 item->addChild(node); 
                 rc = parseValue(node);
             } while(checkToken(Token::KEY_COMMA) != NULL);
@@ -662,15 +661,11 @@ int Com::parseValue(TreeNode *item)
  */
 int Com::parseResult(TreeNode *parent)
 {
-    TreeNode *item = new TreeNode;
-    parent->addChild(item);
-
+    QString name;
 
     Token *tok = peek_token();
     if(tok != NULL && tok->getType() == Token::KEY_LEFT_BRACE)
     {
-        parseValue(item);
-    
     }
     else
     {
@@ -678,14 +673,18 @@ int Com::parseResult(TreeNode *parent)
         Token *tokVar = eatToken(Token::VAR);
         if(tokVar == NULL)
             return -1;
-        item->setName(tokVar->getString());
+        name = tokVar->getString();
         
         //
         if(eatToken(Token::KEY_EQUAL) == NULL)
             return -1;
-
-        parseValue(item);
     }
+
+    TreeNode *item = new TreeNode(name);
+    parent->addChild(item);
+        
+    parseValue(item);
+    
     return 0;
 }
 

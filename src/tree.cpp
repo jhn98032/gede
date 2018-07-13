@@ -13,11 +13,29 @@
 #include <assert.h>
 
 TreeNode::TreeNode()
-    : m_address(0)
+    : m_parent(NULL)
+    ,m_address(0)
 {
 
 }
 
+TreeNode::TreeNode(QString name)
+    : m_parent(NULL)
+    ,m_name(name)
+    ,m_address(0)
+{
+    
+};
+
+
+void TreeNode::addChild(TreeNode *child)
+{
+    child->m_parent = this;
+   
+    m_children.push_back(child);
+    m_childMap[child->m_name] = child;
+
+}
 
 
 void TreeNode::copy(const TreeNode &other)
@@ -33,7 +51,7 @@ void TreeNode::copy(const TreeNode &other)
     // Copy all children
     for(int i = 0;i < other.m_children.size();i++)
     {
-        TreeNode* otherNode = other.m_children[i];
+        const TreeNode* otherNode = other.m_children[i];
         TreeNode* thisNode = new TreeNode;
         thisNode->copy(*otherNode);
 
@@ -161,19 +179,34 @@ TreeNode *TreeNode::findChild(QString path) const
     }
     else
     {
-    // Look for the child
-    for(int u = 0;u < getChildCount();u++)
-    {
-        TreeNode *child = getChild(u);
+        
+        TreeNode *child;
 
-        if(child->getName() == childName)
+        if(m_childMap.contains(childName))
         {
+            child = m_childMap[childName];
+            assert(child->m_name == childName);
             if(restPath.isEmpty())
                 return child;
             else
                 return child->findChild(restPath);
         }
-    }
+        else
+        {
+        // Look for the child
+        for(int u = 0;u < getChildCount();u++)
+        {
+            child = getChild(u);
+
+            if(child->getName() == childName)
+            {
+                if(restPath.isEmpty())
+                    return child;
+                else
+                    return child->findChild(restPath);
+            }
+        }
+        }
     }
         
     return NULL;
