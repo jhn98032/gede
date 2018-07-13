@@ -241,6 +241,7 @@ private:
     static ICore::StopReason parseReasonString(QString string);
     void detectMemoryDepth();
     static int openPseudoTerminal();
+    void ensureStopped();
     
 public:
     int gdbSetBreakpointAtFunc(QString func);

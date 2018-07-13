@@ -719,6 +719,8 @@ int Core::gdbSetBreakpointAtFunc(QString func)
     Tree resultData;
     int rc = 0;
     int res;
+
+    ensureStopped();
     
     res = com.commandF(&resultData, "-break-insert -f %s", stringToCStr(func));
     if(res == GDB_ERROR)
@@ -782,6 +784,16 @@ void Core::gdbContinue()
 
     com.commandF(&resultData, "-exec-continue");
 
+}
+
+
+/**
+ * @brief Ensures that the program is running
+ */
+void Core::ensureStopped()
+{
+    if(m_targetState == ICore::TARGET_RUNNING)
+        stop();
 }
 
 
@@ -1082,7 +1094,10 @@ void Core::gdbRemoveVarWatch(QString watchId)
     Com& com = Com::getInstance();
     Tree resultData;
     
+    ensureStopped();
+
     assert(getVarWatchInfo(watchId) != NULL);
+
 
     // Remove from the list
     for(int i = 0;i < m_watchList.size();i++)
@@ -1288,6 +1303,8 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
 
 void Core::gdbRemoveAllBreakpoints()
 {
+    ensureStopped();
+    
     // Get id for all breakpoints
     QList <int> idList;
     for(int i = 0;i < m_breakpoints.size();i++)
@@ -1321,9 +1338,11 @@ void Core::gdbRemoveBreakpoint(BreakPoint* bkpt)
 {
     Com& com = Com::getInstance();
     Tree resultData;
-    
+
     assert(bkpt != NULL);
-    
+
+    ensureStopped();
+        
     com.commandF(&resultData, "-break-delete %d", bkpt->m_number);    
 
     m_breakpoints.removeOne(bkpt);
@@ -1701,6 +1720,8 @@ int Core::gdbSetBreakpoint(QString filename, int lineNo)
     int rc = 0;
     
     assert(filename != "");
+
+    ensureStopped();
     
     int res = com.commandF(&resultData, "-break-insert %s:%d", stringToCStr(filename), lineNo);
     if(res == GDB_ERROR)
