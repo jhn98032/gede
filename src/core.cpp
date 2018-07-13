@@ -1024,17 +1024,16 @@ int Core::gdbExpandVarWatchChildren(QString watchId)
 
         
     // Enumerate the children
-    QStringList childList = resultData.getChildList("children");
-    for(int i = 0;i < childList.size();i++)
+    TreeNode* root = resultData.findChild("children");
+    for(int i = 0;i < root->getChildCount();i++)
     {
         // Get name and value
-        QString treePath;
-        treePath.sprintf("children/#%d",i+1);
-        QString childWatchId = resultData.getString(treePath + "/name");
-        QString childExp = resultData.getString(treePath + "/exp");
-        QString childValue = resultData.getString(treePath + "/value");
-        QString childType = resultData.getString(treePath + "/type");
-        int numChild = resultData.getInt(treePath + "/numchild", 0);
+        TreeNode* child = root->getChild(i);
+        QString childWatchId = child->getChildDataString("name");
+        QString childExp = child->getChildDataString("exp");
+        QString childValue = child->getChildDataString("value");
+        QString childType = child->getChildDataString("type");
+        int numChild = child->getChildDataInt("numchild", 0);
         bool hasChildren = false;
         if(numChild > 0)
             hasChildren = true;
@@ -1198,10 +1197,10 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
                 m_inf->ICore_onSourceFileListChanged();
             }
             m_scanSources = false;
-        }    
+        }
 
-        QString p = tree.getString("frame/fullname");
-        int lineNo = tree.getInt("frame/line");
+        
+
 
         // Get the reason
         QString reasonString = tree.getString("reason");
@@ -1218,6 +1217,9 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
         
         if(m_inf)
         {
+            QString p = tree.getString("frame/fullname");
+            int lineNo = tree.getInt("frame/line");
+
             if(reason == ICore::SIGNAL_RECEIVED)
             {
                 QString signalName = tree.getString("signal-name");
@@ -1239,14 +1241,18 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
 
             m_inf->ICore_onFrameVarReset();
 
-            QStringList childList = tree.getChildList("frame/args");
-            for(int i = 0;i < childList.size();i++)
+
+            TreeNode *argsNode = tree.findChild("frame/args");
+            if(argsNode)
             {
-                QString treePath = "frame/args/" + childList[i];
-                QString varName = tree.getString(treePath + "/name");
-                QString varValue = tree.getString(treePath + "/value");
-                if(m_inf)
-                    m_inf->ICore_onFrameVarChanged(varName, varValue);
+                for(int i = 0;i < argsNode->getChildCount();i++)
+                {
+                    TreeNode *child2 = argsNode->getChild(i);
+                    QString varName = child2->getChildDataString("name");
+                    QString varValue = child2->getChildDataString("value");
+                    if(m_inf)
+                        m_inf->ICore_onFrameVarChanged(varName, varValue);
+                }
             }
 
             int frameIdx = tree.getInt("frame/level");
@@ -1361,8 +1367,11 @@ BreakPoint* Core::findBreakPointByNumber(int number)
 
 void Core::dispatchBreakpointTree(Tree &tree)
 {
-    int lineNo = tree.getInt("bkpt/line");
-    int number = tree.getInt("bkpt/number");
+    TreeNode *rootNode = tree.findChild("bkpt");
+    if(!rootNode)
+        return;
+    int lineNo = rootNode->getChildDataInt("line");
+    int number = rootNode->getChildDataInt("number");
                 
 
     BreakPoint *bkpt = findBreakPointByNumber(number);
@@ -1372,13 +1381,13 @@ void Core::dispatchBreakpointTree(Tree &tree)
         m_breakpoints.push_back(bkpt);
     }
     bkpt->lineNo = lineNo;
-    bkpt->fullname = tree.getString("bkpt/fullname");
+    bkpt->fullname = rootNode->getChildDataString("fullname");
 
     // We did not receive 'fullname' from gdb.
     // Lets try original-location instead...
     if(bkpt->fullname.isEmpty())
     {
-        QString orgLoc = tree.getString("bkpt/original-location");
+        QString orgLoc = rootNode->getChildDataString("original-location");
         int divPos = orgLoc.lastIndexOf(":");
         if(divPos == -1)
             warnMsg("Original-location in unknown format");
@@ -1388,8 +1397,8 @@ void Core::dispatchBreakpointTree(Tree &tree)
         }
     }
     
-    bkpt->m_funcName = tree.getString("bkpt/func");
-    bkpt->m_addr = tree.getLongLong("bkpt/addr");
+    bkpt->m_funcName = rootNode->getChildDataString("func");
+    bkpt->m_addr = rootNode->getChildDataLongLong("addr");
 
     if(m_inf)
         m_inf->ICore_onBreakpointsChanged();
@@ -1415,12 +1424,10 @@ void Core::onResult(Tree &tree)
             debugMsg("Changelist");
             for(int j = 0;j < rootNode->getChildCount();j++)
             {
-                QString path;
-                path.sprintf("changelist/%d/name", j+1);
-                QString watchId = tree.getString(path);
-                path.sprintf("changelist/%d/type_changed", j+1);
+                TreeNode *child = rootNode->getChild(j);
+                QString watchId = child->getChildDataString("name");
                 bool typeChanged = false;
-                if(tree.getString(path) == "true")
+                if(child->getChildDataString("type_changed") == "true")
                     typeChanged = true;
                 
                 VarWatch *watch = getVarWatchInfo(watchId);
@@ -1439,10 +1446,8 @@ void Core::onResult(Tree &tree)
                         gdbRemoveVarWatch(removeList[cidx]->getWatchId());
                     }
                     watch->setValue("");
-                    path.sprintf("changelist/%d/new_type", j+1);
-                    watch->m_varType = tree.getString(path);
-                    path.sprintf("changelist/%d/new_num_children", j+1);
-                    watch->m_hasChildren = tree.getInt(path) > 0 ? true : false;
+                    watch->m_varType = child->getChildDataString("new_type");
+                    watch->m_hasChildren = child->getChildDataInt("new_num_children") > 0 ? true : false;
                     m_inf->ICore_onWatchVarChanged(*watch);
 
                 }
@@ -1450,10 +1455,8 @@ void Core::onResult(Tree &tree)
                 else if(watch)
                 {
                     
-                path.sprintf("changelist/%d/value", j+1);
-                watch->setValue(tree.getString(path));
-                path.sprintf("changelist/%d/in_scope", j+1);
-                QString inScopeStr = tree.getString(path);
+                watch->setValue(child->getChildDataString("value"));
+                QString inScopeStr = child->getChildDataString("in_scope");
                 if(inScopeStr == "true" || inScopeStr.isEmpty())
                     watch->m_inScope = true;
                 else
@@ -1490,15 +1493,14 @@ void Core::onResult(Tree &tree)
             m_threadList.clear();
             
             // Parse the result
-            QStringList childList = tree.getChildList("threads");
-            for(int cIdx = 0;cIdx < childList.size();cIdx++)
+            for(int cIdx = 0;cIdx < rootNode->getChildCount();cIdx++)
             {
-                QString treePath = "threads/" + childList[cIdx];
-                QString threadId = tree.getString(treePath + "/id");
-                QString targetId = tree.getString(treePath + "/target-id");
-                QString funcName = tree.getString(treePath + "/frame/func");
-                QString lineNo  = tree.getString(treePath + "/frame/line");
-                QString details = tree.getString(treePath + "/details");
+                TreeNode *child = rootNode->getChild(cIdx);
+                QString threadId = child->getChildDataString("id");
+                QString targetId = child->getChildDataString("target-id");
+                QString funcName = child->getChildDataString("frame/func");
+                QString lineNo  = child->getChildDataString("frame/line");
+                QString details = child->getChildDataString("details");
 
                 if(details.isEmpty())
                 {
@@ -1525,19 +1527,16 @@ void Core::onResult(Tree &tree)
         else if(rootName == "current-thread-id")
         {
             // Get the current thread
-            QString threadIdStr = tree.getString("current-thread-id");
-            if(threadIdStr.isEmpty() == false)
-            {
-                int threadId = threadIdStr.toInt(0,0);
-                if(m_inf)
-                    m_inf->ICore_onCurrentThreadChanged(threadId);
-            }
+            int threadId = rootNode->getDataInt(-1);
+            if(threadId != -1 && m_inf)
+                m_inf->ICore_onCurrentThreadChanged(threadId);
+            
         }
         else if(rootName == "frame")
         {
-            QString p = tree.getString("frame/fullname");
-            int lineNo = tree.getInt("frame/line");
-            int frameIdx = tree.getInt("frame/level");
+            QString p = rootNode->getChildDataString("fullname");
+            int lineNo = rootNode->getChildDataInt("line");
+            int frameIdx = rootNode->getChildDataInt("level");
             ICore::StopReason  reason = ICore::UNKNOWN;
              
             m_currentFrameIdx = frameIdx;
@@ -1549,35 +1548,32 @@ void Core::onResult(Tree &tree)
 
                 m_inf->ICore_onFrameVarReset();
 
-                QStringList childList = tree.getChildList("frame/args");
-                for(int i = 0;i < childList.size();i++)
+                TreeNode *argsNode = rootNode->findChild("args");
+                if(argsNode)
                 {
-                    QString treePath = "frame/args/" + childList[i];
-                    QString varName = tree.getString(treePath + "/name");
-                    QString varValue = tree.getString(treePath + "/value");
+                for(int i = 0;i < argsNode->getChildCount();i++)
+                {
+                    TreeNode *child = argsNode->getChild(i);
+                    QString varName = child->getChildDataString("name");
+                    QString varValue = child->getChildDataString("value");
                     if(m_inf)
                         m_inf->ICore_onFrameVarChanged(varName, varValue);
+                }
                 }
             }
         }
         // A stack frame dump?
         else if(rootName == "stack")
         {
-            int cnt = tree.getChildCount("stack");
             QList<StackFrameEntry> stackFrameList;
-            for(int j = 0;j < cnt;j++)
+            for(int j = 0;j < rootNode->getChildCount();j++)
             {
-                QString path;
-                path.sprintf("stack/#%d/func", j+1);
+                const TreeNode *child = rootNode->getChild(j);
                 
-
                 StackFrameEntry entry;
-                path.sprintf("stack/#%d/func", j+1);
-                entry.m_functionName = tree.getString(path);
-                path.sprintf("stack/#%d/line", j+1);
-                entry.m_line = tree.getInt(path);
-                path.sprintf("stack/#%d/fullname", j+1);
-                entry.m_sourcePath = tree.getString(path);
+                entry.m_functionName = child->getChildDataString("func");
+                entry.m_line = child->getChildDataInt("line");
+                entry.m_sourcePath = child->getChildDataString("fullname");
                 stackFrameList.push_front(entry);
             }
             if(m_inf)
@@ -1593,13 +1589,11 @@ void Core::onResult(Tree &tree)
             m_localVars.clear();
                 
             //
-            int cnt = tree.getChildCount("variables");
-            for(int j = 0;j < cnt;j++)
+            for(int j = 0;j < rootNode->getChildCount();j++)
             {
-                QString path;
-                path.sprintf("variables/%d/name", j+1);
-                QString varName = tree.getString(path);
-        
+                TreeNode *child = rootNode->getChild(j);
+                QString varName = child->getChildDataString("name");
+
                 m_localVars.push_back(varName);
             }
 
@@ -1610,16 +1604,17 @@ void Core::onResult(Tree &tree)
         }
         else if(rootName == "msg")
         {
-            QString message = tree.getString("msg");
+            QString message = rootNode->getData();
             if(m_inf)
                 m_inf->ICore_onMessage(message);
                 
         }
         else if(rootName == "groups")
         {
-            if(m_pid == 0)
+            if(m_pid == 0 && rootNode->getChildCount() > 0)
             {
-                m_pid = tree.getInt("groups/1/pid");
+                TreeNode *firstChild = rootNode->getChild(0);
+                m_pid = firstChild->getChildDataInt("pid", 0);
             }
         }
         

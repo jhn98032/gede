@@ -28,12 +28,16 @@ public:
     uint32_t getAddress() const { return m_address; };
     void setAddress(uint32_t addr) { m_address = addr; };
     
-    QStringList getChildList() const;
     void addChild(TreeNode *child);
     TreeNode *getChild(int i) const { return m_children[i]; };
     int getChildCount() const { return m_children.size(); };
     QString getData() const { return m_data; };
+    int getDataInt(int defaultValue = 0) const;
+
     QString getChildDataString(QString childName) const;
+    int getChildDataInt(QString path, int defaultValue = 0) const;
+    long long getChildDataLongLong(QString path, long long defaultValue = 0) const;
+
     void setData(QString data) { m_data = data; };
     void dump();
 
@@ -80,9 +84,8 @@ public:
 
     TreeNode *getChildAt(int idx) { return m_root.getChild(idx);};
     int getRootChildCount() const { return m_root.getChildCount();};
-    int getChildCount(QString path) const;
-    QStringList getChildList(QString path) const;
     
+    TreeNode* findChild(QString path) const;
 
     TreeNode* getRoot() { return &m_root; };
     void copy(const Tree &other);
