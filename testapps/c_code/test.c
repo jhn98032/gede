@@ -10,13 +10,6 @@ void long_func_with_many_arguments(int a_very_long_function_variable_name_xxxxxx
 {
 }
 
-void func()
-{
-    volatile int a = 1;
-    a++;
-    a++;
-    a++;
-}
 
 typedef enum {CUSTOM_ENUM1, CUSTOM_ENUM2} CustomEnum;
 int main(int argc,char *argv[])

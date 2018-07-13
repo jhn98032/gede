@@ -3,7 +3,7 @@ LDFLAGS+=-g
 
 all: test
 
-test: test.o
+test: other.o test.o
 	$(CC) -o $@ $^ $(LDFLAGS)
 
 
