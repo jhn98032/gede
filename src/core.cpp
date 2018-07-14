@@ -1037,6 +1037,8 @@ int Core::gdbExpandVarWatchChildren(QString watchId)
         
     // Enumerate the children
     TreeNode* root = resultData.findChild("children");
+    if(root)
+    {
     for(int i = 0;i < root->getChildCount();i++)
     {
         // Get name and value
@@ -1064,6 +1066,7 @@ int Core::gdbExpandVarWatchChildren(QString watchId)
 
         m_inf->ICore_onWatchVarChildAdded(*watch);
 
+    }
     }
 
     return 0;
