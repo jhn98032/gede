@@ -150,18 +150,26 @@ int TagManager::queueScan(QString filePath)
     assert(m_dbgMainThread == QThread::currentThreadId ());
 
     if(!m_db.contains(filePath))
+    {
         m_worker.queueScan(filePath);
+    }
     return 0;
 }
 
 void TagManager::scan(QString filePath, QList<Tag> *tagList)
 {
-    if(m_db.contains(filePath))
+    if(!m_db.contains(filePath))
     {
-        *tagList = m_db[filePath]->m_tagList;
+        ScannerResult *res = new ScannerResult;
+        res->m_filePath = filePath;
+
+        m_tagScanner.scan(res->m_filePath, &res->m_tagList);
+
+        m_db[filePath] = res;
     }
-    else
-        m_tagScanner.scan(filePath, tagList);
+
+    *tagList = m_db[filePath]->m_tagList;
+
 }
 
 void TagManager::abort()
