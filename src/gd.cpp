@@ -128,10 +128,12 @@ int main(int argc, char *argv[])
         }
     }
 
-    if(!cfg.m_guiStyleName.isEmpty())
-        QApplication::setStyle(cfg.m_guiStyleName);
-
     QApplication app(argc, argv);
+
+    if(!cfg.m_guiStyleName.isEmpty())
+    {
+        QApplication::setStyle(cfg.m_guiStyleName);
+    }
 
     if(cfg.m_lastProgram.isEmpty())
         showConfigDialog = true;
