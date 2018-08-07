@@ -374,7 +374,7 @@ void MemoryWidget::onCopy()
             unsigned int j;
             
             // Display address
-            subText.sprintf("0x%08lx | ", addr);
+            subText.sprintf("0x%08llx | ", (long long)addr);
             contentStr += subText;
 
             // Display data as hex

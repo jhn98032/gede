@@ -566,7 +566,16 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
 void Core::writeTargetStdin(QString text)
 {
     QByteArray rawData = text.toLocal8Bit();
-    write(m_ptsFd, rawData.constData(), rawData.size());
+    int bytesWritten = 0;
+    int n;
+    do
+    {
+        n = write(m_ptsFd, rawData.constData()+bytesWritten, rawData.size()-bytesWritten);
+        if(n > 0)
+            bytesWritten += n;
+        else if(n < 0)
+            errorMsg("Failed to write data to target stdin");
+    }while(n > 0 && bytesWritten != rawData.size());
     fsync(m_ptsFd);
 }
 
@@ -604,7 +613,7 @@ int Core::gdbGetMemory(uint64_t addr, size_t count, QByteArray *data)
 
     int rc = 0;
     QString cmdStr;
-    cmdStr.sprintf("-data-read-memory-bytes 0x%lx %u" , addr, (unsigned int)count);
+    cmdStr.sprintf("-data-read-memory-bytes 0x%llx %u" , (long long)addr, (unsigned int)count);
     
     rc = com.command(&resultData, cmdStr);
 
