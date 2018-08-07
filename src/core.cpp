@@ -25,6 +25,8 @@
 #include <ctype.h>
 #include <termios.h>
 #include <sys/ioctl.h>
+#include <string.h>
+#include <errno.h>
 
 VarWatch::VarWatch()
     : m_inScope(true)
