@@ -22,7 +22,7 @@ public slots:
 
 private:
     Ui_MemoryDialog m_ui;
-
+    uint64_t m_startScrollAddress; //!< The minimum address the user can scroll to.
 };
 
 

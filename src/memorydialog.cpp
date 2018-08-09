@@ -12,6 +12,8 @@
 #include "core.h"
 #include "util.h"
 
+#define SCROLL_ADDR_RANGE   0x10000ULL
+
 QByteArray MemoryDialog::getMemory(uint64_t startAddress, int count)
 {
      Core &core = Core::getInstance();
@@ -28,7 +30,7 @@ MemoryDialog::MemoryDialog(QWidget *parent)
     
     m_ui.setupUi(this);
 
-    m_ui.verticalScrollBar->setRange(0,0xffffffffUL/16);
+    m_ui.verticalScrollBar->setRange(0, SCROLL_ADDR_RANGE/16);
     connect(m_ui.verticalScrollBar, SIGNAL(valueChanged(int)), this, SLOT(onVertScroll(int)));
 
     m_ui.memorywidget->setInterface(this);
@@ -50,9 +52,14 @@ void MemoryDialog::onUpdate()
 void MemoryDialog::setStartAddress(uint64_t addr)
 {
     uint64_t addrAligned = addr & ~0xfULL;
+
+    if(addrAligned < (SCROLL_ADDR_RANGE/2))
+        m_startScrollAddress = 0;
+    else
+        m_startScrollAddress = addrAligned - (SCROLL_ADDR_RANGE/2);
     
     m_ui.memorywidget->setStartAddress(addrAligned);
-    m_ui.verticalScrollBar->setValue(addrAligned/16);
+    m_ui.verticalScrollBar->setValue((addrAligned-m_startScrollAddress)/16);
 
     QString addrText = addrToString(addr);
     m_ui.lineEdit_address->setText(addrText);
@@ -61,7 +68,8 @@ void MemoryDialog::setStartAddress(uint64_t addr)
 
 void MemoryDialog::onVertScroll(int pos)
 {
-    m_ui.memorywidget->setStartAddress(((unsigned long long)pos)*16UL);
+    uint64_t addr = m_startScrollAddress + ((uint64_t)pos*16ULL);
+    m_ui.memorywidget->setStartAddress(addr);
 }
 
 void MemoryDialog::setConfig(Settings *cfg)
