@@ -42,10 +42,30 @@ MemoryDialog::MemoryDialog(QWidget *parent)
 
 }
 
+/**
+ * @brief Converts a string entered by the user to an address.
+ */
+uint64_t MemoryDialog::inputTextToAddress(QString text)
+{
+    // Remove leading zeroes
+    while(text.startsWith('0') && text.length() > 1)
+        text = text.mid(1);
+
+    // Starts with a '0x...' or '0X..'?
+    if(text.startsWith("x") || text.startsWith("X"))
+        text = "0" + text;
+    else if(text.lastIndexOf(QRegExp("[a-zA-Z]+")) != -1)
+    {
+        text = "0x" + text;
+    }
+    
+    return stringToLongLong(text);
+}
+
 
 void MemoryDialog::onUpdate()
 {
-    uint64_t addr = stringToLongLong(m_ui.lineEdit_address->text());
+    uint64_t addr = inputTextToAddress(m_ui.lineEdit_address->text());
     setStartAddress(addr);
 }
 
