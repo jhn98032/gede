@@ -278,6 +278,30 @@ void detectDistro(DistroType *type, QString *distroDesc)
 }
 
 
+/**
+ * @brief Returns a string describing an address (eg: "0x3000_1234").
+ */
+QString addrToString(uint64_t addr)
+{
+    QString valueText;
+    QString text;
+    text.sprintf("%llx", (unsigned long long) addr);
+
+    // Prefix the string with suitable number of zeroes
+    while(text.length()%4 != 0 && text.length() > 4)
+        text = "0" + text;
+    if(text.length()%2 != 0)
+        text = "0" + text;
+
+    for(int i = 0;i < text.length();i++)
+    {
+        valueText = valueText + text[i];
+        if(i%4 == 3 && i+1 != text.length())
+            valueText += "_";
+    }
+    valueText = "0x" + valueText;
+    return valueText;
+}
 
 
 #ifdef NEVER

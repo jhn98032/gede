@@ -32,6 +32,8 @@ QString simplifyPath(QString path);
 typedef enum{ DISTRO_DEBIAN, DISTRO_UBUNTU, DISTRO_UNKNOWN} DistroType;
 void detectDistro(DistroType *type, QString *distroDesc);
 
+QString addrToString(uint64_t addr);
+
 
 #endif // FILE__UTIL_H
 

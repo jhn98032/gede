@@ -32,6 +32,7 @@ MemoryWidget::MemoryWidget(QWidget *parent)
  ,m_selectionEnd(0)
  ,m_inf(0)
 {
+    m_addrCharWidth = 0;
     m_font = QFont("Monospace", 10);
     m_fontInfo = new QFontMetrics(m_font);
 
@@ -78,7 +79,7 @@ void MemoryWidget::setInterface(IMemoryWidget *inf)
 }
 
 
-void MemoryWidget::setStartAddress(unsigned int addr)
+void MemoryWidget::setStartAddress(uint64_t addr)
 {
 
     m_startAddress = addr;
@@ -115,6 +116,7 @@ char MemoryWidget::byteToChar(uint8_t d)
 
 
 
+
 void MemoryWidget::paintEvent ( QPaintEvent * event )
 {
     QPainter painter(this);
@@ -124,10 +126,10 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
     int HEADER_HEIGHT = getHeaderHeight();
     int x;
     int rowCount = ((size().height()-HEADER_HEIGHT)/rowHeight)+1;
-    unsigned int startAddress = m_startAddress;
-
-    unsigned int selectionFirst;
-    unsigned int selectionLast;
+    uint64_t startAddress = m_startAddress;
+    
+    uint64_t selectionFirst;
+    uint64_t selectionLast;
     if(m_selectionEnd < m_selectionStart)
     {
         selectionFirst = m_selectionEnd;
@@ -138,7 +140,9 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
         selectionFirst = m_selectionStart;
         selectionLast = m_selectionEnd;
     }
-     
+
+    m_addrCharWidth = addrToString(m_startAddress+(rowCount*16ULL)).length();
+    
     
     painter.setFont(m_font);
 
@@ -151,7 +155,7 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
     //    startAddress = 0xffffffffU-((rowCount-2)*16);
     
     // Draw 'address' field background
-    QRect rect2(0,0,PAD_ADDR_LEFT+charWidth*9+PAD_ADDR_RIGHT/2, event->rect().bottom()+1);
+    QRect rect2(0,0,PAD_ADDR_LEFT+charWidth*m_addrCharWidth+PAD_ADDR_RIGHT/2, event->rect().bottom()+1);
     painter.fillRect(rect2, Qt::lightGray);
 
     // Draw 'header' background
@@ -167,7 +171,7 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
     text.sprintf("Address");
     x = PAD_ADDR_LEFT;
     painter.drawText(PAD_ADDR_LEFT, rowHeight, text);
-    x += (charWidth*9)+PAD_ADDR_RIGHT;
+    x += (charWidth*m_addrCharWidth)+PAD_ADDR_RIGHT;
     for(int off = 0;off < 16;off++)
     {
         text.sprintf("%x", off);
@@ -194,12 +198,12 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
         int y = HEADER_HEIGHT+rowHeight*rowIdx+rowHeight;
         x = PAD_ADDR_LEFT;
         
-        unsigned int memoryAddr = startAddress + rowIdx*16;
+        uint64_t memoryAddr = startAddress + rowIdx*16;
         if(memoryAddr < startAddress)
             break;
             
         painter.setPen(Qt::black);
-        text.sprintf("%04x_%04x", (unsigned int)(memoryAddr>>16),(unsigned int)(memoryAddr&0xffffUL));
+        text = addrToString(memoryAddr);
         painter.drawText(x, y, text);
         x += charWidth*text.length();
         x += PAD_ADDR_RIGHT;
@@ -263,13 +267,13 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
 
 
 
-unsigned int MemoryWidget::getAddrAtPos(QPoint pos)
+uint64_t MemoryWidget::getAddrAtPos(QPoint pos)
 {
     const int rowHeight = getRowHeight();
     const int charWidth = m_fontInfo->width("H");
-    unsigned int addr;
+    uint64_t addr;
     const int field_hex_width = PAD_HEX_MIDDLE + 16*(PAD_DATA+charWidth*2) + PAD_HEX_RIGHT;
-    const int field_address_width = PAD_ADDR_LEFT+(PAD_DATA+charWidth*9)+PAD_ADDR_RIGHT;
+    const int field_address_width = PAD_ADDR_LEFT+(PAD_DATA+charWidth*m_addrCharWidth)+PAD_ADDR_RIGHT;
     int idx = 0;
     
     addr = m_startAddress+(pos.y()-getHeaderHeight())/rowHeight*BYTES_PER_ROW;
@@ -349,7 +353,7 @@ void MemoryWidget::mousePressEvent(QMouseEvent * event)
 
 void MemoryWidget::onCopy()
 {
-    unsigned int selectionFirst,selectionLast;
+    uint64_t selectionFirst,selectionLast;
     
     if(m_selectionEnd < m_selectionStart)
     {
@@ -374,7 +378,7 @@ void MemoryWidget::onCopy()
             unsigned int j;
             
             // Display address
-            subText.sprintf("0x%08llx | ", (long long)addr);
+            subText.sprintf("0x%08llx | ", (unsigned long long)addr);
             contentStr += subText;
 
             // Display data as hex

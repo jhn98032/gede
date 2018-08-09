@@ -12,7 +12,7 @@
 #include "core.h"
 #include "util.h"
 
-QByteArray MemoryDialog::getMemory(unsigned int startAddress, int count)
+QByteArray MemoryDialog::getMemory(uint64_t startAddress, int count)
 {
      Core &core = Core::getInstance();
    
@@ -47,22 +47,21 @@ void MemoryDialog::onUpdate()
     setStartAddress(addr);
 }
 
-void MemoryDialog::setStartAddress(unsigned int addr)
+void MemoryDialog::setStartAddress(uint64_t addr)
 {
-    unsigned int addrAligned = addr & ~0xfULL;
+    uint64_t addrAligned = addr & ~0xfULL;
     
     m_ui.memorywidget->setStartAddress(addrAligned);
     m_ui.verticalScrollBar->setValue(addrAligned/16);
 
-    QString addrText;
-    addrText.sprintf("0x%04x_%04x", addr>>16, addr&0xffff);
+    QString addrText = addrToString(addr);
     m_ui.lineEdit_address->setText(addrText);
 }
 
 
 void MemoryDialog::onVertScroll(int pos)
 {
-    m_ui.memorywidget->setStartAddress(((unsigned int)pos)*16UL);
+    m_ui.memorywidget->setStartAddress(((unsigned long long)pos)*16UL);
 }
 
 void MemoryDialog::setConfig(Settings *cfg)

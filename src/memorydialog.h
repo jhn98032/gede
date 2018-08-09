@@ -11,8 +11,8 @@ class MemoryDialog : public QDialog, public IMemoryWidget
 public:
     MemoryDialog(QWidget *parent = NULL);
 
-    virtual QByteArray getMemory(unsigned int startAddress, int count);
-    void setStartAddress(unsigned int addr);
+    virtual QByteArray getMemory(uint64_t startAddress, int count);
+    void setStartAddress(uint64_t addr);
 
     void setConfig(Settings *cfg);
 
