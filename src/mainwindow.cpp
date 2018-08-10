@@ -922,7 +922,9 @@ CodeViewTab* MainWindow::open(QString filename)
             }
 
             // Close the oldest tab
+            CodeViewTab* oldestestTab = (CodeViewTab* )m_ui.editorTabWidget->widget(oldestTabIdx);
             m_ui.editorTabWidget->removeTab(oldestTabIdx);
+            delete oldestestTab;
         }
             
         // Create the tab
