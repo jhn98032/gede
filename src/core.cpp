@@ -59,6 +59,7 @@ void VarWatch::setValue(QString value)
 CoreVar::CoreVar()
  : m_address(0)
    ,m_type(TYPE_UNKNOWN)
+   ,m_addressValid(false)
 {
 
 }
@@ -68,6 +69,7 @@ CoreVar::CoreVar(QString name)
     : m_name(name)
     ,m_address(0)
       ,m_type(TYPE_UNKNOWN)
+    ,m_addressValid(false)
 {
 
 }
@@ -78,7 +80,7 @@ CoreVar::~CoreVar()
 }
 
     
-long long CoreVar::getAddress()
+uint64_t CoreVar::getPointerAddress()
 {
     return m_address;
 }
@@ -1849,6 +1851,49 @@ int Core::changeWatchVariable(QString watchId, QString newValue)
     return rc;
 }
 
+
+/**
+ * @brief Returns the address in memory where the variable is stored in.
+ */
+uint64_t Core::getAddress(VarWatch &w)
+{
+    int rc = 0;
+    uint64_t addr = 0;
+    GdbResult gdbRes = GDB_ERROR;
+    Com& com = Com::getInstance();
+    Tree resultData;
+
+    // Get the expression of the watch
+    com.commandF(&resultData, "-var-info-path-expression %s", stringToCStr(w.getWatchId()));
+    QString expr = resultData.getString("path_expr");
+    if(expr.isEmpty())
+    {
+        rc = -1;
+        errorMsg("Failed to get address of %s", stringToCStr(w.getName()));
+        return 0;
+    }
+
+    // Evalute the expression
+    gdbRes = com.commandF(&resultData, "-data-evaluate-expression &(%s)", stringToCStr(expr));
+    if(gdbRes == GDB_DONE)
+    {
+        // Get address response
+        QString varValue = resultData.getString("value");
+        varValue = varValue.split(' ')[0];
+
+        // Convert to integer
+        bool ok = false;
+        addr = varValue.toULongLong(&ok,0);
+        if(!ok)
+            rc = -2;
+    }
+    else if(gdbRes == GDB_ERROR)
+    {
+        rc = -1;
+        errorMsg("Failed to get address of %s", stringToCStr(w.getName()));
+    }
+    return addr;
+}
 
 
 

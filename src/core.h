@@ -88,9 +88,9 @@ public:
     void setVarType(QString varType) { m_varType = varType; };
     QString getVarType() { return m_varType; };
     void setData(Type type, QVariant data);
-    long long getAddress();
-    void setAddress(long long addr) { m_address = addr; };
-
+    uint64_t getPointerAddress();
+    void setPointerAddress(uint64_t addr) { m_addressValid = true; m_address = addr; };
+    bool hasPointerAddress() { return m_addressValid; };
 
     bool hasChildren() { return m_hasChildren; };
     
@@ -104,10 +104,11 @@ private:
 
     QString m_name;
     QVariant m_data;
-    long long m_address;
+    uint64_t m_address; //!< The address of data the variable points to.
     Type m_type;
     QString m_varType;
     bool m_hasChildren;
+    bool m_addressValid;
 };
 
 
@@ -126,8 +127,9 @@ class VarWatch
         QString getValue(CoreVar::DispFormat fmt = CoreVar::FMT_NATIVE) { return m_var.getData(fmt); };
 
         void setValue(QString value);
-        long long getAddress() { return m_var.getAddress(); };
-    
+        long long getPointerAddress() { return m_var.getPointerAddress(); };
+        bool hasPointerAddress() { return m_var.hasPointerAddress(); };
+
     private:
 
         QString watchId;
@@ -258,6 +260,8 @@ public:
     
     QStringList getLocalVars() { return m_localVars; };
 
+    uint64_t getAddress(VarWatch &w);
+    
 
     int gdbSetBreakpoint(QString filename, int lineNo);
     void gdbGetThreadList();

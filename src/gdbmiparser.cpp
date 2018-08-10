@@ -359,7 +359,7 @@ int GdbMiParser::parseVariableData(CoreVar *var, QList<Token*> *tokenList)
         else
         {
             QString valueStr;
-            var->setAddress(firstTokenStr.toLongLong(0,0));
+            var->setPointerAddress(firstTokenStr.toLongLong(0,0));
 
             while( nextTok->getType() == Token::VAR || nextTok->getType() == Token::C_STRING)
             {

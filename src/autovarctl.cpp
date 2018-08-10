@@ -118,6 +118,20 @@ void AutoVarCtl::onContextMenu ( const QPoint &pos)
     m_popupMenu.popup(m_autoWidget->mapToGlobal(pos));
 }
 
+
+/**
+ * @brief Returns the address of the data the variable points to or the actual variable.
+ */
+uint64_t AutoVarCtl::getAddress(VarWatch &w)
+{
+    Core &core = Core::getInstance();
+    if(w.hasPointerAddress())
+    {
+        return w.getPointerAddress();
+    }
+    return core.getAddress(w);
+}
+
 void AutoVarCtl::onShowMemory()
 {
     QList<QTreeWidgetItem *> selectedItems = m_autoWidget->selectedItems();
@@ -135,7 +149,7 @@ void AutoVarCtl::onShowMemory()
             
             MemoryDialog dlg;
             dlg.setConfig(&m_cfg);
-            dlg.setStartAddress(watch->getAddress());
+            dlg.setStartAddress(getAddress(*watch));
             dlg.exec();
         }
     }
