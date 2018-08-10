@@ -168,7 +168,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_ui.editorTabWidget, SIGNAL(tabCloseRequested(int)), SLOT(onCodeViewTab_tabCloseRequested(int)));
     connect(m_ui.editorTabWidget, SIGNAL(currentChanged(int)), SLOT(onCodeViewTab_currentChanged(int)));
-    
+    m_ui.editorTabWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_ui.editorTabWidget, SIGNAL(customContextMenuRequested(const QPoint &)), SLOT(onCodeViewTab_launchContextMenu(const QPoint&)));
+
     statusBar()->addPermanentWidget(&m_statusLineWidget);
 
 
@@ -784,7 +786,74 @@ CodeViewTab* MainWindow::currentTab()
 }
 
 
+/**
+ * @brief Called when user right clicks on tab and chooses 'Close Tabs To The Left'.
+ */
+void MainWindow::onCodeViewTab_closeTabsToLeft()
+{
+    // Get the selected tab
+    QAction *action = static_cast<QAction *>(sender ());
+    int tabIdx  = action->data().toInt();
 
+    for(int i = 0;i < tabIdx;i++)
+    {
+        m_ui.editorTabWidget->removeTab(0);
+    }
+}
+
+
+/**
+ * @brief Called when user right clicks on tab and chooses 'Close Other Tabs'.
+ */
+void MainWindow::onCodeViewTab_closeOtherTabs()
+{
+    // Get the selected tab
+    QAction *action = static_cast<QAction *>(sender ());
+    int tabIdx  = action->data().toInt();
+
+    for(int i = 0;i < tabIdx;i++)
+    {
+        m_ui.editorTabWidget->removeTab(0);
+    }
+    while(m_ui.editorTabWidget->count() >= 2)
+    {
+        m_ui.editorTabWidget->removeTab(1);
+    }
+}
+
+
+/**
+ * @brief Called when the user right clicks on the opened file tab widget.
+ */
+void MainWindow::onCodeViewTab_launchContextMenu(const QPoint& pos)
+{
+    QAction *action;
+    QString title;
+
+    // Get tab
+    int tabIdx = m_ui.editorTabWidget->tabBar()->tabAt(pos);
+    if(tabIdx == -1)
+        tabIdx  = m_ui.editorTabWidget->currentIndex();
+    
+    m_popupMenu.clear();
+
+    action = m_popupMenu.addSeparator();
+
+    // Add 'open'
+    action = m_popupMenu.addAction("Close Other Tabs");
+    action->setData(tabIdx);
+    connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewTab_closeOtherTabs()));
+
+        
+    // Add 'Show current PC location'
+    action = m_popupMenu.addAction("Close Tabs To The Left");
+    action->setData(tabIdx);
+    connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewTab_closeTabsToLeft()));
+
+    
+    QPoint popupPos = m_ui.editorTabWidget->mapToGlobal(pos);
+    m_popupMenu.popup(popupPos);
+}
 
 void MainWindow::onCodeViewTab_currentChanged( int tabIdx)
 {

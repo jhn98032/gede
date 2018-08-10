@@ -128,7 +128,10 @@ public slots:
     void onCodeViewContextMenuToggleBreakpoint();
     void onCodeViewTab_tabCloseRequested ( int index );
     void onCodeViewTab_currentChanged( int tabIdx);
-    
+    void onCodeViewTab_launchContextMenu(const QPoint&);
+    void onCodeViewTab_closeTabsToLeft();
+    void onCodeViewTab_closeOtherTabs();
+
     void onViewStack();
     void onViewBreakpoints();
     void onViewThreads();
