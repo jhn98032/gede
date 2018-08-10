@@ -833,8 +833,8 @@ void MainWindow::onCodeViewTab_launchContextMenu(const QPoint& pos)
     // Get tab
     int tabIdx = m_ui.editorTabWidget->tabBar()->tabAt(pos);
     if(tabIdx == -1)
-        tabIdx  = m_ui.editorTabWidget->currentIndex();
-    
+        return;
+
     m_popupMenu.clear();
 
     action = m_popupMenu.addSeparator();
