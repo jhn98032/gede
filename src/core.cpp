@@ -1892,6 +1892,8 @@ uint64_t Core::getAddress(VarWatch &w)
         rc = -1;
         errorMsg("Failed to get address of %s", stringToCStr(w.getName()));
     }
+    if(rc)
+        return 0;
     return addr;
 }
 
