@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include "config.h"
 #include "version.h"
+#include <sys/time.h>
 
 #include <QDateTime>
 
@@ -130,7 +131,9 @@ Com::~Com()
 
     if(m_enableLog)
     {
-        writeLogEntry("\r\n#\r\n#\r\n");
+        writeLogEntry("\n");
+        writeLogEntry("#\n");
+        writeLogEntry("#\n");
         m_logFile.close();
     }
 }
@@ -800,7 +803,16 @@ Resp *Com::parseOutput()
 void Com::writeLogEntry(QString logText)
 {
     assert(m_enableLog == true);
-    m_logFile.write(logText.toUtf8());
+
+    // 
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    QString timeStr;
+    timeStr.sprintf("%02d.%03d", (int)(tv.tv_sec%100), (int)(tv.tv_usec/1000));
+    
+    QString fullText = timeStr + "|" + logText;
+    
+    m_logFile.write(fullText.toUtf8());
     m_logFile.flush();
 }
                
@@ -1024,8 +1036,9 @@ GdbResult Com::command(Tree *resultData, QString text)
     {
         //
         QString logText;
-        logText = "\n<< ";
-        logText += text + "\n";
+        writeLogEntry("\n");
+        logText = "<< ";
+        logText += text;
         writeLogEntry(logText);
     }
     
@@ -1074,7 +1087,7 @@ int Com::init(QString gdbPath, bool enableDebugLog)
     if(m_enableLog)
     {
         QString logStr;
-        logStr = "# Gdb commandline: '" + commandLine + "'\r\n";
+        logStr = "# Gdb commandline: '" + commandLine + "'\n";
         writeLogEntry(logStr);
     }
 
@@ -1184,7 +1197,7 @@ void Com::enableLog(bool enable)
 
     if(m_enableLog)
     {
-        writeLogEntry("#\r\n");
+        writeLogEntry("#\n");
         m_logFile.close();
     }
     m_enableLog = false;
@@ -1199,14 +1212,14 @@ void Com::enableLog(bool enable)
 
             QString logStr;
             QDateTime now = QDateTime::currentDateTime();
-            logStr = "# Created: " + now.toString("yyyy-MM-dd hh:mm:ss") + "\r\n";
+            logStr = "# Created: " + now.toString("yyyy-MM-dd hh:mm:ss") + "\n";
             writeLogEntry(logStr);
-            logStr.sprintf("# Gede version: %d.%d.%d \r\n", GD_MAJOR,GD_MINOR,GD_PATCH);
+            logStr.sprintf("# Gede version: %d.%d.%d \n", GD_MAJOR,GD_MINOR,GD_PATCH);
             writeLogEntry(logStr);
 
             QString distroDesc;
             detectDistro(NULL, &distroDesc);
-            logStr = "# Host: " + distroDesc + "\r\n";
+            logStr = "# Host: " + distroDesc + "\n";
             writeLogEntry(logStr);
 
         }
