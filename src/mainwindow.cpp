@@ -903,8 +903,28 @@ CodeViewTab* MainWindow::open(QString filename)
         // Get the tags in the file
         QList<Tag> tagList;
         m_tagManager.scan(filename, &tagList);
-        
-    
+
+        // Close if we have to many opened
+        if(m_ui.editorTabWidget->count() >= m_cfg.m_maxTabs)
+        {
+            // Find the oldest tab
+            int oldestTabIdx = -1;
+            QTime tnow = QTime::currentTime();
+            QTime oldestTabTime = tnow;
+            for(int tabIdx = 0;tabIdx < m_ui.editorTabWidget->count();tabIdx++)
+            {
+                CodeViewTab* testTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
+                if(oldestTabIdx == -1 || testTab->getLastAccessTime() < oldestTabTime)
+                {
+                    oldestTabTime = testTab->getLastAccessTime();
+                    oldestTabIdx = tabIdx;
+                }
+            }
+
+            // Close the oldest tab
+            m_ui.editorTabWidget->removeTab(oldestTabIdx);
+        }
+            
         // Create the tab
         codeViewTab = new CodeViewTab(this);
         codeViewTab->setInterface(this);
@@ -920,7 +940,9 @@ CodeViewTab* MainWindow::open(QString filename)
         m_ui.editorTabWidget->addTab(codeViewTab, getFilenamePart(filename));
         m_ui.editorTabWidget->setCurrentIndex(m_ui.editorTabWidget->count()-1);
     }
-    
+
+    codeViewTab->updateLastAccessStamp();
+        
     // Set window title
     QString windowTitle;
     QString filenamePart, folderPathPart;

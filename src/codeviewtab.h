@@ -13,6 +13,7 @@
 
 #include "tagscanner.h"
 #include <QWidget>
+#include <QTime>
 
 class CodeViewTab : public QWidget
 {
@@ -38,6 +39,8 @@ public:
 
     QString getFilePath() { return m_filepath; };
 
+    void updateLastAccessStamp() { m_lastOpened = QTime::currentTime(); };
+    QTime getLastAccessTime() { return m_lastOpened; };
 private:
     
     void fillInFunctions(QList<Tag> tagList);
@@ -50,6 +53,7 @@ private:
     QString m_filepath;
     Settings *m_cfg;
     QList<Tag> m_tagList;
+    QTime m_lastOpened; //!< When the tab was last accessed
 };
 
 #endif

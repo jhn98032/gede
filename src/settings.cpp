@@ -48,6 +48,8 @@ Settings::Settings()
 
 void Settings::loadDefaultsGui()
 {
+    m_maxTabs = 15;
+    
     m_fontFamily = "Monospace";
     m_fontSize = 8;
     m_memoryFontFamily = "Monospace";
@@ -168,6 +170,8 @@ void Settings::loadGlobalConfig()
     m_tabIndentCount = tmpIni.getInt("Gui/TabIndentCount", m_tabIndentCount);
 
     m_sourceIgnoreDirs = tmpIni.getStringList("General/ScannerIgnoreDirs", m_sourceIgnoreDirs);
+
+    m_maxTabs = std::max(1, tmpIni.getInt("General/MaxTabs", m_maxTabs));
 
     tmpIni.getByteArray("GuiState/MainWindowState", &m_gui_mainwindowState);
     tmpIni.getByteArray("GuiState/MainWindowGeometry", &m_gui_mainwindowGeometry);
@@ -373,6 +377,7 @@ void Settings::saveGlobalConfig()
 
     tmpIni.setInt("Gui/TabIndentCount", m_tabIndentCount);
 
+    tmpIni.setInt("General/MaxTabs", m_maxTabs);
 
     tmpIni.setStringList("General/ScannerIgnoreDirs", m_sourceIgnoreDirs);
 

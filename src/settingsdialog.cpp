@@ -91,6 +91,7 @@ void SettingsDialog::loadConfig()
 
     m_ui.spinBox_tabIndent->setValue(m_cfg->getTabIndentCount());
 
+    m_ui.spinBox_maxTabs->setValue(m_cfg->m_maxTabs);
 
     m_ui.lineEdit_sourceIgnoreDirs->setText(m_cfg->m_sourceIgnoreDirs.join(";"));
 
@@ -170,6 +171,8 @@ void SettingsDialog::getConfig(Settings *cfg)
 
     cfg->m_gdbOutputFontFamily = m_settingsGdbOutputFontFamily;
     cfg->m_gdbOutputFontSize = m_settingsGdbOutputFontSize;
+
+    cfg->m_maxTabs = m_ui.spinBox_maxTabs->value();
 
     cfg->m_tabIndentCount = m_ui.spinBox_tabIndent->value();
 

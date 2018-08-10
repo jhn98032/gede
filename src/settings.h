@@ -138,6 +138,7 @@ class Settings
         typedef enum { HOLLOW_RECT = 0, FILLED_RECT } CurrentLineStyle;
         CurrentLineStyle m_currentLineStyle;
 
+        int m_maxTabs; //!< Max number of opened tabs at the same time
 };
 
 
