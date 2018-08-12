@@ -942,6 +942,33 @@ Core& Core::getInstance()
 
 
 /**
+ * @brief Evaluate an data expression.
+ * @return 0 on success.
+ */
+int Core::evaluateExpression(QString expr, QString *data)
+{
+    Com& com = Com::getInstance();
+    Tree resultData;
+    GdbResult res;
+    int rc = 0;
+    
+    assert(expr.isEmpty() == false);
+
+    if(expr.isEmpty())
+        return -1;
+    
+    res = com.commandF(&resultData, "-data-evaluate-expression %s", stringToCStr(expr));
+    if(res != GDB_DONE)
+    {
+        rc = -1;
+    }
+    else
+        *data = resultData.getString("value");
+
+    return rc;
+}
+
+/**
  * @brief Returns info for an existing watch.
  */
 VarWatch* Core::getVarWatchInfo(QString watchId)

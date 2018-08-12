@@ -80,6 +80,8 @@ void SettingsDialog::updateGui()
 
 void SettingsDialog::loadConfig()
 {
+    m_ui.spinBox_variableInfoWindowDelay->setValue(m_cfg->m_variablePopupDelay);
+
     m_settingsFontFamily = m_cfg->m_fontFamily;
     m_settingsFontSize = m_cfg->m_fontSize;
     m_settingsMemoryFontFamily = m_cfg->m_memoryFontFamily;
@@ -160,6 +162,8 @@ void SettingsDialog::loadConfig()
 
 void SettingsDialog::getConfig(Settings *cfg)
 {
+    m_cfg->m_variablePopupDelay = m_ui.spinBox_variableInfoWindowDelay->value();
+
     cfg->m_fontFamily = m_settingsFontFamily;
     cfg->m_fontSize = m_settingsFontSize;
 

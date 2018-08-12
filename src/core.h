@@ -225,6 +225,7 @@ public:
     int initLocal(Settings *cfg, QString gdbPath, QString programPath, QStringList argumentList);
     int initCoreDump(Settings *cfg, QString gdbPath, QString programPath, QString coreDumpFile);
     int initRemote(Settings *cfg, QString gdbPath, QString programPath, QString tcpHost, int tcpPort);
+    int evaluateExpression(QString expr, QString *data);
     
     void setListener(ICore *inf) { m_inf = inf; };
 

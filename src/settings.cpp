@@ -103,6 +103,8 @@ void Settings::loadDefaultsGui()
 
     m_progConBackspaceKey = 0;
     m_progConDelKey = 2;
+
+    m_variablePopupDelay = 300;
 }
 
 void Settings::loadDefaultsAdvanced()
@@ -136,6 +138,8 @@ void Settings::loadGlobalConfig()
     loadDefaultsAdvanced();
 
     m_enableDebugLog = tmpIni.getBool("General/EnableDebugLog", false);
+
+    m_variablePopupDelay = tmpIni.getInt("Gui/VariablePopupDelay", m_variablePopupDelay);
 
     switch(tmpIni.getInt("Gui/CurrentLineStyle", m_currentLineStyle))
     {
@@ -357,6 +361,8 @@ void Settings::saveGlobalConfig()
     tmpIni.setBool("General/EnableDebugLog", m_enableDebugLog);
 
     tmpIni.setInt("Gui/CurrentLineStyle", m_currentLineStyle);
+
+    tmpIni.setInt("Gui/VariablePopupDelay", m_variablePopupDelay);
 
     tmpIni.setBool("Gui/ShowLineNo", m_showLineNo);
     

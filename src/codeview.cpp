@@ -24,10 +24,17 @@
 CodeView::CodeView()
   : m_highlighter(0)
     ,m_cfg(0)
- {
+    ,m_infoWindow(&m_font)
+{
     m_font = QFont("Monospace", 8);
     m_fontInfo = new QFontMetrics(m_font);
     m_cursorY = 0;
+
+    m_timer.setSingleShot(true);
+    connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimerTimeout()));
+    
+    setMouseTracking(true);
+
 }
 
 
@@ -47,6 +54,57 @@ int CodeView::getBorderWidth()
         return BORDER_WIDTH;
     else
         return 20;
+}
+
+
+
+void CodeView::onTimerTimeout()
+{
+    QPoint globalCursorPos = QCursor::pos();
+    QPoint mousePos = mapFromGlobal(globalCursorPos);
+
+    // Clicked on a text row?
+    TextField *foundField = NULL;
+    int rowHeight = getRowHeight();
+    int rowIdx = mousePos.y() / rowHeight;
+    if(rowIdx >= 0 && rowIdx < (int)m_highlighter->getRowCount())
+    {
+        // Get the words in the line
+        QVector<TextField*> cols = m_highlighter->getRow(rowIdx);
+        
+        // Find the word under the cursor
+        int x = getBorderWidth()+10;
+        int foundPos = -1;
+        int j;
+        for(j = 0;j < cols.size() && foundPos == -1;j++)
+        {
+            TextField *field = cols[j];            
+            int w = m_fontInfo->width(field->m_text);
+            if(x <= mousePos.x() && mousePos.x() <= x+w)
+            {
+                foundField = field;
+                foundPos = j;
+            }
+            x += w;
+        }
+
+    }
+
+
+    if(foundField)
+    {   
+        int windowY = mousePos.y() - (mousePos.y()%rowHeight) + rowHeight;
+        QPoint menuPos = mapToGlobal(QPoint(mousePos.x()+15, windowY));
+        m_infoWindow.move(menuPos);
+
+
+        m_infoWindow.show(foundField->m_text);    
+
+    }
+    else
+        m_infoWindow.hide();
+
+
 }
 
 void CodeView::setPlainText(QString text, CodeType type)
@@ -192,6 +250,9 @@ void CodeView::disableCurrentLine()
 void CodeView::setCurrentLine(int lineNo)
 {
     m_cursorY = lineNo;
+
+    m_infoWindow.hide();
+    
     update();
 }
 
@@ -324,6 +385,20 @@ void CodeView::mousePressEvent( QMouseEvent * event )
 }
 
 
+void CodeView::mouseMoveEvent ( QMouseEvent * event )
+{
+    Q_UNUSED(event);
+
+    m_infoWindow.hide();
+
+    if(m_cfg)
+    {
+        if(m_cfg->m_variablePopupDelay > 0)
+            m_timer.start(m_cfg->m_variablePopupDelay);
+    }
+}
+
+
 void CodeView::mouseDoubleClickEvent( QMouseEvent * event )
 {
     int rowHeight = m_fontInfo->lineSpacing()+2;
@@ -361,6 +436,9 @@ void CodeView::setConfig(Settings *cfg)
     m_font = QFont(m_cfg->m_fontFamily, m_cfg->m_fontSize);
     delete m_fontInfo;
     m_fontInfo = new QFontMetrics(m_font);
+
+    if(cfg->m_variablePopupDelay > 0)
+        m_timer.start(cfg->m_variablePopupDelay);
 
     update();
 }
