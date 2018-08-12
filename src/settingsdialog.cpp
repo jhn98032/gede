@@ -80,6 +80,8 @@ void SettingsDialog::updateGui()
 
 void SettingsDialog::loadConfig()
 {
+    m_ui.spinBox_variableInfoWindowDelay->setValue(m_cfg->m_variablePopupDelay);
+
     m_settingsFontFamily = m_cfg->m_fontFamily;
     m_settingsFontSize = m_cfg->m_fontSize;
     m_settingsMemoryFontFamily = m_cfg->m_memoryFontFamily;
@@ -91,6 +93,7 @@ void SettingsDialog::loadConfig()
 
     m_ui.spinBox_tabIndent->setValue(m_cfg->getTabIndentCount());
 
+    m_ui.spinBox_maxTabs->setValue(m_cfg->m_maxTabs);
 
     m_ui.lineEdit_sourceIgnoreDirs->setText(m_cfg->m_sourceIgnoreDirs.join(";"));
 
@@ -159,6 +162,8 @@ void SettingsDialog::loadConfig()
 
 void SettingsDialog::getConfig(Settings *cfg)
 {
+    m_cfg->m_variablePopupDelay = m_ui.spinBox_variableInfoWindowDelay->value();
+
     cfg->m_fontFamily = m_settingsFontFamily;
     cfg->m_fontSize = m_settingsFontSize;
 
@@ -170,6 +175,8 @@ void SettingsDialog::getConfig(Settings *cfg)
 
     cfg->m_gdbOutputFontFamily = m_settingsGdbOutputFontFamily;
     cfg->m_gdbOutputFontSize = m_settingsGdbOutputFontSize;
+
+    cfg->m_maxTabs = m_ui.spinBox_maxTabs->value();
 
     cfg->m_tabIndentCount = m_ui.spinBox_tabIndent->value();
 

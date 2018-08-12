@@ -92,6 +92,9 @@ HEADERS+=autosignalblocker.h
 SOURCES+= execombobox.cpp
 HEADERS+= execombobox.h
 
+SOURCES+=variableinfowindow.cpp
+HEADERS+=variableinfowindow.h
+
 RESOURCES += resource.qrc
 
 #QMAKE_CXXFLAGS += -I./  -g

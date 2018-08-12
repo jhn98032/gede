@@ -168,7 +168,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_ui.editorTabWidget, SIGNAL(tabCloseRequested(int)), SLOT(onCodeViewTab_tabCloseRequested(int)));
     connect(m_ui.editorTabWidget, SIGNAL(currentChanged(int)), SLOT(onCodeViewTab_currentChanged(int)));
-    
+    m_ui.editorTabWidget->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_ui.editorTabWidget, SIGNAL(customContextMenuRequested(const QPoint &)), SLOT(onCodeViewTab_launchContextMenu(const QPoint&)));
+
     statusBar()->addPermanentWidget(&m_statusLineWidget);
 
 
@@ -784,7 +786,74 @@ CodeViewTab* MainWindow::currentTab()
 }
 
 
+/**
+ * @brief Called when user right clicks on tab and chooses 'Close Tabs To The Left'.
+ */
+void MainWindow::onCodeViewTab_closeTabsToLeft()
+{
+    // Get the selected tab
+    QAction *action = static_cast<QAction *>(sender ());
+    int tabIdx  = action->data().toInt();
 
+    for(int i = 0;i < tabIdx;i++)
+    {
+        m_ui.editorTabWidget->removeTab(0);
+    }
+}
+
+
+/**
+ * @brief Called when user right clicks on tab and chooses 'Close Other Tabs'.
+ */
+void MainWindow::onCodeViewTab_closeOtherTabs()
+{
+    // Get the selected tab
+    QAction *action = static_cast<QAction *>(sender ());
+    int tabIdx  = action->data().toInt();
+
+    for(int i = 0;i < tabIdx;i++)
+    {
+        m_ui.editorTabWidget->removeTab(0);
+    }
+    while(m_ui.editorTabWidget->count() >= 2)
+    {
+        m_ui.editorTabWidget->removeTab(1);
+    }
+}
+
+
+/**
+ * @brief Called when the user right clicks on the opened file tab widget.
+ */
+void MainWindow::onCodeViewTab_launchContextMenu(const QPoint& pos)
+{
+    QAction *action;
+    QString title;
+
+    // Get tab
+    int tabIdx = m_ui.editorTabWidget->tabBar()->tabAt(pos);
+    if(tabIdx == -1)
+        return;
+
+    m_popupMenu.clear();
+
+    action = m_popupMenu.addSeparator();
+
+    // Add 'open'
+    action = m_popupMenu.addAction("Close Other Tabs");
+    action->setData(tabIdx);
+    connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewTab_closeOtherTabs()));
+
+        
+    // Add 'Show current PC location'
+    action = m_popupMenu.addAction("Close Tabs To The Left");
+    action->setData(tabIdx);
+    connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewTab_closeTabsToLeft()));
+
+    
+    QPoint popupPos = m_ui.editorTabWidget->mapToGlobal(pos);
+    m_popupMenu.popup(popupPos);
+}
 
 void MainWindow::onCodeViewTab_currentChanged( int tabIdx)
 {
@@ -834,8 +903,30 @@ CodeViewTab* MainWindow::open(QString filename)
         // Get the tags in the file
         QList<Tag> tagList;
         m_tagManager.scan(filename, &tagList);
-        
-    
+
+        // Close if we have to many opened
+        if(m_ui.editorTabWidget->count() >= m_cfg.m_maxTabs)
+        {
+            // Find the oldest tab
+            int oldestTabIdx = -1;
+            QTime tnow = QTime::currentTime();
+            QTime oldestTabTime = tnow;
+            for(int tabIdx = 0;tabIdx < m_ui.editorTabWidget->count();tabIdx++)
+            {
+                CodeViewTab* testTab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
+                if(oldestTabIdx == -1 || testTab->getLastAccessTime() < oldestTabTime)
+                {
+                    oldestTabTime = testTab->getLastAccessTime();
+                    oldestTabIdx = tabIdx;
+                }
+            }
+
+            // Close the oldest tab
+            CodeViewTab* oldestestTab = (CodeViewTab* )m_ui.editorTabWidget->widget(oldestTabIdx);
+            m_ui.editorTabWidget->removeTab(oldestTabIdx);
+            delete oldestestTab;
+        }
+            
         // Create the tab
         codeViewTab = new CodeViewTab(this);
         codeViewTab->setInterface(this);
@@ -851,7 +942,9 @@ CodeViewTab* MainWindow::open(QString filename)
         m_ui.editorTabWidget->addTab(codeViewTab, getFilenamePart(filename));
         m_ui.editorTabWidget->setCurrentIndex(m_ui.editorTabWidget->count()-1);
     }
-    
+
+    codeViewTab->updateLastAccessStamp();
+        
     // Set window title
     QString windowTitle;
     QString filenamePart, folderPathPart;

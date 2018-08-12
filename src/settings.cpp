@@ -48,6 +48,8 @@ Settings::Settings()
 
 void Settings::loadDefaultsGui()
 {
+    m_maxTabs = 15;
+    
     m_fontFamily = "Monospace";
     m_fontSize = 8;
     m_memoryFontFamily = "Monospace";
@@ -101,6 +103,8 @@ void Settings::loadDefaultsGui()
 
     m_progConBackspaceKey = 0;
     m_progConDelKey = 2;
+
+    m_variablePopupDelay = 300;
 }
 
 void Settings::loadDefaultsAdvanced()
@@ -135,6 +139,8 @@ void Settings::loadGlobalConfig()
 
     m_enableDebugLog = tmpIni.getBool("General/EnableDebugLog", false);
 
+    m_variablePopupDelay = tmpIni.getInt("Gui/VariablePopupDelay", m_variablePopupDelay);
+
     switch(tmpIni.getInt("Gui/CurrentLineStyle", m_currentLineStyle))
     {
         case HOLLOW_RECT: m_currentLineStyle = HOLLOW_RECT;break;
@@ -168,6 +174,8 @@ void Settings::loadGlobalConfig()
     m_tabIndentCount = tmpIni.getInt("Gui/TabIndentCount", m_tabIndentCount);
 
     m_sourceIgnoreDirs = tmpIni.getStringList("General/ScannerIgnoreDirs", m_sourceIgnoreDirs);
+
+    m_maxTabs = std::max(1, tmpIni.getInt("General/MaxTabs", m_maxTabs));
 
     tmpIni.getByteArray("GuiState/MainWindowState", &m_gui_mainwindowState);
     tmpIni.getByteArray("GuiState/MainWindowGeometry", &m_gui_mainwindowGeometry);
@@ -354,6 +362,8 @@ void Settings::saveGlobalConfig()
 
     tmpIni.setInt("Gui/CurrentLineStyle", m_currentLineStyle);
 
+    tmpIni.setInt("Gui/VariablePopupDelay", m_variablePopupDelay);
+
     tmpIni.setBool("Gui/ShowLineNo", m_showLineNo);
     
     tmpIni.setString("Gui/Style", m_guiStyleName);
@@ -373,6 +383,7 @@ void Settings::saveGlobalConfig()
 
     tmpIni.setInt("Gui/TabIndentCount", m_tabIndentCount);
 
+    tmpIni.setInt("General/MaxTabs", m_maxTabs);
 
     tmpIni.setStringList("General/ScannerIgnoreDirs", m_sourceIgnoreDirs);
 

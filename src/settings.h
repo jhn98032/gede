@@ -138,6 +138,9 @@ class Settings
         typedef enum { HOLLOW_RECT = 0, FILLED_RECT } CurrentLineStyle;
         CurrentLineStyle m_currentLineStyle;
 
+        int m_maxTabs; //!< Max number of opened tabs at the same time
+
+        int m_variablePopupDelay; //!< Number of milliseconds before the variables value should be displayed in a popup.
 };
 
 
