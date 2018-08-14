@@ -2,6 +2,9 @@
 #define FILE_MEMORYDIALOG_H
 
 #include "ui_memorydialog.h"
+
+#include <stdint.h>
+
 #include <QDialog>
 
 

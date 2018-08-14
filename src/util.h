@@ -9,6 +9,8 @@
 #ifndef FILE__UTIL_H
 #define FILE__UTIL_H
 
+#include <stdint.h>
+
 #include <QString>
 
 #define MIN(a,b) ((a)<(b))

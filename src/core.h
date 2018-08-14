@@ -9,6 +9,7 @@
 #ifndef FILE__CORE_H
 #define FILE__CORE_H
 
+#include <stdint.h>
 #include "com.h"
 #include <QList>
 #include <QMap>
