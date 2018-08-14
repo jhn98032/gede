@@ -23,7 +23,6 @@ static const int PAD_ADDR_RIGHT = 10; //!< Pad length right to the address field
 static const int PAD_HEX_MIDDLE = 10;  //!< Space between the first 8 and the last 8 bytes in a row
 static const int PAD_INTER_HEX = 5; //!< Space between each 8 hex strings.
 static const int PAD_HEX_RIGHT = 10;   //!< Pad length right to the hex field.
-static const int PAD_DATA = 5;
 static const int BYTES_PER_ROW = 16;
 
 
@@ -157,7 +156,7 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
     //    startAddress = 0xffffffffU-((rowCount-2)*16);
     
     // Draw 'address' field background
-    QRect rect2(0,0,PAD_ADDR_LEFT+charWidth*m_addrCharWidth+PAD_ADDR_RIGHT/2, event->rect().bottom()+1);
+    QRect rect2(0,0,PAD_ADDR_LEFT+(charWidth*m_addrCharWidth)+PAD_ADDR_RIGHT/2, event->rect().bottom()+1);
     painter.fillRect(rect2, Qt::lightGray);
 
     // Draw 'header' background
@@ -172,13 +171,13 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
     // Draw header
     text.sprintf("Address");
     x = PAD_ADDR_LEFT;
-    painter.drawText(PAD_ADDR_LEFT, rowHeight, text);
+    painter.drawText(x, rowHeight, text);
     x += (charWidth*m_addrCharWidth)+PAD_ADDR_RIGHT;
     for(int off = 0;off < 16;off++)
     {
         text.sprintf("%x", off);
         painter.drawText(x, rowHeight, text);
-        x += (charWidth*2)+PAD_DATA;
+        x += (charWidth*2)+PAD_INTER_HEX;
         if(off==8)
             x += PAD_HEX_MIDDLE;
     }
@@ -291,8 +290,8 @@ uint64_t MemoryWidget::getAddrAtPos(QPoint pos)
     const int rowHeight = getRowHeight();
     const int charWidth = m_fontInfo->width("H");
     uint64_t addr;
-    const int field_hex_width = PAD_HEX_MIDDLE + 16*(PAD_DATA+charWidth*2) + PAD_HEX_RIGHT;
-    const int field_address_width = PAD_ADDR_LEFT+(PAD_DATA+charWidth*m_addrCharWidth)+PAD_ADDR_RIGHT;
+    const int field_hex_width = PAD_HEX_MIDDLE + 16*(PAD_INTER_HEX+charWidth*2) + PAD_HEX_RIGHT;
+    const int field_address_width = PAD_ADDR_LEFT+(charWidth*m_addrCharWidth)+PAD_ADDR_RIGHT;
     int idx = 0;
     
     addr = m_startAddress+(pos.y()-getHeaderHeight())/rowHeight*BYTES_PER_ROW;
@@ -300,6 +299,7 @@ uint64_t MemoryWidget::getAddrAtPos(QPoint pos)
     // Adjust for the address column
     int x = pos.x();
     x -= field_address_width;
+
     if(x > 0)
     {
         // In the ascii field?
@@ -310,11 +310,11 @@ uint64_t MemoryWidget::getAddrAtPos(QPoint pos)
         else
         {
             // Adjust for the middle space
-            if(x > (PAD_HEX_MIDDLE+8*((charWidth*2)+5)))
+            if(x > ((PAD_HEX_MIDDLE/2)+8*((charWidth*2)+PAD_INTER_HEX)))
                 x -= PAD_HEX_MIDDLE;
 
             // Get the character index
-            idx = x / (((charWidth*2)+5));
+            idx = (x+PAD_INTER_HEX/2) / ((charWidth*2)+PAD_INTER_HEX);
         }
     }
     if(idx < 0)
