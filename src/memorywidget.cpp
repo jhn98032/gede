@@ -21,6 +21,7 @@
 static const int PAD_ADDR_LEFT = 10; //!< Pad length left to the address field
 static const int PAD_ADDR_RIGHT = 10; //!< Pad length right to the address field.
 static const int PAD_HEX_MIDDLE = 10;  //!< Space between the first 8 and the last 8 bytes in a row
+static const int PAD_INTER_HEX = 5; //!< Space between each 8 hex strings.
 static const int PAD_HEX_RIGHT = 10;   //!< Pad length right to the hex field.
 static const int PAD_DATA = 5;
 static const int BYTES_PER_ROW = 16;
@@ -120,6 +121,7 @@ char MemoryWidget::byteToChar(uint8_t d)
 void MemoryWidget::paintEvent ( QPaintEvent * event )
 {
     QPainter painter(this);
+    const int ascent = m_fontInfo->ascent();
     const int rowHeight = getRowHeight();
     const int charWidth = m_fontInfo->width("H");
     QString text;
@@ -208,6 +210,7 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
         x += charWidth*text.length();
         x += PAD_ADDR_RIGHT;
         
+        painter.setPen(Qt::black);
         for(int off = 0;off < 16;off++)
         {
             int dataIdx = rowIdx*16+off;
@@ -217,17 +220,31 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
 
             if(selectionFirst != 0 || selectionLast != 0)
             {
+                // Paint the selection marker
                 if(selectionFirst <= off+memoryAddr && off+memoryAddr <=  selectionLast)
-                    painter.setPen(Qt::red);
-                else
-                    painter.setPen(Qt::black);
+                {
+                    QRect bgRect(x,y-rowHeight+(rowHeight-ascent)/2,charWidth*2, rowHeight);
+                    if(off == 0)
+                        bgRect.adjust(-(PAD_ADDR_RIGHT/2),0,(PAD_INTER_HEX/2)+1, 0);
+                    else
+                        bgRect.adjust(-(PAD_INTER_HEX/2),0,(PAD_INTER_HEX/2)+1, 0);
+                    if(off == 7)
+                        bgRect.adjust(0,0,PAD_HEX_MIDDLE/2+1,0);
+                    else if(off == 8)
+                        bgRect.adjust(-PAD_HEX_MIDDLE/2,0,0,0);
+                    else if(off == 15)
+                        bgRect.adjust(0,0, PAD_HEX_RIGHT+(PAD_INTER_HEX-(PAD_INTER_HEX/2)-1),0);
+                    
+
+                    painter.fillRect(bgRect,QBrush(Qt::yellow));
+                }
             }
             
             text.sprintf("%02x", d);
             painter.drawText(x, y, text);
             }
         
-            x += charWidth*text.length()+5;
+            x += charWidth*text.length()+PAD_INTER_HEX;
 
             if(off == 8)
                 x += PAD_HEX_MIDDLE;
@@ -246,9 +263,11 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
             if(selectionFirst != 0 || selectionLast != 0)
             {
                 if(selectionFirst <= off+memoryAddr && off+memoryAddr <=  selectionLast)
-                    painter.setPen(Qt::red);
-                else
-                    painter.setPen(Qt::black);
+                {
+                    QRect bgRect(x,y-rowHeight+(rowHeight-ascent)/2,charWidth, rowHeight);
+                    painter.fillRect(bgRect,QBrush(Qt::yellow));
+               
+                }
             }
             
             painter.drawText(x, y, QString(c2));
