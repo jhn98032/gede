@@ -178,7 +178,7 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
         text.sprintf("%x", off);
         painter.drawText(x, rowHeight, text);
         x += (charWidth*2)+PAD_INTER_HEX;
-        if(off==8)
+        if(off==7)
             x += PAD_HEX_MIDDLE;
     }
     x += PAD_HEX_RIGHT;
@@ -243,9 +243,9 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
             painter.drawText(x, y, text);
             }
         
-            x += charWidth*text.length()+PAD_INTER_HEX;
+            x += (charWidth*2)+PAD_INTER_HEX;
 
-            if(off == 8)
+            if(off == 7)
                 x += PAD_HEX_MIDDLE;
         }
         x += PAD_HEX_RIGHT;
@@ -317,6 +317,8 @@ uint64_t MemoryWidget::getAddrAtPos(QPoint pos)
             idx = (x+PAD_INTER_HEX/2) / ((charWidth*2)+PAD_INTER_HEX);
         }
     }
+    else if(x < -PAD_ADDR_RIGHT/2)
+        addr -= 1;
     if(idx < 0)
         idx = -1;
     else if(BYTES_PER_ROW-1 < idx)
