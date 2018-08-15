@@ -6,7 +6,6 @@
 #include <QScrollBar>
 #include <QMenu>
 
-#include <stdint.h>
 
 #include "settings.h"
 
@@ -14,7 +13,7 @@
 class IMemoryWidget
 {
 public:
-    virtual QByteArray getMemory(uint64_t startAddress, int count) = 0;
+    virtual QByteArray getMemory(quint64 startAddress, int count) = 0;
 
 };
 
@@ -34,14 +33,14 @@ public:
     
 private:
     int getRowHeight();
-    uint64_t getAddrAtPos(QPoint pos);
+    quint64 getAddrAtPos(QPoint pos);
     int getHeaderHeight();
-    char byteToChar(uint8_t d);
+    char byteToChar(quint8 d);
 
     virtual void keyPressEvent(QKeyEvent *e);
     
 public slots:
-    void setStartAddress(uint64_t addr);
+    void setStartAddress(quint64 addr);
     void onCopy();
     
 private:
@@ -54,8 +53,8 @@ private:
     QFontMetrics *m_fontInfo;
 
     bool m_selectionStartValid;
-    uint64_t m_startAddress;
-    uint64_t m_selectionStart, m_selectionEnd;
+    quint64 m_startAddress;
+    quint64 m_selectionStart, m_selectionEnd;
     IMemoryWidget *m_inf;
     QMenu m_popupMenu;
     int m_addrCharWidth;

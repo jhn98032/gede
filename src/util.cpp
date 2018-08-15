@@ -281,7 +281,7 @@ void detectDistro(DistroType *type, QString *distroDesc)
 /**
  * @brief Returns a string describing an address (eg: "0x3000_1234").
  */
-QString addrToString(uint64_t addr)
+QString addrToString(quint64 addr)
 {
     QString valueText;
     QString text;

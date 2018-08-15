@@ -122,7 +122,7 @@ void AutoVarCtl::onContextMenu ( const QPoint &pos)
 /**
  * @brief Returns the address of the data the variable points to or the actual variable.
  */
-uint64_t AutoVarCtl::getAddress(VarWatch &w)
+quint64 AutoVarCtl::getAddress(VarWatch &w)
 {
     Core &core = Core::getInstance();
     if(w.hasPointerAddress())

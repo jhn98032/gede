@@ -11,7 +11,6 @@
 
 #include <QApplication>
 #include <QClipboard>
-#include <stdint.h>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QColor>
@@ -79,7 +78,7 @@ void MemoryWidget::setInterface(IMemoryWidget *inf)
 }
 
 
-void MemoryWidget::setStartAddress(uint64_t addr)
+void MemoryWidget::setStartAddress(quint64 addr)
 {
 
     m_startAddress = addr;
@@ -104,7 +103,7 @@ int MemoryWidget::getHeaderHeight()
 }
 
 
-char MemoryWidget::byteToChar(uint8_t d)
+char MemoryWidget::byteToChar(quint8 d)
 {
     char c;
     if(0x21 <= d && d <= 0x7e)
@@ -127,10 +126,10 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
     int HEADER_HEIGHT = getHeaderHeight();
     int x;
     int rowCount = ((size().height()-HEADER_HEIGHT)/rowHeight)+1;
-    uint64_t startAddress = m_startAddress;
+    quint64 startAddress = m_startAddress;
     
-    uint64_t selectionFirst;
-    uint64_t selectionLast;
+    quint64 selectionFirst;
+    quint64 selectionLast;
     if(m_selectionEnd < m_selectionStart)
     {
         selectionFirst = m_selectionEnd;
@@ -199,7 +198,7 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
         int y = HEADER_HEIGHT+rowHeight*rowIdx+rowHeight;
         x = PAD_ADDR_LEFT;
         
-        uint64_t memoryAddr = startAddress + rowIdx*16;
+        quint64 memoryAddr = startAddress + rowIdx*16;
         if(memoryAddr < startAddress)
             break;
             
@@ -215,7 +214,7 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
             int dataIdx = rowIdx*16+off;
             if(dataIdx < content.size())
             {
-            uint8_t d = content[dataIdx];
+            quint8 d = content[dataIdx];
 
             if(selectionFirst != 0 || selectionLast != 0)
             {
@@ -285,11 +284,11 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
 
 
 
-uint64_t MemoryWidget::getAddrAtPos(QPoint pos)
+quint64 MemoryWidget::getAddrAtPos(QPoint pos)
 {
     const int rowHeight = getRowHeight();
     const int charWidth = m_fontInfo->width("H");
-    uint64_t addr;
+    quint64 addr;
     const int field_hex_width = PAD_HEX_MIDDLE + 16*(PAD_INTER_HEX+charWidth*2) + PAD_HEX_RIGHT;
     const int field_address_width = PAD_ADDR_LEFT+(charWidth*m_addrCharWidth)+PAD_ADDR_RIGHT;
     int idx = 0;
@@ -374,7 +373,7 @@ void MemoryWidget::mousePressEvent(QMouseEvent * event)
 
 void MemoryWidget::onCopy()
 {
-    uint64_t selectionFirst,selectionLast;
+    quint64 selectionFirst,selectionLast;
     
     if(m_selectionEnd < m_selectionStart)
     {
@@ -394,7 +393,7 @@ void MemoryWidget::onCopy()
 
         QString contentStr;
         QString subText;
-        for(uint64_t addr = (selectionFirst & ~0xfULL);addr <= selectionLast;addr+=16)
+        for(quint64 addr = (selectionFirst & ~0xfULL);addr <= selectionLast;addr+=16)
         {
             unsigned int j;
             
@@ -407,7 +406,7 @@ void MemoryWidget::onCopy()
             {
                 if(selectionFirst <= addr+j && addr+j <= selectionLast) 
                 {
-                    uint8_t b = (unsigned char)content[(int)(addr+j-selectionFirst)];
+                    quint8 b = (unsigned char)content[(int)(addr+j-selectionFirst)];
                     subText.sprintf("%02x ", b);
                 }
                 else
@@ -423,7 +422,7 @@ void MemoryWidget::onCopy()
             {
                 if(selectionFirst <= addr+j && addr+j <= selectionLast) 
                 {
-                    uint8_t b = content[(int)(addr+j-selectionFirst)];
+                    quint8 b = content[(int)(addr+j-selectionFirst)];
                     subText.sprintf("%c", byteToChar(b));
                 }
                 else

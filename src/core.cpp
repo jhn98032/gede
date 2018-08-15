@@ -80,7 +80,7 @@ CoreVar::~CoreVar()
 }
 
     
-uint64_t CoreVar::getPointerAddress()
+quint64 CoreVar::getPointerAddress()
 {
     return m_address;
 }
@@ -608,7 +608,7 @@ void Core::onGdbOutput(int socketFd)
  * @brief Reads a memory area.
  * @return 0 on success.
  */
-int Core::gdbGetMemory(uint64_t addr, size_t count, QByteArray *data)
+int Core::gdbGetMemory(quint64 addr, size_t count, QByteArray *data)
 {
     Com& com = Com::getInstance();
     Tree resultData;
@@ -1882,10 +1882,10 @@ int Core::changeWatchVariable(QString watchId, QString newValue)
 /**
  * @brief Returns the address in memory where the variable is stored in.
  */
-uint64_t Core::getAddress(VarWatch &w)
+quint64 Core::getAddress(VarWatch &w)
 {
     int rc = 0;
-    uint64_t addr = 0;
+    quint64 addr = 0;
     GdbResult gdbRes = GDB_ERROR;
     Com& com = Com::getInstance();
     Tree resultData;

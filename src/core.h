@@ -9,7 +9,6 @@
 #ifndef FILE__CORE_H
 #define FILE__CORE_H
 
-#include <stdint.h>
 #include "com.h"
 #include <QList>
 #include <QMap>
@@ -89,8 +88,8 @@ public:
     void setVarType(QString varType) { m_varType = varType; };
     QString getVarType() { return m_varType; };
     void setData(Type type, QVariant data);
-    uint64_t getPointerAddress();
-    void setPointerAddress(uint64_t addr) { m_addressValid = true; m_address = addr; };
+    quint64 getPointerAddress();
+    void setPointerAddress(quint64 addr) { m_addressValid = true; m_address = addr; };
     bool hasPointerAddress() { return m_addressValid; };
 
     bool hasChildren() { return m_hasChildren; };
@@ -105,7 +104,7 @@ private:
 
     QString m_name;
     QVariant m_data;
-    uint64_t m_address; //!< The address of data the variable points to.
+    quint64 m_address; //!< The address of data the variable points to.
     Type m_type;
     QString m_varType;
     bool m_hasChildren;
@@ -262,7 +261,7 @@ public:
     
     QStringList getLocalVars() { return m_localVars; };
 
-    uint64_t getAddress(VarWatch &w);
+    quint64 getAddress(VarWatch &w);
     
 
     int gdbSetBreakpoint(QString filename, int lineNo);
@@ -270,7 +269,7 @@ public:
     void getStackFrames();
     void stop();
     int gdbExpandVarWatchChildren(QString watchId);
-    int gdbGetMemory(uint64_t addr, size_t count, QByteArray *data);
+    int gdbGetMemory(quint64 addr, size_t count, QByteArray *data);
     
     void selectThread(int threadId);
     void selectFrame(int selectedFrameIdx);

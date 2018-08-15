@@ -14,7 +14,7 @@
 
 #define SCROLL_ADDR_RANGE   0x10000ULL
 
-QByteArray MemoryDialog::getMemory(uint64_t startAddress, int count)
+QByteArray MemoryDialog::getMemory(quint64 startAddress, int count)
 {
      Core &core = Core::getInstance();
    
@@ -45,7 +45,7 @@ MemoryDialog::MemoryDialog(QWidget *parent)
 /**
  * @brief Converts a string entered by the user to an address.
  */
-uint64_t MemoryDialog::inputTextToAddress(QString text)
+quint64 MemoryDialog::inputTextToAddress(QString text)
 {
     // Remove leading zeroes
     while(text.startsWith('0') && text.length() > 1)
@@ -65,13 +65,13 @@ uint64_t MemoryDialog::inputTextToAddress(QString text)
 
 void MemoryDialog::onUpdate()
 {
-    uint64_t addr = inputTextToAddress(m_ui.lineEdit_address->text());
+    quint64 addr = inputTextToAddress(m_ui.lineEdit_address->text());
     setStartAddress(addr);
 }
 
-void MemoryDialog::setStartAddress(uint64_t addr)
+void MemoryDialog::setStartAddress(quint64 addr)
 {
-    uint64_t addrAligned = addr & ~0xfULL;
+    quint64 addrAligned = addr & ~0xfULL;
 
     if(addrAligned < (SCROLL_ADDR_RANGE/2))
         m_startScrollAddress = 0;
@@ -88,7 +88,7 @@ void MemoryDialog::setStartAddress(uint64_t addr)
 
 void MemoryDialog::onVertScroll(int pos)
 {
-    uint64_t addr = m_startScrollAddress + ((uint64_t)pos*16ULL);
+    quint64 addr = m_startScrollAddress + ((quint64)pos*16ULL);
     m_ui.memorywidget->setStartAddress(addr);
 }
 
