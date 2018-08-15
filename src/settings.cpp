@@ -504,7 +504,14 @@ QStringList Settings::getDefaultCxxKeywordList()
     keywordList += "int16_t";
     keywordList += "int8_t";
     
-    return keywordList;
+    keywordList += "quint32";
+    keywordList += "quint16";
+    keywordList += "quint8";
+    keywordList += "qint32";
+    keywordList += "qint16";
+    keywordList += "qint8";
+    
+   return keywordList;
 }
 
 
