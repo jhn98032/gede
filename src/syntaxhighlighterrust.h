@@ -9,13 +9,13 @@
 #ifndef  FILE__SYNTAXHIGHLIGHTERRUST_H
 #define  FILE__SYNTAXHIGHLIGHTERRUST_H
 
-#include <settings.h>
 
 #include <QVector>
 #include <QString>
 #include <QColor>
 #include <QHash>
 
+#include "settings.h"
 #include "syntaxhighlighter.h"
 
 

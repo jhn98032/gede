@@ -9,12 +9,12 @@
 #ifndef  FILE__SYNTAXHIGHLIGHTER
 #define  FILE__SYNTAXHIGHLIGHTER
 
-#include <settings.h>
-
 #include <QVector>
 #include <QString>
 #include <QColor>
 #include <QHash>
+
+#include "settings.h"
 
 
 struct TextField
