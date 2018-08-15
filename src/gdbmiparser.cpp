@@ -8,10 +8,11 @@
 
 //#define ENABLE_DEBUGMSG
 
+#include <assert.h>
+
 #include "gdbmiparser.h"
 #include "util.h"
 #include "log.h"
-#include <assert.h>
 #include "core.h"
 
 

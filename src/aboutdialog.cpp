@@ -8,8 +8,9 @@
 
 #include "aboutdialog.h"
 
-#include "version.h"
 #include <QProcess>
+
+#include "version.h"
 #include "util.h"
 #include "log.h"
 

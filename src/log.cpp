@@ -7,6 +7,7 @@
  */
 
 #include "log.h"
+
 #include <QDebug>
 #include <QTime>
 #include <QMutex>

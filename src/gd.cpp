@@ -10,17 +10,19 @@
 #if QT_VERSION < 0x050000
 #include <QtGui/QApplication>
 #endif
+
+#include <QMessageBox>
+#include <QDir>
+
 #include "mainwindow.h"
 #include "core.h"
 #include "log.h"
 #include "util.h"
-#include <QMessageBox>
 #include "tree.h"
 #include "opendialog.h"
 #include "settings.h"
 #include "version.h"
 
-#include <QDir>
 
 
 static int dumpUsage()

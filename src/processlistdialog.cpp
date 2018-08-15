@@ -10,18 +10,20 @@
 
 #include "processlistdialog.h"
 
-#include "version.h"
-#include <QProcess>
-#include "util.h"
-#include "log.h"
-
 #include <QList>
 #include <QDir>
 #include <QFileInfoList>
+#include <QProcess>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+
+#include "version.h"
+#include "util.h"
+#include "log.h"
+
+
 
 enum
 {

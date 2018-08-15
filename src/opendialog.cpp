@@ -7,6 +7,7 @@
  */
 
 #include "opendialog.h"
+
 #include "version.h"
 #include "log.h"
 #include "util.h"

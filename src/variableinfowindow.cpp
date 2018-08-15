@@ -1,6 +1,8 @@
 #include "variableinfowindow.h"
-#include "core.h"
+
 #include <QFontMetrics>
+
+#include "core.h"
 
 
 VariableInfoWindow::VariableInfoWindow(QFont *font)

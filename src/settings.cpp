@@ -7,13 +7,15 @@
  */
 
 #include "settings.h"
+
+#include <QDir>
+#include <QStyleFactory>
+
 #include "util.h"
 #include "log.h"
 #include "ini.h"
 #include "config.h"
 
-#include <QDir>
-#include <QStyleFactory>
 
 
 

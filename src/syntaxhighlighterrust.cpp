@@ -12,6 +12,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <QStringList>
+
 #include "util.h"
 #include "settings.h"
 

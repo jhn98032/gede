@@ -8,13 +8,13 @@
 
 #include "tagscanner.h"
 
-#include "log.h"
-#include "util.h"
-#include "rusttagscanner.h"
-
 #include <QMessageBox>
 #include <QProcess>
 #include <QDebug>
+
+#include "log.h"
+#include "util.h"
+#include "rusttagscanner.h"
 
 
 static const char ETAGS_CMD[] = "ctags";

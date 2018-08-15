@@ -9,7 +9,6 @@
 #ifndef FILE__CORE_H
 #define FILE__CORE_H
 
-#include "com.h"
 #include <QList>
 #include <QMap>
 #include <QHash>
@@ -17,8 +16,9 @@
 #include <QObject>
 #include <QVector>
 
-
+#include "com.h"
 #include "settings.h"
+
 
 class Core;
 

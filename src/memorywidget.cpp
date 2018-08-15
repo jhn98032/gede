@@ -14,6 +14,7 @@
 #include <QPainter>
 #include <QPaintEvent>
 #include <QColor>
+
 #include "log.h"
 #include "util.h"
 

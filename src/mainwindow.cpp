@@ -9,19 +9,21 @@
  */
 
 #include "mainwindow.h"
+
+#include <QDirIterator>
+#include <QMessageBox>
+#include <QScrollBar>
+
+#include <assert.h>
+
 #include "util.h"
 #include "log.h"
 #include "core.h"
-#include <assert.h>
 #include "aboutdialog.h"
 #include "settingsdialog.h"
 #include "tagscanner.h"
 #include "codeview.h"
-
 #include "memorydialog.h"
-#include <QDirIterator>
-#include <QMessageBox>
-#include <QScrollBar>
 
 
 MainWindow::MainWindow(QWidget *parent)

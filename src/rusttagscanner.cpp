@@ -6,22 +6,15 @@
  * of the BSD license.  See the LICENSE file for details.
  */
 
-#include <assert.h>
-#include <stdio.h>
-#include <QStringList>
-#include "util.h"
-#include "settings.h"
-
-#include "rusttagscanner.h"
-#include <QFile>
-
-
 // #define ENABLE_DEBUGMSG
 
+#include "rusttagscanner.h"
 
 #include <assert.h>
 #include <stdio.h>
 #include <QStringList>
+#include <QFile>
+
 #include "util.h"
 #include "settings.h"
 #include "log.h"

@@ -10,11 +10,6 @@
 
 #include "core.h"
 
-#include "ini.h"
-#include "util.h"
-#include "log.h"
-#include "gdbmiparser.h"
-
 #include <QByteArray>
 #include <QDebug>
 #include <unistd.h>
@@ -27,6 +22,12 @@
 #include <sys/ioctl.h>
 #include <string.h>
 #include <errno.h>
+
+#include "ini.h"
+#include "util.h"
+#include "log.h"
+#include "gdbmiparser.h"
+
 
 VarWatch::VarWatch()
     : m_inScope(true)

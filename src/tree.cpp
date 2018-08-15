@@ -7,10 +7,12 @@
  */
 
 #include "tree.h"
+
 #include <QList>
+#include <assert.h>
+
 #include "log.h"
 #include "util.h"
-#include <assert.h>
 
 TreeNode::TreeNode()
     : m_parent(NULL)

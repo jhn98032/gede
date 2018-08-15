@@ -7,18 +7,18 @@
  */
 
 #include "com.h"
+
+#include <QDateTime>
 #include <QByteArray>
 #include <QDebug>
 #include <unistd.h>
-#include "log.h"
-#include "util.h"
 #include <assert.h>
-#include <unistd.h>
-#include "config.h"
-#include "version.h"
 #include <sys/time.h>
 
-#include <QDateTime>
+#include "log.h"
+#include "util.h"
+#include "config.h"
+#include "version.h"
 
 
 

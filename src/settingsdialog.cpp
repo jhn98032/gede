@@ -7,12 +7,14 @@
  */
 
 #include "settingsdialog.h"
+
+#include <QStyleFactory>
+#include <QFontDialog>
+
 #include "version.h"
 #include "log.h"
 #include "util.h"
 
-#include <QStyleFactory>
-#include <QFontDialog>
 
 
 SettingsDialog::SettingsDialog(QWidget *parent, Settings *cfg)

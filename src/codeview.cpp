@@ -7,13 +7,14 @@
  */
 
 #include "codeview.h"
+
 #include <QPainter>
 #include <QDebug>
 #include <QPaintEvent>
 #include <QColor>
-#include "log.h"
 #include <assert.h>
 
+#include "log.h"
 #include "syntaxhighlighter.h"
 #include "util.h"
 

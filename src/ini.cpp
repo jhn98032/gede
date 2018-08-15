@@ -10,9 +10,10 @@
 
 #include <QFile>
 #include <QStringList>
+#include <assert.h>
+
 #include "util.h"
 #include "log.h"
-#include <assert.h>
 
 // Enables this if the entries should be sorted in the ini file.
 #define INI_SORT_ENTRIES
