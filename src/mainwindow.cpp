@@ -833,7 +833,7 @@ void MainWindow::onCodeViewTab_launchContextMenu(const QPoint& pos)
     QString title;
 
     // Get tab
-    int tabIdx = m_ui.editorTabWidget->tabBar()->tabAt(pos);
+    int tabIdx = m_ui.editorTabWidget->tabAt(pos);
     if(tabIdx == -1)
         return;
 

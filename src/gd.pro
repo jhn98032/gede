@@ -95,6 +95,9 @@ HEADERS+= execombobox.h
 SOURCES+=variableinfowindow.cpp
 HEADERS+=variableinfowindow.h
 
+SOURCES+=tabwidgetadv.cpp
+HEADERS+=tabwidgetadv.h
+
 RESOURCES += resource.qrc
 
 #QMAKE_CXXFLAGS += -I./  -g

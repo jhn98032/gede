@@ -35,7 +35,7 @@
           </property>
          </column>
         </widget>
-        <widget class="QTabWidget" name="editorTabWidget">
+        <widget class="TabWidgetAdv" name="editorTabWidget">
          <property name="tabsClosable">
           <bool>true</bool>
          </property>
@@ -450,6 +450,12 @@
    <class>ConsoleWidget</class>
    <extends>QWidget</extends>
    <header>consolewidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>TabWidgetAdv</class>
+   <extends>QTabWidget</extends>
+   <header>tabwidgetadv.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
