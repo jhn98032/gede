@@ -116,6 +116,7 @@ public slots:
     void onStepIn();
     void onStepOut();
     void onAbout();
+    void onGoToLine();
     void onStop();
     void onBreakpointsWidgetItemDoubleClicked(QTreeWidgetItem * item,int column);
     void onRun();

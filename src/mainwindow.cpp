@@ -24,6 +24,8 @@
 #include "tagscanner.h"
 #include "codeview.h"
 #include "memorydialog.h"
+#include "gotodialog.h"
+
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -138,6 +140,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ui.actionStop, SIGNAL(triggered()), SLOT(onStop()));
     connect(m_ui.actionNext, SIGNAL(triggered()), SLOT(onNext()));
     connect(m_ui.actionAbout, SIGNAL(triggered()), SLOT(onAbout()));
+    connect(m_ui.actionGoToLine, SIGNAL(triggered()), SLOT(onGoToLine()));
     connect(m_ui.actionStep_In, SIGNAL(triggered()), SLOT(onStepIn()));
     connect(m_ui.actionStep_Out, SIGNAL(triggered()), SLOT(onStepOut()));
     connect(m_ui.actionRun, SIGNAL(triggered()), SLOT(onRun()));
@@ -1043,6 +1046,38 @@ void MainWindow::onAbout()
     dlg.exec();
 }
 
+
+/**
+ * @brief Called when user presses "Search->Go toline".
+ */
+void MainWindow::onGoToLine()
+{
+    // Get currently opened file
+    QString currentFilename;
+    CodeViewTab* currentCodeViewTab = currentTab();
+    assert(currentCodeViewTab != NULL);
+    if(currentCodeViewTab)
+        currentFilename = currentCodeViewTab->getFilePath();
+    
+    // Show dialog
+    GoToDialog dlg(this, &m_cfg, currentFilename);
+    if(dlg.exec() != QDialog::Accepted)
+        return;
+
+    // Which file and line was selected?
+    QString filename;
+    int lineno;
+    dlg.getSelection(&filename, &lineno);
+
+
+    // Open file    
+    if(!filename.isEmpty() && lineno > 0)
+    {
+        CodeViewTab* currentCodeViewTab = open(filename);
+        if(currentCodeViewTab)
+            currentCodeViewTab->ensureLineIsVisible(lineno);    
+    }    
+}
 
 void MainWindow::onRun()
 {

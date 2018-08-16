@@ -252,7 +252,14 @@
     <addaction name="separator"/>
     <addaction name="actionDefaultViewSetup"/>
    </widget>
+   <widget class="QMenu" name="menuSearch">
+    <property name="title">
+     <string>Search</string>
+    </property>
+    <addaction name="actionGoToLine"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuSearch"/>
    <addaction name="menuExecution"/>
    <addaction name="menuView"/>
    <addaction name="menuHelp"/>
@@ -442,6 +449,14 @@
   <action name="actionDefaultViewSetup">
    <property name="text">
     <string>Restore Default View</string>
+   </property>
+  </action>
+  <action name="actionGoToLine">
+   <property name="text">
+    <string>Go To Line...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+G</string>
    </property>
   </action>
  </widget>

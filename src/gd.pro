@@ -98,6 +98,10 @@ HEADERS+=variableinfowindow.h
 SOURCES+=tabwidgetadv.cpp
 HEADERS+=tabwidgetadv.h
 
+SOURCES+=gotodialog.cpp
+HEADERS+=gotodialog.h
+FORMS+=gotodialog.ui
+
 RESOURCES += resource.qrc
 
 #QMAKE_CXXFLAGS += -I./  -g
