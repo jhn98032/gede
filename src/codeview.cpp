@@ -35,6 +35,7 @@ CodeView::CodeView()
     connect(&m_timer, SIGNAL(timeout()), this, SLOT(onTimerTimeout()));
     
     setMouseTracking(true);
+    setFocusPolicy(Qt::ClickFocus);
 
 }
 
@@ -93,7 +94,8 @@ void CodeView::onTimerTimeout()
 
 
     if(foundField)
-    {   
+    {
+        setFocus();
         int windowY = mousePos.y() - (mousePos.y()%rowHeight) + rowHeight;
         QPoint menuPos = mapToGlobal(QPoint(mousePos.x()+15, windowY));
         m_infoWindow.move(menuPos);
@@ -233,6 +235,7 @@ void CodeView::paintEvent ( QPaintEvent * event )
 
         }
     }
+
 
 }
 
@@ -385,6 +388,11 @@ void CodeView::mousePressEvent( QMouseEvent * event )
     }
 }
 
+void CodeView::focusOutEvent ( QFocusEvent * event )
+{
+    Q_UNUSED(event);
+    m_infoWindow.hide();
+}
 
 void CodeView::mouseMoveEvent ( QMouseEvent * event )
 {

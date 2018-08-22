@@ -67,6 +67,7 @@ private:
     void mouseDoubleClickEvent( QMouseEvent * event );
     void mousePressEvent(QMouseEvent * event);
     void mouseMoveEvent(QMouseEvent * event);
+    void focusOutEvent ( QFocusEvent * event );
 
 public:
     QFont m_font;
