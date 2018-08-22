@@ -30,6 +30,7 @@
 
 MainWindow::MainWindow(QWidget *parent)
       : QMainWindow(parent)
+      ,m_locator(&m_tagManager, &m_sourceFiles)
 {
     QStringList names;
     
@@ -957,6 +958,7 @@ CodeViewTab* MainWindow::open(QString filename)
     windowTitle.sprintf("%s - %s",  stringToCStr(filenamePart), stringToCStr(folderPathPart));
     setWindowTitle(windowTitle);
 
+    m_locator.setCurrentFile(filename);
 
     ICore_onBreakpointsChanged();
 
@@ -1060,7 +1062,7 @@ void MainWindow::onGoToLine()
         currentFilename = currentCodeViewTab->getFilePath();
     
     // Show dialog
-    GoToDialog dlg(this, &m_cfg, currentFilename);
+    GoToDialog dlg(this, &m_locator, &m_cfg, currentFilename);
     if(dlg.exec() != QDialog::Accepted)
         return;
 

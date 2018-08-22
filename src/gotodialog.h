@@ -15,13 +15,7 @@
 #include "ui_gotodialog.h"
 
 #include "settings.h"
-
-class Location
-{
-    public:
-        QString m_filename;
-        QString m_lineno;
-};
+#include "locator.h"
 
 class GoToDialog : public QDialog
 {
@@ -29,7 +23,7 @@ class GoToDialog : public QDialog
 
 public:
 
-    GoToDialog(QWidget *parent, Settings *cfg, QString currentFilename);
+    GoToDialog(QWidget *parent, Locator *locator, Settings *cfg, QString currentFilename);
     virtual ~GoToDialog();
 
     void getSelection(QString *filename, int *lineno);
@@ -42,6 +36,7 @@ private:
 
     Ui_GoToDialog m_ui;
     QString m_currentFilename;
+    Locator *m_locator;
     
 };
 

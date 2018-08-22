@@ -33,6 +33,8 @@ public:
     QString fullName; //!< The full path (Eg: "/a/dir/main.c").
 };
 
+#include "locator.h"
+
 
 class MainWindow : public QMainWindow, public ICore, public ICodeView
 {
@@ -174,6 +176,7 @@ private:
     QFont m_outputFont;
     QFont m_gdbOutputFont;
     QLabel m_statusLineWidget;
+    Locator m_locator;
 };
 
 

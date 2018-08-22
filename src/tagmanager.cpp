@@ -185,4 +185,20 @@ void TagManager::getTags(QString filePath, QList<Tag> *tagList)
     }
 }
 
+void TagManager::lookupTag(QString name, QList<Tag> *tagList)
+{
+    debugMsg("%s(name:'%s')", __func__, qPrintable(name)); 
+    foreach (ScannerResult* info, m_db)
+    {
+        for(int j = 0;j < info->m_tagList.size();j++)
+        {
+            Tag &tag = info->m_tagList[j];
+            if(tag.getName() == name)
+                tagList->append(tag);
+        }
+    }
+
+}
+
+
 

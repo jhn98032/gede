@@ -21,12 +21,14 @@ class Tag
         Tag();
         void dump() const;
 
+        QString getName() const { return m_name; };
         QString getLongName() const;
         QString getSignature() const { return m_signature; };
         void setSignature(QString signature) { m_signature = signature; };
         void setLineNo(int lineNo) { m_lineNo = lineNo;};
         int getLineNo() const { return m_lineNo; };
-        
+        QString getFilePath() { return filepath; };
+
         QString className;
         QString m_name;
         QString filepath;

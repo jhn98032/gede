@@ -15,9 +15,10 @@
 
 
 
-GoToDialog::GoToDialog(QWidget *parent, Settings *cfg, QString currentFilename)
+GoToDialog::GoToDialog(QWidget *parent, Locator *locator, Settings *cfg, QString currentFilename)
     : QDialog(parent)
     ,m_currentFilename(currentFilename)
+    ,m_locator(locator)
 {
     Q_UNUSED(cfg);
     
@@ -34,17 +35,16 @@ GoToDialog::~GoToDialog()
 }
 
 
-void stringToLocation(QString str, QString *filename, int *lineNo)
-{
-    Q_UNUSED(filename);
-    *lineNo = str.toInt();
-}
-
 void GoToDialog::getSelection(QString *filename, int *lineno)
 {
-    stringToLocation(m_ui.lineEdit->text(), filename, lineno);
-    if(filename->isEmpty())
-        *filename = m_currentFilename;
+    QString expr = m_ui.lineEdit->text();
+    QVector<Location> locList = m_locator->locate(expr);
+    if(locList.size() >= 1)
+    {
+        Location loc = locList[0];
+        *filename = loc.filename;
+        *lineno = loc.lineNo;
+    }
 }
 
     

@@ -76,6 +76,8 @@ public:
 
     void getTags(QString filePath, QList<Tag> *tagList);
 
+    void lookupTag(QString name, QList<Tag> *tagList);
+
 private slots:
     void onScanDone(QString filePath, QList<Tag> *tags);
     
