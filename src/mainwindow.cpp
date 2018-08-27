@@ -890,10 +890,14 @@ CodeViewTab* MainWindow::open(QString filename)
         CodeViewTab* tab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
         if(tab->getFilePath() == filename)
         {
+            debugMsg("Found already opened '%s'", qPrintable(filename));
             foundCodeViewTabIdx = tabIdx;
             
         }
     }
+    if(foundCodeViewTabIdx == -1)
+        debugMsg("Did not find '%s'", qPrintable(filename));
+    
     if(foundCodeViewTabIdx != -1 && foundCodeViewTabIdx == m_ui.editorTabWidget->currentIndex())
          return (CodeViewTab* )m_ui.editorTabWidget->currentWidget();
          
@@ -1077,7 +1081,10 @@ void MainWindow::onGoToLine()
     {
         CodeViewTab* currentCodeViewTab = open(filename);
         if(currentCodeViewTab)
+        {
+            debugMsg("Ensuring that line %d is visible", lineno);
             currentCodeViewTab->ensureLineIsVisible(lineno);    
+        }
     }    
 }
 

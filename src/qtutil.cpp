@@ -9,3 +9,15 @@
 #include "qtutil.h"
 
 
+
+bool isInteger(QString str)
+{
+    if(str.size() == 0)
+        return false;
+    if(str[0] == '-')
+        return true;
+    if(str[0].isDigit())
+        return true;
+    return false;
+}
+

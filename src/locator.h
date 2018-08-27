@@ -27,6 +27,9 @@ public:
     void setCurrentFile(QString filename);
     QVector<Location> locate(QString expr);
 
+    QStringList searchExpression(QString expressionStart);
+     
+    QStringList searchExpression(QString filename, QString expressionStart);
 
 private:
     QStringList findFile(QString defFilename);

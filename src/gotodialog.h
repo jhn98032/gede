@@ -30,9 +30,13 @@ public:
 
 public slots:
     void onGo();
+    void onSearchTextEdited( const QString & text );
+    void onItemClicked ( QListWidgetItem * item );
 
 private:
+    void showListWidget(bool show );
 
+private:
 
     Ui_GoToDialog m_ui;
     QString m_currentFilename;

@@ -4,6 +4,7 @@
 #include "log.h"
 #include "core.h"
 #include "mainwindow.h"
+#include "qtutil.h"
 
 
 Location::Location(QString filename_, int lineNo_)
@@ -36,7 +37,7 @@ void Locator::setCurrentFile(QString filename)
 
 static bool validFunctionChar(QChar c)
 {
-    if(c.isDigit() || c.isLetter() || c == '.' || c == ':' || c == '_' || c == '(' || c == ')')
+    if(c.isDigit() || c.isLetter() || c == '.' || c == ':' || c == '_' || c == '(' || c == ')' || c == '~')
         return true;
     return false;
 }
@@ -96,15 +97,6 @@ static QStringList tokenize(QString expr)
 
 
 
-bool isInteger(QString str)
-{
-    if(str.size() == 0)
-        return false;
-    if(str[0].isDigit())
-        return true;
-    return false;
-}
-
 QStringList Locator::findFile(QString defFilename)
 {
     QStringList fileList;
@@ -121,7 +113,71 @@ QStringList Locator::findFile(QString defFilename)
     return fileList;
 }
 
+QStringList Locator::searchExpression(QString filename, QString expressionStart)
+{
+    debugMsg("%s('%s', '%s')", __func__, qPrintable(filename), qPrintable(expressionStart));
+    
+    QStringList list;
+    for(int k = 0;k < m_sourceFiles->size();k++)
+    {
+        FileInfo &info = (*m_sourceFiles)[k];
 
+        
+        if(info.name != filename)
+            continue;
+            
+        // Find the tag
+        QList<Tag> tagList;
+        m_mgr->getTags(info.fullName, &tagList);
+        for(int i = 0;i < tagList.size();i++)
+        {
+            Tag &tag = tagList[i];
+            if(tag.type == Tag::TAG_FUNC)
+            {
+                QString tagName = tag.getName() + "()";
+                if(tagName.startsWith(expressionStart) || expressionStart.isEmpty())
+                {
+                    debugMsg("Found '%s'", qPrintable(tagName));
+                    list.append(tagName);
+                }
+            }
+        }
+    }
+    return list;
+}
+
+
+QStringList Locator::searchExpression(QString expressionStart)
+{
+    QStringList list;
+    for(int k = 0;k < m_sourceFiles->size();k++)
+    {
+        FileInfo &info = (*m_sourceFiles)[k];
+        if(info.name.startsWith(expressionStart))
+            list.append(info.name);
+
+
+        // Find the tag
+        QList<Tag> tagList;
+        m_mgr->getTags(info.fullName, &tagList);
+        for(int i = 0;i < tagList.size();i++)
+        {
+            Tag &tag = tagList[i];
+            if(tag.type == Tag::TAG_FUNC)
+            {
+            QString tagName = tag.getName() + "()";
+            if(tagName.startsWith(expressionStart))
+            {
+                debugMsg("Found '%s'", qPrintable(tagName));
+                list.append(tagName);
+            }
+            }
+        }
+    }
+                
+    return list;
+}
+    
 
 QVector<Location> Locator::locate(QString expr)
 {
@@ -203,28 +259,31 @@ QVector<Location> Locator::locate(QString expr)
                         
                     }
                 }
-                if(tokenList.size() == 2)
+                if(tokenList.size() >= 1)
                 {
-                    QString op = tokenList[0];
-                    int val = tokenList[1].toInt();
+                    QString op = tokenList.takeFirst();
+                    int val = 0;
+                    if(!tokenList.isEmpty())
+                        val = tokenList.takeFirst().toInt();
+                        
                     if(op == "-" || op == "+")
                     {
                         if(op == "-")
                             val = -val;
-
-
-                        debugMsg("Adjusting line numbers with %d.", val);
-                        // Updating lineno
-                        for(int k = 0;k < list.size();k++)
-                        {
-                            Location *loc = &list[k];
-                            debugMsg("%d -> %d", loc->lineNo, loc->lineNo+val);
-                            loc->lineNo += val;
-                        }
-
                     }
                     else
-                        warnMsg("Unknown op '%s'.", qPrintable(op));
+                        val = op.toInt();
+                        
+
+                    debugMsg("Adjusting line numbers with %d.", val);
+                    // Updating lineno
+                    for(int k = 0;k < list.size();k++)
+                    {
+                        Location *loc = &list[k];
+                        debugMsg("%d -> %d", loc->lineNo, loc->lineNo+val);
+                        loc->lineNo += val;
+                    }
+
                     
                 }
                 else

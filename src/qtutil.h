@@ -8,6 +8,10 @@
 #ifndef FILE__QTUTIL_H
 #define FILE__QTUTIL_H
 
+#include <QString>
+
+bool isInteger(QString str);
+
 
 #endif
 

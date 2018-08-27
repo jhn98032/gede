@@ -10,9 +10,11 @@
 
 #include <QProcess>
 
+#include "qtutil.h"
 #include "util.h"
 #include "log.h"
 
+#define MAX_TAGS   2000
 
 
 GoToDialog::GoToDialog(QWidget *parent, Locator *locator, Settings *cfg, QString currentFilename)
@@ -26,6 +28,13 @@ GoToDialog::GoToDialog(QWidget *parent, Locator *locator, Settings *cfg, QString
 
     connect(m_ui.pushButton, SIGNAL(clicked()), SLOT(onGo()));
 
+    connect(m_ui.lineEdit, SIGNAL(textChanged( const QString &  )), SLOT(onSearchTextEdited(const QString &)));
+ 
+
+    connect(m_ui.listWidget, SIGNAL(itemClicked(QListWidgetItem *)), SLOT(onItemClicked(QListWidgetItem *)));
+
+    onSearchTextEdited("");
+   
 }
 
 
@@ -34,6 +43,131 @@ GoToDialog::~GoToDialog()
 
 }
 
+void GoToDialog::onItemClicked ( QListWidgetItem * item )
+{
+    QString itemText = item->text();
+
+    //
+    QString newText;
+    QString oldExpr = m_ui.lineEdit->text();
+    int lastSep = oldExpr.lastIndexOf(' ');
+    if(lastSep == -1)
+    {
+        newText = itemText;
+    }
+    else
+    {
+        newText = oldExpr.left(lastSep+1) + itemText;
+    }
+
+    if(newText.contains(' '))
+        showListWidget(false);
+    m_ui.lineEdit->setText(newText + " ");
+    m_ui.lineEdit->setFocus();
+    m_ui.lineEdit->deselect();
+    
+}
+
+void GoToDialog::showListWidget (bool show )
+{
+    if(show)
+        m_ui.listWidget->show();
+    else
+        m_ui.listWidget->hide();
+
+    int oldWidth = size().width();
+    int oldHeight = size().height();
+    int newHeight = show ? 250 : 10;
+
+    if(oldHeight != newHeight)
+    {
+        adjustSize();
+        //
+        resize(oldWidth, newHeight);
+    }
+}
+
+void GoToDialog::onSearchTextEdited ( const QString & text )
+{
+    debugMsg("%s('%s')", __func__ ,qPrintable(text));
+    
+    m_ui.listWidget->clear();
+
+/*    
+    if(text.endsWith(' '))
+    {
+        showListWidget(false);
+        return;
+    }
+*/
+
+    // Get the last expression
+    QStringList expList = text.split(' ');
+    QString expr;
+    enum { SHOW_NONE, SHOW_FUNC, SHOW_FUNC_AND_FILE} showSuggestion = SHOW_FUNC_AND_FILE;
+    if(expList.size() == 0)
+        expList.append("");
+    QString lastExpr = expList.last();
+    if(expList.size() <= 1)
+    {
+        if(isInteger(lastExpr) && !lastExpr.isEmpty())
+        {
+            m_ui.labelHelp->setText("Enter linenumber");
+            showSuggestion = SHOW_NONE;
+        }
+        else
+        {
+            m_ui.labelHelp->setText("Syntax: [file.c] [func()] [lineno]");
+            showSuggestion = SHOW_FUNC_AND_FILE;
+        }
+    }
+    else if(expList.size() == 2)
+    {
+        if(isInteger(lastExpr) && !lastExpr.isEmpty())
+        {
+            m_ui.labelHelp->setText("Enter linenumber");
+            showSuggestion = SHOW_NONE;
+        }
+        else
+        {
+            m_ui.labelHelp->setText("Enter function or linenumber");
+            showSuggestion = SHOW_FUNC;
+        }
+    }
+    else if(expList.size() == 3)
+    {
+        m_ui.labelHelp->setText("Enter function linenumber offset");
+        showSuggestion = SHOW_NONE;
+    }
+    else
+    {
+        m_ui.labelHelp->setText("To many arguments!");
+        showSuggestion = SHOW_NONE;
+    }
+    expr = expList.last();
+        
+    // Ask the locator for files and tags that match
+    QStringList exprList;
+    if(showSuggestion == SHOW_FUNC_AND_FILE)
+        exprList = m_locator->searchExpression(expr);
+    else if(showSuggestion == SHOW_FUNC)
+        exprList = m_locator->searchExpression(expList[0], expr);
+    
+    // Add the found ones to to the list
+    for(int i = 0;i < qMin(exprList.size(), MAX_TAGS);i++)
+    {
+        QString fieldText = exprList[i];
+        QListWidgetItem *item = new QListWidgetItem(fieldText);
+        item->setSizeHint(QSize(160,20));
+        m_ui.listWidget->addItem(item);
+    }
+
+    if(showSuggestion == SHOW_NONE)
+        showListWidget(false);
+    else
+        showListWidget(true);
+    
+}
 
 void GoToDialog::getSelection(QString *filename, int *lineno)
 {
