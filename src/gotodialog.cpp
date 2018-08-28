@@ -9,6 +9,9 @@
 #include "gotodialog.h"
 
 #include <QProcess>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QKeyEvent>
 
 #include "qtutil.h"
 #include "util.h"
@@ -28,13 +31,18 @@ GoToDialog::GoToDialog(QWidget *parent, Locator *locator, Settings *cfg, QString
 
     connect(m_ui.pushButton, SIGNAL(clicked()), SLOT(onGo()));
 
-    connect(m_ui.lineEdit, SIGNAL(textChanged( const QString &  )), SLOT(onSearchTextEdited(const QString &)));
+    connect(m_ui.comboBox, SIGNAL(editTextChanged( const QString &  )), SLOT(onSearchTextEdited(const QString &)));
  
 
     connect(m_ui.listWidget, SIGNAL(itemClicked(QListWidgetItem *)), SLOT(onItemClicked(QListWidgetItem *)));
 
     onSearchTextEdited("");
    
+    setFocusPolicy(Qt::StrongFocus);
+
+
+    m_ui.comboBox->installEventFilter(this);
+
 }
 
 
@@ -43,13 +51,83 @@ GoToDialog::~GoToDialog()
 
 }
 
+
+/**
+ * @brief The user has pressed the tab key while the search combobox is selected.
+ */
+void GoToDialog::onComboBoxTabKey()
+{
+    QLineEdit *lineEdit = m_ui.comboBox->lineEdit();
+
+    
+    if(m_ui.listWidget->count() == 1)
+    {
+        // Simulate a click on the item
+        QListWidgetItem *item =  m_ui.listWidget->item(0);
+        if(item)
+            onItemClicked(item);
+    }
+    // No items in the list?
+    else if(m_ui.listWidget->count() == 0)
+    {
+        // Add a space seperator
+        QString editText = lineEdit->text();
+        if(!editText.endsWith(" "))
+            lineEdit->setText(editText + " ");
+    }
+    else
+    {
+        // Loop through all items in the list
+        QString commonText;
+        QListWidgetItem *item = m_ui.listWidget->item(0);
+        commonText = item->text();
+        for(int i = 1;i < m_ui.listWidget->count() && !(commonText.isEmpty());i++)
+        {
+            // Get the text of the item in the list
+            item =  m_ui.listWidget->item(i);
+            QString compText = item->text();
+
+            // How many characters do they have in common?
+            if(compText.size() < commonText.size())
+                commonText = commonText.left(compText.size());
+            
+            for(int i = 0;i < qMin(commonText.size(), compText.size());i++)
+            {
+                if(compText[i] != commonText[i])
+                    commonText = commonText.left(i);
+            }
+        }
+
+        // User pressed 'tab' when there entries with a common beginning
+        if(!commonText.isEmpty())
+        {
+            debugMsg("common '%s'", qPrintable(commonText));
+            // Split the entered text into fields
+            QString editText = lineEdit->text();
+            QStringList fields = editText.split(' ');
+
+            // Replace the last part with the common beginning from the listwidget
+            if(fields.size() == 0)
+                fields.append(commonText);
+            else
+                fields[fields.size()-1] = commonText;
+
+            // Update the combobox
+            lineEdit->setText(fields.join(" "));
+            
+        }
+    }
+    
+}
+
+
 void GoToDialog::onItemClicked ( QListWidgetItem * item )
 {
     QString itemText = item->text();
 
     //
     QString newText;
-    QString oldExpr = m_ui.lineEdit->text();
+    QString oldExpr = m_ui.comboBox->currentText();
     int lastSep = oldExpr.lastIndexOf(' ');
     if(lastSep == -1)
     {
@@ -62,9 +140,9 @@ void GoToDialog::onItemClicked ( QListWidgetItem * item )
 
     if(newText.contains(' '))
         showListWidget(false);
-    m_ui.lineEdit->setText(newText + " ");
-    m_ui.lineEdit->setFocus();
-    m_ui.lineEdit->deselect();
+    m_ui.comboBox->lineEdit()->setText(newText + " ");
+    m_ui.comboBox->setFocus();
+    m_ui.comboBox->lineEdit()->deselect();
     
 }
 
@@ -128,6 +206,11 @@ void GoToDialog::onSearchTextEdited ( const QString & text )
             m_ui.labelHelp->setText("Enter linenumber");
             showSuggestion = SHOW_NONE;
         }
+        else if(expList[0].contains("("))
+        {
+            m_ui.labelHelp->setText("Enter linenumber");
+            showSuggestion = SHOW_NONE;
+        }
         else
         {
             m_ui.labelHelp->setText("Enter function or linenumber");
@@ -171,7 +254,7 @@ void GoToDialog::onSearchTextEdited ( const QString & text )
 
 void GoToDialog::getSelection(QString *filename, int *lineno)
 {
-    QString expr = m_ui.lineEdit->text();
+    QString expr = m_ui.comboBox->currentText();
     QVector<Location> locList = m_locator->locate(expr);
     if(locList.size() >= 1)
     {
@@ -187,4 +270,38 @@ void GoToDialog::onGo()
 
     accept();
 }
+
+
+bool GoToDialog::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj==m_ui.comboBox)
+    {
+        if (event->type() == QEvent::KeyPress)
+        {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+
+            if(keyEvent->key() == Qt::Key_Tab)
+            {
+
+                onComboBoxTabKey();
+                
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        // pass the event on to the parent class
+        return QWidget::eventFilter(obj, event);
+    }
+}
+
 

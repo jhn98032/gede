@@ -35,7 +35,10 @@ public slots:
 
 private:
     void showListWidget(bool show );
+    bool eventFilter(QObject *obj, QEvent *event);
 
+    void onComboBoxTabKey();
+    
 private:
 
     Ui_GoToDialog m_ui;
