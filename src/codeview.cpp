@@ -92,7 +92,13 @@ void CodeView::onTimerTimeout()
 
     }
 
-
+    // Skip if it is not a variable
+    if(foundField)
+    {
+        if(foundField->m_type != TextField::WORD)
+            foundField = NULL;
+    }
+    
     if(foundField)
     {
         setFocus();
