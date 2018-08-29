@@ -262,7 +262,10 @@ void Settings::loadProjectConfig()
     m_reloadBreakpoints = tmpIni.getBool("ReuseBreakpoints", false);
 
     m_initialBreakpoint = tmpIni.getString("InitialBreakpoint","main");
-    
+
+    m_gotoRuiList.clear();
+    m_gotoRuiList = tmpIni.getStringList("GoToRecentlyUsed", m_gotoRuiList);
+
 
     //
     QStringList breakpointStringList;
@@ -326,6 +329,7 @@ void Settings::saveProjectConfig()
 
     tmpIni.setString("InitialBreakpoint",m_initialBreakpoint);
 
+    tmpIni.setStringList("GoToRecentlyUsed", m_gotoRuiList);
 
     
     //
@@ -627,6 +631,19 @@ QStringList Settings::getDefaultBasicKeywordList()
 QString Settings::getProgramPath()
 {
     return m_lastProgram;
+}
+
+
+QStringList Settings::getGoToList()
+{
+    return m_gotoRuiList;
+}
+    
+void Settings::setGoToList(QStringList list)
+{
+    while(list.size() > MAX_GOTO_RUI_COUNT)
+        list.takeLast();
+    m_gotoRuiList = list;
 }
 
 

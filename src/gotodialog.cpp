@@ -1,3 +1,5 @@
+//#define ENABLE_DEBUGMSG
+
 /*
  * Copyright (C) 2018 Johan Henriksson.
  * All rights reserved.
@@ -36,6 +38,15 @@ GoToDialog::GoToDialog(QWidget *parent, Locator *locator, Settings *cfg, QString
 
     connect(m_ui.listWidget, SIGNAL(itemClicked(QListWidgetItem *)), SLOT(onItemClicked(QListWidgetItem *)));
 
+
+    // Insert the list of old search terms in the combobox
+    QStringList list = cfg->getGoToList();
+    for(int i = 0;i < list.size();i++)
+    {
+        m_ui.comboBox->addItem(" " + list[i]);
+    }
+    m_ui.comboBox->clearEditText();
+
     onSearchTextEdited("");
    
     setFocusPolicy(Qt::StrongFocus);
@@ -52,6 +63,39 @@ GoToDialog::~GoToDialog()
 }
 
 
+void GoToDialog::saveSettings(Settings *cfg)
+{
+    // Get the list of items in the combobox
+    QComboBox *comboBox = m_ui.comboBox;
+    QStringList list;
+    QString curText = comboBox->currentText();
+    curText = curText.trimmed();
+    if(!curText.isEmpty())
+        list.append(curText);
+    for(int i = 0; i < comboBox->count();i++)
+    {
+        list.append(comboBox->itemText(i).trimmed());
+    }
+
+
+    cfg->setGoToList(list);
+}
+
+
+QString getTextLeftToCursor(QComboBox *comboBox)
+{
+    // 
+    int cursorPos = comboBox->lineEdit()->cursorPosition();
+    QString oldExpr = comboBox->currentText();
+    if(cursorPos < oldExpr.size())
+    {
+        oldExpr = oldExpr.left(cursorPos);
+    }
+    return oldExpr;
+}
+
+
+
 /**
  * @brief The user has pressed the tab key while the search combobox is selected.
  */
@@ -59,7 +103,20 @@ void GoToDialog::onComboBoxTabKey()
 {
     QLineEdit *lineEdit = m_ui.comboBox->lineEdit();
 
+    // Move cursor to end
+    if(lineEdit->text().size() > 0)
+        lineEdit->setCursorPosition(lineEdit->text().size()-1);
+
+
+    // Set selection to before any selected text
+    if(lineEdit->hasSelectedText())
+    {
+        int pos = lineEdit->text().size()-lineEdit->selectedText().size();
+        lineEdit->setCursorPosition(pos);
+    }
+
     
+
     if(m_ui.listWidget->count() == 1)
     {
         // Simulate a click on the item
@@ -101,11 +158,12 @@ void GoToDialog::onComboBoxTabKey()
         // User pressed 'tab' when there entries with a common beginning
         if(!commonText.isEmpty())
         {
-            debugMsg("common '%s'", qPrintable(commonText));
-            // Split the entered text into fields
-            QString editText = lineEdit->text();
-            QStringList fields = editText.split(' ');
 
+            QString curText = getTextLeftToCursor(m_ui.comboBox);
+
+            // Split the entered text into fields
+            QStringList fields = curText.split(" ");
+            
             // Replace the last part with the common beginning from the listwidget
             if(fields.size() == 0)
                 fields.append(commonText);
@@ -116,6 +174,7 @@ void GoToDialog::onComboBoxTabKey()
             lineEdit->setText(fields.join(" "));
             
         }
+            
     }
     
 }
@@ -123,11 +182,12 @@ void GoToDialog::onComboBoxTabKey()
 
 void GoToDialog::onItemClicked ( QListWidgetItem * item )
 {
-    QString itemText = item->text();
+    QString itemText = item->text().trimmed();
+
 
     //
     QString newText;
-    QString oldExpr = m_ui.comboBox->currentText();
+    QString oldExpr = getTextLeftToCursor(m_ui.comboBox);
     int lastSep = oldExpr.lastIndexOf(' ');
     if(lastSep == -1)
     {
@@ -138,8 +198,10 @@ void GoToDialog::onItemClicked ( QListWidgetItem * item )
         newText = oldExpr.left(lastSep+1) + itemText;
     }
 
+/*
     if(newText.contains(' '))
         showListWidget(false);
+*/
     m_ui.comboBox->lineEdit()->setText(newText + " ");
     m_ui.comboBox->setFocus();
     m_ui.comboBox->lineEdit()->deselect();
@@ -165,19 +227,29 @@ void GoToDialog::showListWidget (bool show )
     }
 }
 
-void GoToDialog::onSearchTextEdited ( const QString & text )
+QString GoToDialog::cleanupLinEditText(QString rawText)
 {
+    QString str = rawText.trimmed();
+    if(rawText.endsWith(' '))
+        str += ' ';
+    return str;
+}
+
+QString GoToDialog::getCurrentLineEditText()
+{
+    QLineEdit *lineEdit = m_ui.comboBox->lineEdit();
+    return cleanupLinEditText(lineEdit->text());
+}
+
+void GoToDialog::onSearchTextEdited ( const QString & text2 )
+{
+    QString text = cleanupLinEditText(text2);
+
     debugMsg("%s('%s')", __func__ ,qPrintable(text));
-    
+
+
     m_ui.listWidget->clear();
 
-/*    
-    if(text.endsWith(' '))
-    {
-        showListWidget(false);
-        return;
-    }
-*/
 
     // Get the last expression
     QStringList expList = text.split(' ');
@@ -186,6 +258,15 @@ void GoToDialog::onSearchTextEdited ( const QString & text )
     if(expList.size() == 0)
         expList.append("");
     QString lastExpr = expList.last();
+
+    // No suggestion if the last field is a integer
+    if(isInteger(lastExpr))
+    {
+        showListWidget(false);
+        return;
+    }
+
+    //
     if(expList.size() <= 1)
     {
         if(isInteger(lastExpr) && !lastExpr.isEmpty())
@@ -254,7 +335,7 @@ void GoToDialog::onSearchTextEdited ( const QString & text )
 
 void GoToDialog::getSelection(QString *filename, int *lineno)
 {
-    QString expr = m_ui.comboBox->currentText();
+    QString expr = getCurrentLineEditText();
     QVector<Location> locList = m_locator->locate(expr);
     if(locList.size() >= 1)
     {
@@ -262,6 +343,8 @@ void GoToDialog::getSelection(QString *filename, int *lineno)
         *filename = loc.filename;
         *lineno = loc.lineNo;
     }
+    else
+        debugMsg("No location found!");
 }
 
     

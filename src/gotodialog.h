@@ -28,6 +28,8 @@ public:
 
     void getSelection(QString *filename, int *lineno);
 
+    void saveSettings(Settings *cfg);
+
 public slots:
     void onGo();
     void onSearchTextEdited( const QString & text );
@@ -38,6 +40,9 @@ private:
     bool eventFilter(QObject *obj, QEvent *event);
 
     void onComboBoxTabKey();
+    QString getCurrentLineEditText();
+    QString cleanupLinEditText(QString rawText);
+
     
 private:
 

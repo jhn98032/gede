@@ -1054,7 +1054,7 @@ void MainWindow::onAbout()
 
 
 /**
- * @brief Called when user presses "Search->Go toline".
+ * @brief Called when user presses "Search->Go to line".
  */
 void MainWindow::onGoToLine()
 {
@@ -1070,6 +1070,8 @@ void MainWindow::onGoToLine()
     if(dlg.exec() != QDialog::Accepted)
         return;
 
+    dlg.saveSettings(&m_cfg);
+    
     // Which file and line was selected?
     QString filename;
     int lineno;
@@ -1085,7 +1087,9 @@ void MainWindow::onGoToLine()
             debugMsg("Ensuring that line %d is visible", lineno);
             currentCodeViewTab->ensureLineIsVisible(lineno);    
         }
-    }    
+    }
+    else
+        warnMsg("Location not found!");
 }
 
 void MainWindow::onRun()

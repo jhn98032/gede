@@ -50,6 +50,9 @@ class Settings
         QString getProgramPath();
 
         int getTabIndentCount() const { return m_tabIndentCount; };
+
+        QStringList getGoToList();
+        void setGoToList(QStringList list);
         
     private:
         void loadProjectConfig();
@@ -141,6 +144,7 @@ class Settings
         int m_maxTabs; //!< Max number of opened tabs at the same time
 
         int m_variablePopupDelay; //!< Number of milliseconds before the variables value should be displayed in a popup.
+        QStringList m_gotoRuiList;
 };
 
 

@@ -19,6 +19,8 @@
 
 #define GDB_LOG_FILE  "gede_gdb_log.txt"
 
+// Max number of recently used goto locations to save
+#define MAX_GOTO_RUI_COUNT  10
 
 #endif // FILE__CONFIG_H
 

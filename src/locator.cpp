@@ -110,6 +110,9 @@ QStringList Locator::findFile(QString defFilename)
 
         }
     }
+    if(fileList.isEmpty())
+        warnMsg("File '%s' not found", qPrintable(defFilename));
+        
     return fileList;
 }
 
@@ -251,7 +254,8 @@ QVector<Location> Locator::locate(QString expr)
                 {
                     Tag &tag = tagList[i];
                     tag.dump();
-                    if(defFilename.isEmpty() || tag.getFilePath() == defFilename)
+                    if(defFilename.isEmpty() ||
+                        tag.getFilePath().endsWith("/" + defFilename))
                     {
                         Location loc = Location(tag.getFilePath(), tag.getLineNo());
                         loc.dump();
