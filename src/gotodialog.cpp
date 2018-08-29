@@ -63,6 +63,9 @@ GoToDialog::~GoToDialog()
 }
 
 
+/**
+ * @brief Called to save settings used by the GoTo dialog.
+ */
 void GoToDialog::saveSettings(Settings *cfg)
 {
     // Get the list of items in the combobox
@@ -82,6 +85,9 @@ void GoToDialog::saveSettings(Settings *cfg)
 }
 
 
+/**
+ * @brief Get the text left to the cursor in the search QLineEdit.
+ */
 QString getTextLeftToCursor(QComboBox *comboBox)
 {
     // 
@@ -180,6 +186,9 @@ void GoToDialog::onComboBoxTabKey()
 }
 
 
+/**
+ * @brief Called when the user has clicked on one of the QListWidget suggestions.
+ */
 void GoToDialog::onItemClicked ( QListWidgetItem * item )
 {
     QString itemText = item->text().trimmed();
@@ -208,6 +217,10 @@ void GoToDialog::onItemClicked ( QListWidgetItem * item )
     
 }
 
+
+/**
+ * @brief Shows or hides the suggestion listwidget
+ */
 void GoToDialog::showListWidget (bool show )
 {
     if(show)
@@ -227,20 +240,38 @@ void GoToDialog::showListWidget (bool show )
     }
 }
 
+/**
+ * @brief Cleans up the text entered by the user in the line edit box.
+ */ 
 QString GoToDialog::cleanupLinEditText(QString rawText)
 {
     QString str = rawText.trimmed();
+
+    // Replace double spaces and strange spaces
+    str.replace("\t", " ");
+    while(str.contains("  "))
+        str.replace("  ", " ");
+
+    // Add trailing space
     if(rawText.endsWith(' '))
         str += ' ';
     return str;
 }
 
+
+/**
+ * @brief Returns the (cleaned up current entered text).
+ */ 
 QString GoToDialog::getCurrentLineEditText()
 {
     QLineEdit *lineEdit = m_ui.comboBox->lineEdit();
     return cleanupLinEditText(lineEdit->text());
 }
 
+
+/**
+ * @brief Called when the user changed the search text in the QLineEdit.
+ */
 void GoToDialog::onSearchTextEdited ( const QString & text2 )
 {
     QString text = cleanupLinEditText(text2);
@@ -333,6 +364,10 @@ void GoToDialog::onSearchTextEdited ( const QString & text2 )
     
 }
 
+
+/**
+ * @brief Returns the file and linenumber the user wants to go to.
+ */
 void GoToDialog::getSelection(QString *filename, int *lineno)
 {
     QString expr = getCurrentLineEditText();
@@ -347,7 +382,9 @@ void GoToDialog::getSelection(QString *filename, int *lineno)
         debugMsg("No location found!");
 }
 
-    
+/**
+ * @brief Called when the user pressed the go button.
+ */
 void GoToDialog::onGo()
 {
 
@@ -355,6 +392,9 @@ void GoToDialog::onGo()
 }
 
 
+/**
+ * @brief Event filter.
+ */
 bool GoToDialog::eventFilter(QObject *obj, QEvent *event)
 {
     if (obj==m_ui.comboBox)
