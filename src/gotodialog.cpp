@@ -356,6 +356,7 @@ void GoToDialog::onSearchTextEdited ( const QString & text2 )
         item->setSizeHint(QSize(160,20));
         m_ui.listWidget->addItem(item);
     }
+    m_ui.listWidget->sortItems(Qt::AscendingOrder);
 
     if(showSuggestion == SHOW_NONE)
         showListWidget(false);
