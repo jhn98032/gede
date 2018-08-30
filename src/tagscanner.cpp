@@ -17,9 +17,9 @@
 #include "util.h"
 #include "rusttagscanner.h"
 
-static bool m_ctagsExist = true;
-static bool m_doneCtagCheck = false;
-static QString m_ctagsCmd; //!< Name of executable
+static bool g_ctagsExist = true;
+static bool g_doneCtagCheck = false;
+static QString g_ctagsCmd; //!< Name of executable
         
 
 Tag::Tag()
@@ -78,21 +78,21 @@ TagScanner::TagScanner()
 void TagScanner::checkForCtags()
 {
     // Only do check once
-    if(m_doneCtagCheck)
+    if(g_doneCtagCheck)
         return;
-    m_doneCtagCheck = true;
+    g_doneCtagCheck = true;
     
     // Check which executable to use
-    m_ctagsExist = true;
+    g_ctagsExist = true;
     if(exeExists(ETAGS_CMD2))
-        m_ctagsCmd = ETAGS_CMD2;
+        g_ctagsCmd = ETAGS_CMD2;
     else if(exeExists(ETAGS_CMD1))
-        m_ctagsCmd = ETAGS_CMD1;
+        g_ctagsCmd = ETAGS_CMD1;
     else
-        m_ctagsExist = false;
+        g_ctagsExist = false;
 
     // Found a executable?
-    if(!m_ctagsExist)
+    if(!g_ctagsExist)
     {
         QString msg;
 
@@ -112,7 +112,7 @@ void TagScanner::checkForCtags()
         QStringList argList;
         argList.push_back("--version");
         QByteArray stdoutContent;
-        int n = execProgram(m_ctagsCmd, argList, &stdoutContent, NULL);
+        int n = execProgram(g_ctagsCmd, argList, &stdoutContent, NULL);
         QStringList outputList = QString(stdoutContent).split('\n');
         for(int u = 0;u < outputList.size();u++)
         {
@@ -122,17 +122,17 @@ void TagScanner::checkForCtags()
         {
             QString msg;
 
-            msg.sprintf("Failed to start program '%s'\n", qPrintable(m_ctagsCmd));
+            msg.sprintf("Failed to start program '%s'\n", qPrintable(g_ctagsCmd));
         
             QMessageBox::warning(NULL,
                         "Failed to start ctags",
                         msg);
-            m_ctagsExist = false;
+            g_ctagsExist = false;
         }
         else
         {
-            infoMsg("Found ctags ('%s')", qPrintable(m_ctagsCmd));
-            m_ctagsExist = true;
+            infoMsg("Found ctags ('%s')", qPrintable(g_ctagsCmd));
+            g_ctagsExist = true;
         }
     }
 
@@ -195,20 +195,20 @@ int TagScanner::scan(QString filepath, QList<Tag> *taglist)
     }
     
 
-    if(!m_ctagsExist)
+    if(!g_ctagsExist)
         return 0;
 
     QString etagsCmd;
     etagsCmd = ETAGS_ARGS;
     etagsCmd += " ";
     etagsCmd += filepath;
-    QString name = m_ctagsCmd;
+    QString name = g_ctagsCmd;
     QStringList argList;
     argList = etagsCmd.split(' ',  QString::SkipEmptyParts);
 
     QByteArray stdoutContent;
     QByteArray stderrContent;
-    int rc = execProgram(m_ctagsCmd, argList,
+    int rc = execProgram(g_ctagsCmd, argList,
                             &stdoutContent,
                             &stderrContent);
 
