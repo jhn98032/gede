@@ -54,13 +54,13 @@ class TagScanner
     private:
         int parseOutput(QByteArray output, QList<Tag> *taglist);
 
+        void checkForCtags();
 
     static int execProgram(QString name, QStringList argList,
                             QByteArray *stdoutContent,
                             QByteArray *stderrContent);
 
 
-        bool m_ctagsExist;
         Settings *m_cfg;
 };
 

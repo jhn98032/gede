@@ -34,6 +34,9 @@ void detectDistro(DistroType *type, QString *distroDesc);
 
 QString addrToString(quint64 addr);
 
+bool exeExists(QString name, bool checkCurrentDir = false);
+
+
 
 #endif // FILE__UTIL_H
 

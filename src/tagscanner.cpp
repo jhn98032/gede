@@ -12,13 +12,15 @@
 #include <QProcess>
 #include <QDebug>
 
+#include "config.h"
 #include "log.h"
 #include "util.h"
 #include "rusttagscanner.h"
 
-
-static const char ETAGS_CMD[] = "ctags";
-static const char ETAGS_ARGS[] = "  -f - --excmd=number --fields=+nmsSk";
+static bool m_ctagsExist = true;
+static bool m_doneCtagCheck = false;
+static QString m_ctagsCmd; //!< Name of executable
+        
 
 Tag::Tag()
  : m_lineNo(0)
@@ -73,6 +75,69 @@ TagScanner::TagScanner()
 
 }
 
+void TagScanner::checkForCtags()
+{
+    // Only do check once
+    if(m_doneCtagCheck)
+        return;
+    m_doneCtagCheck = true;
+    
+    // Check which executable to use
+    m_ctagsExist = true;
+    if(exeExists(ETAGS_CMD2))
+        m_ctagsCmd = ETAGS_CMD2;
+    else if(exeExists(ETAGS_CMD1))
+        m_ctagsCmd = ETAGS_CMD1;
+    else
+        m_ctagsExist = false;
+
+    // Found a executable?
+    if(!m_ctagsExist)
+    {
+        QString msg;
+
+        msg.sprintf("Failed to start program '%s/%s'\n", ETAGS_CMD1, ETAGS_CMD2);
+        msg += "ctags can be installed on ubuntu/debian using command:\n";
+        msg +=  "\n";
+        msg += " apt-get install exuberant-ctags";
+
+        QMessageBox::warning(NULL,
+                    "Failed to start ctags",
+                    msg);
+
+    }
+    else
+    {
+        // Check if ctags can startup?
+        QStringList argList;
+        argList.push_back("--version");
+        QByteArray stdoutContent;
+        int n = execProgram(m_ctagsCmd, argList, &stdoutContent, NULL);
+        QStringList outputList = QString(stdoutContent).split('\n');
+        for(int u = 0;u < outputList.size();u++)
+        {
+            debugMsg("ETAGS: %s", stringToCStr(outputList[u]));
+        }
+        if(n)
+        {
+            QString msg;
+
+            msg.sprintf("Failed to start program '%s'\n", qPrintable(m_ctagsCmd));
+        
+            QMessageBox::warning(NULL,
+                        "Failed to start ctags",
+                        msg);
+            m_ctagsExist = false;
+        }
+        else
+        {
+            infoMsg("Found ctags ('%s')", qPrintable(m_ctagsCmd));
+            m_ctagsExist = true;
+        }
+    }
+
+}
+
 TagScanner::~TagScanner()
 {
 
@@ -112,32 +177,8 @@ void TagScanner::init(Settings *cfg)
 {
     m_cfg = cfg;
 
-    // Check if ctags exists?
-    QStringList argList;
-    argList.push_back("--version");
-    QByteArray stdoutContent;
-    int n = execProgram(ETAGS_CMD, argList, &stdoutContent, NULL);
-    QStringList outputList = QString(stdoutContent).split('\n');
-    for(int u = 0;u < outputList.size();u++)
-    {
-        debugMsg("ETAGS: %s", stringToCStr(outputList[u]));
-    }
-    if(n)
-    {
-        QString msg;
-
-        msg.sprintf("Failed to start program '%s'\n", ETAGS_CMD);
-        msg += "ctags can be installed on ubuntu/debian using command:\n";
-        msg +  "\n";
-        msg += " apt-get install exuberant-ctags";
-
-        QMessageBox::warning(NULL,
-                    "Failed to start ctags",
-                    msg);
-        m_ctagsExist = false;
-    }
-    else
-        m_ctagsExist = true;
+    checkForCtags();
+    
 }
 
 
@@ -161,13 +202,13 @@ int TagScanner::scan(QString filepath, QList<Tag> *taglist)
     etagsCmd = ETAGS_ARGS;
     etagsCmd += " ";
     etagsCmd += filepath;
-    QString name = ETAGS_CMD;
+    QString name = m_ctagsCmd;
     QStringList argList;
     argList = etagsCmd.split(' ',  QString::SkipEmptyParts);
 
     QByteArray stdoutContent;
     QByteArray stderrContent;
-    int rc = execProgram(ETAGS_CMD, argList,
+    int rc = execProgram(m_ctagsCmd, argList,
                             &stdoutContent,
                             &stderrContent);
 

@@ -14,6 +14,9 @@
 #include <QFile>
 #include <QProcess>
 #include <QMap>
+#include <QDir>
+#include <QStringList>
+
 
 
 /**
@@ -301,6 +304,37 @@ QString addrToString(quint64 addr)
     }
     valueText = "0x" + valueText;
     return valueText;
+}
+
+/**
+ * @brief Checks if an executable exist in the PATH (or in current directory)
+ * @param name   Name of executable (Eg: "cp").
+ * @return true if the exe exists
+ */
+bool exeExists(QString name, bool checkCurrentDir)
+{
+    QStringList pathList;
+
+    //
+    const char *pathStr = getenv("PATH");
+    if(pathStr)
+        pathList = QString(pathStr).split(":");
+    
+    if(checkCurrentDir)
+    {
+        pathList.append("./");
+    }
+    
+    for(int i = 0;i < pathList.size();i++)
+    {
+        QString exePath = pathList[i];
+        
+        QDir dir(exePath);
+        dir.setFilter(QDir::Files | QDir::Executable);
+        if(dir.exists(name))
+            return true;
+    }
+    return false;
 }
 
 
