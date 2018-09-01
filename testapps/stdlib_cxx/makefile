@@ -1,8 +1,10 @@
 CXXFLAGS+=-g -Wall -O0
 
+OBJ=test.o otherclass.o
+
 all: test
 
-test: test.o
+test: $(OBJ)
 	$(CXX) -o $@ $^
 
 
