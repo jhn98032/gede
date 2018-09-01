@@ -1,3 +1,5 @@
+//#define ENABLE_DEBUGMSG
+
 /*
  * Copyright (C) 2014-2017 Johan Henriksson.
  * All rights reserved.
@@ -37,6 +39,12 @@ CodeView::CodeView()
     setMouseTracking(true);
     setFocusPolicy(Qt::ClickFocus);
 
+
+    
+    m_incSearchStartPosRow = 15;
+    m_incSearchStartPosColumn = 4;
+    m_incSearchText = "mai";
+    
 }
 
 
@@ -198,32 +206,32 @@ void CodeView::paintEvent ( QPaintEvent * event )
         QString nrText;
 
 
-    // Draw current line cursor
-    if((int)rowIdx == m_cursorY-1)
-    {
-        QRect rect2(getBorderWidth()+1, y, event->rect().width()-1, rowHeight);
-        if(m_cfg->m_currentLineStyle == Settings::HOLLOW_RECT)
+        // Draw current line cursor
+        if((int)rowIdx == m_cursorY-1)
         {
-            QPen pen(m_cfg->m_clrCurrentLine);
-            pen.setWidth(2);
-            painter.setPen(pen);
-            painter.setBrush(Qt::NoBrush);
-            painter.drawRect(rect2);
+            QRect rect2(getBorderWidth()+1, y, event->rect().width()-1, rowHeight);
+            if(m_cfg->m_currentLineStyle == Settings::HOLLOW_RECT)
+            {
+                QPen pen(m_cfg->m_clrCurrentLine);
+                pen.setWidth(2);
+                painter.setPen(pen);
+                painter.setBrush(Qt::NoBrush);
+                painter.drawRect(rect2);
+            }
+            else
+            {
+                painter.fillRect(rect2, m_cfg->m_clrCurrentLine);
+            }
         }
-        else
-        {
-            painter.fillRect(rect2, m_cfg->m_clrCurrentLine);
-        }
-    }
 
-    // Draw line number
-    int fontY = y+(rowHeight-(m_fontInfo->ascent()+m_fontInfo->descent()))/2+m_fontInfo->ascent();
-    if(m_cfg->m_showLineNo)
-    {
-        painter.setPen(Qt::white);
-        nrText = QString::number(rowIdx+1).rightJustified(maxLineDigits);
-        painter.drawText(4, fontY, nrText);
-    }
+        // Draw line number
+        int fontY = y+(rowHeight-(m_fontInfo->ascent()+m_fontInfo->descent()))/2+m_fontInfo->ascent();
+        if(m_cfg->m_showLineNo)
+        {
+            painter.setPen(Qt::white);
+            nrText = QString::number(rowIdx+1).rightJustified(maxLineDigits);
+            painter.drawText(4, fontY, nrText);
+        }
 
         // Draw line text
         QVector<TextField*> cols = m_highlighter->getRow(rowIdx);
@@ -458,4 +466,49 @@ void CodeView::setConfig(Settings *cfg)
     update();
 }
 
-    
+void CodeView::incSearchStart(QString pattern)
+{
+    for(size_t rowIdx = 0;rowIdx < m_highlighter->getRowCount();rowIdx++)
+    {
+        QVector<TextField*> cols = m_highlighter->getRow(rowIdx);
+
+        // Get the line content of this row
+        QString thisRowText;
+        for(int colIdx = 0;colIdx < cols.size();colIdx++)
+        {
+            TextField *field = cols[colIdx];
+            thisRowText += field->m_text;
+        }
+
+        // Found the text
+        int pos = thisRowText.indexOf(pattern);
+        if(pos != -1)
+        {
+            debugMsg("Found search term '%s' at L%d:%d", qPrintable(pattern), rowIdx+1, pos);
+
+            m_incSearchStartPosRow = rowIdx;
+            m_incSearchStartPosColumn = pos;
+            m_incSearchText = pattern;
+            return;
+        }
+    }
+   
+}
+
+void CodeView::incSearchNext()
+{
+
+}
+
+void CodeView::incSearchPrev()
+{
+
+}
+
+
+
+
+
+
+
+

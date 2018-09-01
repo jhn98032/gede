@@ -166,12 +166,14 @@ MainWindow::MainWindow(QWidget *parent)
     core.setListener(this);
 
 
+    connect(m_ui.lineEdit_search, SIGNAL(textChanged(const QString &)), SLOT(onIncSearch_textChanged(const QString&)));
     
 
     installEventFilter(this);
 
     loadConfig();
 
+    // EditorTabWidget
     connect(m_ui.editorTabWidget, SIGNAL(tabCloseRequested(int)), SLOT(onCodeViewTab_tabCloseRequested(int)));
     connect(m_ui.editorTabWidget, SIGNAL(currentChanged(int)), SLOT(onCodeViewTab_currentChanged(int)));
     m_ui.editorTabWidget->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -1849,5 +1851,17 @@ void MainWindow::onBreakpointsWidgetContextMenu(const QPoint& pos)
     m_popupMenu.popup(popupPos);
 }
 
+void MainWindow::onIncSearch_textChanged(const QString &text)
+{
+    debugMsg("%s('%s')", __func__, qPrintable(text));
+
+    // Get active tab
+    CodeViewTab* currentTab = (CodeViewTab* )m_ui.editorTabWidget->currentWidget();
+    if(!currentTab)
+        return;
+
+    currentTab->incSearchStart(text);
+        
+}
 
     

@@ -57,6 +57,11 @@ public:
 
     int getRowHeight();
 
+
+    void incSearchStart(QString text);
+    void incSearchNext();
+    void incSearchPrev();
+    
 public slots:
     void onTimerTimeout();
 
@@ -80,6 +85,12 @@ public:
     QString m_text;
     QTimer m_timer;
     VariableInfoWindow m_infoWindow;
+
+
+    int m_incSearchStartPosRow;
+    int m_incSearchStartPosColumn;
+    QString m_incSearchText;
+    
 };
 
 
