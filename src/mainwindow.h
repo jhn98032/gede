@@ -110,6 +110,7 @@ private:
 
 
 public slots:
+    void onIncSearch_textChanged(const QString &text);
     void onFolderViewItemActivated ( QTreeWidgetItem * item, int column );
     void onThreadWidgetSelectionChanged( );
     void onStackWidgetSelectionChanged();

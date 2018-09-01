@@ -168,6 +168,8 @@ MainWindow::MainWindow(QWidget *parent)
     treeWidget->setColumnWidth(0, 200);
     connect(m_ui.treeWidget_functions, SIGNAL(itemClicked(QTreeWidgetItem * , int )),
             SLOT(onFuncWidgetItemSelected(QTreeWidgetItem * , int )));
+
+    connect(m_ui.lineEdit_search, SIGNAL(textChanged(const QString &)), SLOT(onIncSearch_textChanged(const QString&)));
     
     //Setup the class treewidget
     treeWidget = m_ui.treeWidget_classes;
@@ -181,6 +183,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     loadConfig();
 
+    // EditorTabWidget
     connect(m_ui.editorTabWidget, SIGNAL(tabCloseRequested(int)), SLOT(onCodeViewTab_tabCloseRequested(int)));
     connect(m_ui.editorTabWidget, SIGNAL(currentChanged(int)), SLOT(onCodeViewTab_currentChanged(int)));
     m_ui.editorTabWidget->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -1868,6 +1871,18 @@ void MainWindow::onBreakpointsWidgetContextMenu(const QPoint& pos)
     m_popupMenu.popup(popupPos);
 }
 
+void MainWindow::onIncSearch_textChanged(const QString &text)
+{
+    debugMsg("%s('%s')", __func__, qPrintable(text));
+
+    // Get active tab
+    CodeViewTab* currentTab = (CodeViewTab* )m_ui.editorTabWidget->currentWidget();
+    if(!currentTab)
+        return;
+
+    currentTab->incSearchStart(text);
+        
+}
 
 /**
  * @brief Called when the tag manager is done with finding all the tags
