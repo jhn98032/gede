@@ -1,4 +1,4 @@
-#define ENABLE_DEBUGMSG
+//#define ENABLE_DEBUGMSG
 
 /*
  * Copyright (C) 2014-2017 Johan Henriksson.
@@ -1903,7 +1903,8 @@ void MainWindow::onAllTagScansDone()
             classList += tag.className;
     }
     classList.removeDuplicates();
-
+    classList.sort();
+    
     // Insert the classes in the class widget
     for(int ci = 0;ci < classList.size();ci++)
     {
