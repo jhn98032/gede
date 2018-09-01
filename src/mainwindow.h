@@ -152,6 +152,7 @@ public slots:
 
     void onAllTagScansDone();
     void onFuncWidgetItemSelected(QTreeWidgetItem * item, int column);
+    void onClassWidgetItemSelected(QTreeWidgetItem * item, int column);
     
 
 private:

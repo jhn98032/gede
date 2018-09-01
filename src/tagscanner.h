@@ -27,8 +27,9 @@ class Tag
         void setSignature(QString signature) { m_signature = signature; };
         void setLineNo(int lineNo) { m_lineNo = lineNo;};
         int getLineNo() const { return m_lineNo; };
-        QString getFilePath() { return filepath; };
-
+        QString getFilePath() const { return filepath; };
+        QString getClassName() const { return className;};
+        
         QString className;
         QString m_name;
         QString filepath;

@@ -28,7 +28,7 @@
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <widget class="QTabWidget" name="tabWidget_3">
+        <widget class="QTabWidget" name="tabWidget_tags">
          <property name="currentIndex">
           <number>0</number>
          </property>
@@ -55,9 +55,25 @@
           <layout class="QVBoxLayout" name="verticalLayout_9">
            <item>
             <widget class="QTreeWidget" name="treeWidget_classes">
+             <property name="selectionMode">
+              <enum>QAbstractItemView::NoSelection</enum>
+             </property>
+             <property name="rootIsDecorated">
+              <bool>false</bool>
+             </property>
              <column>
               <property name="text">
                <string notr="true">Name</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Filename</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Line</string>
               </property>
              </column>
             </widget>
@@ -78,7 +94,7 @@
               <bool>false</bool>
              </property>
              <property name="columnCount">
-              <number>2</number>
+              <number>3</number>
              </property>
              <column>
               <property name="text">
@@ -88,6 +104,11 @@
              <column>
               <property name="text">
                <string>Filename</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Line</string>
               </property>
              </column>
             </widget>

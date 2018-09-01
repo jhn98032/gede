@@ -1,4 +1,4 @@
-//#define ENABLE_DEBUGMSG
+#define ENABLE_DEBUGMSG
 
 /*
  * Copyright (C) 2014-2017 Johan Henriksson.
@@ -169,6 +169,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ui.treeWidget_functions, SIGNAL(itemClicked(QTreeWidgetItem * , int )),
             SLOT(onFuncWidgetItemSelected(QTreeWidgetItem * , int )));
     
+    //Setup the class treewidget
+    treeWidget = m_ui.treeWidget_classes;
+    treeWidget->setColumnWidth(0, 200);
+    connect(m_ui.treeWidget_classes, SIGNAL(itemClicked(QTreeWidgetItem * , int )),
+            SLOT(onFuncWidgetItemSelected(QTreeWidgetItem * , int )));
+
+
 
     installEventFilter(this);
 
@@ -1868,37 +1875,85 @@ void MainWindow::onBreakpointsWidgetContextMenu(const QPoint& pos)
 void MainWindow::onAllTagScansDone()
 {
     QTreeWidget *funcWidget = m_ui.treeWidget_functions;
+    QTreeWidget *classWidget = m_ui.treeWidget_classes;
+    QTreeWidgetItem *item;
 
     funcWidget->clear();
+    classWidget->clear();
 
     // Get all tags
-    QStringList list;
+    QList<Tag> tagList;
     for(int k = 0;k < m_sourceFiles.size();k++)
     {
         FileInfo &info = m_sourceFiles[k];
 
         // Find the tag
-        QList<Tag> tagList;
-        m_tagManager.getTags(info.fullName, &tagList);
+        QList<Tag> thisTagList;
+        m_tagManager.getTags(info.fullName, &thisTagList);
+        tagList += thisTagList;
+    }
+
+    // Get all classes
+    QStringList classList;
+    for(int i = 0;i < tagList.size();i++)
+    {
+        const Tag &tag = tagList[i];
+        QString className = tag.getClassName();
+        if(!className.isEmpty())
+            classList += tag.className;
+    }
+    classList.removeDuplicates();
+
+    // Insert the classes in the class widget
+    for(int ci = 0;ci < classList.size();ci++)
+    {
+        QString className = classList[ci];
+
+        // Insert the class
+        QTreeWidgetItem *classItem = new QTreeWidgetItem;
+        classItem->setText(0, className);
+        QBrush blueBrush (Qt::blue);
+        classItem->setForeground( 0, blueBrush);
+        classWidget->insertTopLevelItem(0, classItem);
+
+
+        // Add all functions to the class in the class widget
         for(int i = 0;i < tagList.size();i++)
         {
-            Tag &tag = tagList[i];
-            if(tag.type == Tag::TAG_FUNC)
+            const Tag &tag = tagList[i];
+            if(tag.type == Tag::TAG_FUNC && tag.getClassName() == className)
             {
-                QString tagName = tag.getName() + "()";
-                list += tagName;
-                    
-                // Add the functions to the treewidget
-                QTreeWidgetItem *item = new QTreeWidgetItem;
-                item->setText(0, tag.getName() + "()");
+                item = new QTreeWidgetItem;
+                item->setText(0, tag.getName() + tag.getSignature());
                 item->setData(0, Qt::UserRole, tag.getLineNo());
                 item->setText(1, getFilenamePart(tag.getFilePath()));
                 item->setData(1, Qt::UserRole, tag.getFilePath());
-                
-                funcWidget->insertTopLevelItem(0, item);
+                item->setText(2, QString::number(tag.getLineNo()));
+                classItem->addChild(item);
+
             }
         }
+
+        classItem->setExpanded(true);
     }
+
+    // Add all functions to the treewidget
+    for(int i = 0;i < tagList.size();i++)
+    {
+        const Tag &tag = tagList[i];
+        if(tag.type == Tag::TAG_FUNC)
+        {
+            item = new QTreeWidgetItem;
+            item->setText(0, tag.getName() + tag.getSignature());
+            item->setData(0, Qt::UserRole, tag.getLineNo());
+            item->setText(1, getFilenamePart(tag.getFilePath()));
+            item->setData(1, Qt::UserRole, tag.getFilePath());
+            item->setText(2, QString::number(tag.getLineNo()));
+                
+            funcWidget->insertTopLevelItem(0, item);
+        }
+    }
+
 }
 
 void MainWindow::onFuncWidgetItemSelected(QTreeWidgetItem * item, int column)
@@ -1912,4 +1967,17 @@ void MainWindow::onFuncWidgetItemSelected(QTreeWidgetItem * item, int column)
     open(filePath, lineNo);
 }
 
+
+void MainWindow::onClassWidgetItemSelected(QTreeWidgetItem * item, int column)
+{
+    Q_UNUSED(column);
+
+    debugMsg("%s(item:%p column:%d)", __func__, item, column);
+
+    // Get the linenumber and file where the function is defined in            
+    QString filePath = item->data(1, Qt::UserRole).toString();
+    int lineNo = item->data(0, Qt::UserRole).toInt();
+
+    open(filePath, lineNo);
+}
 
