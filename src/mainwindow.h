@@ -44,7 +44,7 @@ public:
     virtual ~MainWindow();
 
     CodeViewTab* open(QString filename);
-    
+    CodeViewTab* open(QString filename, int lineNo);
 
 public:
     void insertSourceFiles();
@@ -149,6 +149,10 @@ public slots:
     void onBreakpointsRemoveAll();
     void onBreakpointsGoTo();
     void onBreakpointsWidgetContextMenu(const QPoint& pt);
+
+    void onAllTagScansDone();
+    void onFuncWidgetItemSelected(QTreeWidgetItem * item, int column);
+    
 
 private:
     QByteArray m_gui_default_mainwindowState;

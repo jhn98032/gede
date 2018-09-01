@@ -27,6 +27,12 @@ void ScannerWorker::abort()
     m_workQueue.clear();
 }
 
+bool ScannerWorker::isIdle()
+{
+    return m_workQueue.isEmpty() ? true : false;
+}
+
+    
 void ScannerWorker::run()
 {
     assert(m_dbgMainThread != QThread::currentThreadId ());
@@ -141,6 +147,10 @@ void TagManager::onScanDone(QString filePath, QList<Tag> *tags)
     }
 
     m_db[filePath] = info;
+
+    if(m_worker.isIdle())
+        emit onAllScansDone();
+
 
     delete tags;
 }

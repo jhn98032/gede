@@ -28,12 +28,72 @@
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <widget class="QTreeWidget" name="treeWidget_file">
-         <column>
-          <property name="text">
-           <string notr="true">1</string>
-          </property>
-         </column>
+        <widget class="QTabWidget" name="tabWidget_3">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
+         <widget class="QWidget" name="tab_9">
+          <attribute name="title">
+           <string>Files</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <widget class="QTreeWidget" name="treeWidget_file">
+             <column>
+              <property name="text">
+               <string notr="true">Name</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab_10">
+          <attribute name="title">
+           <string>Classes</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_9">
+           <item>
+            <widget class="QTreeWidget" name="treeWidget_classes">
+             <column>
+              <property name="text">
+               <string notr="true">Name</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+         <widget class="QWidget" name="tab">
+          <attribute name="title">
+           <string>Functions</string>
+          </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_8">
+           <item>
+            <widget class="QTreeWidget" name="treeWidget_functions">
+             <property name="selectionMode">
+              <enum>QAbstractItemView::NoSelection</enum>
+             </property>
+             <property name="rootIsDecorated">
+              <bool>false</bool>
+             </property>
+             <property name="columnCount">
+              <number>2</number>
+             </property>
+             <column>
+              <property name="text">
+               <string notr="true">Name</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>Filename</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+          </layout>
+         </widget>
         </widget>
         <widget class="TabWidgetAdv" name="editorTabWidget">
          <property name="tabsClosable">
@@ -206,7 +266,7 @@
      <x>0</x>
      <y>0</y>
      <width>881</width>
-     <height>18</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -474,9 +534,6 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <tabstops>
-  <tabstop>treeWidget_file</tabstop>
- </tabstops>
  <resources>
   <include location="resource.qrc"/>
  </resources>

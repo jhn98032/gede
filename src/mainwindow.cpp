@@ -70,10 +70,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     //
     QTreeWidget *treeWidget = m_ui.treeWidget_file;
-    names.clear();
-    names += "Name";
-    treeWidget->setHeaderLabels(names);
-    treeWidget->setColumnCount(1);
     treeWidget->setColumnWidth(0, 200);
 
 
@@ -165,7 +161,13 @@ MainWindow::MainWindow(QWidget *parent)
     Core &core = Core::getInstance();
     core.setListener(this);
 
+    connect(&m_tagManager, SIGNAL(onAllScansDone()), SLOT(onAllTagScansDone()));
 
+    //Setup the function treewidget
+    treeWidget = m_ui.treeWidget_functions;
+    treeWidget->setColumnWidth(0, 200);
+    connect(m_ui.treeWidget_functions, SIGNAL(itemClicked(QTreeWidgetItem * , int )),
+            SLOT(onFuncWidgetItemSelected(QTreeWidgetItem * , int )));
     
 
     installEventFilter(this);
@@ -874,6 +876,19 @@ void MainWindow::onCodeViewTab_tabCloseRequested ( int tabIdx)
     delete codeViewTab;
 }
 
+/**
+ * @brief Opens a source file in the sourcecode viewer and highlights a specific line.
+ */
+CodeViewTab* MainWindow::open(QString filename, int lineNo)
+{
+    CodeViewTab* currentCodeViewTab = open(filename);
+    if(currentCodeViewTab)
+    {
+        debugMsg("Ensuring that line %d is visible", lineNo);
+        currentCodeViewTab->ensureLineIsVisible(lineNo);    
+    }
+    return currentCodeViewTab;
+}
 
 /**
  * @brief Opens a source file in the sourcecode viewer.
@@ -1081,12 +1096,7 @@ void MainWindow::onGoToLine()
     // Open file    
     if(!filename.isEmpty() && lineno > 0)
     {
-        CodeViewTab* currentCodeViewTab = open(filename);
-        if(currentCodeViewTab)
-        {
-            debugMsg("Ensuring that line %d is visible", lineno);
-            currentCodeViewTab->ensureLineIsVisible(lineno);    
-        }
+        open(filename, lineno);
     }
     else
         warnMsg("Location not found!");
@@ -1792,6 +1802,8 @@ void MainWindow::onBreakpointsRemoveSelected()
 
 }
 
+
+
 void MainWindow::onBreakpointsGoTo()
 {
 
@@ -1850,4 +1862,54 @@ void MainWindow::onBreakpointsWidgetContextMenu(const QPoint& pos)
 }
 
 
-    
+/**
+ * @brief Called when the tag manager is done with finding all the tags
+ */
+void MainWindow::onAllTagScansDone()
+{
+    QTreeWidget *funcWidget = m_ui.treeWidget_functions;
+
+    funcWidget->clear();
+
+    // Get all tags
+    QStringList list;
+    for(int k = 0;k < m_sourceFiles.size();k++)
+    {
+        FileInfo &info = m_sourceFiles[k];
+
+        // Find the tag
+        QList<Tag> tagList;
+        m_tagManager.getTags(info.fullName, &tagList);
+        for(int i = 0;i < tagList.size();i++)
+        {
+            Tag &tag = tagList[i];
+            if(tag.type == Tag::TAG_FUNC)
+            {
+                QString tagName = tag.getName() + "()";
+                list += tagName;
+                    
+                // Add the functions to the treewidget
+                QTreeWidgetItem *item = new QTreeWidgetItem;
+                item->setText(0, tag.getName() + "()");
+                item->setData(0, Qt::UserRole, tag.getLineNo());
+                item->setText(1, getFilenamePart(tag.getFilePath()));
+                item->setData(1, Qt::UserRole, tag.getFilePath());
+                
+                funcWidget->insertTopLevelItem(0, item);
+            }
+        }
+    }
+}
+
+void MainWindow::onFuncWidgetItemSelected(QTreeWidgetItem * item, int column)
+{
+    Q_UNUSED(column);
+
+    // Get the linenumber and file where the function is defined in            
+    QString filePath = item->data(1, Qt::UserRole).toString();
+    int lineNo = item->data(0, Qt::UserRole).toInt();
+
+    open(filePath, lineNo);
+}
+
+

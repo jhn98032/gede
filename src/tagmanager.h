@@ -34,6 +34,8 @@ class ScannerWorker : public QThread
         void requestQuit();
         void queueScan(QString filePath);
 
+        bool isIdle();
+        
     private:
         void scan(QString filePath);
     
@@ -78,6 +80,9 @@ public:
 
     void lookupTag(QString name, QList<Tag> *tagList);
 
+signals:
+    void onAllScansDone();
+    
 private slots:
     void onScanDone(QString filePath, QList<Tag> *tags);
     
