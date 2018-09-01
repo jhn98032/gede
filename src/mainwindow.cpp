@@ -1915,7 +1915,7 @@ void MainWindow::onAllTagScansDone()
         classItem->setText(0, className);
         QBrush blueBrush (Qt::blue);
         classItem->setForeground( 0, blueBrush);
-        classWidget->insertTopLevelItem(0, classItem);
+        classWidget->addTopLevelItem(classItem);
 
 
         // Add all functions to the class in the class widget
@@ -1951,7 +1951,7 @@ void MainWindow::onAllTagScansDone()
             item->setData(1, Qt::UserRole, tag.getFilePath());
             item->setText(2, QString::number(tag.getLineNo()));
                 
-            funcWidget->insertTopLevelItem(0, item);
+            funcWidget->addTopLevelItem(item);
         }
     }
 
