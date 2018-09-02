@@ -1969,6 +1969,7 @@ void MainWindow::onAllTagScansDone()
             funcWidget->addTopLevelItem(item);
         }
     }
+    funcWidget->sortItems(0, Qt::AscendingOrder);
 
 }
 
