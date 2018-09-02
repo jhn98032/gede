@@ -30,7 +30,8 @@ class Tag
         QString getFilePath() const { return m_filepath; };
         QString getClassName() const { return m_className;};
         bool isFunc() const { return (m_type == TAG_FUNC) ? true : false; };
-        
+        bool isClassMember() const { return m_className.isEmpty() ? false : true; };
+          
         QString m_className;
         QString m_name;
         QString m_filepath;

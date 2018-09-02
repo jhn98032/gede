@@ -1,3 +1,14 @@
+//#define ENABLE_DEBUGMSG
+
+
+/*
+ * Copyright (C) 2018 Johan Henriksson.
+ * All rights reserved.
+ *
+ * This software may be modified and distributed under the terms
+ * of the BSD license.  See the LICENSE file for details.
+ */
+ 
 #include "tagmanager.h"
 
 #include "tagscanner.h"
@@ -195,16 +206,37 @@ void TagManager::getTags(QString filePath, QList<Tag> *tagList)
     }
 }
 
+
+/**
+ * @brief Lookup tags with a specific name.
+ * @param name       The name of the tag (Eg: "main" or "Class::myFunc").
+ * @return tagList   The found tags.
+ */
 void TagManager::lookupTag(QString name, QList<Tag> *tagList)
 {
     debugMsg("%s(name:'%s')", __func__, qPrintable(name)); 
+
+    QString funcName;
+    QString className;
+
+    if(name.contains("::"))
+    {
+        int divPos = name.indexOf("::");
+        funcName = name.mid(divPos+2);
+        className = name.left(divPos);
+    }
+    else
+        funcName = name;
+
     foreach (ScannerResult* info, m_db)
     {
         for(int j = 0;j < info->m_tagList.size();j++)
         {
             Tag &tag = info->m_tagList[j];
-            if(tag.getName() == name)
+            
+            if(tag.getName() == funcName && className == tag.getClassName())
                 tagList->append(tag);
+            
         }
     }
 

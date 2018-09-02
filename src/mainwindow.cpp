@@ -2041,7 +2041,10 @@ void MainWindow::onAllTagScansDone()
         if(tag.isFunc())
         {
             item = new QTreeWidgetItem;
-            item->setText(0, tag.getName() + tag.getSignature());
+            if(tag.getClassName().isEmpty())
+                item->setText(0, " " + tag.getLongName());
+            else
+                item->setText(0, tag.getLongName());
             item->setData(0, Qt::UserRole, tag.getLineNo());
             item->setText(1, getFilenamePart(tag.getFilePath()));
             item->setData(1, Qt::UserRole, tag.getFilePath());

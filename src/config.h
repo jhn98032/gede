@@ -28,6 +28,9 @@
 // Max number of recently used goto locations to save
 #define MAX_GOTO_RUI_COUNT  10
 
+// Width of items in the GoTo list widget.
+#define GOTO_LISTWIDGET_ITEM_WIDTH  240
+
 #endif // FILE__CONFIG_H
 
 

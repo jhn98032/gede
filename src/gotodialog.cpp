@@ -18,6 +18,8 @@
 #include "qtutil.h"
 #include "util.h"
 #include "log.h"
+#include "config.h"
+
 
 #define MAX_TAGS   2000
 
@@ -353,7 +355,7 @@ void GoToDialog::onSearchTextEdited ( const QString & text2 )
     {
         QString fieldText = exprList[i];
         QListWidgetItem *item = new QListWidgetItem(fieldText);
-        item->setSizeHint(QSize(160,20));
+        item->setSizeHint(QSize(GOTO_LISTWIDGET_ITEM_WIDTH,20));
         m_ui.listWidget->addItem(item);
     }
     m_ui.listWidget->sortItems(Qt::AscendingOrder);

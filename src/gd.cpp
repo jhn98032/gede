@@ -65,6 +65,7 @@ void loadBreakpoints(Settings &cfg, Core &core)
     for(int i = 0;i < cfg.m_breakpoints.size();i++)
     {
         SettingsBreakpoint bkptCfg = cfg.m_breakpoints[i];
+        debugMsg("Setting breakpoint at %s:L%d", qPrintable(bkptCfg.m_filename), bkptCfg.m_lineNo);
         core.gdbSetBreakpoint(bkptCfg.m_filename, bkptCfg.m_lineNo);
     }
 }

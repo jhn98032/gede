@@ -168,7 +168,13 @@ QStringList Locator::searchExpression(QString expressionStart)
             Tag &tag = tagList[i];
             if(tag.m_type == Tag::TAG_FUNC)
             {
-            QString tagName = tag.getName() + "()";
+            QString tagName;
+            if(tag.isClassMember())
+                tagName = tag.getClassName() + "::" + tag.getName();
+            else
+                tagName = tag.getName();
+            tagName += "()";
+            
             if(tagName.startsWith(expressionStart))
             {
                 debugMsg("Found '%s'", qPrintable(tagName));
