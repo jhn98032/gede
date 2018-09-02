@@ -1764,6 +1764,8 @@ int Core::gdbSetBreakpoint(QString filename, int lineNo)
     int rc = 0;
     
     assert(filename != "");
+    if(filename.isEmpty())
+        return -1;
 
     ensureStopped();
     
