@@ -138,6 +138,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ui.actionNext, SIGNAL(triggered()), SLOT(onNext()));
     connect(m_ui.actionAbout, SIGNAL(triggered()), SLOT(onAbout()));
     connect(m_ui.actionGoToLine, SIGNAL(triggered()), SLOT(onGoToLine()));
+    connect(m_ui.actionSearch, SIGNAL(triggered()), SLOT(onSearch()));
     connect(m_ui.actionStep_In, SIGNAL(triggered()), SLOT(onStepIn()));
     connect(m_ui.actionStep_Out, SIGNAL(triggered()), SLOT(onStepOut()));
     connect(m_ui.actionRun, SIGNAL(triggered()), SLOT(onRun()));
@@ -170,6 +171,12 @@ MainWindow::MainWindow(QWidget *parent)
             SLOT(onFuncWidgetItemSelected(QTreeWidgetItem * , int )));
 
     connect(m_ui.lineEdit_search, SIGNAL(textChanged(const QString &)), SLOT(onIncSearch_textChanged(const QString&)));
+    connect(m_ui.checkBox_search, SIGNAL(stateChanged (int)), SLOT(onSearchCheckBoxStateChanged(int)));
+    connect(m_ui.pushButton_searchNext, SIGNAL(clicked()), SLOT(onSearchNext()));
+    connect(m_ui.pushButton_searchPrev, SIGNAL(clicked()), SLOT(onSearchPrev()));
+    
+    m_ui.widget_search->hide();
+
     
     //Setup the class treewidget
     treeWidget = m_ui.treeWidget_classes;
@@ -1079,6 +1086,19 @@ void MainWindow::onAbout()
 
 
 /**
+ * @brief Called when user presses "Search->Search".
+ */
+void MainWindow::onSearch()
+{
+    m_ui.widget_search->show();
+    m_ui.checkBox_search->setCheckState(Qt::Checked);
+
+    
+    m_ui.lineEdit_search->setFocus();
+}
+
+
+/**
  * @brief Called when user presses "Search->Go to line".
  */
 void MainWindow::onGoToLine()
@@ -1870,6 +1890,40 @@ void MainWindow::onBreakpointsWidgetContextMenu(const QPoint& pos)
     
     m_popupMenu.popup(popupPos);
 }
+
+void MainWindow::onSearchCheckBoxStateChanged(int state)
+{
+    debugMsg("%s(state:%d)", __func__, state);
+
+    if(state == Qt::Checked)
+        m_ui.widget_search->show();
+    else
+        m_ui.widget_search->hide();
+    
+}
+
+void MainWindow::onSearchNext()
+{
+    // Get active tab
+    CodeViewTab* currentTab = (CodeViewTab* )m_ui.editorTabWidget->currentWidget();
+    if(!currentTab)
+        return;
+
+    currentTab->incSearchNext();
+    m_ui.lineEdit_search->setFocus();
+}
+
+void MainWindow::onSearchPrev()
+{
+    // Get active tab
+    CodeViewTab* currentTab = (CodeViewTab* )m_ui.editorTabWidget->currentWidget();
+    if(!currentTab)
+        return;
+
+    currentTab->incSearchPrev();
+    m_ui.lineEdit_search->setFocus();
+}
+
 
 void MainWindow::onIncSearch_textChanged(const QString &text)
 {

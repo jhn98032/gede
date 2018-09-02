@@ -41,9 +41,8 @@ CodeView::CodeView()
 
 
     
-    m_incSearchStartPosRow = 15;
-    m_incSearchStartPosColumn = 4;
-    m_incSearchText = "mai";
+    m_incSearchStartPosRow = -1;
+    m_incSearchStartPosColumn = 0;
     
 }
 
@@ -235,11 +234,28 @@ void CodeView::paintEvent ( QPaintEvent * event )
 
         // Draw line text
         QVector<TextField*> cols = m_highlighter->getRow(rowIdx);
-        
+
         int x = getBorderWidth()+10;
+
+        // Draw search selection
+        if(m_incSearchStartPosRow == (int)rowIdx)
+        {
+            QString fullRowText;
+            for(int j = 0;j < cols.size();j++)
+            {
+                TextField *field = cols[j];            
+                fullRowText += field->m_text;
+            }
+            int selPosX = x + m_fontInfo->width(fullRowText.left(m_incSearchStartPosColumn));
+            int selPosWidth = m_fontInfo->width(fullRowText.mid(m_incSearchStartPosColumn, m_incSearchText.length()));
+            QRect rect2(selPosX, y, selPosWidth, rowHeight);
+            painter.fillRect(rect2, QColor(100,100,100));
+        
+        }
+
+        // Draw text
         for(int j = 0;j < cols.size();j++)
         {
-
             TextField *field = cols[j];            
 
             painter.setPen(field->m_color);
@@ -287,6 +303,8 @@ void CodeView::mousePressEvent( QMouseEvent * event )
     Q_UNUSED(event);
     int j;
 
+    m_infoWindow.hide();
+    
     if(!m_highlighter)
         return;
     
@@ -466,42 +484,74 @@ void CodeView::setConfig(Settings *cfg)
     update();
 }
 
+
+void CodeView::idxToRowColumn(int idx, int *rowIdx, int *colIdx)
+{
+    QString prevText = m_text.left(idx);
+    int lastRowPos = prevText.lastIndexOf("\n");
+    if(lastRowPos == -1)
+        *colIdx = prevText.length();
+    else
+        *colIdx = prevText.length()-lastRowPos-1;
+    *rowIdx = prevText.count("\n");
+}
+
+void CodeView::doIncSearch(QString pattern, int startPos, bool searchForward)
+{
+
+    // Search for the pattern
+    int pos = -1;
+    if(searchForward)
+    {
+        if(startPos >= 0)
+            pos = m_text.indexOf(pattern, startPos);
+    }
+    else if(startPos >= 0)
+        pos = m_text.lastIndexOf(pattern, startPos);
+    if(pos == -1)
+    {
+        debugMsg("Did not find '%s'", qPrintable(pattern));
+    }
+    else
+    {
+        int row = 0;
+        int colIdx = 0;
+        
+        // Get row and column
+        idxToRowColumn(pos, &row, &colIdx);
+
+        m_incSearchStartPosRow = row;
+        m_incSearchStartPosColumn = colIdx;
+        m_incSearchStartPosIdx = pos;
+        
+        debugMsg("Found search term '%s' at L%d:%d",
+                qPrintable(pattern), m_incSearchStartPosRow+1, m_incSearchStartPosColumn);
+    }
+
+    m_incSearchText = pattern;
+
+    update();
+    
+}
+
 void CodeView::incSearchStart(QString pattern)
 {
-    for(size_t rowIdx = 0;rowIdx < m_highlighter->getRowCount();rowIdx++)
-    {
-        QVector<TextField*> cols = m_highlighter->getRow(rowIdx);
+    debugMsg("%s('%s')", __func__, qPrintable(pattern));
 
-        // Get the line content of this row
-        QString thisRowText;
-        for(int colIdx = 0;colIdx < cols.size();colIdx++)
-        {
-            TextField *field = cols[colIdx];
-            thisRowText += field->m_text;
-        }
-
-        // Found the text
-        int pos = thisRowText.indexOf(pattern);
-        if(pos != -1)
-        {
-            debugMsg("Found search term '%s' at L%d:%d", qPrintable(pattern), rowIdx+1, pos);
-
-            m_incSearchStartPosRow = rowIdx;
-            m_incSearchStartPosColumn = pos;
-            m_incSearchText = pattern;
-            return;
-        }
-    }
-   
+    m_incSearchStartPosRow = -1;
+    doIncSearch(pattern, 0, true);
 }
 
 void CodeView::incSearchNext()
 {
-
+    debugMsg("CodeView::%s()", __func__);
+    doIncSearch(m_incSearchText, m_incSearchStartPosIdx+1, true);
 }
 
 void CodeView::incSearchPrev()
 {
+    debugMsg("CodeView::%s()", __func__);
+    doIncSearch(m_incSearchText, m_incSearchStartPosIdx-1, false);
 
 }
 

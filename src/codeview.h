@@ -61,6 +61,11 @@ public:
     void incSearchStart(QString text);
     void incSearchNext();
     void incSearchPrev();
+
+private:
+    void idxToRowColumn(int idx, int *rowIdx, int *colIdx);
+    void doIncSearch(QString pattern, int startPos, bool searchForward);
+
     
 public slots:
     void onTimerTimeout();
@@ -90,7 +95,7 @@ public:
     int m_incSearchStartPosRow;
     int m_incSearchStartPosColumn;
     QString m_incSearchText;
-    
+    int m_incSearchStartPosIdx;
 };
 
 

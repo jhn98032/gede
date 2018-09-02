@@ -31,8 +31,8 @@ public:
     void setCurrentLine(int currentLine);
                     
     void incSearchStart(QString text) { return m_ui.codeView->incSearchStart(text); };
-    void incSearchNext() { return m_ui.codeView->incSearchNext(); };
-    void incSearchPrev() { return m_ui.codeView->incSearchNext(); };
+    void incSearchNext() { m_ui.codeView->incSearchNext(); };
+    void incSearchPrev() { m_ui.codeView->incSearchPrev(); };
     
     int open(QString filename, QList<Tag> tagList);
 

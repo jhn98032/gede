@@ -119,6 +119,10 @@ public slots:
     void onStepIn();
     void onStepOut();
     void onAbout();
+    void onSearch();
+    void onSearchCheckBoxStateChanged(int state);
+    void onSearchNext();
+    void onSearchPrev();
     void onGoToLine();
     void onStop();
     void onBreakpointsWidgetItemDoubleClicked(QTreeWidgetItem * item,int column);
