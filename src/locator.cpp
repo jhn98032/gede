@@ -1,3 +1,15 @@
+/*
+ * Copyright (C) 2018 Johan Henriksson.
+ * All rights reserved.
+ *
+ * This software may be modified and distributed under the terms
+ * of the BSD license.  See the LICENSE file for details.
+ */
+
+
+// #define ENABLE_DEBUGMSG
+
+
 #include "locator.h"
 
 #include "util.h"
@@ -259,12 +271,16 @@ QVector<Location> Locator::locate(QString expr)
                 for(int i = 0;i < tagList.size();i++)
                 {
                     Tag &tag = tagList[i];
+#ifdef ENABLE_DEBUGMSG
                     tag.dump();
+#endif
                     if(defFilename.isEmpty() ||
                         tag.getFilePath().endsWith("/" + defFilename))
                     {
                         Location loc = Location(tag.getFilePath(), tag.getLineNo());
+#ifdef ENABLE_DEBUGMSG
                         loc.dump();
+#endif
                         list += loc;
                         
                     }
