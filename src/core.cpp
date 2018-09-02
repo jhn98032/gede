@@ -443,9 +443,7 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
     }
 
 
-    if(rc == 0)
-        gdbRun();
-
+    
     
     return 0;
 }
@@ -558,8 +556,7 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
     
     gdbGetFiles();
 
-    gdbRun();
-
+    
     return 0;
 }
 

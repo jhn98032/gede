@@ -190,6 +190,9 @@ int main(int argc, char *argv[])
     if(cfg.m_reloadBreakpoints)
         loadBreakpoints(cfg, core);
 
+    if(rc == 0 && (cfg.m_connectionMode == MODE_LOCAL || cfg.m_connectionMode == MODE_TCP))
+        core.gdbRun();
+
     w.show();
 
     return app.exec();
