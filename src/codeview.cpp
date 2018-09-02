@@ -72,7 +72,7 @@ void CodeView::onTimerTimeout()
     QPoint globalCursorPos = QCursor::pos();
     QPoint mousePos = mapFromGlobal(globalCursorPos);
 
-    // Clicked on a text row?
+    // Hover mouse over a text row?
     TextField *foundField = NULL;
     int rowHeight = getRowHeight();
     int rowIdx = mousePos.y() / rowHeight;
@@ -285,7 +285,7 @@ void CodeView::setCurrentLine(int lineNo)
 {
     m_cursorY = lineNo;
 
-    m_infoWindow.hide();
+    hideInfoWindow();
     
     update();
 }
@@ -303,7 +303,7 @@ void CodeView::mousePressEvent( QMouseEvent * event )
     Q_UNUSED(event);
     int j;
 
-    m_infoWindow.hide();
+    hideInfoWindow();
     
     if(!m_highlighter)
         return;
@@ -420,10 +420,22 @@ void CodeView::mousePressEvent( QMouseEvent * event )
     }
 }
 
+
+/**
+ * @brief Hides the variable info window.
+ */
+void CodeView::hideInfoWindow()
+{
+    m_infoWindow.hide();
+    m_timer.stop();
+}
+
 void CodeView::focusOutEvent ( QFocusEvent * event )
 {
     Q_UNUSED(event);
-    m_infoWindow.hide();
+
+    hideInfoWindow();
+    
 }
 
 void CodeView::mouseMoveEvent ( QMouseEvent * event )

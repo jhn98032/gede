@@ -65,6 +65,7 @@ public:
 private:
     void idxToRowColumn(int idx, int *rowIdx, int *colIdx);
     void doIncSearch(QString pattern, int startPos, bool searchForward);
+    void hideInfoWindow();
 
     
 public slots:
