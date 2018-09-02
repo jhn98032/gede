@@ -618,7 +618,7 @@ void MainWindow::insertSourceFiles()
             QString ignoreDir = m_cfg.m_sourceIgnoreDirs[j];
             if(!ignoreDir.isEmpty())
             {
-                if(source->fullName.startsWith(ignoreDir))
+                if(source->m_fullName.startsWith(ignoreDir))
                     ignore = true;
             }
         }
@@ -626,8 +626,8 @@ void MainWindow::insertSourceFiles()
         if(!ignore)
         {
             FileInfo info;
-            info.name = source->name;
-            info.fullName = source->fullName;
+            info.m_name = source->m_name;
+            info.m_fullName = source->m_fullName;
             
             m_sourceFiles.push_back(info);
         }
@@ -639,7 +639,7 @@ void MainWindow::insertSourceFiles()
     {
         FileInfo &info = m_sourceFiles[i];
 
-        m_tagManager.queueScan(info.fullName);
+        m_tagManager.queueScan(info.m_fullName);
         
 
         QTreeWidgetItem *parentNode  = NULL;
@@ -647,7 +647,7 @@ void MainWindow::insertSourceFiles()
         // Get parent path
         QString folderPath;
         QString filename;
-        dividePath(info.fullName, &filename, &folderPath);
+        dividePath(info.m_fullName, &filename, &folderPath);
         folderPath = simplifyPath(folderPath);
         
         if(!folderPath.isEmpty())
@@ -661,7 +661,7 @@ void MainWindow::insertSourceFiles()
         {
             item = new QTreeWidgetItem;
             item->setText(0, filename);
-            item->setData(0, Qt::UserRole, info.fullName);
+            item->setData(0, Qt::UserRole, info.m_fullName);
             item->setIcon(0, m_fileIcon);
             
             if(parentNode == NULL)
@@ -1214,7 +1214,7 @@ void MainWindow::ICore_onThreadListChanged()
         names.push_back(name);
         names.push_back(desc);
         QTreeWidgetItem *item = new QTreeWidgetItem(names);
-        item->setData(0, Qt::UserRole, list[idx].id);
+        item->setData(0, Qt::UserRole, list[idx].m_id);
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         threadWidget->insertTopLevelItem(0, item);
 
@@ -1260,8 +1260,8 @@ void MainWindow::ICore_onBreakpointsChanged()
     {
         BreakPoint* bkpt = bklist[u];
         SettingsBreakpoint bkptCfg;
-        bkptCfg.filename = bkpt->fullname;
-        bkptCfg.lineNo = bkpt->lineNo;
+        bkptCfg.m_filename = bkpt->m_fullname;
+        bkptCfg.m_lineNo = bkpt->m_lineNo;
         m_cfg.m_breakpoints.push_back(bkptCfg);
     }
     m_cfg.save();
@@ -1275,8 +1275,8 @@ void MainWindow::ICore_onBreakpointsChanged()
 
         QStringList nameList;
         QString name;
-        nameList.append(getFilenamePart(bk->fullname));
-        name.sprintf("%d", bk->lineNo);
+        nameList.append(getFilenamePart(bk->m_fullname));
+        name.sprintf("%d", bk->m_lineNo);
         nameList.append(name);
         nameList.append(bk->m_funcName);
         nameList.append(longLongToHexString(bk->m_addr));
@@ -1302,8 +1302,8 @@ void MainWindow::ICore_onBreakpointsChanged()
         {
             BreakPoint* bk = bklist[i];
 
-            if(bk->fullname == codeViewTab->getFilePath())
-                numList.push_back(bk->lineNo);
+            if(bk->m_fullname == codeViewTab->getFilePath())
+                numList.push_back(bk->m_lineNo);
         }
 
         codeViewTab->setBreakpoints(numList);
@@ -1403,9 +1403,9 @@ void MainWindow::onBreakpointsWidgetItemDoubleClicked(QTreeWidgetItem * item,int
     int idx = item->data(0, Qt::UserRole).toInt();
     BreakPoint* bk = bklist[idx];
 
-    CodeViewTab* currentCodeViewTab = open(bk->fullname);
+    CodeViewTab* currentCodeViewTab = open(bk->m_fullname);
     if(currentCodeViewTab)
-        currentCodeViewTab->ensureLineIsVisible(bk->lineNo);
+        currentCodeViewTab->ensureLineIsVisible(bk->m_lineNo);
     
 }
     
@@ -1471,7 +1471,7 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList tex
             FileInfo& fileInfo = m_sourceFiles[i];
 
             QList<Tag> tagList;
-            m_tagManager.getTags(fileInfo.fullName, &tagList);
+            m_tagManager.getTags(fileInfo.m_fullName, &tagList);
 
             // Loop through all the tags
             for(int j = 0;j < tagList.size();j++)
@@ -1487,7 +1487,7 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList tex
                     {
                         // Get filename and lineNo
                         QStringList defList;
-                        defList.push_back(fileInfo.fullName);
+                        defList.push_back(fileInfo.m_fullName);
                         QString lineNoStr;
                         lineNoStr.sprintf("%d", tagInfo.getLineNo());
                         defList.push_back(lineNoStr);
@@ -1634,8 +1634,8 @@ void MainWindow::onCodeViewContextMenuOpenFile()
         for(int j = 0;foundFilename == "" && j < m_sourceFiles.size();j++)
         {
             FileInfo &info = m_sourceFiles[j];
-            if(info.fullName.endsWith("/" + filenameWop))
-                foundFilename = info.fullName;
+            if(info.m_fullName.endsWith("/" + filenameWop))
+                foundFilename = info.m_fullName;
         }
 
         // otherwise look in all the dirs
@@ -1646,7 +1646,7 @@ void MainWindow::onCodeViewContextMenuOpenFile()
             for(int j = 0;foundFilename == "" && j < m_sourceFiles.size();j++)
             {
                 FileInfo &info = m_sourceFiles[j];
-                dividePath(info.fullName, NULL, &folderPath);
+                dividePath(info.m_fullName, NULL, &folderPath);
                 dirs.push_back(folderPath);
             }
             dirs.removeDuplicates();
@@ -1882,9 +1882,9 @@ void MainWindow::onBreakpointsGoTo()
             BreakPoint* bk = bklist[idx];
 
             // Show the breakpoint
-            CodeViewTab* currentCodeViewTab = open(bk->fullname);
+            CodeViewTab* currentCodeViewTab = open(bk->m_fullname);
             if(currentCodeViewTab)
-                currentCodeViewTab->ensureLineIsVisible(bk->lineNo);
+                currentCodeViewTab->ensureLineIsVisible(bk->m_lineNo);
         }
     }
 }
@@ -1985,7 +1985,7 @@ void MainWindow::onAllTagScansDone()
 
         // Find the tag
         QList<Tag> thisTagList;
-        m_tagManager.getTags(info.fullName, &thisTagList);
+        m_tagManager.getTags(info.m_fullName, &thisTagList);
         tagList += thisTagList;
     }
 

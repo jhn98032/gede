@@ -105,8 +105,8 @@ QStringList Locator::findFile(QString defFilename)
         for(int k = 0;k < m_sourceFiles->size();k++)
         {
             FileInfo &info = (*m_sourceFiles)[k];
-            if(info.name == defFilename)
-                fileList.append(info.fullName);
+            if(info.m_name == defFilename)
+                fileList.append(info.m_fullName);
 
         }
     }
@@ -126,12 +126,12 @@ QStringList Locator::searchExpression(QString filename, QString expressionStart)
         FileInfo &info = (*m_sourceFiles)[k];
 
         
-        if(info.name != filename)
+        if(info.m_name != filename)
             continue;
             
         // Find the tag
         QList<Tag> tagList;
-        m_mgr->getTags(info.fullName, &tagList);
+        m_mgr->getTags(info.m_fullName, &tagList);
         for(int i = 0;i < tagList.size();i++)
         {
             Tag &tag = tagList[i];
@@ -156,13 +156,13 @@ QStringList Locator::searchExpression(QString expressionStart)
     for(int k = 0;k < m_sourceFiles->size();k++)
     {
         FileInfo &info = (*m_sourceFiles)[k];
-        if(info.name.startsWith(expressionStart))
-            list.append(info.name);
+        if(info.m_name.startsWith(expressionStart))
+            list.append(info.m_name);
 
 
         // Find the tag
         QList<Tag> tagList;
-        m_mgr->getTags(info.fullName, &tagList);
+        m_mgr->getTags(info.m_fullName, &tagList);
         for(int i = 0;i < tagList.size();i++)
         {
             Tag &tag = tagList[i];
@@ -318,7 +318,7 @@ QVector<Location> Locator::locateFunction(QString name)
 
         // Find the tag
         QList<Tag> tagList;
-        m_mgr->getTags(info.fullName, &tagList);
+        m_mgr->getTags(info.m_fullName, &tagList);
         for(int i = 0;i < tagList.size();i++)
         {
             Tag &tag = tagList[i];

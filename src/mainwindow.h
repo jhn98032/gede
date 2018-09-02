@@ -29,8 +29,8 @@
 class FileInfo
 {
 public:
-    QString name; //!< The name of the file (Eg: "main.c").
-    QString fullName; //!< The full path (Eg: "/a/dir/main.c").
+    QString m_name; //!< The name of the file (Eg: "main.c").
+    QString m_fullName; //!< The full path (Eg: "/a/dir/main.c").
 };
 
 #include "locator.h"

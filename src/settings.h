@@ -27,8 +27,8 @@ class SettingsBreakpoint
 {
 public:
     
-    QString filename;
-    int lineNo;
+    QString m_filename;
+    int m_lineNo;
 };
 
 

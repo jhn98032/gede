@@ -36,8 +36,8 @@ VarWatch::VarWatch()
 }
 
 VarWatch::VarWatch(QString watchId_, QString name_)
-  : watchId(watchId_)
-    ,name(name_)
+  : m_watchId(watchId_)
+    ,m_name(name_)
     ,m_inScope(true)
     ,m_var(name_)
     ,m_hasChildren(false)
@@ -659,7 +659,7 @@ bool Core::gdbGetFiles()
     for(int m = 0;m < m_sourceFiles.size();m++)
     {
         SourceFile *sourceFile = m_sourceFiles[m];
-        fileLookup[sourceFile->fullName] = false;
+        fileLookup[sourceFile->m_fullName] = false;
         delete sourceFile;
     }
     m_sourceFiles.clear();
@@ -701,8 +701,8 @@ bool Core::gdbGetFiles()
                         
                         sourceFile = new SourceFile; 
 
-                        sourceFile->name = name;
-                        sourceFile->fullName = fullname;
+                        sourceFile->m_name = name;
+                        sourceFile->m_fullName = fullname;
 
                         m_sourceFiles.append(sourceFile);
                     }
@@ -1426,7 +1426,7 @@ BreakPoint* Core::findBreakPoint(QString fullPath, int lineNo)
         BreakPoint *bkpt = m_breakpoints[i];
 
     
-        if(bkpt->lineNo == lineNo && fullPath == bkpt->fullname)
+        if(bkpt->m_lineNo == lineNo && fullPath == bkpt->m_fullname)
         {
             return bkpt;
         }
@@ -1470,12 +1470,12 @@ void Core::dispatchBreakpointTree(Tree &tree)
         bkpt = new BreakPoint(number);
         m_breakpoints.push_back(bkpt);
     }
-    bkpt->lineNo = lineNo;
-    bkpt->fullname = rootNode->getChildDataString("fullname");
+    bkpt->m_lineNo = lineNo;
+    bkpt->m_fullname = rootNode->getChildDataString("fullname");
 
     // We did not receive 'fullname' from gdb.
     // Lets try original-location instead...
-    if(bkpt->fullname.isEmpty())
+    if(bkpt->m_fullname.isEmpty())
     {
         QString orgLoc = rootNode->getChildDataString("original-location");
         int divPos = orgLoc.lastIndexOf(":");
@@ -1483,7 +1483,7 @@ void Core::dispatchBreakpointTree(Tree &tree)
             warnMsg("Original-location in unknown format");
         else
         {
-            bkpt->fullname = orgLoc.left(divPos);
+            bkpt->m_fullname = orgLoc.left(divPos);
         }
     }
     
@@ -1603,11 +1603,11 @@ void Core::onResult(Tree &tree)
                 }
                 
                 ThreadInfo tinfo;
-                tinfo.id = atoi(stringToCStr(threadId));
+                tinfo.m_id = atoi(stringToCStr(threadId));
                 tinfo.m_name = targetId;
                 tinfo.m_details = details;
                 tinfo.m_func = funcName;
-                m_threadList[tinfo.id] = tinfo;
+                m_threadList[tinfo.m_id] = tinfo;
             }
 
             if(m_inf)

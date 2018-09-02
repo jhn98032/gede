@@ -24,7 +24,7 @@ class Core;
 
 struct ThreadInfo
 {
-    int id;             //!< The numeric id assigned to the thread by GDB.
+    int m_id;             //!< The numeric id assigned to the thread by GDB.
     QString m_name;     //!< Target-specific string identifying the thread.
 
     QString m_func; //!< The name of the function (Eg: "func"). 
@@ -44,8 +44,8 @@ struct StackFrameEntry
 class SourceFile
 {
 public:
-    QString name;
-    QString fullName;
+    QString m_name;
+    QString m_fullName;
 };
 
 /**
@@ -56,10 +56,10 @@ class BreakPoint
 public:
     BreakPoint(int number) : m_number(number) { };
 
-
+public:
     int m_number;
-    QString fullname;
-    int lineNo;
+    QString m_fullname;
+    int m_lineNo;
     QString m_funcName;
     unsigned long long m_addr;
     
@@ -118,8 +118,8 @@ class VarWatch
         VarWatch();
         VarWatch(QString watchId_, QString name_);
         
-        QString getName() { return name; };
-        QString getWatchId() { return watchId; };
+        QString getName() { return m_name; };
+        QString getWatchId() { return m_watchId; };
 
         bool hasChildren();
         bool inScope() { return m_inScope;};
@@ -132,8 +132,8 @@ class VarWatch
 
     private:
 
-        QString watchId;
-        QString name;
+        QString m_watchId;
+        QString m_name;
         bool m_inScope;
         CoreVar m_var;
         QString m_varType;

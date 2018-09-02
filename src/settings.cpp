@@ -277,8 +277,8 @@ void Settings::loadProjectConfig()
         if(str.indexOf(':') != -1)
         {
             SettingsBreakpoint bkptCfg;
-            bkptCfg.filename = str.left(str.indexOf(':'));
-            bkptCfg.lineNo = str.mid(str.indexOf(':')+1).toInt();
+            bkptCfg.m_filename = str.left(str.indexOf(':'));
+            bkptCfg.m_lineNo = str.mid(str.indexOf(':')+1).toInt();
             
             m_breakpoints.push_back(bkptCfg);
         }
@@ -339,10 +339,10 @@ void Settings::saveProjectConfig()
     {
         SettingsBreakpoint bkptCfg = m_breakpoints[i];
         QString field;
-        field = bkptCfg.filename;
+        field = bkptCfg.m_filename;
         field += ":";
         QString lineNoStr;
-        lineNoStr.sprintf("%d", bkptCfg.lineNo);
+        lineNoStr.sprintf("%d", bkptCfg.m_lineNo);
         field += lineNoStr;
         breakpointStringList.push_back(field);
     }
