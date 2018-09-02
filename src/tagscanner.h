@@ -29,6 +29,7 @@ class Tag
         int getLineNo() const { return m_lineNo; };
         QString getFilePath() const { return m_filepath; };
         QString getClassName() const { return m_className;};
+        bool isFunc() const { return (m_type == TAG_FUNC) ? true : false; };
         
         QString m_className;
         QString m_name;
