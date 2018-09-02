@@ -25,6 +25,7 @@ int main(int argc,char *argv[])
             int b;
         }s2;
     }s;
+    int a = 1001;
     char c = 'Z';
     float f1;
     char *varStr;
@@ -40,7 +41,8 @@ int main(int argc,char *argv[])
     varEnum = ENUM1;
     varEnum = ENUM2;
     c = '\'';
-    
+    a++;
+
     strList = strListData;
 
     switch(s.a)
