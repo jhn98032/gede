@@ -469,6 +469,7 @@
     </property>
     <addaction name="actionGoToLine"/>
     <addaction name="actionSearch"/>
+    <addaction name="actionGoToMain"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuSearch"/>
@@ -677,6 +678,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+F</string>
+   </property>
+  </action>
+  <action name="actionGoToMain">
+   <property name="text">
+    <string>Go To main()</string>
    </property>
   </action>
  </widget>

@@ -152,6 +152,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ui.actionViewTargetOutput, SIGNAL(triggered()), SLOT(onViewTargetOutput()));
     connect(m_ui.actionViewGdbOutput, SIGNAL(triggered()), SLOT(onViewGdbOutput()));
     connect(m_ui.actionViewFileBrowser, SIGNAL(triggered()), SLOT(onViewFileBrowser()));
+    connect(m_ui.actionGoToMain, SIGNAL(triggered()), SLOT(onGoToMain()));
 
     connect(m_ui.actionDefaultViewSetup, SIGNAL(triggered()), SLOT(onDefaultViewSetup()));
 
@@ -893,6 +894,16 @@ void MainWindow::onCodeViewTab_tabCloseRequested ( int tabIdx)
     delete codeViewTab;
 }
 
+
+/**
+ * @brief Opens a source file in the sourcecode viewer and highlights a specific line.
+ */
+CodeViewTab* MainWindow::open(Location loc)
+{
+    return open(loc.filename, loc.lineNo);
+}
+
+
 /**
  * @brief Opens a source file in the sourcecode viewer and highlights a specific line.
  */
@@ -906,6 +917,7 @@ CodeViewTab* MainWindow::open(QString filename, int lineNo)
     }
     return currentCodeViewTab;
 }
+
 
 /**
  * @brief Opens a source file in the sourcecode viewer.
@@ -1097,6 +1109,18 @@ void MainWindow::onSearch()
     m_ui.lineEdit_search->setFocus();
 }
 
+/**
+ * @brief Called when user presses "Search->Go to main()".
+ */
+void MainWindow::onGoToMain()
+{
+    QVector<Location> locList = m_locator.locateFunction("main");
+
+    if(locList.size() > 0)
+    {
+        open(locList[0]);
+    }
+}
 
 /**
  * @brief Called when user presses "Search->Go to line".

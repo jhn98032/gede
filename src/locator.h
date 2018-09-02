@@ -26,6 +26,7 @@ public:
     
     void setCurrentFile(QString filename);
     QVector<Location> locate(QString expr);
+    QVector<Location> locateFunction(QString name);
 
     QStringList searchExpression(QString expressionStart);
      

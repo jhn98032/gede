@@ -304,3 +304,31 @@ QVector<Location> Locator::locate(QString expr)
 }
 
 
+/**
+ * @brief Search for a function in all files.
+ * @param name   The name of the function (Eg: "main").
+ * @return List of locations where the function is defined.
+ */
+QVector<Location> Locator::locateFunction(QString name)
+{
+    QVector<Location> list;
+    for(int k = 0;k < m_sourceFiles->size();k++)
+    {
+        FileInfo &info = (*m_sourceFiles)[k];
+
+        // Find the tag
+        QList<Tag> tagList;
+        m_mgr->getTags(info.fullName, &tagList);
+        for(int i = 0;i < tagList.size();i++)
+        {
+            Tag &tag = tagList[i];
+            if(tag.type == Tag::TAG_FUNC && tag.getName() == name)
+            {
+                list.append(Location(tag.getFilePath(), tag.getLineNo()));
+            }
+            
+        }
+    }
+    return list;
+}
+ 

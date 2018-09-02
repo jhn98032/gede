@@ -43,6 +43,7 @@ public:
     MainWindow(QWidget *parent);
     virtual ~MainWindow();
 
+    CodeViewTab* open(Location loc);
     CodeViewTab* open(QString filename);
     CodeViewTab* open(QString filename, int lineNo);
 
@@ -124,6 +125,7 @@ public slots:
     void onSearchNext();
     void onSearchPrev();
     void onGoToLine();
+    void onGoToMain();
     void onStop();
     void onBreakpointsWidgetItemDoubleClicked(QTreeWidgetItem * item,int column);
     void onRun();
