@@ -109,14 +109,14 @@ QList<Token*> GdbMiParser::tokenizeVarString(QString str)
                         type = Token::KEY_STAR;
                     cur = new Token(type);
                     list.push_back(cur);
-                    cur->text += c;
+                    cur->m_text += c;
                     state = IDLE;
                 }
                 else if( c != ' ')
                 {
                     cur = new Token(Token::VAR);
                     list.push_back(cur);
-                    cur->text = c;
+                    cur->m_text = c;
                     state = VAR;
                 }
                 
@@ -125,29 +125,29 @@ QList<Token*> GdbMiParser::tokenizeVarString(QString str)
             {
                 if(isEscaped)
                 {
-                    cur->text += '\\';
-                    cur->text += c;
+                    cur->m_text += '\\';
+                    cur->m_text += c;
                 }
                 else if(c == '\'')
                 {
                     state = IDLE;
                 }
                 else
-                    cur->text += c;
+                    cur->m_text += c;
             };break;
             case STRING:
             {
                 if(isEscaped)
                 {
-                    cur->text += '\\';
-                    cur->text += c;
+                    cur->m_text += '\\';
+                    cur->m_text += c;
                 }
                 else if(c == '"')
                 {
                     state = IDLE;
                 }
                 else
-                    cur->text += c;
+                    cur->m_text += c;
             };break;
             case BLOCK_COLON:
             case BLOCK:
@@ -155,34 +155,34 @@ QList<Token*> GdbMiParser::tokenizeVarString(QString str)
                 if(isEscaped)
                 {
                     if(c == 'n')
-                        cur->text += '\n';
+                        cur->m_text += '\n';
                     else
-                        cur->text += c;
+                        cur->m_text += c;
                 }
                 else if((c == '>' && state == BLOCK) ||
                         (c == ')' && state == BLOCK_COLON))
                 {
                     if(state == BLOCK_COLON)
                     {
-                        int barIdx = cur->text.indexOf('|');
+                        int barIdx = cur->m_text.indexOf('|');
                         if(barIdx != -1)
-                            cur->text = cur->text.mid(barIdx+1);
+                            cur->m_text = cur->m_text.mid(barIdx+1);
                     }
                     state = IDLE;
                 }
                 else
-                    cur->text += c;
+                    cur->m_text += c;
             };break;
             case VAR:
             {
                 if(c == ' ' || c == '=' || c == ',' || c == '{' || c == '}')
                 {
                     i--;
-                    cur->text = cur->text.trimmed();
+                    cur->m_text = cur->m_text.trimmed();
                     state = IDLE;
                 }
                 else
-                    cur->text += c;
+                    cur->m_text += c;
             };break;
             
         }
@@ -191,7 +191,7 @@ QList<Token*> GdbMiParser::tokenizeVarString(QString str)
     if(cur)
     {
         if(cur->getType() == Token::VAR)
-            cur->text = cur->text.trimmed();
+            cur->m_text = cur->m_text.trimmed();
     }
     return list;
 }

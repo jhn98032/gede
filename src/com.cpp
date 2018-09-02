@@ -48,7 +48,7 @@ const char* Com::asyncClassToString(ComListener::AsyncClass ac)
     
 const char *Token::toString()
 {
-    strcpy(m_tmpBuff, (const char*)stringToCStr(text));
+    strcpy(m_tmpBuff, (const char*)stringToCStr(m_text));
         
     return m_tmpBuff;
 };
@@ -197,7 +197,7 @@ QList<Token*> Com::tokenize(QString str)
                 {
                     cur = new Token(Token::END_CODE);
                     list.push_back(cur);
-                    cur->text += c;
+                    cur->m_text += c;
                     state = END_CODE;
                 }
                 else if(c == '=' || c == '{' || c == '}' || c == ',' ||
@@ -231,14 +231,14 @@ QList<Token*> Com::tokenize(QString str)
                         type = Token::KEY_STAR;
                     cur = new Token(type);
                     list.push_back(cur);
-                    cur->text += c;
+                    cur->m_text += c;
                     state = IDLE;
                 }
                 else if( c != ' ')
                 {
                     cur = new Token(Token::VAR);
                     list.push_back(cur);
-                    cur->text = c;
+                    cur->m_text = c;
                     state = VAR;
                 }
                 
@@ -246,14 +246,14 @@ QList<Token*> Com::tokenize(QString str)
             case END_CODE:
             {
                 QString codeEndStr = "(gdb)";
-                cur->text += c;
+                cur->m_text += c;
 
-                if(cur->text.length() == codeEndStr.length())
+                if(cur->m_text.length() == codeEndStr.length())
                 {
                     state = IDLE;
                     
                 }
-                else if(cur->text.compare(codeEndStr.left(cur->text.length())) != 0)
+                else if(cur->m_text.compare(codeEndStr.left(cur->m_text.length())) != 0)
                 {
                     cur->setType(Token::VAR);
                     state = IDLE;
@@ -268,21 +268,21 @@ QList<Token*> Com::tokenize(QString str)
                 }
                 else if(isEscaped)
                 {
-                    cur->text += c;
+                    cur->m_text += c;
                 }
                 else
-                    cur->text += c;
+                    cur->m_text += c;
             };break;
             case VAR:
             {
                 if(c == '=' || c == ',' || c == '{' || c == '}')
                 {
                     i--;
-                    cur->text = cur->text.trimmed();
+                    cur->m_text = cur->m_text.trimmed();
                     state = IDLE;
                 }
                 else
-                    cur->text += c;
+                    cur->m_text += c;
             };break;
             
         }
@@ -291,7 +291,7 @@ QList<Token*> Com::tokenize(QString str)
     if(cur)
     {
         if(cur->getType() == Token::VAR)
-            cur->text = cur->text.trimmed();
+            cur->m_text = cur->m_text.trimmed();
     }
     return list;
 }

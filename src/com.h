@@ -48,7 +48,7 @@ class Token
         static const char *typeToString(Type type);
         Type getType() const { return m_type; };
         void setType(Type type) { m_type = type; };
-        QString getString() const { return text; };
+        QString getString() const { return m_text; };
 
         const char *toString();
 
@@ -56,7 +56,7 @@ class Token
         Type m_type;
         char m_tmpBuff[128];
     public:
-        QString text;
+        QString m_text;
 };
 
 
