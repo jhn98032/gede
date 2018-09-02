@@ -471,6 +471,20 @@ QGroupBox::title {
             </property>
            </widget>
           </item>
+          <item row="9" column="0">
+           <widget class="QLabel" name="label_28">
+            <property name="text">
+             <string>Selection</string>
+            </property>
+           </widget>
+          </item>
+          <item row="9" column="1">
+           <widget class="MColorButton" name="pushButton_clr_selection">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>

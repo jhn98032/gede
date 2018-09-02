@@ -945,6 +945,9 @@ CodeViewTab* MainWindow::open(QString filename)
     if(foundCodeViewTabIdx != -1 && foundCodeViewTabIdx == m_ui.editorTabWidget->currentIndex())
          return (CodeViewTab* )m_ui.editorTabWidget->currentWidget();
          
+    // Remove search widget
+    m_ui.widget_search->hide();
+    onIncSearch_textChanged("");
 
     CodeViewTab* codeViewTab = NULL;
     if(foundCodeViewTabIdx != -1)

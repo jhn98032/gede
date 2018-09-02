@@ -99,6 +99,7 @@ class Settings
         QColor m_clrCurrentLine;
         QColor m_clrNumber;
         QColor m_clrForeground;
+        QColor m_clrSelection; // Selection in codeview
        
         QByteArray m_gui_mainwindowState;
         QByteArray m_gui_mainwindowGeometry;

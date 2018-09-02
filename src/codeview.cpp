@@ -249,7 +249,7 @@ void CodeView::paintEvent ( QPaintEvent * event )
             int selPosX = x + m_fontInfo->width(fullRowText.left(m_incSearchStartPosColumn));
             int selPosWidth = m_fontInfo->width(fullRowText.mid(m_incSearchStartPosColumn, m_incSearchText.length()));
             QRect rect2(selPosX, y, selPosWidth, rowHeight);
-            painter.fillRect(rect2, QColor(100,100,100));
+            painter.fillRect(rect2, m_cfg->m_clrSelection);
         
         }
 

@@ -108,6 +108,7 @@ void SettingsDialog::loadConfig()
     m_ui.pushButton_clr_curLine->setColor(m_cfg->m_clrCurrentLine);
     m_ui.pushButton_clr_number->setColor(m_cfg->m_clrNumber);
     m_ui.pushButton_clr_foreground->setColor(m_cfg->m_clrForeground);
+    m_ui.pushButton_clr_selection->setColor(m_cfg->m_clrSelection);
 
     m_ui.checkBox_showLineNo->setCheckState(m_cfg->m_showLineNo ? Qt::Checked : Qt::Unchecked);
 
@@ -213,6 +214,7 @@ void SettingsDialog::getConfig(Settings *cfg)
     cfg->m_clrCurrentLine = m_ui.pushButton_clr_curLine->getColor();
     cfg->m_clrNumber = m_ui.pushButton_clr_number->getColor();
     cfg->m_clrForeground = m_ui.pushButton_clr_foreground->getColor();
+    cfg->m_clrSelection = m_ui.pushButton_clr_selection->getColor();
 
 
     int comboIdx = m_ui.comboBox_sortTags->currentIndex();

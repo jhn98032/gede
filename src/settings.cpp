@@ -71,6 +71,7 @@ void Settings::loadDefaultsGui()
     m_clrCurrentLine = QColor(100,0,0);
     m_clrNumber = Qt::magenta;
     m_clrForeground = Qt::white;
+    m_clrSelection = QColor(100,100,100);
 
     m_tagSortByName = false;
     m_tagShowLineNumbers = true;
@@ -205,7 +206,7 @@ void Settings::loadGlobalConfig()
     m_clrCurrentLine= tmpIni.getColor("GuiColor/ColorCurrentLine", m_clrCurrentLine);
     m_clrNumber = tmpIni.getColor("GuiColor/ColorNumber", Qt::magenta);
     m_clrForeground = tmpIni.getColor("GuiColor/ColorForeGround", Qt::white);
-
+    m_clrSelection = tmpIni.getColor("GuiColor/ColorSelection", m_clrSelection);
 
     m_progConScrollback = std::max(1, tmpIni.getInt("ProgramConsole/Scrollback", m_progConScrollback));
     m_progConColorFg = tmpIni.getColor("ProgramConsole/ColorForeground", m_progConColorFg);
@@ -419,6 +420,7 @@ void Settings::saveGlobalConfig()
     tmpIni.setColor("GuiColor/ColorCurrentLine", m_clrCurrentLine);
     tmpIni.setColor("GuiColor/ColorNumber", m_clrNumber);
     tmpIni.setColor("GuiColor/ColorForeGround", m_clrForeground);
+    tmpIni.setColor("GuiColor/ColorSelection", m_clrSelection);
 
     tmpIni.setInt("ProgramConsole/Scrollback", m_progConScrollback);
 
