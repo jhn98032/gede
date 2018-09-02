@@ -1492,7 +1492,7 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList tex
                         lineNoStr.sprintf("%d", tagInfo.getLineNo());
                         defList.push_back(lineNoStr);
 
-                        if(tagInfo.type != Tag::TAG_FUNC)
+                        if(tagInfo.m_type != Tag::TAG_FUNC)
                             onlyFuncs = false;
                             
                         // Add to popupmenu
@@ -1996,7 +1996,7 @@ void MainWindow::onAllTagScansDone()
         const Tag &tag = tagList[i];
         QString className = tag.getClassName();
         if(!className.isEmpty())
-            classList += tag.className;
+            classList += tag.getClassName();
     }
     classList.removeDuplicates();
     classList.sort();
@@ -2018,7 +2018,7 @@ void MainWindow::onAllTagScansDone()
         for(int i = 0;i < tagList.size();i++)
         {
             const Tag &tag = tagList[i];
-            if(tag.type == Tag::TAG_FUNC && tag.getClassName() == className)
+            if(tag.m_type == Tag::TAG_FUNC && tag.getClassName() == className)
             {
                 item = new QTreeWidgetItem;
                 item->setText(0, tag.getName() + tag.getSignature());
@@ -2038,7 +2038,7 @@ void MainWindow::onAllTagScansDone()
     for(int i = 0;i < tagList.size();i++)
     {
         const Tag &tag = tagList[i];
-        if(tag.type == Tag::TAG_FUNC)
+        if(tag.m_type == Tag::TAG_FUNC)
         {
             item = new QTreeWidgetItem;
             item->setText(0, tag.getName() + tag.getSignature());

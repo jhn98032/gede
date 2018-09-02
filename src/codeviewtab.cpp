@@ -50,7 +50,7 @@ void CodeViewTab::fillInFunctions(QList<Tag> tagList)
     for(int tagIdx = 0;tagIdx < tagList.size();tagIdx++)
     {
         Tag &tag = tagList[tagIdx];
-        if(tag.type == Tag::TAG_FUNC)
+        if(tag.m_type == Tag::TAG_FUNC)
         {
             QString text;
             if(m_cfg->m_tagShowLineNumbers)

@@ -135,7 +135,7 @@ QStringList Locator::searchExpression(QString filename, QString expressionStart)
         for(int i = 0;i < tagList.size();i++)
         {
             Tag &tag = tagList[i];
-            if(tag.type == Tag::TAG_FUNC)
+            if(tag.m_type == Tag::TAG_FUNC)
             {
                 QString tagName = tag.getName() + "()";
                 if(tagName.startsWith(expressionStart) || expressionStart.isEmpty())
@@ -166,7 +166,7 @@ QStringList Locator::searchExpression(QString expressionStart)
         for(int i = 0;i < tagList.size();i++)
         {
             Tag &tag = tagList[i];
-            if(tag.type == Tag::TAG_FUNC)
+            if(tag.m_type == Tag::TAG_FUNC)
             {
             QString tagName = tag.getName() + "()";
             if(tagName.startsWith(expressionStart))
@@ -322,7 +322,7 @@ QVector<Location> Locator::locateFunction(QString name)
         for(int i = 0;i < tagList.size();i++)
         {
             Tag &tag = tagList[i];
-            if(tag.type == Tag::TAG_FUNC && tag.getName() == name)
+            if(tag.m_type == Tag::TAG_FUNC && tag.getName() == name)
             {
                 list.append(Location(tag.getFilePath(), tag.getLineNo()));
             }

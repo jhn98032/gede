@@ -31,11 +31,11 @@ Tag::Tag()
 QString Tag::getLongName() const
 {
     QString longName;
-    if(this->className.isEmpty())
+    if(m_className.isEmpty())
         longName = m_name;
     else
-        longName = this->className + "::" + m_name;
-    longName += this->m_signature;
+        longName = m_className + "::" + m_name;
+    longName += m_signature;
     return longName;
 }
 
@@ -44,11 +44,11 @@ void Tag::dump() const
 {
     qDebug() << "/------------";
     qDebug() << "Name: " << m_name;
-    qDebug() << "Class: " << className;
-    qDebug() << "Filepath: " << filepath;
-    if(TAG_VARIABLE == type)
+    qDebug() << "Class: " << m_className;
+    qDebug() << "Filepath: " << m_filepath;
+    if(TAG_VARIABLE == m_type)
         qDebug() << "Type: " << " variable";
-    else if(TAG_FUNC == type)
+    else if(TAG_FUNC == m_type)
         qDebug() << "Type: " << " function";
 
 
@@ -258,18 +258,18 @@ int TagScanner::parseOutput(QByteArray output, QList<Tag> *taglist)
                 Tag tag;
 
                 tag.m_name = colList[0];
-                tag.filepath = colList[1];
+                tag.m_filepath = colList[1];
                 QString type = colList[3];
                 if(type == "v") // v = variable
-                    tag.type = Tag::TAG_VARIABLE;
+                    tag.m_type = Tag::TAG_VARIABLE;
                 else if(type == "f") // f = function
                 {
-                    tag.type = Tag::TAG_FUNC;
+                    tag.m_type = Tag::TAG_FUNC;
                     tag.setSignature("()");
                 }
                 else
                 {
-                    tag.type = Tag::TAG_VARIABLE;
+                    tag.m_type = Tag::TAG_VARIABLE;
                     //debugMsg("Unknown type (%s) returned from ctags", stringToCStr(type));
                 }    
                 for(int colIdx = 4;colIdx < colList.size();colIdx++)
@@ -285,7 +285,7 @@ int TagScanner::parseOutput(QByteArray output, QList<Tag> *taglist)
                         // qDebug() << '|' << fieldName << '|' << fieldData << '|';
 
                         if(fieldName == "class")
-                            tag.className = fieldData;
+                            tag.m_className = fieldData;
                         if(fieldName == "signature")
                         {
                             tag.setSignature(fieldData);

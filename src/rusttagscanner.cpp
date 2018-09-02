@@ -168,8 +168,8 @@ void RustTagScanner::parse(QList<Tag> *taglist)
                     Tag tag;
                     tag.setLineNo(tok->getLineNr());
                     tag.m_name = tok->getText();
-                    tag.filepath = m_filepath;
-                    tag.type = Tag::TAG_FUNC;
+                    tag.m_filepath = m_filepath;
+                    tag.m_type = Tag::TAG_FUNC;
                     state = IDLE;
 
                     // Parse signature
