@@ -8,15 +8,15 @@
 
 
 Location::Location(QString filename_, int lineNo_)
- :  filename(filename_)
-    ,lineNo(lineNo_)
+ :  m_filename(filename_)
+    ,m_lineNo(lineNo_)
 {
 }
 
 void Location::dump()
 {
-    qDebug() << "Filename:" << filename;
-    qDebug() << "Lineno:  " << lineNo;
+    qDebug() << "Filename:" << m_filename;
+    qDebug() << "Lineno:  " << m_lineNo;
 };
 
 Locator::Locator(TagManager *mgr, QList<FileInfo> *sourceFiles)
@@ -285,7 +285,7 @@ QVector<Location> Locator::locate(QString expr)
                     {
                         Location *loc = &list[k];
                         debugMsg("%d -> %d", loc->lineNo, loc->lineNo+val);
-                        loc->lineNo += val;
+                        loc->m_lineNo += val;
                     }
 
                     

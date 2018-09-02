@@ -900,7 +900,7 @@ void MainWindow::onCodeViewTab_tabCloseRequested ( int tabIdx)
  */
 CodeViewTab* MainWindow::open(Location loc)
 {
-    return open(loc.filename, loc.lineNo);
+    return open(loc.m_filename, loc.m_lineNo);
 }
 
 

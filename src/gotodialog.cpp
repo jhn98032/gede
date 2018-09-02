@@ -376,8 +376,8 @@ void GoToDialog::getSelection(QString *filename, int *lineno)
     if(locList.size() >= 1)
     {
         Location loc = locList[0];
-        *filename = loc.filename;
-        *lineno = loc.lineNo;
+        *filename = loc.m_filename;
+        *lineno = loc.m_lineNo;
     }
     else
         debugMsg("No location found!");

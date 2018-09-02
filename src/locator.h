@@ -13,9 +13,10 @@ public:
     Location() {};
 
     void dump();
-    
-    QString filename;
-    int lineNo;
+
+public:
+    QString m_filename;
+    int m_lineNo;
 };
 
 class Locator
