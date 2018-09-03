@@ -65,6 +65,22 @@ int CodeView::getBorderWidth()
         return 20;
 }
 
+/**
+ * @brief Checks if a string is a legal variable expression.
+*/
+bool isLegalExpression(QString name)
+{
+    if(name.isEmpty())
+        return false;
+    if(name[0].isLetter() ||
+        name[0] == '_' ||
+        name[0] == ':' ||
+        name[0] == '&')
+    {
+        return true;
+    }
+    return false;
+}
 
 
 void CodeView::onTimerTimeout()
@@ -110,9 +126,7 @@ void CodeView::onTimerTimeout()
             if(text.isEmpty())
                 foundField = NULL;
             // Variable?
-            else if(!(text[0].isLetter() ||
-                    text[0] == '_' ||
-                    text[0] == ':'))
+            else if(!isLegalExpression(text))
             {
                 foundField = NULL;
             }
