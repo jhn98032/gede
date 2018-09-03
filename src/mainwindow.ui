@@ -358,6 +358,9 @@
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
            <widget class="QTreeWidget" name="treeWidget_threads">
+            <property name="rootIsDecorated">
+             <bool>false</bool>
+            </property>
             <column>
              <property name="text">
               <string notr="true">1</string>
@@ -376,6 +379,9 @@
            <widget class="QTreeWidget" name="treeWidget_breakpoints">
             <property name="selectionMode">
              <enum>QAbstractItemView::ExtendedSelection</enum>
+            </property>
+            <property name="rootIsDecorated">
+             <bool>false</bool>
             </property>
             <property name="allColumnsShowFocus">
              <bool>true</bool>
@@ -396,6 +402,9 @@
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
            <widget class="QTreeWidget" name="treeWidget_stack">
+            <property name="rootIsDecorated">
+             <bool>false</bool>
+            </property>
             <column>
              <property name="text">
               <string notr="true">1</string>
