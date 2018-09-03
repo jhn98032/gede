@@ -104,8 +104,20 @@ void CodeView::onTimerTimeout()
     {
         if(foundField->m_type != TextField::WORD)
             foundField = NULL;
+        else
+        {
+            QString text = foundField->m_text;
+            if(text.isEmpty())
+                foundField = NULL;
+            // Variable?
+            else if(!(text[0].isLetter() ||
+                    text[0] == '_' ||
+                    text[0] == ':'))
+            {
+                foundField = NULL;
+            }
+        }
     }
-    
     if(foundField)
     {
         setFocus();
