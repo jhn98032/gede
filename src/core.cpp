@@ -443,9 +443,7 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
     }
 
 
-    
-    
-    return 0;
+    return rc;
 }
 
 
