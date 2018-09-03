@@ -2041,7 +2041,7 @@ void MainWindow::onAllTagScansDone()
     }
 
     // Expand class treewidget?
-    if(totalClassFuncCount < 40)
+    if(totalClassFuncCount < CLASS_LIST_AUTO_EXPAND_COUNT)
     {
         for(int j = classWidget->topLevelItemCount()-1;j >= 0;--j)
         {

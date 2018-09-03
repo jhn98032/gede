@@ -31,6 +31,10 @@
 // Width of items in the GoTo list widget.
 #define GOTO_LISTWIDGET_ITEM_WIDTH  240
 
+
+// Expand all classes if the total number of members is below this number
+#define CLASS_LIST_AUTO_EXPAND_COUNT 40
+
 #endif // FILE__CONFIG_H
 
 
