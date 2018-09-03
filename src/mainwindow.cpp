@@ -635,13 +635,19 @@ void MainWindow::insertSourceFiles()
 
     
 
+    // Queue all scans
+    QStringList queueList;
     for(int i = 0;i < m_sourceFiles.size();i++)
     {
         FileInfo &info = m_sourceFiles[i];
+        queueList += info.m_fullName;
+    }
+    m_tagManager.queueScan(queueList);
 
-        m_tagManager.queueScan(info.m_fullName);
-        
-
+    
+    for(int i = 0;i < m_sourceFiles.size();i++)
+    {
+        const FileInfo &info = m_sourceFiles[i];
         QTreeWidgetItem *parentNode  = NULL;
 
         // Get parent path
