@@ -2008,6 +2008,7 @@ void MainWindow::onAllTagScansDone()
     classList.sort();
     
     // Insert the classes in the class widget
+    int totalClassFuncCount = 0;
     for(int ci = 0;ci < classList.size();ci++)
     {
         QString className = classList[ci];
@@ -2036,9 +2037,19 @@ void MainWindow::onAllTagScansDone()
 
             }
         }
-
-        classItem->setExpanded(true);
+        totalClassFuncCount += tagList.size();
     }
+
+    // Expand class treewidget?
+    if(totalClassFuncCount < 40)
+    {
+        for(int j = classWidget->topLevelItemCount()-1;j >= 0;--j)
+        {
+            QTreeWidgetItem * classItem = classWidget->topLevelItem(j);
+            classItem->setExpanded(true);
+        }
+    }
+    
 
     // Add all functions to the treewidget
     for(int i = 0;i < tagList.size();i++)
