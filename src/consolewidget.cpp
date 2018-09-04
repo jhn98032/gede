@@ -24,6 +24,7 @@
 #define ASCII_ESC           0x1B
 #define ASCII_BELL          0x7
 #define ASCII_BACKSPACE     '\b'
+#define ANSI_CSI           "\033["
 
 static QColor red(255,0,0);
 
@@ -95,6 +96,8 @@ QString printable(QString str)
 
 void ConsoleWidget::clearAll()
 {
+    debugMsg("%s()", __func__);
+    
     m_lines.clear();
     setMinimumSize(100,1);
     m_cursorX = 0;
@@ -287,7 +290,23 @@ void ConsoleWidget::insert(QChar c)
             }
             x += blk->text.size();
         }
+
+
+        // Cursor outside of existing line content?
+        if(m_cursorX >= 0)
+        {
+            Block blk;
+            blk.m_fgColor = m_fgColor;
+            blk.m_bgColor = m_bgColor;
+            if(m_cursorX > x)
+                blk.text = QString((int)(m_cursorX-x), QChar(' '));
+            blk.text += c;
+            line.append(blk);
+            m_cursorX++;
+        }
+        
     }
+
 }
 
 
@@ -458,6 +477,19 @@ void ConsoleWidget::appendLog ( QString text )
                             {
                                 m_cursorX = std::max(0, m_cursorX-1);
                             };break;
+                            case 'J':
+                            {
+                                int ansiParamVal = m_ansiParamStr.toInt();
+                                // Erase screen
+                                if(ansiParamVal == 2)
+                                {
+                                    clearAll();
+                                }
+                                else
+                                    warnMsg("Got unknown ANSI control sequence 'CSI %s %c'",
+                                            qPrintable(m_ansiParamStr), c.toLatin1());
+                                
+                            };break;
                             case 'K': // EL - Erase in Line
                             {
                                 int ansiParamVal = m_ansiParamStr.toInt();
@@ -506,6 +538,63 @@ void ConsoleWidget::appendLog ( QString text )
                                         
                                 }
                             };break;
+                            case 'h':
+                            {
+                                // Cursor key mode: "Set: application sequences".
+                                if(m_ansiParamStr == "?1")
+                                {
+
+                                }
+                                else
+                                    warnMsg("Got unknown ANSI control sequence 'CSI %s %c'",
+                                            qPrintable(m_ansiParamStr), c.toLatin1());
+                            };break;
+                            case 'l':
+                            {
+                                // Cursor key mode: "Reset: cursor sequences"
+                                if(m_ansiParamStr == "?1")
+                                {
+
+                                }
+                                else
+                                    warnMsg("Got unknown ANSI control sequence 'CSI %s %c'",
+                                            qPrintable(m_ansiParamStr), c.toLatin1());
+                            };break;
+                            // Cursor home
+                            case 'H':
+                            {
+                                QStringList paramList =  m_ansiParamStr.split(';');
+                                if(paramList.size() == 2)
+                                {
+                                    int row = paramList[0].toInt();
+                                    int column = paramList[1].toInt();  
+                                        
+                                    m_cursorY  = row-1;
+                                    m_cursorX = column-1;
+
+                                    debugMsg("Setting cursor to L%dC%d", m_cursorY, m_cursorX);
+                                }
+                                else
+                                    warnMsg("Got unknown ANSI control sequence 'CSI %s %c'",
+                                            qPrintable(m_ansiParamStr), c.toLatin1());
+
+                            };break;
+                            case 'n':
+                            {
+                                // Request cursor position?
+                                if(m_ansiParamStr == "6")
+                                {
+                                    QString resp;
+                                    resp.sprintf(ANSI_CSI "%d;%dR", m_cursorY, m_cursorX);
+                                    Core &core = Core::getInstance();
+                                    core.writeTargetStdin(resp);
+                                    debugMsg("Sending cursor position to target 'CSI%s'", qPrintable(resp.mid(2)));
+                                }
+                                else
+                                    warnMsg("Got unknown ANSI control sequence 'CSI %s %c'",
+                                            qPrintable(m_ansiParamStr), c.toLatin1());
+
+                            };break; 
                             default:
                             {
                                 warnMsg("Got unknown ANSI control sequence 'CSI %s %c'", qPrintable(m_ansiParamStr), c.toLatin1());

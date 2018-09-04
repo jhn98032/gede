@@ -72,8 +72,8 @@ public:
     typedef QVector <Block> Line;
     QVector <Line> m_lines;
 
-    int m_cursorX;
-    int m_cursorY;
+    int m_cursorX; // Current cursor position column (0=first column)
+    int m_cursorY; // Current cursor position row index (0=first row)
     QMenu m_popupMenu;
     Settings *m_cfg;
 
