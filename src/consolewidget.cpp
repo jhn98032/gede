@@ -568,9 +568,9 @@ void ConsoleWidget::appendLog ( QString text )
                                 {
                                     int row = paramList[0].toInt();
                                     int column = paramList[1].toInt();  
-                                        
-                                    m_cursorY  = row-1;
-                                    m_cursorX = column-1;
+
+                                    m_cursorY  = qMax(0, row-1);
+                                    m_cursorX = qMax(0, column-1);
 
                                     debugMsg("Setting cursor to L%dC%d", m_cursorY, m_cursorX);
                                 }
