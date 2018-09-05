@@ -186,6 +186,8 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
     painter.setFont(m_font);
 
     // Display cursor
+    if(hasFocus())
+    {
     if(m_cursorMode == BLINK_ON || m_cursorMode == STEADY)
     {
         QRect r;
@@ -196,6 +198,7 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
         r.setHeight(rowHeight);
         if(m_cfg)
             painter.fillRect(r, QBrush(m_cfg->m_progConColorCursor));
+    }
     }
 
     // Display text
