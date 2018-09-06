@@ -12,8 +12,12 @@ CLS
 
 
 sub example_sub()
-    print "Hello"
+    Dim userInput As String
+    Input "What is your name?", userInput
+    Print "Hello " ; userInput ; "!"
 end sub
+
+example_sub()
 
 PRINT "Looping"
 
