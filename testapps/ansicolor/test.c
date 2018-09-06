@@ -18,7 +18,10 @@ char* letterToStr(int c)
 {
     static char rsp[3] = { '\0','\0','\0'};
     if(isalpha(c) || isdigit(c))
+    {
         rsp[0] = (char)c;
+        rsp[1] = '\0';
+    }
     else if(c == '\n')
         strcpy(rsp, "\\n");
     return rsp;
