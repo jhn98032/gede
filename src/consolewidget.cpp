@@ -370,6 +370,242 @@ void ConsoleWidget::updateScrollBars()
 }
 
 
+/**
+ * @brief Dispatches a ANSI escape sequence.
+ */
+void ConsoleWidget::decodeCSI(QChar c)
+{
+    switch(c.toLatin1())
+    {
+        case 'm':
+        {
+            //debugMsg("SGR:>%s<", qPrintable(m_ansiParamStr));
+
+            QStringList paramList =  m_ansiParamStr.split(';');
+            for(int i = 0;i < paramList.size();i++)
+            {
+                int p = paramList[i].toInt();
+                //debugMsg("c:%d", p);
+                switch(p)
+                {
+                    case 0:
+                    {
+                        m_fgColor = -1;
+                        m_bgColor = -1;
+                    };break;
+                    case 40:
+                    case 41:
+                    case 42:
+                    case 43:
+                    case 44:
+                    case 45:
+                    case 46:
+                    case 47:
+                    case 100:
+                    case 101:
+                    case 102:
+                    case 103:
+                    case 104:
+                    case 105:
+                    case 106:
+                    case 107:
+                        m_bgColor = p;break;
+                    case 30:
+                    case 31:
+                    case 32:
+                    case 33:
+                    case 34:
+                    case 35:
+                    case 36:
+                    case 37:
+                    case 90:
+                    case 91:
+                    case 92:
+                    case 93:
+                    case 94:
+                    case 95:
+                    case 96:
+                    case 97:
+                        m_fgColor = p;break;
+                    default:;break;
+                }
+            }
+            
+        };break;
+        case 'A': // CUU - Cursor Up
+        {
+            m_cursorY = qMax(0, m_cursorY-1);
+            m_cursorX = 0;
+        };break;
+        case 'B': // CUU - Cursor Down
+        {
+            m_cursorY = qMin(m_cursorY+1, getRowsPerScreen()-1);
+            m_cursorX = 0;
+        };break;
+        case 'C': // CUF - Cursor Forward 
+        {
+            m_cursorX++;
+        };break;
+        case 'D': // CUB - Cursor Back
+        {
+            m_cursorX = qMax(0, m_cursorX-1);
+        };break;
+        case 'J':
+        {
+            int ansiParamVal = m_ansiParamStr.toInt();
+            // Erase screen
+            if(ansiParamVal == 2)
+            {
+                debugMsg("erasing %d", getRowsPerScreen());
+                // Fill the visible part with newlines
+                for(int i4 = 0;i4 < getRowsPerScreen();i4++)
+                    insert('\n');
+            }
+            else
+                warnMsg("Got unknown ANSI control sequence 'CSI %s %c'",
+                        qPrintable(m_ansiParamStr), c.toLatin1());
+            
+        };break;
+        case 'K': // EL - Erase in Line
+        {
+            int ansiParamVal = m_ansiParamStr.toInt();
+            if(ansiParamVal == 0) // erase from cursor and forward
+            {
+                if((m_cursorY+m_origoY) < m_lines.size())
+                {
+                    Line &line = m_lines[m_cursorY+m_origoY];
+
+                    int charIdx = 0;
+                    for(int blkIdx = 0;blkIdx < line.size();blkIdx++)
+                    {
+                        Block *blk = &line[blkIdx];
+                        if(charIdx <= m_cursorX && m_cursorX < charIdx+blk->text.size()) 
+                        {
+                            int cutIdx = m_cursorX-charIdx;
+                            blk->text = blk->text.left(cutIdx);
+                        }
+                        charIdx += blk->text.size();
+                    }
+                }
+                    
+            }
+        };break;
+        case 'P': // Delete character
+        {
+            //int ansiParamVal = m_ansiParamStr.toInt();
+            {
+                if(m_cursorY+m_origoY < m_lines.size())
+                {
+                    Line &line = m_lines[m_cursorY+m_origoY];
+
+                    int charIdx = 0;
+                    for(int blkIdx = 0;blkIdx < line.size();blkIdx++)
+                    {
+                        Block *blk = &line[blkIdx];
+                        if(charIdx <= m_cursorX && m_cursorX < charIdx+blk->text.size()) 
+                        {
+                            int cutIdx = m_cursorX-charIdx;
+                            blk->text.remove(cutIdx, 1);
+                            blkIdx = line.size();
+                        }
+                        charIdx += blk->text.size();
+                    }
+                }
+                    
+            }
+        };break;
+        case 'h':
+        {
+            // DECCKM: Cursor key mode: "Set: application sequences".
+            if(m_ansiParamStr == "?1")
+            {
+
+            }
+            // DECTCEM: Makes the cursor visible ("ESC[?25h")
+            else if(m_ansiParamStr == "?25")
+            {
+                debugMsg("show cursor!");
+                m_cursorMode = BLINK_ON;
+            }
+            // AT&T 610: Blink cursor ("ESC[?12h")
+            else if(m_ansiParamStr == "?12")
+            {
+                debugMsg("blink cursor!");
+                m_cursorMode = BLINK_ON;
+            }
+            else
+                warnMsg("Got unknown ANSI control sequence 'CSI %s %c'",
+                        qPrintable(m_ansiParamStr), c.toLatin1());
+        };break;
+        case 'l':
+        {
+
+            // DECTCEM: Makes the cursor invisible ("ESC[?25l")
+            if(m_ansiParamStr == "?25")
+            {
+                debugMsg("hide cursor!");
+                m_cursorMode = HIDDEN;
+            }
+            // DECCKM: Cursor key mode: "Reset: cursor sequences"
+            else if(m_ansiParamStr == "?1")
+            {
+
+            }
+            // AT&T 610: Steady cursor ("ESC[?12l")
+            else if(m_ansiParamStr == "?12")
+            {
+                debugMsg("steady cursor!");
+                m_cursorMode = STEADY;
+            }
+            else
+                warnMsg("Got unknown ANSI control sequence 'CSI %s %c'",
+                        qPrintable(m_ansiParamStr), c.toLatin1());
+        };break;
+        // Cursor home
+        case 'H':
+        {
+            QStringList paramList =  m_ansiParamStr.split(';');
+            // Set current cursor position
+            if(paramList.size() == 2)
+            {
+                int row = paramList[0].toInt();
+                int column = paramList[1].toInt();  
+
+                m_cursorY  = qBound(0, row-1, 9999);
+                m_cursorX = qBound(0, column-1, 9999);
+
+                debugMsg("Setting cursor to L%dC%d", m_cursorY, m_cursorX);
+            }
+            else
+                warnMsg("Got unknown ANSI control sequence 'CSI %s %c'",
+                        qPrintable(m_ansiParamStr), c.toLatin1());
+
+        };break;
+        case 'n':
+        {
+            // Request cursor position?
+            if(m_ansiParamStr == "6")
+            {
+                QString resp;
+                resp.sprintf(ANSI_CSI "%d;%dR", m_cursorY+1, m_cursorX+1);
+                Core &core = Core::getInstance();
+                core.writeTargetStdin(resp);
+                debugMsg("Sending cursor position to target 'CSI%s'", qPrintable(resp.mid(2)));
+            }
+            else
+                warnMsg("Got unknown ANSI control sequence 'CSI %s %c'",
+                        qPrintable(m_ansiParamStr), c.toLatin1());
+
+        };break; 
+        default:
+        {
+            warnMsg("Got unknown ANSI control sequence 'CSI %s %c'", qPrintable(m_ansiParamStr), c.toLatin1());
+
+        };break;
+    }
+}
+
+
 void ConsoleWidget::appendLog ( QString text )
 {
     debugMsg("%s(%d bytes)", __func__, text.size());
@@ -462,234 +698,8 @@ void ConsoleWidget::appendLog ( QString text )
                     }
                     else
                     {
-                        switch(c.toLatin1())
-                        {
-                            case 'm':
-                            {
-                                //debugMsg("SGR:>%s<", qPrintable(m_ansiParamStr));
-
-                                QStringList paramList =  m_ansiParamStr.split(';');
-                                for(int i = 0;i < paramList.size();i++)
-                                {
-                                    int p = paramList[i].toInt();
-                                    //debugMsg("c:%d", p);
-                                    switch(p)
-                                    {
-                                        case 0:
-                                        {
-                                            m_fgColor = -1;
-                                            m_bgColor = -1;
-                                        };break;
-                                        case 40:
-                                        case 41:
-                                        case 42:
-                                        case 43:
-                                        case 44:
-                                        case 45:
-                                        case 46:
-                                        case 47:
-                                        case 100:
-                                        case 101:
-                                        case 102:
-                                        case 103:
-                                        case 104:
-                                        case 105:
-                                        case 106:
-                                        case 107:
-                                            m_bgColor = p;break;
-                                        case 30:
-                                        case 31:
-                                        case 32:
-                                        case 33:
-                                        case 34:
-                                        case 35:
-                                        case 36:
-                                        case 37:
-                                        case 90:
-                                        case 91:
-                                        case 92:
-                                        case 93:
-                                        case 94:
-                                        case 95:
-                                        case 96:
-                                        case 97:
-                                            m_fgColor = p;break;
-                                        default:;break;
-                                    }
-                                }
-                                
-                            };break;
-                            case 'A': // CUU - Cursor Up
-                            {
-                                m_cursorY = qMax(0, m_cursorY-1);
-                                m_cursorX = 0;
-                            };break;
-                            case 'B': // CUU - Cursor Down
-                            {
-                                m_cursorY = qMin(m_cursorY+1, getRowsPerScreen()-1);
-                                m_cursorX = 0;
-                            };break;
-                            case 'C': // CUF - Cursor Forward 
-                            {
-                                m_cursorX++;
-                            };break;
-                            case 'D': // CUB - Cursor Back
-                            {
-                                m_cursorX = qMax(0, m_cursorX-1);
-                            };break;
-                            case 'J':
-                            {
-                                int ansiParamVal = m_ansiParamStr.toInt();
-                                // Erase screen
-                                if(ansiParamVal == 2)
-                                {
-                                    debugMsg("erasing %d", getRowsPerScreen());
-                                    // Fill the visible part with newlines
-                                    for(int i4 = 0;i4 < getRowsPerScreen();i4++)
-                                        insert('\n');
-                                }
-                                else
-                                    warnMsg("Got unknown ANSI control sequence 'CSI %s %c'",
-                                            qPrintable(m_ansiParamStr), c.toLatin1());
-                                
-                            };break;
-                            case 'K': // EL - Erase in Line
-                            {
-                                int ansiParamVal = m_ansiParamStr.toInt();
-                                if(ansiParamVal == 0) // erase from cursor and forward
-                                {
-                                    if((m_cursorY+m_origoY) < m_lines.size())
-                                    {
-                                        Line &line = m_lines[m_cursorY+m_origoY];
-
-                                        int charIdx = 0;
-                                        for(int blkIdx = 0;blkIdx < line.size();blkIdx++)
-                                        {
-                                            Block *blk = &line[blkIdx];
-                                            if(charIdx <= m_cursorX && m_cursorX < charIdx+blk->text.size()) 
-                                            {
-                                                int cutIdx = m_cursorX-charIdx;
-                                                blk->text = blk->text.left(cutIdx);
-                                            }
-                                            charIdx += blk->text.size();
-                                        }
-                                    }
-                                        
-                                }
-                            };break;
-                            case 'P': // Delete character
-                            {
-                                //int ansiParamVal = m_ansiParamStr.toInt();
-                                {
-                                    if(m_cursorY+m_origoY < m_lines.size())
-                                    {
-                                        Line &line = m_lines[m_cursorY+m_origoY];
-
-                                        int charIdx = 0;
-                                        for(int blkIdx = 0;blkIdx < line.size();blkIdx++)
-                                        {
-                                            Block *blk = &line[blkIdx];
-                                            if(charIdx <= m_cursorX && m_cursorX < charIdx+blk->text.size()) 
-                                            {
-                                                int cutIdx = m_cursorX-charIdx;
-                                                blk->text.remove(cutIdx, 1);
-                                                blkIdx = line.size();
-                                            }
-                                            charIdx += blk->text.size();
-                                        }
-                                    }
-                                        
-                                }
-                            };break;
-                            case 'h':
-                            {
-                                // DECCKM: Cursor key mode: "Set: application sequences".
-                                if(m_ansiParamStr == "?1")
-                                {
-
-                                }
-                                // DECTCEM: Makes the cursor visible ("ESC[?25h")
-                                else if(m_ansiParamStr == "?25")
-                                {
-                                    debugMsg("show cursor!");
-                                    m_cursorMode = BLINK_ON;
-                                }
-                                // AT&T 610: Blink cursor ("ESC[?12h")
-                                else if(m_ansiParamStr == "?12")
-                                {
-                                    debugMsg("blink cursor!");
-                                    m_cursorMode = BLINK_ON;
-                                }
-                                else
-                                    warnMsg("Got unknown ANSI control sequence 'CSI %s %c'",
-                                            qPrintable(m_ansiParamStr), c.toLatin1());
-                            };break;
-                            case 'l':
-                            {
-
-                                // DECTCEM: Makes the cursor invisible ("ESC[?25l")
-                                if(m_ansiParamStr == "?25")
-                                {
-                                    debugMsg("hide cursor!");
-                                    m_cursorMode = HIDDEN;
-                                }
-                                // DECCKM: Cursor key mode: "Reset: cursor sequences"
-                                else if(m_ansiParamStr == "?1")
-                                {
-
-                                }
-                                // AT&T 610: Steady cursor ("ESC[?12l")
-                                else if(m_ansiParamStr == "?12")
-                                {
-                                    debugMsg("steady cursor!");
-                                    m_cursorMode = STEADY;
-                                }
-                                else
-                                    warnMsg("Got unknown ANSI control sequence 'CSI %s %c'",
-                                            qPrintable(m_ansiParamStr), c.toLatin1());
-                            };break;
-                            // Cursor home
-                            case 'H':
-                            {
-                                QStringList paramList =  m_ansiParamStr.split(';');
-                                // Set current cursor position
-                                if(paramList.size() == 2)
-                                {
-                                    int row = paramList[0].toInt();
-                                    int column = paramList[1].toInt();  
-
-                                    m_cursorY  = qBound(0, row-1, 9999);
-                                    m_cursorX = qBound(0, column-1, 9999);
-
-                                    debugMsg("Setting cursor to L%dC%d", m_cursorY, m_cursorX);
-                                }
-                                else
-                                    warnMsg("Got unknown ANSI control sequence 'CSI %s %c'",
-                                            qPrintable(m_ansiParamStr), c.toLatin1());
-
-                            };break;
-                            case 'n':
-                            {
-                                // Request cursor position?
-                                if(m_ansiParamStr == "6")
-                                {
-                                    QString resp;
-                                    resp.sprintf(ANSI_CSI "%d;%dR", m_cursorY+1, m_cursorX+1);
-                                    Core &core = Core::getInstance();
-                                    core.writeTargetStdin(resp);
-                                    debugMsg("Sending cursor position to target 'CSI%s'", qPrintable(resp.mid(2)));
-                                }
-                                else
-                                    warnMsg("Got unknown ANSI control sequence 'CSI %s %c'",
-                                            qPrintable(m_ansiParamStr), c.toLatin1());
-
-                            };break; 
-                            default:
-                            {
-                                warnMsg("Got unknown ANSI control sequence 'CSI %s %c'", qPrintable(m_ansiParamStr), c.toLatin1());
-
-                            };break;
-                        }
+                        decodeCSI(c);
+                        
                         
                         QString ansiStr = m_ansiParamStr + m_ansiInter;
                         debugMsg(" ANSI.CSI %c>%s<", c.toLatin1(), qPrintable(ansiStr));

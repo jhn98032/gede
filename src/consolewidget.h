@@ -40,6 +40,7 @@ public slots:
     void onTimerTimeout();
 
 private:
+    void decodeCSI(QChar c);
     void resizeEvent ( QResizeEvent * event );
     int getRowHeight();
     void insert(QChar c);
