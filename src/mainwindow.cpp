@@ -1116,8 +1116,8 @@ void MainWindow::onSearch()
     m_ui.widget_search->show();
     m_ui.checkBox_search->setCheckState(Qt::Checked);
 
-    
     m_ui.lineEdit_search->setFocus();
+    m_ui.lineEdit_search->selectAll();
 }
 
 /**
