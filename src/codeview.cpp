@@ -534,7 +534,8 @@ void CodeView::idxToRowColumn(int idx, int *rowIdx, int *colIdx)
     *rowIdx = prevText.count("\n");
 }
 
-void CodeView::doIncSearch(QString pattern, int startPos, bool searchForward)
+
+int CodeView::doIncSearch(QString pattern, int startPos, bool searchForward)
 {
 
     // Search for the pattern
@@ -568,28 +569,29 @@ void CodeView::doIncSearch(QString pattern, int startPos, bool searchForward)
 
     m_incSearchText = pattern;
 
+
     update();
-    
+    return m_incSearchStartPosRow;
 }
 
-void CodeView::incSearchStart(QString pattern)
+int CodeView::incSearchStart(QString pattern)
 {
     debugMsg("%s('%s')", __func__, qPrintable(pattern));
 
     m_incSearchStartPosRow = -1;
-    doIncSearch(pattern, 0, true);
+    return doIncSearch(pattern, 0, true);
 }
 
-void CodeView::incSearchNext()
+int CodeView::incSearchNext()
 {
     debugMsg("CodeView::%s()", __func__);
-    doIncSearch(m_incSearchText, m_incSearchStartPosIdx+1, true);
+    return doIncSearch(m_incSearchText, m_incSearchStartPosIdx+1, true);
 }
 
-void CodeView::incSearchPrev()
+int CodeView::incSearchPrev()
 {
     debugMsg("CodeView::%s()", __func__);
-    doIncSearch(m_incSearchText, m_incSearchStartPosIdx-1, false);
+    return doIncSearch(m_incSearchText, m_incSearchStartPosIdx-1, false);
 
 }
 

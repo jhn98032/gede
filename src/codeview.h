@@ -58,13 +58,13 @@ public:
     int getRowHeight();
 
 
-    void incSearchStart(QString text);
-    void incSearchNext();
-    void incSearchPrev();
+    int incSearchStart(QString text);
+    int incSearchNext();
+    int incSearchPrev();
 
 private:
     void idxToRowColumn(int idx, int *rowIdx, int *colIdx);
-    void doIncSearch(QString pattern, int startPos, bool searchForward);
+    int doIncSearch(QString pattern, int startPos, bool searchForward);
     void hideInfoWindow();
 
     

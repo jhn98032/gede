@@ -1943,7 +1943,10 @@ void MainWindow::onSearchNext()
     if(!currentTab)
         return;
 
-    currentTab->incSearchNext();
+    int lineNo = currentTab->incSearchNext();
+    if(lineNo > 0)
+        currentTab->ensureLineIsVisible(lineNo);
+
     m_ui.lineEdit_search->setFocus();
 }
 
@@ -1954,7 +1957,9 @@ void MainWindow::onSearchPrev()
     if(!currentTab)
         return;
 
-    currentTab->incSearchPrev();
+    int lineNo = currentTab->incSearchPrev();
+    if(lineNo > 0)
+        currentTab->ensureLineIsVisible(lineNo);
     m_ui.lineEdit_search->setFocus();
 }
 
@@ -1968,8 +1973,10 @@ void MainWindow::onIncSearch_textChanged(const QString &text)
     if(!currentTab)
         return;
 
-    currentTab->incSearchStart(text);
-        
+    int lineNo = currentTab->incSearchStart(text);
+    if(lineNo > 0)
+        currentTab->ensureLineIsVisible(lineNo);
+
 }
 
 /**
