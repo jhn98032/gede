@@ -108,6 +108,7 @@ private:
     void updateCurrentLine(QString filename, int lineno);
     void onCurrentLineChanged(int lineno);
     void onCurrentLineDisabled();
+    void hideSearchBox();
 
 
 public slots:

@@ -595,6 +595,12 @@ int CodeView::incSearchPrev()
 
 }
 
+void CodeView::clearIncSearch()
+{
+    m_incSearchStartPosRow = -1;
+    m_incSearchStartPosColumn = 0;
+    update();
+}
 
 
 

@@ -33,6 +33,7 @@ public:
     int incSearchStart(QString text) { return m_ui.codeView->incSearchStart(text); };
     int incSearchNext() { return m_ui.codeView->incSearchNext(); };
     int incSearchPrev() { return m_ui.codeView->incSearchPrev(); };
+    void clearIncSearch() { m_ui.codeView->clearIncSearch(); };
     
     int open(QString filename, QList<Tag> tagList);
 

@@ -426,13 +426,17 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
         QWidget *widget = QApplication::focusWidget();
 
-        // 'Delete' key pressed in the var widget 
+        // 'Delete' key pressed in the var widget?
         if(widget == m_ui.varWidget)
         {
             m_watchVarCtl.onKeyPress(keyEvent);
             
         }
-        
+
+        if(keyEvent->key() == Qt::Key_Escape)
+        {
+            hideSearchBox();
+        }
         //qDebug() << "key " << keyEvent->key() << " from " << obj << "focus " << widget;
 
     }
@@ -1925,6 +1929,20 @@ void MainWindow::onBreakpointsWidgetContextMenu(const QPoint& pos)
     m_popupMenu.popup(popupPos);
 }
 
+void MainWindow::hideSearchBox()
+{
+    m_ui.widget_search->hide();
+
+    // Get active tab
+    CodeViewTab* currentTab = (CodeViewTab* )m_ui.editorTabWidget->currentWidget();
+    if(!currentTab)
+        return;
+
+    currentTab->clearIncSearch();
+    
+}
+
+        
 void MainWindow::onSearchCheckBoxStateChanged(int state)
 {
     debugMsg("%s(state:%d)", __func__, state);
@@ -1932,8 +1950,9 @@ void MainWindow::onSearchCheckBoxStateChanged(int state)
     if(state == Qt::Checked)
         m_ui.widget_search->show();
     else
-        m_ui.widget_search->hide();
-    
+    {
+        hideSearchBox();
+    }
 }
 
 void MainWindow::onSearchNext()

@@ -61,7 +61,8 @@ public:
     int incSearchStart(QString text);
     int incSearchNext();
     int incSearchPrev();
-
+    void clearIncSearch();
+    
 private:
     void idxToRowColumn(int idx, int *rowIdx, int *colIdx);
     int doIncSearch(QString pattern, int startPos, bool searchForward);
