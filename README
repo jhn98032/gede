@@ -43,9 +43,9 @@ Extract:
     # tar -xvJf gede-x.y.z.tar.xz
 
 
-Compile and install (to /usr/local):
+Compile and install (to /usr/local/bin):
 
-    # make install
+    # sudo make install
 
 Gede can now be launched:
 
