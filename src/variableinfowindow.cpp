@@ -1,5 +1,6 @@
 #include "variableinfowindow.h"
 
+#include <QPaintEvent>
 #include <QFontMetrics>
 
 #include "core.h"
@@ -67,23 +68,26 @@ void drawFrame(QPainter &paint, const QRect &r)
     paint.drawLines(lines,4);
 }
 
-void VariableInfoWindow::paintEvent(QPaintEvent *pe)
+
+void VariableInfoWindow::paintEvent(QPaintEvent *event)
 {
-    Q_UNUSED(pe);
+    Q_UNUSED(event);
 
-
-    QRect border = QRect(QPoint(0,0), size());
+    QColor textColor = palette().color(QPalette::WindowText);
 
     // Create painter
     QPainter paint;   
     paint.begin(this);
+    
+    
+    QRect border = QRect(QPoint(0,0), size());
 
     // Set font
     paint.setFont(*m_font);
     QFontMetrics m_fontInfo(*m_font);
     
     // Draw text
-    paint.setPen(Qt::black);
+    paint.setPen(textColor);
     paint.drawText(10, 5+m_fontInfo.ascent(), m_text);
 
     // Draw widget frame
