@@ -28,6 +28,7 @@ enum
 
 AutoVarCtl::AutoVarCtl()
     : m_autoWidget(0)
+    ,m_textColor(Qt::black)
 {
 
 
@@ -57,6 +58,8 @@ void AutoVarCtl::setWidget(QTreeWidget *autoWidget)
 {
     m_autoWidget = autoWidget;
 
+    m_textColor = autoWidget->palette().color(QPalette::WindowText);
+    
         //
     m_autoWidget->setColumnCount(3);
     m_autoWidget->setColumnWidth(COLUMN_NAME, 120);
@@ -264,7 +267,7 @@ void AutoVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
     QString varType = watch.getVarType();
     bool hasChildren  = watch.hasChildren();
     bool inScope = watch.inScope();
-
+    
     debugMsg("%s(name:'%s')",__func__, stringToCStr(name));
 
 
@@ -370,7 +373,7 @@ void AutoVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
             if(newDispInfo.lastData != valueString)
                 b = QBrush(Qt::red);
             else
-                b = QBrush(Qt::black);
+                b = m_textColor;
             item->setForeground(COLUMN_VALUE,b);
             newDispInfo.lastData = valueString;
 
@@ -658,7 +661,7 @@ void AutoVarCtl::addNewWatch(QString varName)
             if(dispInfo.lastData != value)
                 b = QBrush(Qt::red);
             else
-                b = QBrush(Qt::black);
+                b = m_textColor;
             current->setForeground(COLUMN_VALUE,b);
             dispInfo.lastData = value;
 

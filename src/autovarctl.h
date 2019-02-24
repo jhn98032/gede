@@ -77,6 +77,7 @@ private:
     
     VarCtl::DispInfoMap m_autoVarDispInfo;
     Settings m_cfg;
+    QColor m_textColor; //!< Color to use for text in the widget
 };
 
 
