@@ -20,9 +20,12 @@
 
 static const int PAD_ADDR_LEFT = 10; //!< Pad length left to the address field
 static const int PAD_ADDR_RIGHT = 10; //!< Pad length right to the address field.
+static const int PAD_HEX_LEFT = 10;   //!< Pad length left to the hex field.
 static const int PAD_HEX_MIDDLE = 10;  //!< Space between the first 8 and the last 8 bytes in a row
 static const int PAD_INTER_HEX = 5; //!< Space between each 8 hex strings.
 static const int PAD_HEX_RIGHT = 10;   //!< Pad length right to the hex field.
+static const int PAD_ASCII_LEFT = 10;   //!< Pad length left to the ascii field.
+static const int PAD_ASCII_RIGHT = 10;   //!< Pad length right to the ascii field.
 static const int BYTES_PER_ROW = 16;
 
 
@@ -119,6 +122,13 @@ char MemoryWidget::byteToChar(quint8 d)
 
 void MemoryWidget::paintEvent ( QPaintEvent * event )
 {
+    QColor background1 = palette().color(QPalette::Base);
+    QColor background2 = palette().color(QPalette::AlternateBase);
+    QColor textColor = palette().color(QPalette::WindowText);
+    QColor headerBgColor = palette().color(QPalette::Window);
+    QColor highLightBgColor = palette().color(QPalette::Highlight);
+    QColor highLightColorText = palette().color(QPalette::HighlightedText);
+
     QPainter painter(this);
     const int ascent = m_fontInfo->ascent();
     const int rowHeight = getRowHeight();
@@ -127,6 +137,14 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
     int HEADER_HEIGHT = getHeaderHeight();
     int x;
     int rowCount = ((size().height()-HEADER_HEIGHT)/rowHeight)+1;
+
+    m_addrCharWidth = addrToString(m_startAddress+(rowCount*16ULL)).length();
+
+    int fieldAddressX = 0;
+    int fieldHexX = PAD_ADDR_LEFT+(charWidth*m_addrCharWidth) + PAD_ADDR_RIGHT;
+    int fieldAsciiX = fieldHexX + PAD_HEX_LEFT + (BYTES_PER_ROW*((charWidth*2)+PAD_INTER_HEX))+PAD_HEX_MIDDLE+PAD_HEX_RIGHT;
+
+
     quint64 startAddress = m_startAddress;
     
     quint64 selectionFirst;
@@ -140,58 +158,69 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
     {
         selectionFirst = m_selectionStart;
         selectionLast = m_selectionEnd;
-    }
-
-    m_addrCharWidth = addrToString(m_startAddress+(rowCount*16ULL)).length();
-    
+    }    
     
     painter.setFont(m_font);
 
     QByteArray content;
     if(m_inf)
-        content = m_inf->getMemory(startAddress, rowCount*16);
+        content = m_inf->getMemory(startAddress, rowCount*BYTES_PER_ROW);
     
 
     //if((0xffffffffU-startAddress) < rowCount*16)
     //    startAddress = 0xffffffffU-((rowCount-2)*16);
     
-    // Draw 'address' field background
-    QRect rect2(0,0,PAD_ADDR_LEFT+(charWidth*m_addrCharWidth)+PAD_ADDR_RIGHT/2, event->rect().bottom()+1);
-    painter.fillRect(rect2, Qt::lightGray);
+    // Draw 'Address' field background
+    QRect rect2(fieldAddressX,0, (fieldHexX-fieldAddressX), event->rect().bottom()+1);
+    painter.fillRect(rect2, background2);
 
-    // Draw 'header' background
+    // Draw 'Hex' field background
+    QRect rect4(fieldHexX,
+                0,
+                (fieldAsciiX-fieldHexX),
+                event->rect().bottom()+1);
+    painter.fillRect(rect4, background1);
+
+
+    // Draw header background
     QRect rect3(0,0, event->rect().right()+1, HEADER_HEIGHT);
-    painter.fillRect(rect3, Qt::cyan);
+    painter.fillRect(rect3, headerBgColor);
 
-    // Draw 'header' frame
-    rect3 = QRect(0,HEADER_HEIGHT, event->rect().right(), HEADER_HEIGHT);
-    painter.setPen(Qt::black);
-    painter.drawLine(0, HEADER_HEIGHT, event->rect().right(), HEADER_HEIGHT);
+    // Draw header frame
+    painter.setPen(textColor);
+    painter.drawLine(0, HEADER_HEIGHT, width(), HEADER_HEIGHT);
     
     // Draw header
     text.sprintf("Address");
     x = PAD_ADDR_LEFT;
     painter.drawText(x, rowHeight, text);
-    x += (charWidth*m_addrCharWidth)+PAD_ADDR_RIGHT;
-    for(int off = 0;off < 16;off++)
+    x = fieldHexX + PAD_HEX_LEFT;
+    for(int off = 0;off < BYTES_PER_ROW;off++)
     {
+        if((off%8) == 0 && off != 0)
+            x += PAD_HEX_MIDDLE;
         text.sprintf("%x", off);
         painter.drawText(x, rowHeight, text);
         x += (charWidth*2)+PAD_INTER_HEX;
-        if(off==7)
-            x += PAD_HEX_MIDDLE;
     }
-    x += PAD_HEX_RIGHT;
 
-    rect2 = QRect(x,HEADER_HEIGHT+1,x+charWidth*16, event->rect().bottom());
-    painter.fillRect(rect2, Qt::lightGray);
 
-    for(int off = 0;off < 16;off++)
+    // Draw ASCII field background
+    rect2 = QRect(fieldAsciiX,
+                    HEADER_HEIGHT+1,
+                    PAD_ASCII_LEFT+charWidth*BYTES_PER_ROW+PAD_ASCII_RIGHT,
+                    event->rect().bottom());
+    painter.fillRect(rect2, background2);
+
+    // Draw 'offset' header text
+    x = fieldAsciiX + PAD_ASCII_LEFT;
+    for(int off = 0;off < BYTES_PER_ROW;off++)
     {
         text.sprintf("%x", off);
         painter.drawText(x, rowHeight, text);
         x += charWidth;
     }
+
 
     // Draw data
     for(int rowIdx= 0;rowIdx < rowCount;rowIdx++)
@@ -199,20 +228,22 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
         int y = HEADER_HEIGHT+rowHeight*rowIdx+rowHeight;
         x = PAD_ADDR_LEFT;
         
-        quint64 memoryAddr = startAddress + rowIdx*16;
+        quint64 memoryAddr = startAddress + (rowIdx*BYTES_PER_ROW);
         if(memoryAddr < startAddress)
             break;
             
-        painter.setPen(Qt::black);
+        painter.setPen(textColor);
         text = addrToString(memoryAddr);
         painter.drawText(x, y, text);
-        x += charWidth*text.length();
-        x += PAD_ADDR_RIGHT;
         
-        painter.setPen(Qt::black);
-        for(int off = 0;off < 16;off++)
+        painter.setPen(textColor);
+        x = fieldHexX + PAD_HEX_LEFT;
+        for(int off = 0;off < BYTES_PER_ROW;off++)
         {
-            int dataIdx = rowIdx*16+off;
+            if((off%8) == 0 && off != 0)
+                x += PAD_HEX_MIDDLE;
+
+            int dataIdx = (rowIdx*BYTES_PER_ROW)+off;
             if(dataIdx < content.size())
             {
             quint8 d = content[dataIdx];
@@ -224,7 +255,7 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
                 {
                     QRect bgRect(x,y-rowHeight+(rowHeight-ascent)/2,charWidth*2, rowHeight);
                     if(off == 0)
-                        bgRect.adjust(-(PAD_ADDR_RIGHT/2),0,(PAD_INTER_HEX/2)+1, 0);
+                        bgRect.adjust(-(PAD_ADDR_RIGHT),0,(PAD_INTER_HEX/2)+1, 0);
                     else
                         bgRect.adjust(-(PAD_INTER_HEX/2),0,(PAD_INTER_HEX/2)+1, 0);
                     if(off == 7)
@@ -235,8 +266,12 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
                         bgRect.adjust(0,0, PAD_HEX_RIGHT+(PAD_INTER_HEX-(PAD_INTER_HEX/2)-1),0);
                     
 
-                    painter.fillRect(bgRect,QBrush(Qt::yellow));
+                    painter.fillRect(bgRect,QBrush(highLightBgColor));
+                    painter.setPen(highLightColorText);
                 }
+                else
+                    painter.setPen(textColor);
+                
             }
             
             text.sprintf("%02x", d);
@@ -245,16 +280,14 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
         
             x += (charWidth*2)+PAD_INTER_HEX;
 
-            if(off == 7)
-                x += PAD_HEX_MIDDLE;
         }
-        x += PAD_HEX_RIGHT;
 
-        painter.setPen(Qt::black);
-            
-        for(int off = 0;off < 16;off++)
+        painter.setPen(textColor);
+
+        x = fieldAsciiX + PAD_ASCII_LEFT;
+        for(int off = 0;off < BYTES_PER_ROW;off++)
         {
-            int dataIdx = rowIdx*16+off;
+            int dataIdx = (rowIdx*BYTES_PER_ROW)+off;
             if(dataIdx < content.size())
             {
                 char c2 = byteToChar(content[dataIdx]);
@@ -264,9 +297,13 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
                 if(selectionFirst <= off+memoryAddr && off+memoryAddr <=  selectionLast)
                 {
                     QRect bgRect(x,y-rowHeight+(rowHeight-ascent)/2,charWidth, rowHeight);
-                    painter.fillRect(bgRect,QBrush(Qt::yellow));
+                    painter.fillRect(bgRect,QBrush(highLightBgColor));
                
+                    painter.setPen(highLightColorText);
                 }
+                else
+                    painter.setPen(textColor);
+               
             }
             
             painter.drawText(x, y, QString(c2));
@@ -278,8 +315,8 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
     }
 
     // Draw border
-    painter.setPen(Qt::black);
-    painter.drawRect(0,0, frameSize().width()-2,frameSize().height()-1);
+    painter.setPen(textColor);
+    painter.drawRect(0,0, frameSize().width()-1,frameSize().height()-1);
 
 }
 
@@ -290,7 +327,7 @@ quint64 MemoryWidget::getAddrAtPos(QPoint pos)
     const int rowHeight = getRowHeight();
     const int charWidth = m_fontInfo->width("H");
     quint64 addr;
-    const int field_hex_width = PAD_HEX_MIDDLE + 16*(PAD_INTER_HEX+charWidth*2) + PAD_HEX_RIGHT;
+    const int field_hex_width = PAD_HEX_LEFT + PAD_HEX_MIDDLE + BYTES_PER_ROW*(PAD_INTER_HEX+charWidth*2) + PAD_HEX_RIGHT;
     const int field_address_width = PAD_ADDR_LEFT+(charWidth*m_addrCharWidth)+PAD_ADDR_RIGHT;
     int idx = 0;
     
@@ -298,6 +335,7 @@ quint64 MemoryWidget::getAddrAtPos(QPoint pos)
 
     // Adjust for the address column
     int x = pos.x();
+    
     x -= field_address_width;
 
     if(x > 0)
@@ -305,10 +343,14 @@ quint64 MemoryWidget::getAddrAtPos(QPoint pos)
         // In the ascii field?
         if(x >= field_hex_width)
         {
-            idx = (x-field_hex_width)/charWidth;
+            x -= field_hex_width;
+            x -= PAD_ASCII_LEFT;
+            idx = x/charWidth;
         }
         else
         {
+            x -= PAD_HEX_LEFT;
+            
             // Adjust for the middle space
             if(x > ((PAD_HEX_MIDDLE/2)+8*((charWidth*2)+PAD_INTER_HEX)))
                 x -= PAD_HEX_MIDDLE;
@@ -317,8 +359,8 @@ quint64 MemoryWidget::getAddrAtPos(QPoint pos)
             idx = (x+PAD_INTER_HEX/2) / ((charWidth*2)+PAD_INTER_HEX);
         }
     }
-    else if(x < -PAD_ADDR_RIGHT/2)
-        addr -= 1;
+    else
+        idx = 0;
     if(idx < 0)
         idx = -1;
     else if(BYTES_PER_ROW-1 < idx)
@@ -394,7 +436,7 @@ void MemoryWidget::onCopy()
 
         QString contentStr;
         QString subText;
-        for(quint64 addr = (selectionFirst & ~0xfULL);addr <= selectionLast;addr+=16)
+        for(quint64 addr = (selectionFirst & ~0xfULL);addr <= selectionLast;addr+=BYTES_PER_ROW)
         {
             unsigned int j;
             
@@ -403,7 +445,7 @@ void MemoryWidget::onCopy()
             contentStr += subText;
 
             // Display data as hex
-            for(j = 0;j < 16;j++)
+            for(j = 0;j < BYTES_PER_ROW;j++)
             {
                 if(selectionFirst <= addr+j && addr+j <= selectionLast) 
                 {
@@ -419,7 +461,7 @@ void MemoryWidget::onCopy()
             contentStr += "| ";
 
             // Display data as ascii
-            for(j = 0;j < 16;j++)
+            for(j = 0;j < BYTES_PER_ROW;j++)
             {
                 if(selectionFirst <= addr+j && addr+j <= selectionLast) 
                 {
