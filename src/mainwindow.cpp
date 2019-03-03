@@ -170,10 +170,13 @@ MainWindow::MainWindow(QWidget *parent)
     treeWidget->setColumnWidth(0, 200);
     connect(m_ui.treeWidget_functions, SIGNAL(itemClicked(QTreeWidgetItem * , int )),
             SLOT(onFuncWidgetItemSelected(QTreeWidgetItem * , int )));
+
+    m_ui.lineEdit_funcFilter->setPlaceholderText("Filter1;Filter2;...");
     connect(m_ui.lineEdit_funcFilter, SIGNAL(textChanged(const QString &)), SLOT(onFuncFilter_textChanged(const QString&)));
     connect(m_ui.pushButton_clearFuncFilter, SIGNAL(clicked()), SLOT(onFuncFilterClear()));
     connect(m_ui.pushButton_closeFuncFilter, SIGNAL(clicked()), SLOT(onFuncFilterClose()));
-    
+
+    m_ui.lineEdit_classFilter->setPlaceholderText("Filter1;Filter2;...");
     connect(m_ui.lineEdit_classFilter, SIGNAL(textChanged(const QString &)), SLOT(onClassFilter_textChanged(const QString&)));
     connect(m_ui.pushButton_clearClassFilter, SIGNAL(clicked()), SLOT(onClassFilterClear()));
     connect(m_ui.pushButton_closeClassFilter, SIGNAL(clicked()), SLOT(onClassFilterClose()));
