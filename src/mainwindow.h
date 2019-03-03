@@ -116,9 +116,8 @@ private:
 public slots:
     void onFuncFilter_textChanged(const QString &text);
     void onFuncFilterClear();
-    void onFuncFilterClose();
-
-    void onClassFilterClose();
+    void onFuncFilterCheckBoxStateChanged(int state);
+    void onClassFilterCheckBoxStateChanged(int state);
     void onClassFilterClear();
     void onClassFilter_textChanged(const QString &text);
 

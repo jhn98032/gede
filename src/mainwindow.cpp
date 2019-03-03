@@ -174,13 +174,13 @@ MainWindow::MainWindow(QWidget *parent)
     m_ui.lineEdit_funcFilter->setPlaceholderText("Filter1;Filter2;...");
     connect(m_ui.lineEdit_funcFilter, SIGNAL(textChanged(const QString &)), SLOT(onFuncFilter_textChanged(const QString&)));
     connect(m_ui.pushButton_clearFuncFilter, SIGNAL(clicked()), SLOT(onFuncFilterClear()));
-    connect(m_ui.pushButton_closeFuncFilter, SIGNAL(clicked()), SLOT(onFuncFilterClose()));
-
+    connect(m_ui.checkBox_funcFilter, SIGNAL(stateChanged (int)), SLOT(onFuncFilterCheckBoxStateChanged(int)));
+    
     m_ui.lineEdit_classFilter->setPlaceholderText("Filter1;Filter2;...");
     connect(m_ui.lineEdit_classFilter, SIGNAL(textChanged(const QString &)), SLOT(onClassFilter_textChanged(const QString&)));
     connect(m_ui.pushButton_clearClassFilter, SIGNAL(clicked()), SLOT(onClassFilterClear()));
-    connect(m_ui.pushButton_closeClassFilter, SIGNAL(clicked()), SLOT(onClassFilterClose()));
-
+    connect(m_ui.checkBox_classFilter, SIGNAL(stateChanged (int)), SLOT(onClassFilterCheckBoxStateChanged(int)));
+    
     connect(m_ui.lineEdit_search, SIGNAL(textChanged(const QString &)), SLOT(onIncSearch_textChanged(const QString&)));
     connect(m_ui.checkBox_search, SIGNAL(stateChanged (int)), SLOT(onSearchCheckBoxStateChanged(int)));
     connect(m_ui.pushButton_searchNext, SIGNAL(clicked()), SLOT(onSearchNext()));
@@ -274,12 +274,16 @@ void MainWindow::showWidgets()
 
     m_ui.lineEdit_funcFilter->setVisible(m_cfg.m_viewFuncFilter);
     m_ui.pushButton_clearFuncFilter->setVisible(m_cfg.m_viewFuncFilter);
-    m_ui.pushButton_closeFuncFilter->setVisible(m_cfg.m_viewFuncFilter);
-        
+    m_ui.checkBox_funcFilter->setVisible(m_cfg.m_viewFuncFilter);
+    if(m_cfg.m_viewFuncFilter)
+        m_ui.checkBox_funcFilter->setCheckState(Qt::Checked);
+    
     m_ui.lineEdit_classFilter->setVisible(m_cfg.m_viewClassFilter);
     m_ui.pushButton_clearClassFilter->setVisible(m_cfg.m_viewClassFilter);
-    m_ui.pushButton_closeClassFilter->setVisible(m_cfg.m_viewClassFilter);
-
+    m_ui.checkBox_classFilter->setVisible(m_cfg.m_viewClassFilter);
+    if(m_cfg.m_viewClassFilter)
+        m_ui.checkBox_classFilter->setCheckState(Qt::Checked);
+    
     
     m_ui.varWidget->setVisible(m_cfg.m_viewWindowWatch);
     m_ui.autoWidget->setVisible(m_cfg.m_viewWindowAutoVariables);
@@ -412,7 +416,7 @@ void MainWindow::onViewClassFilter()
 
 void MainWindow::onViewFuncFilter()
 {
-    m_cfg.m_viewFuncFilter = m_cfg.m_viewFuncFilter ? false : true;
+    m_cfg.m_viewFuncFilter = m_ui.actionViewFunctionFilter->isChecked() ? true : false;
     
     showWidgets();
 }
@@ -2062,12 +2066,6 @@ void MainWindow::onSearchPrev()
 }
 
 
-void MainWindow::onFuncFilterClose()
-{
-    m_cfg.m_viewFuncFilter = false;
-    showWidgets();
-}
-
 
 void MainWindow::onFuncFilterClear()
 {
@@ -2092,10 +2090,22 @@ void MainWindow::onFuncFilter_textChanged(const QString &text)
 }
 
 
-
-void MainWindow::onClassFilterClose()
+void MainWindow::onFuncFilterCheckBoxStateChanged(int state)
 {
-    m_ui.actionViewClassFilter->setChecked(false);
+    if(state == Qt::Unchecked)
+    {
+        m_cfg.m_viewFuncFilter = false;
+        showWidgets();
+    }
+}
+
+void MainWindow::onClassFilterCheckBoxStateChanged(int state)
+{
+    if(state == Qt::Unchecked)
+    {
+        m_cfg.m_viewClassFilter = false;
+        showWidgets();
+    }
 }
 
 

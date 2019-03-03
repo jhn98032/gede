@@ -92,18 +92,12 @@
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_classFilter">
              <property name="leftMargin">
-              <number>3</number>
+              <number>5</number>
              </property>
              <item>
-              <widget class="QPushButton" name="pushButton_closeClassFilter">
-               <property name="maximumSize">
-                <size>
-                 <width>20</width>
-                 <height>16777215</height>
-                </size>
-               </property>
+              <widget class="QCheckBox" name="checkBox_classFilter">
                <property name="text">
-                <string>X</string>
+                <string/>
                </property>
               </widget>
              </item>
@@ -178,21 +172,9 @@
               <number>5</number>
              </property>
              <item>
-              <widget class="QPushButton" name="pushButton_closeFuncFilter">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>20</width>
-                 <height>16777215</height>
-                </size>
-               </property>
+              <widget class="QCheckBox" name="checkBox_funcFilter">
                <property name="text">
-                <string>X</string>
+                <string/>
                </property>
               </widget>
              </item>
