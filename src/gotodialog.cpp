@@ -309,7 +309,7 @@ void GoToDialog::onSearchTextEdited ( const QString & text2 )
         }
         else
         {
-            m_ui.labelHelp->setText("Syntax: [file.c] [func()] [lineno]");
+            m_ui.labelHelp->setText("Syntax: [file.c] [func()] [lineno] (tab key for completion)");
             showSuggestion = SHOW_FUNC_AND_FILE;
         }
     }
@@ -322,18 +322,18 @@ void GoToDialog::onSearchTextEdited ( const QString & text2 )
         }
         else if(expList[0].contains("("))
         {
-            m_ui.labelHelp->setText("Enter linenumber");
+            m_ui.labelHelp->setText("Enter linenumber (or press Go)");
             showSuggestion = SHOW_NONE;
         }
         else
         {
-            m_ui.labelHelp->setText("Enter function or linenumber");
+            m_ui.labelHelp->setText("Enter function or linenumber (tab key for completion)");
             showSuggestion = SHOW_FUNC;
         }
     }
     else if(expList.size() == 3)
     {
-        m_ui.labelHelp->setText("Enter function linenumber offset");
+        m_ui.labelHelp->setText("Enter function linenumber offset (or press Go)");
         showSuggestion = SHOW_NONE;
     }
     else
