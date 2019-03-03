@@ -80,7 +80,9 @@ private:
     void closeEvent(QCloseEvent *e);
 
     void showWidgets();
-
+    void fillInFuncList();
+    void fillInClassList();
+    
 public:
         
 private:
@@ -112,6 +114,14 @@ private:
 
 
 public slots:
+    void onFuncFilter_textChanged(const QString &text);
+    void onFuncFilterClear();
+    void onFuncFilterClose();
+
+    void onClassFilterClose();
+    void onClassFilterClear();
+    void onClassFilter_textChanged(const QString &text);
+
     void onIncSearch_textChanged(const QString &text);
     void onFolderViewItemActivated ( QTreeWidgetItem * item, int column );
     void onThreadWidgetSelectionChanged( );
@@ -151,6 +161,8 @@ public slots:
     void onViewTargetOutput();
     void onViewGdbOutput();
     void onViewFileBrowser();
+    void onViewFuncFilter();
+    void onViewClassFilter();
     void onDefaultViewSetup();
 
     void onBreakpointsRemoveSelected();
@@ -179,11 +191,15 @@ private:
     int m_currentLine; //!< The linenumber (first=1) which the program counter points to.
     QList<StackFrameEntry> m_stackFrameList;
     QMenu m_popupMenu;
+    QStringList m_funcFilterText; //!< Filter for the function list.
+    QStringList m_classFilterText; //!< Filter for the class list.
+
     
     Settings m_cfg;
     TagManager m_tagManager;
     QList<FileInfo> m_sourceFiles;
-
+    QList<Tag> m_tagList; // Current list of tags
+    
     AutoVarCtl m_autoVarCtl;
     WatchVarCtl m_watchVarCtl;
     QFont m_outputFont;

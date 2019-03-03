@@ -34,6 +34,9 @@ Settings::Settings()
     m_viewWindowFileBrowser = true;
     m_enableDebugLog = false;
     m_tabIndentCount = 4;
+    m_viewFuncFilter = true;
+    m_viewClassFilter = true;
+        
     
     // Set cleanlooks as default on Debian
     DistroType distroType = DISTRO_UNKNOWN;
@@ -195,7 +198,9 @@ void Settings::loadGlobalConfig()
     m_viewWindowTargetOutput = tmpIni.getBool("GuiState/EnableWindowTargetOutput", m_viewWindowTargetOutput);
     m_viewWindowGdbOutput = tmpIni.getBool("GuiState/EnableWindowGdbOutput", m_viewWindowGdbOutput);
     m_viewWindowFileBrowser = tmpIni.getBool("GuiState/EnableWindowFileBrowser", m_viewWindowFileBrowser);
-
+    m_viewFuncFilter = tmpIni.getBool("GuiState/EnableFuncFilter", m_viewFuncFilter);
+    m_viewClassFilter = tmpIni.getBool("GuiState/EnableClassFilter", m_viewClassFilter);
+    
 
     m_clrBackground = tmpIni.getColor("GuiColor/ColorBackground", Qt::black);
     m_clrComment = tmpIni.getColor("GuiColor/ColorComment", Qt::green);
@@ -409,7 +414,9 @@ void Settings::saveGlobalConfig()
     tmpIni.setBool("GuiState/EnableWindowTargetOutput", m_viewWindowTargetOutput);
     tmpIni.setBool("GuiState/EnableWindowGdbOutput", m_viewWindowGdbOutput);
     tmpIni.setBool("GuiState/EnableWindowFileBrowser", m_viewWindowFileBrowser);
-
+    tmpIni.setBool("GuiState/EnableFuncFilter", m_viewFuncFilter);
+    tmpIni.setBool("GuiState/EnableClassFilter", m_viewClassFilter);
+    
 
     tmpIni.setColor("GuiColor/ColorBackground", m_clrBackground);
     tmpIni.setColor("GuiColor/ColorComment", m_clrComment);

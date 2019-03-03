@@ -149,6 +149,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ui.actionViewTargetOutput, SIGNAL(triggered()), SLOT(onViewTargetOutput()));
     connect(m_ui.actionViewGdbOutput, SIGNAL(triggered()), SLOT(onViewGdbOutput()));
     connect(m_ui.actionViewFileBrowser, SIGNAL(triggered()), SLOT(onViewFileBrowser()));
+    connect(m_ui.actionViewClassFilter, SIGNAL(triggered()), SLOT(onViewClassFilter()));
+    connect(m_ui.actionViewFunctionFilter, SIGNAL(triggered()), SLOT(onViewFuncFilter()));
+    
     connect(m_ui.actionGoToMain, SIGNAL(triggered()), SLOT(onGoToMain()));
 
     connect(m_ui.actionDefaultViewSetup, SIGNAL(triggered()), SLOT(onDefaultViewSetup()));
@@ -167,6 +170,13 @@ MainWindow::MainWindow(QWidget *parent)
     treeWidget->setColumnWidth(0, 200);
     connect(m_ui.treeWidget_functions, SIGNAL(itemClicked(QTreeWidgetItem * , int )),
             SLOT(onFuncWidgetItemSelected(QTreeWidgetItem * , int )));
+    connect(m_ui.lineEdit_funcFilter, SIGNAL(textChanged(const QString &)), SLOT(onFuncFilter_textChanged(const QString&)));
+    connect(m_ui.pushButton_clearFuncFilter, SIGNAL(clicked()), SLOT(onFuncFilterClear()));
+    connect(m_ui.pushButton_closeFuncFilter, SIGNAL(clicked()), SLOT(onFuncFilterClose()));
+    
+    connect(m_ui.lineEdit_classFilter, SIGNAL(textChanged(const QString &)), SLOT(onClassFilter_textChanged(const QString&)));
+    connect(m_ui.pushButton_clearClassFilter, SIGNAL(clicked()), SLOT(onClassFilterClear()));
+    connect(m_ui.pushButton_closeClassFilter, SIGNAL(clicked()), SLOT(onClassFilterClose()));
 
     connect(m_ui.lineEdit_search, SIGNAL(textChanged(const QString &)), SLOT(onIncSearch_textChanged(const QString&)));
     connect(m_ui.checkBox_search, SIGNAL(stateChanged (int)), SLOT(onSearchCheckBoxStateChanged(int)));
@@ -225,6 +235,15 @@ MainWindow::~MainWindow()
  */
 void MainWindow::showWidgets()
 {
+    if(!m_cfg.m_viewFuncFilter)
+        m_funcFilterText.clear();
+    if(!m_cfg.m_viewClassFilter)
+        m_classFilterText.clear();
+
+
+    m_ui.actionViewFunctionFilter->setChecked(m_cfg.m_viewFuncFilter);
+    m_ui.actionViewClassFilter->setChecked(m_cfg.m_viewClassFilter);
+
 
     QWidget *currentSelection = m_ui.tabWidget->currentWidget();
     m_ui.tabWidget->clear();
@@ -250,7 +269,14 @@ void MainWindow::showWidgets()
     m_ui.tabWidget->setVisible(m_ui.tabWidget->count() == 0 ? false : true);
     
 
-    
+    m_ui.lineEdit_funcFilter->setVisible(m_cfg.m_viewFuncFilter);
+    m_ui.pushButton_clearFuncFilter->setVisible(m_cfg.m_viewFuncFilter);
+    m_ui.pushButton_closeFuncFilter->setVisible(m_cfg.m_viewFuncFilter);
+        
+    m_ui.lineEdit_classFilter->setVisible(m_cfg.m_viewClassFilter);
+    m_ui.pushButton_clearClassFilter->setVisible(m_cfg.m_viewClassFilter);
+    m_ui.pushButton_closeClassFilter->setVisible(m_cfg.m_viewClassFilter);
+
     
     m_ui.varWidget->setVisible(m_cfg.m_viewWindowWatch);
     m_ui.autoWidget->setVisible(m_cfg.m_viewWindowAutoVariables);
@@ -272,7 +298,9 @@ void MainWindow::showWidgets()
 }
 
 
-
+/**
+ * @param Called when user selects 'Restore Default View'.
+ */
 void MainWindow::onDefaultViewSetup()
 {
     m_cfg.m_viewWindowStack = true;
@@ -283,7 +311,8 @@ void MainWindow::onDefaultViewSetup()
     m_cfg.m_viewWindowTargetOutput = true;
     m_cfg.m_viewWindowGdbOutput = true;
     m_cfg.m_viewWindowFileBrowser = true;
-
+    m_cfg.m_viewFuncFilter = true;
+    m_cfg.m_viewClassFilter = true;
 
     m_cfg.m_gui_mainwindowGeometry = m_gui_default_mainwindowGeometry;
     m_cfg.m_gui_mainwindowState = m_gui_default_mainwindowState;
@@ -302,6 +331,10 @@ void MainWindow::onDefaultViewSetup()
     m_ui.actionViewTargetOutput->setChecked(m_cfg.m_viewWindowTargetOutput);
     m_ui.actionViewGdbOutput->setChecked(m_cfg.m_viewWindowGdbOutput);
     m_ui.actionViewFileBrowser->setChecked(m_cfg.m_viewWindowFileBrowser);
+    m_ui.actionViewFunctionFilter->setChecked(m_cfg.m_viewFuncFilter);
+    m_ui.actionViewClassFilter->setChecked(m_cfg.m_viewClassFilter);
+    
+
 
     showWidgets();
 
@@ -361,10 +394,27 @@ void MainWindow::onViewGdbOutput()
 
 void MainWindow::onViewFileBrowser()
 {
-      m_cfg.m_viewWindowFileBrowser = m_cfg.m_viewWindowFileBrowser ? false : true;
+    m_cfg.m_viewWindowFileBrowser = m_cfg.m_viewWindowFileBrowser ? false : true;
     
     showWidgets();
 }
+
+
+void MainWindow::onViewClassFilter()
+{
+    m_cfg.m_viewClassFilter = m_ui.actionViewClassFilter->isChecked() ? true : false;
+    
+    showWidgets();
+}
+
+void MainWindow::onViewFuncFilter()
+{
+    m_cfg.m_viewFuncFilter = m_cfg.m_viewFuncFilter ? false : true;
+    
+    showWidgets();
+}
+
+
 
 void MainWindow::loadConfig()
 {
@@ -384,6 +434,8 @@ void MainWindow::loadConfig()
     m_ui.actionViewTargetOutput->setChecked(m_cfg.m_viewWindowTargetOutput);
     m_ui.actionViewGdbOutput->setChecked(m_cfg.m_viewWindowGdbOutput);
     m_ui.actionViewFileBrowser->setChecked(m_cfg.m_viewWindowFileBrowser);
+    m_ui.actionViewFunctionFilter->setChecked(m_cfg.m_viewFuncFilter);
+    m_ui.actionViewClassFilter->setChecked(m_cfg.m_viewClassFilter);
 
     showWidgets();
     
@@ -1983,6 +2035,65 @@ void MainWindow::onSearchPrev()
 }
 
 
+void MainWindow::onFuncFilterClose()
+{
+    m_cfg.m_viewFuncFilter = false;
+    showWidgets();
+}
+
+
+void MainWindow::onFuncFilterClear()
+{
+    m_ui.lineEdit_funcFilter->setText("");
+    
+}
+
+
+void MainWindow::onFuncFilter_textChanged(const QString &text)
+{
+    // Create the search list
+    m_funcFilterText.clear();
+    QStringList list = text.split(";");
+    for(int i = 0;i < list.size();i++)
+    {
+        QString item = list[i].trimmed();
+        if(!item.isEmpty())
+            m_funcFilterText.append(item);
+    }
+    
+    fillInFuncList();
+}
+
+
+
+void MainWindow::onClassFilterClose()
+{
+    m_ui.actionViewClassFilter->setChecked(false);
+}
+
+
+void MainWindow::onClassFilterClear()
+{
+    m_ui.lineEdit_classFilter->setText("");
+    
+}
+
+
+void MainWindow::onClassFilter_textChanged(const QString &text)
+{
+    // Create the search list
+    m_classFilterText.clear();
+    QStringList list = text.split(";");
+    for(int i = 0;i < list.size();i++)
+    {
+        QString item = list[i].trimmed();
+        if(!item.isEmpty())
+            m_classFilterText.append(item);
+    }
+    
+    fillInClassList();
+}
+
 void MainWindow::onIncSearch_textChanged(const QString &text)
 {
     debugMsg("%s('%s')", __func__, qPrintable(text));
@@ -2003,15 +2114,8 @@ void MainWindow::onIncSearch_textChanged(const QString &text)
  */
 void MainWindow::onAllTagScansDone()
 {
-    QTreeWidget *funcWidget = m_ui.treeWidget_functions;
-    QTreeWidget *classWidget = m_ui.treeWidget_classes;
-    QTreeWidgetItem *item;
-
-    funcWidget->clear();
-    classWidget->clear();
-
     // Get all tags
-    QList<Tag> tagList;
+    m_tagList.clear();
     for(int k = 0;k < m_sourceFiles.size();k++)
     {
         FileInfo &info = m_sourceFiles[k];
@@ -2019,14 +2123,21 @@ void MainWindow::onAllTagScansDone()
         // Find the tag
         QList<Tag> thisTagList;
         m_tagManager.getTags(info.m_fullName, &thisTagList);
-        tagList += thisTagList;
+        m_tagList += thisTagList;
     }
 
+    fillInClassList();
+    fillInFuncList();
+}
+
+
+void MainWindow::fillInClassList()
+{
     // Get all classes
     QStringList classList;
-    for(int i = 0;i < tagList.size();i++)
+    for(int i = 0;i < m_tagList.size();i++)
     {
-        const Tag &tag = tagList[i];
+        const Tag &tag = m_tagList[i];
         QString className = tag.getClassName();
         if(!className.isEmpty())
             classList += tag.getClassName();
@@ -2035,36 +2146,51 @@ void MainWindow::onAllTagScansDone()
     classList.sort();
     
     // Insert the classes in the class widget
+    QTreeWidget *classWidget = m_ui.treeWidget_classes;
+    classWidget->clear();
     int totalClassFuncCount = 0;
     for(int ci = 0;ci < classList.size();ci++)
     {
         QString className = classList[ci];
 
-        // Insert the class
-        QTreeWidgetItem *classItem = new QTreeWidgetItem;
-        classItem->setText(0, className);
-        QBrush blueBrush (Qt::blue);
-        classItem->setForeground( 0, blueBrush);
-        classWidget->addTopLevelItem(classItem);
-
-
-        // Add all functions to the class in the class widget
-        for(int i = 0;i < tagList.size();i++)
+        bool isMatch = true;
+        
+        // Does the filter match the name?
+        for(int j = 0;j < m_classFilterText.size();j++)
         {
-            const Tag &tag = tagList[i];
-            if(tag.isFunc() && tag.getClassName() == className)
-            {
-                item = new QTreeWidgetItem;
-                item->setText(0, tag.getName() + tag.getSignature());
-                item->setData(0, Qt::UserRole, tag.getLineNo());
-                item->setText(1, getFilenamePart(tag.getFilePath()));
-                item->setData(1, Qt::UserRole, tag.getFilePath());
-                item->setText(2, QString::number(tag.getLineNo()));
-                classItem->addChild(item);
-
-            }
+            if(className.indexOf(m_classFilterText[j]) == -1)
+                isMatch = false;
         }
-        totalClassFuncCount += tagList.size();
+
+        if(isMatch)
+        {
+            // Insert the class
+            QTreeWidgetItem *classItem = new QTreeWidgetItem;
+            classItem->setText(0, className);
+            QBrush blueBrush (Qt::blue);
+            classItem->setForeground( 0, blueBrush);
+            classWidget->addTopLevelItem(classItem);
+
+
+            // Add all functions to the class in the class widget
+            for(int i = 0;i < m_tagList.size();i++)
+            {
+                const Tag &tag = m_tagList[i];
+                if(tag.isFunc() && tag.getClassName() == className)
+                {
+                    QTreeWidgetItem *item = new QTreeWidgetItem;
+                    item->setText(0, tag.getName() + tag.getSignature());
+                    item->setData(0, Qt::UserRole, tag.getLineNo());
+                    item->setText(1, getFilenamePart(tag.getFilePath()));
+                    item->setData(1, Qt::UserRole, tag.getFilePath());
+                    item->setText(2, QString::number(tag.getLineNo()));
+                    classItem->addChild(item);
+
+                }
+            }
+            totalClassFuncCount += m_tagList.size();
+        }
+    
     }
 
     // Expand class treewidget?
@@ -2077,24 +2203,44 @@ void MainWindow::onAllTagScansDone()
         }
     }
     
+}
+
+void MainWindow::fillInFuncList()
+{
+    QTreeWidget *funcWidget = m_ui.treeWidget_functions;
+    funcWidget->clear();
 
     // Add all functions to the treewidget
-    for(int i = 0;i < tagList.size();i++)
+    for(int i = 0;i < m_tagList.size();i++)
     {
-        const Tag &tag = tagList[i];
+        const Tag &tag = m_tagList[i];
         if(tag.isFunc())
         {
-            item = new QTreeWidgetItem;
-            if(tag.getClassName().isEmpty())
-                item->setText(0, " " + tag.getLongName());
-            else
-                item->setText(0, tag.getLongName());
-            item->setData(0, Qt::UserRole, tag.getLineNo());
-            item->setText(1, getFilenamePart(tag.getFilePath()));
-            item->setData(1, Qt::UserRole, tag.getFilePath());
-            item->setText(2, QString::number(tag.getLineNo()));
-                
-            funcWidget->addTopLevelItem(item);
+            bool isMatch = true;
+
+            // Does the filter match the name?
+            QString name = tag.getLongName();
+            for(int j = 0;j < m_funcFilterText.size();j++)
+            {
+                if(name.indexOf(m_funcFilterText[j]) == -1)
+                    isMatch = false;
+            }
+
+            // Add the item if it matches
+            if(isMatch)
+            {
+                QTreeWidgetItem *item = new QTreeWidgetItem;
+                if(tag.getClassName().isEmpty())
+                    item->setText(0, " " + name);
+                else
+                    item->setText(0, name);
+                item->setData(0, Qt::UserRole, tag.getLineNo());
+                item->setText(1, getFilenamePart(tag.getFilePath()));
+                item->setData(1, Qt::UserRole, tag.getFilePath());
+                item->setText(2, QString::number(tag.getLineNo()));
+                    
+                funcWidget->addTopLevelItem(item);
+            }
         }
     }
     funcWidget->sortItems(0, Qt::AscendingOrder);
