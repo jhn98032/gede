@@ -875,6 +875,38 @@ void Core::gdbNext()
 }
 
 
+
+/**
+ * @brief Jumps to a location (by changing program counter).
+ * @return 0 on success.
+ */
+int Core::jump(QString filename, int lineNo)
+{
+    int res;
+    Com& com = Com::getInstance();
+    Tree resultData;
+
+    if(m_targetState != ICore::TARGET_STOPPED)
+    {
+        if(m_inf)
+            m_inf->ICore_onMessage("Program is not stopped");
+        return -3;
+    }
+
+    res = com.commandF(&resultData, "-break-insert -t %s:%d", stringToCStr(filename), lineNo);
+    if(res != GDB_DONE)
+        return -1;
+    resultData.removeAll();
+        
+    res = com.commandF(&resultData, "-exec-jump %s:%d", stringToCStr(filename), lineNo);
+    if(res != GDB_DONE)
+        return -2;
+
+    return 0;
+}
+
+
+
 /**
  * @brief Request a list of stack frames.
  */
@@ -1172,9 +1204,14 @@ void Core::onNotifyAsyncOut(Tree &tree, AsyncClass ac)
 {
     debugMsg("NotifyAsyncOut> %s", Com::asyncClassToString(ac));
 
-     if(ac == ComListener::AC_BREAKPOINT_MODIFIED)
-    {
 
+    if(ac == ComListener::AC_BREAKPOINT_DELETED)
+    {
+        int id = tree.getInt("id");
+        dispatchBreakpointDeleted(id);
+    }
+    else if(ac == ComListener::AC_BREAKPOINT_MODIFIED)
+    {
         for(int i = 0;i < tree.getRootChildCount();i++)
         {
             TreeNode *rootNode = tree.getChildAt(i);
@@ -1449,6 +1486,21 @@ BreakPoint* Core::findBreakPointByNumber(int number)
     return NULL;
 }
 
+void Core::dispatchBreakpointDeleted(int id)
+{
+
+    BreakPoint *bkpt = findBreakPointByNumber(id);
+    if(bkpt == NULL)
+    {
+        warnMsg("Unknown breakpoint %d deleted", id);
+    }
+    else
+        m_breakpoints.removeOne(bkpt);
+
+    if(m_inf)
+        m_inf->ICore_onBreakpointsChanged();
+
+}
 
 void Core::dispatchBreakpointTree(Tree &tree)
 {

@@ -152,6 +152,7 @@ public slots:
     void onCodeViewTab_launchContextMenu(const QPoint&);
     void onCodeViewTab_closeTabsToLeft();
     void onCodeViewTab_closeOtherTabs();
+    void onCodeViewContextMenuJumpToLocation();
 
     void onViewStack();
     void onViewBreakpoints();

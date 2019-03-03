@@ -33,6 +33,7 @@ const char* Com::asyncClassToString(ComListener::AsyncClass ac)
         case ComListener::AC_THREAD_GROUP_STARTED:return "thread_group_started";break;
         case ComListener::AC_LIBRARY_LOADED:return "library_loaded";break;
         case ComListener::AC_BREAKPOINT_MODIFIED: return "breakpoint_modified";break;
+        case ComListener::AC_BREAKPOINT_DELETED: return "breakpoint_deleted";break;
         case ComListener::AC_THREAD_EXITED: return "thread_exited";break;
         case ComListener::AC_THREAD_GROUP_EXITED: return "thread_group_exited";break;
         case ComListener::AC_LIBRARY_UNLOADED: return "library_unloaded";break;
@@ -362,6 +363,10 @@ int Com::parseAsyncOutput(Resp *resp, ComListener::AsyncClass *ac)
     else if(acString == "breakpoint-modified")
     {
         *ac = ComListener::AC_BREAKPOINT_MODIFIED;
+    }
+    else if(acString == "breakpoint-deleted")
+    {
+        *ac = ComListener::AC_BREAKPOINT_DELETED;
     }
     else if(acString == "thread-exited")
     {

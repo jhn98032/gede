@@ -78,6 +78,7 @@ private:
             AC_THREAD_GROUP_STARTED,
             AC_LIBRARY_LOADED,
             AC_BREAKPOINT_MODIFIED,
+            AC_BREAKPOINT_DELETED,
             AC_THREAD_EXITED,
             AC_THREAD_GROUP_EXITED,
             AC_LIBRARY_UNLOADED,

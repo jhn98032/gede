@@ -932,13 +932,13 @@ void MainWindow::onCodeViewTab_launchContextMenu(const QPoint& pos)
 
     action = m_popupMenu.addSeparator();
 
-    // Add 'open'
+    // Add 'Close Other Tabs'
     action = m_popupMenu.addAction("Close Other Tabs");
     action->setData(tabIdx);
     connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewTab_closeOtherTabs()));
 
         
-    // Add 'Show current PC location'
+    // Add 'Close Tabs To The Left'
     action = m_popupMenu.addAction("Close Tabs To The Left");
     action->setData(tabIdx);
     connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewTab_closeTabsToLeft()));
@@ -1490,7 +1490,7 @@ void MainWindow::ICodeView_onContextMenuIncFile(QPoint pos, int lineNo, QString 
     
     m_popupMenu.clear();
 
-    // Add 'open'
+    // Add 'Open <include file>'
     action = m_popupMenu.addAction("Open " + incFile);
     action->setData(incFile);
     connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuOpenFile()));
@@ -1501,6 +1501,7 @@ void MainWindow::ICodeView_onContextMenuIncFile(QPoint pos, int lineNo, QString 
     title = "Show current PC location";
     action = m_popupMenu.addAction(title);
     connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuShowCurrentLocation()));
+
 
     
     m_popupMenu.popup(pos);
@@ -1617,8 +1618,31 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList tex
     action = m_popupMenu.addAction(title);
     connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuShowCurrentLocation()));
 
+    // Add 'Jump to this location'
+    action = m_popupMenu.addSeparator();
+    title = "Jump to this location";
+    action = m_popupMenu.addAction(title);
+    action->setData(lineNo);
+    connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuJumpToLocation()));
+
     
     m_popupMenu.popup(pos);
+}
+
+
+void MainWindow::onCodeViewContextMenuJumpToLocation()
+{
+    QAction *action = static_cast<QAction *>(sender ());
+    int lineNo = action->data().toInt();
+    Core &core = Core::getInstance();
+
+    CodeViewTab* currentCodeViewTab = currentTab();
+    if(!currentCodeViewTab)
+        return;
+        
+    QString filename = currentCodeViewTab->getFilePath();
+
+    core.jump(filename, lineNo);
 }
 
 

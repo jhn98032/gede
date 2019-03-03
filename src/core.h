@@ -240,6 +240,7 @@ private:
      void onTargetStreamOutput(QString str);
      void onLogStreamOutput(QString str);
 
+    void dispatchBreakpointDeleted(int id);
     void dispatchBreakpointTree(Tree &tree);
     static ICore::StopReason parseReasonString(QString string);
     void detectMemoryDepth();
@@ -263,6 +264,8 @@ public:
 
     quint64 getAddress(VarWatch &w);
     
+
+    int jump(QString filename, int lineNo);
 
     int gdbSetBreakpoint(QString filename, int lineNo);
     void gdbGetThreadList();
