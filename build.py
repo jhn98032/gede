@@ -161,7 +161,7 @@ if __name__ == "__main__":
                 raise
 
             print("")
-            print("Gede has been installed to " + g_dest_path)
+            print("Gede has been installed to " + g_dest_path + "/bin")
             print("Start it by running gede") 
 
     except IOError as e:
