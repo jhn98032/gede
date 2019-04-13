@@ -8,10 +8,18 @@ import subprocess
 import shutil
 
 
+FORCE_QT4=1
+FORCE_QT5=2
+AUTODETECT=3
+
 g_dest_path = "/usr/local"
 g_verbose = False
 g_exeName = "gede"
+g_qtVersionToUse = AUTODETECT
+g_qmakeQt4 = ""
+g_qmakeQt5 = ""
 
+        
 # Run the make command
 def run_make(a_list):
     if g_verbose:
@@ -61,6 +69,8 @@ def dump_usage():
     print("where OPTIONS are:")
     print("      --prefix=DESTDIR  The path to install to (default is %s)." % (g_dest_path))
     print("      --verbose         Verbose output.")
+    print("      --use-qt4         Use qt4")
+    print("      --use-qt5         Use qt5")
     print("")
     return 1
 
@@ -90,18 +100,35 @@ def detectQt():
     """ @brief Detects the Qt version installed in the system.
         @return The name of the qmake executable. 
     """
+    global g_qmakeQt4
+    global g_qmakeQt5
     sys.stdout.write("Detecting Qt version... "),
+    qtVerList = []
     if exeExist("qmake-qt4"):
-        print("Qt4 found");
-        return "qmake-qt4";
-    elif exeExist("qmake-qt5"):
-        print("Qt5 found");
-        return "qmake-qt5";
-    elif exeExist("qmake"):
-        print("Qt? found (qmake)");
-        return "qmake";
-    print("No Qt found");
-    return "qmake";
+        qtVerList += ["Qt4"]
+        g_qmakeQt4 = "qmake-qt4";
+    if exeExist("qmake-qt5"):
+        qtVerList += ["Qt5"]
+        g_qmakeQt5 = "qmake-qt5";
+    if exeExist("qmake"):
+        qtVerList += ["Qt?"]
+        if not g_qmakeQt5:
+            g_qmakeQt5 = "qmake";
+        else:
+            g_qmakeQt4 = "qmake";
+    sys.stdout.write(", ".join(qtVerList) + "\n")
+    if (not g_qmakeQt4) and (not g_qmakeQt5):
+        print("No Qt found");
+
+    # Which version to use?
+    qmakeName = "qmake"
+    if g_qtVersionToUse == FORCE_QT4 and g_qmakeQt4:
+        qmakeName = g_qmakeQt4;
+    elif g_qmakeQt5:
+        qmakeName = g_qmakeQt5;
+    print("Using '" + qmakeName + "'")
+
+    return qmakeName;
 
 
 # Main entry
@@ -124,6 +151,10 @@ if __name__ == "__main__":
                 g_verbose = True
             elif arg.find("--prefix=") == 0:
                 g_dest_path = arg[9:]
+            elif arg == "--use-qt4":
+                g_qtVersionToUse = FORCE_QT4
+            elif arg == "--use-qt5":
+                g_qtVersionToUse = FORCE_QT5
             else:
                 exit(dump_usage())
 
