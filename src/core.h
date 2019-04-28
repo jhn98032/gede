@@ -246,6 +246,7 @@ private:
     void detectMemoryDepth();
     static int openPseudoTerminal();
     void ensureStopped();
+    int runInitCommands(Settings *cfg);
     
 public:
     int gdbSetBreakpointAtFunc(QString func);

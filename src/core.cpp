@@ -357,9 +357,22 @@ int Core::initPid(Settings *cfg, QString gdbPath, QString programPath, int pid)
         errorMsg("Failed to set breakpoint at %s", stringToCStr(cfg->m_initialBreakpoint));
     }
 
+    runInitCommands(cfg);
+
     gdbGetFiles();
 
-    // Run the initializing commands
+    return rc;
+}
+
+
+/**
+ * @brief Execute the init commands (supplied by the user).
+ */
+int Core::runInitCommands(Settings *cfg)
+{
+    Com& com = Com::getInstance();
+
+    // Loop through the initializing commands
     for(int i = 0;i < cfg->m_initCommands.size();i++)
     {
         QString cmd = cfg->m_initCommands[i];
@@ -374,8 +387,7 @@ int Core::initPid(Settings *cfg, QString gdbPath, QString programPath, int pid)
 
     }
 
-    
-    return rc;
+    return 0;
 }
 
 int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QStringList argumentList)
@@ -419,29 +431,17 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
         com.command(NULL, commandStr);
     }
     
+
+    runInitCommands(cfg);
+
     if(gdbSetBreakpointAtFunc(cfg->m_initialBreakpoint))
     {
         rc = 1;
         errorMsg("Failed to set breakpoint at %s", stringToCStr(cfg->m_initialBreakpoint));
     }
 
+
     gdbGetFiles();
-
-    // Run the initializing commands
-    for(int i = 0;i < cfg->m_initCommands.size();i++)
-    {
-        QString cmd = cfg->m_initCommands[i];
-
-        // Remove comments
-        if(cmd.indexOf('#') != -1)
-            cmd = cmd.left(cmd.indexOf('#'));
-        cmd = cmd.trimmed();
-
-        if(!cmd.isEmpty())
-            com.commandF(NULL, "%s", stringToCStr(cmd));
-
-    }
-
 
     return rc;
 }
@@ -488,6 +488,7 @@ int Core::initCoreDump(Settings *cfg, QString gdbPath, QString programPath, QStr
     // Get memory depth (32 or 64)
     detectMemoryDepth();
 
+    runInitCommands(cfg);
 
     gdbGetFiles();
 
@@ -524,20 +525,7 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
 
     }
 
-    // Run the initializing commands
-    for(int i = 0;i < cfg->m_initCommands.size();i++)
-    {
-        QString cmd = cfg->m_initCommands[i];
-
-        // Remove comments
-        if(cmd.indexOf('#') != -1)
-            cmd = cmd.left(cmd.indexOf('#'));
-        cmd = cmd.trimmed();
-
-        if(!cmd.isEmpty())
-            com.commandF(NULL, "%s", stringToCStr(cmd));
-
-    }
+    runInitCommands(cfg);
 
     if(!programPath.isEmpty())
     {

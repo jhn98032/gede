@@ -35,6 +35,8 @@ OpenDialog::OpenDialog(QWidget *parent)
 
     m_ui.comboBox_gdbCommand->setSearchAreas(ExeComboBox::UseEnvPath);
     m_ui.comboBox_gdbCommand->setFilter(QRegExp("gdb(?!tui|server)"));
+
+    m_ui.plainTextEdit_initCommands->setPlaceholderText("Example: \"set substitute-path '/src' '/src2' # a comment\"");
 }
 
 

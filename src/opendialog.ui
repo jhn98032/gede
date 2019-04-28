@@ -264,7 +264,11 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
-           <widget class="QPlainTextEdit" name="plainTextEdit_initCommands"/>
+           <widget class="QPlainTextEdit" name="plainTextEdit_initCommands">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter commands to send to GDB.&lt;br/&gt;One line per command.&lt;br/&gt;Comments can be added by preceding them with '#'.&lt;/p&gt;&lt;p&gt;Example:&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;  # Change source path&lt;br/&gt;  set substitute-path '/path/my_source' '/new_path'&lt;br/&gt;&lt;/span&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
