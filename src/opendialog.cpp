@@ -15,6 +15,7 @@
 
 #include <QFileDialog>
 #include <QDir>
+#include <QtGlobal>
 
 
 OpenDialog::OpenDialog(QWidget *parent)
@@ -36,7 +37,9 @@ OpenDialog::OpenDialog(QWidget *parent)
     m_ui.comboBox_gdbCommand->setSearchAreas(ExeComboBox::UseEnvPath);
     m_ui.comboBox_gdbCommand->setFilter(QRegExp("gdb(?!tui|server)"));
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
     m_ui.plainTextEdit_initCommands->setPlaceholderText("Example: \"set substitute-path '/src' '/src2' # a comment\"");
+#endif
 }
 
 
