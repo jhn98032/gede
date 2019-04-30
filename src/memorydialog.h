@@ -5,6 +5,7 @@
 
 
 #include <QDialog>
+#include <QWheelEvent>
 
 
 class MemoryDialog : public QDialog, public IMemoryWidget
@@ -24,6 +25,7 @@ public slots:
 
 private:
     quint64 inputTextToAddress(QString text);
+    void wheelEvent(QWheelEvent * event);
     
 private:
     Ui_MemoryDialog m_ui;
