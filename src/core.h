@@ -169,13 +169,6 @@ class ICore
         EXITED
     };
     
-    enum SignalType
-    {
-        SIGINT,
-        SIGTERM,
-        SIGKILL,
-        SIGUNKNOWN
-    };
     virtual void ICore_onStopped(StopReason reason, QString path, int lineNo) = 0;
     virtual void ICore_onStateChanged(TargetState state) = 0;
     virtual void ICore_onSignalReceived(QString signalName) = 0;
