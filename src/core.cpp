@@ -1783,6 +1783,9 @@ void Core::onTargetStreamOutput(QString str)
 
 void Core::onLogStreamOutput(QString str)
 {
+    str.replace("\r","");
+    if(str.endsWith('\n'))
+        str = str.left(str.size()-1);
     QStringList list = str.split('\n');
     for(int i = 0;i < list.size();i++)
         infoMsg("GDB | Log-stream | %s", stringToCStr(list[i]));

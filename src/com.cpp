@@ -164,7 +164,7 @@ QList<Token*> Com::tokenize(QString str)
     enum { IDLE, END_CODE, STRING, VAR} state = IDLE;
     QList<Token*> list;
     Token *cur = NULL;
-    QChar prevC = ' ';
+    bool prevCharIsEscCode = false;
     
     if(str.isEmpty())
         return list;
@@ -173,14 +173,18 @@ QList<Token*> Com::tokenize(QString str)
     {
         QChar c = str[i];
         bool isEscaped = false;
-        if(c == '\\' && prevC == '\\')
+        if(c == '\\' && prevCharIsEscCode)
         {
+            prevCharIsEscCode = false;
         }
-        else if(prevC == '\\')
+        else if(prevCharIsEscCode)
+        {
             isEscaped = true;
+            prevCharIsEscCode = false;
+        }
         else if(c == '\\')
         {
-            prevC = c;
+            prevCharIsEscCode = true;
             continue;
         }
         
@@ -269,7 +273,12 @@ QList<Token*> Com::tokenize(QString str)
                 }
                 else if(isEscaped)
                 {
-                    cur->m_text += c;
+                    if(c == 'n')
+                        cur->m_text += '\n';
+                    else if(c == 't')
+                        cur->m_text += '\t';
+                    else
+                        cur->m_text += c;
                 }
                 else
                     cur->m_text += c;
@@ -287,7 +296,7 @@ QList<Token*> Com::tokenize(QString str)
             };break;
             
         }
-        prevC = c;
+        
     }
     if(cur)
     {
