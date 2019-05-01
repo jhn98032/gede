@@ -17,6 +17,7 @@
 #include "config.h"
 
 
+QString Settings::g_projConfigFilename = PROJECT_CONFIG_FILENAME;
 
 
 Settings::Settings()
@@ -237,7 +238,7 @@ void Settings::loadProjectConfig()
     if(m_globalProjConfig)
         filepath = QDir::homePath() + "/"  GLOBAL_CONFIG_DIR + "/" + PROJECT_GLOBAL_CONFIG_FILENAME;
     else
-        filepath = PROJECT_CONFIG_FILENAME;
+        filepath = g_projConfigFilename;
 
     // Load from file
     Ini tmpIni;
@@ -299,6 +300,10 @@ void Settings::save()
     saveGlobalConfig();
 }
 
+void Settings::setProjectConfig(QString filename)
+{
+    g_projConfigFilename = filename;
+}
 
 
 void Settings::saveProjectConfig()
@@ -309,7 +314,7 @@ void Settings::saveProjectConfig()
     if(m_globalProjConfig)
         filepath = QDir::homePath() + "/"  GLOBAL_CONFIG_DIR + "/" + PROJECT_GLOBAL_CONFIG_FILENAME;
     else
-        filepath = PROJECT_CONFIG_FILENAME;
+        filepath = g_projConfigFilename;
     
     Ini tmpIni;
 

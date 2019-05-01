@@ -40,6 +40,8 @@ static int dumpUsage()
     printf("  --no-show-config / --show-config   Shows the configuration window at startup.\n");
     printf("  --help                             Displays this text.\n");
     printf("  --version                          Displays the version of gede.\n");
+    printf("  --projconfig FILENAME              Specify config filename to use.\n");
+    printf("                                     Default is '%s' \n", PROJECT_CONFIG_FILENAME);
     printf("\n");
     printf("Examples:\n");
     printf("\n");
@@ -99,6 +101,13 @@ int main(int argc, char *argv[])
         {
             return dumpUsage();
         }
+        else if((strcmp(curArg, "--projconfig") == 0 || strcmp(curArg, "--proj-config") == 0)
+            && i+1 < argc)
+        {
+            i++;
+            cfg.setProjectConfig(argv[i]);
+        }
+        
     }
     
     // Load default config
@@ -106,7 +115,12 @@ int main(int argc, char *argv[])
     for(int i = 1;i < argc;i++)
     {
         const char *curArg = argv[i];
-        if(strcmp(curArg, "--args") == 0)
+        if((strcmp(curArg, "--projconfig") == 0 || strcmp(curArg, "--proj-config") == 0)
+            && i+1 < argc)
+        {
+            i++;
+        }
+        else if(strcmp(curArg, "--args") == 0)
         {
             cfg.m_connectionMode = MODE_LOCAL;
             cfg.m_argumentList.clear();

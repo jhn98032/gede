@@ -53,6 +53,8 @@ class Settings
 
         QStringList getGoToList();
         void setGoToList(QStringList list);
+
+        static void setProjectConfig(QString filename);
         
     private:
         void loadProjectConfig();
@@ -149,6 +151,9 @@ class Settings
 
         int m_variablePopupDelay; //!< Number of milliseconds before the variables value should be displayed in a popup.
         QStringList m_gotoRuiList;
+
+    private:
+        static QString g_projConfigFilename; //!< Filename of the project config file. 
 };
 
 
