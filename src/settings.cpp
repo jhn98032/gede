@@ -639,6 +639,23 @@ QStringList Settings::getDefaultBasicKeywordList()
 }
 
 
+QStringList Settings::getDefaultFortranKeywordList()
+{
+    QStringList keywordList;
+
+    keywordList += "print";
+
+    keywordList += "subroutine";
+    keywordList += "program";
+
+    keywordList += "end";
+    keywordList += "call";
+
+    keywordList += "real";
+
+    return keywordList;
+}
+
 /**
  * @brief Returns the path of the program to debug
  */

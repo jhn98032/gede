@@ -35,6 +35,9 @@
 // Expand all classes if the total number of members is below this number
 #define CLASS_LIST_AUTO_EXPAND_COUNT 40
 
+// Which fileextension does rust use?
+#define RUST_FILE_EXTENSION  ".rs"
+
 #endif // FILE__CONFIG_H
 
 

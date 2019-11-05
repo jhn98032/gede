@@ -86,6 +86,9 @@ int CodeViewTab::open(QString filename, QList<Tag> tagList)
 
     if(extension.toLower() == ".bas")
         m_ui.codeView->setPlainText(text, CodeView::CODE_BASIC);
+    else if(extension.toLower() == ".f" || extension.toLower() == ".f95"
+             || extension.toLower() == ".for")
+        m_ui.codeView->setPlainText(text, CodeView::CODE_FORTRAN);
     else if(extension.toLower() == ".rs")
         m_ui.codeView->setPlainText(text, CodeView::CODE_RUST);
     else
