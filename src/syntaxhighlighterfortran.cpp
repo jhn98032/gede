@@ -205,14 +205,16 @@ void SyntaxHighlighterFortran::colorize(QString text)
 {
     Row *currentRow;
     TextField *field = NULL;
-    enum {STATE_IDLE,
+    enum {STATE_STARTLINE,
+        STATE_MIDLINE,
+        STATE_PRE_SPACES,
         SPACES,
         WORD,
         STRING,
         ESCAPED_CHAR,
         INC_STRING
         ,STATE_LINE_COMMENT
-    } state = STATE_IDLE;
+    } state = STATE_STARTLINE;
     char c = '\n';
     char prevC = ' ';
     char prevPrevC = ' ';
@@ -224,9 +226,9 @@ void SyntaxHighlighterFortran::colorize(QString text)
     m_rows.push_back(currentRow);
     
 
-    for(int i = 0;i < text.size();i++)
+    for(int i3 = 0;i3 < text.size();i3++)
     {
-        c = text[i].toLatin1();
+        c = text[i3].toLatin1();
 
         // Was the last character an escape?
         if(prevC == '\\' && prevPrevC != '\\')
@@ -239,7 +241,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
         
         switch(state)
         {   
-            case STATE_IDLE:
+            case STATE_STARTLINE:
             {
                 if(c == '!')
                 {
@@ -251,6 +253,37 @@ void SyntaxHighlighterFortran::colorize(QString text)
                     field->m_text = c;
                 }
                 else if(c == ' ' || c == '\t')
+                {
+                    state = STATE_PRE_SPACES;
+                    field = new TextField;
+                    field->m_type = TextField::SPACES;
+                    field->m_color = Qt::white;
+                    if(c == '\t')
+                    {
+                        int spacesToAdd = tabIndent-(currentRow->getCharCount()%tabIndent);
+                        field->m_text = QString(spacesToAdd, ' ');
+                    }
+                    else
+                        field->m_text = c;
+                    currentRow->appendField(field);
+                }
+                else if(c == '\n')
+                {
+                    currentRow = new Row;
+                    m_rows.push_back(currentRow);
+                    state = STATE_STARTLINE;
+                }
+                else
+                {
+                    i3--;
+                    state = STATE_MIDLINE;
+                    field = NULL;
+                }
+            };break;
+            case STATE_MIDLINE:
+            {
+                
+                if(c == ' ' || c == '\t')
                 {
                     state = SPACES;
                     field = new TextField;
@@ -347,7 +380,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
                 {
                     currentRow = new Row;
                     m_rows.push_back(currentRow);
-                    state = STATE_IDLE;
+                    state = STATE_STARTLINE;
                 }
                 else
                 {
@@ -373,7 +406,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
                     field->m_type = TextField::COMMENT;
                     currentRow->appendField(field);
 
-                    state = STATE_IDLE;
+                    state = STATE_STARTLINE;
                 }
                 else
                 {
@@ -381,6 +414,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
                 }
 
             };break;
+            case STATE_PRE_SPACES:
             case SPACES:
             {
                 if(c == ' ' || c == '\t')
@@ -396,9 +430,12 @@ void SyntaxHighlighterFortran::colorize(QString text)
                 }
                 else
                 {
-                    i--;
+                    i3--;
                     field = NULL;
-                    state = STATE_IDLE;
+                    if(state == STATE_PRE_SPACES)
+                        state = STATE_STARTLINE;
+                    else
+                        state = STATE_MIDLINE;
                 }  
             };break;
             case ESCAPED_CHAR:
@@ -407,16 +444,16 @@ void SyntaxHighlighterFortran::colorize(QString text)
                 if(!isEscaped && c == '\'')
                 {
                     field = NULL;
-                    state = STATE_IDLE;
+                    state = STATE_MIDLINE;
                 }
             };break;
             case INC_STRING:
             {
                 if(!isEscaped && c == '\n')
                 {
-                    i--;
+                    i3--;
                     field = NULL;
-                    state = STATE_IDLE;
+                    state = STATE_STARTLINE;
                 }
                 else
                 {
@@ -424,7 +461,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
                     if(!isEscaped && c == '>')
                     {
                         field = NULL;
-                        state = STATE_IDLE;
+                        state = STATE_MIDLINE;
                     }
                 }
             };break;
@@ -434,7 +471,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
                 if(!isEscaped && c == '"')
                 {
                     field = NULL;
-                    state = STATE_IDLE;
+                    state = STATE_MIDLINE;
                 }
                   
             };break;
@@ -442,14 +479,17 @@ void SyntaxHighlighterFortran::colorize(QString text)
             {
                 if(isSpecialChar(c) || c == ' ' || c == '\t' || c == '\n')
                 {
-                    i--;
+                    i3--;
 
                     if(isKeyword(field->m_text))
                         field->m_type = TextField::KEYWORD;
                 
                 
                     field = NULL;
-                    state = STATE_IDLE;
+                    if(c == '\n')
+                        state = STATE_STARTLINE;
+                    else
+                        state = STATE_MIDLINE;
                 }
                 else
                 {
