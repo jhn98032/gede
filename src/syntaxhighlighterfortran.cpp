@@ -205,14 +205,14 @@ void SyntaxHighlighterFortran::colorize(QString text)
 {
     Row *currentRow;
     TextField *field = NULL;
-    enum {IDLE,
-        MULTI_COMMENT,
+    enum {STATE_IDLE,
         SPACES,
-        WORD, COMMENT1,COMMENT,
+        WORD,
         STRING,
         ESCAPED_CHAR,
         INC_STRING
-    } state = IDLE;
+        ,STATE_LINE_COMMENT
+    } state = STATE_IDLE;
     char c = '\n';
     char prevC = ' ';
     char prevPrevC = ' ';
@@ -239,34 +239,16 @@ void SyntaxHighlighterFortran::colorize(QString text)
         
         switch(state)
         {   
-            case IDLE:
+            case STATE_IDLE:
             {
                 if(c == '!')
                 {
-                    state = COMMENT;
+                    state = STATE_LINE_COMMENT;
                     field = new TextField;
-                    field->m_type = TextField::C;
-                    field->m_color = Qt::white;
-                    currentRow->appendField(field);
-                    field->m_text = c;
-                }
-                else if(c == '/')
-                {
-                    state = COMMENT1;
-                    field = new TextField;
-                    field->m_type = TextField::WORD;
-                    field->m_color = Qt::white;
-                    currentRow->appendField(field);
-                    field->m_text = c;
-                }
-                else if(c == '\'')
-                {
-                    field = new TextField;
-                    field->m_text = c;
                     field->m_type = TextField::COMMENT;
-                    field->m_color = Qt::green;
+                    field->m_color = Qt::white;
                     currentRow->appendField(field);
-                    state = COMMENT;
+                    field->m_text = c;
                 }
                 else if(c == ' ' || c == '\t')
                 {
@@ -365,7 +347,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
                 {
                     currentRow = new Row;
                     m_rows.push_back(currentRow);
-                    state = IDLE;
+                    state = STATE_IDLE;
                 }
                 else
                 {
@@ -380,23 +362,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
                     field->m_text = c;
                 }
             };break;
-            case COMMENT1:
-            {
-                if(c == '\'')
-                {
-                    field->m_text += c;
-                    field->m_type = TextField::COMMENT;
-                    field->m_color = Qt::green;
-                    state = MULTI_COMMENT;
-                    
-                }
-                else
-                {
-                    i--;
-                    state = IDLE;
-                }
-            };break;
-            case MULTI_COMMENT:
+            case STATE_LINE_COMMENT:
             {
                 if(c == '\n')
                 {
@@ -406,28 +372,14 @@ void SyntaxHighlighterFortran::colorize(QString text)
                     field = new TextField;
                     field->m_type = TextField::COMMENT;
                     currentRow->appendField(field);
-                    
-                }
-                else if(text[i-1].toLatin1() == '\'' && c == '/')
-                {
-                    field->m_text += c;
-                    state = IDLE;
+
+                    state = STATE_IDLE;
                 }
                 else
                 {
                     field->m_text += c;
                 }
-            };break;
-            case COMMENT:
-            {
-                if(c == '\n')
-                {
-                    i--;
-                    state = IDLE;
-                }
-                else
-                    field->m_text += c;
-                    
+
             };break;
             case SPACES:
             {
@@ -446,7 +398,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
                 {
                     i--;
                     field = NULL;
-                    state = IDLE;
+                    state = STATE_IDLE;
                 }  
             };break;
             case ESCAPED_CHAR:
@@ -455,7 +407,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
                 if(!isEscaped && c == '\'')
                 {
                     field = NULL;
-                    state = IDLE;
+                    state = STATE_IDLE;
                 }
             };break;
             case INC_STRING:
@@ -464,7 +416,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
                 {
                     i--;
                     field = NULL;
-                    state = IDLE;
+                    state = STATE_IDLE;
                 }
                 else
                 {
@@ -472,7 +424,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
                     if(!isEscaped && c == '>')
                     {
                         field = NULL;
-                        state = IDLE;
+                        state = STATE_IDLE;
                     }
                 }
             };break;
@@ -482,7 +434,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
                 if(!isEscaped && c == '"')
                 {
                     field = NULL;
-                    state = IDLE;
+                    state = STATE_IDLE;
                 }
                   
             };break;
@@ -492,20 +444,12 @@ void SyntaxHighlighterFortran::colorize(QString text)
                 {
                     i--;
 
-                    if(field->m_text.compare("rem",Qt::CaseInsensitive) == 0)
-                    {
-                        field->m_type = TextField::COMMENT;
-                        state = COMMENT;
-                    }
-                    else
-                    {
-                        if(isKeyword(field->m_text))
-                            field->m_type = TextField::KEYWORD;
-                    
-                    
-                        field = NULL;
-                        state = IDLE;
-                    }
+                    if(isKeyword(field->m_text))
+                        field->m_type = TextField::KEYWORD;
+                
+                
+                    field = NULL;
+                    state = STATE_IDLE;
                 }
                 else
                 {

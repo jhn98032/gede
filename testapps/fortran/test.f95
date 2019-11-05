@@ -7,10 +7,10 @@ end Subroutine sfunc1
 Program hello
     integer :: y
     real :: x
-    x = 1
-    x = 2
+    x = 1.1
+    x = 2.3
     y = 2
-    x = 3
+    x = 3.4
     y = 3
     print *, "Hello World!"
     call sfunc1()
