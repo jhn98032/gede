@@ -11,6 +11,9 @@ TEMPLATE = app
 
 SOURCES+=gd.cpp
 
+SOURCES+=parsecharqueue.cpp
+HEADERS+=parsecharqueue.h
+
 SOURCES+=mainwindow.cpp
 HEADERS+=mainwindow.h
 
