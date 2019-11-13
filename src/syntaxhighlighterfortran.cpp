@@ -83,6 +83,11 @@ SyntaxHighlighterFortran::~SyntaxHighlighterFortran()
 }
 
 
+bool SyntaxHighlighterFortran::isSpecialChar(QChar c) const
+{
+    return isSpecialChar(c.toLatin1());
+}
+
 /**
  * @brief Checks if a character is a special character.
  * @return Returns true if the character is a special character (Eg: '\t').
@@ -203,6 +208,12 @@ void SyntaxHighlighterFortran::setConfig(Settings *cfg)
  */
 void SyntaxHighlighterFortran::colorize(QString text)
 {
+    ParseCharQueue pq(text);
+    colorize(pq);
+}
+
+void SyntaxHighlighterFortran::colorize(ParseCharQueue pq)
+{
     Row *currentRow;
     TextField *field = NULL;
     enum {STATE_STARTLINE,
@@ -215,10 +226,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
         INC_STRING
         ,STATE_LINE_COMMENT
     } state = STATE_STARTLINE;
-    char c = '\n';
-    char prevC = ' ';
-    char prevPrevC = ' ';
-    bool isEscaped = false;
+    QChar c = '\n';
     const int tabIndent = m_cfg->getTabIndentCount();
     reset();
 
@@ -226,19 +234,12 @@ void SyntaxHighlighterFortran::colorize(QString text)
     m_rows.push_back(currentRow);
     
 
-    for(int i3 = 0;i3 < text.size();i3++)
+    while(!pq.isEmpty())
     {
-        c = text[i3].toLatin1();
-
         // Was the last character an escape?
-        if(prevC == '\\' && prevPrevC != '\\')
-            isEscaped = true;
-        else
-            isEscaped = false;
-        prevPrevC = prevC;
-        prevC = c;
-        
-        
+        bool isEscaped = false;
+        c = pq.popNext(&isEscaped);
+
         switch(state)
         {   
             case STATE_STARTLINE:
@@ -275,7 +276,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
                 }
                 else
                 {
-                    i3--;
+                    pq.revertPop();
                     state = STATE_MIDLINE;
                     field = NULL;
                 }
@@ -430,7 +431,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
                 }
                 else
                 {
-                    i3--;
+                    pq.revertPop();
                     field = NULL;
                     if(state == STATE_PRE_SPACES)
                         state = STATE_STARTLINE;
@@ -440,6 +441,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
             };break;
             case ESCAPED_CHAR:
             {
+                
                 field->m_text += c;
                 if(!isEscaped && c == '\'')
                 {
@@ -451,7 +453,7 @@ void SyntaxHighlighterFortran::colorize(QString text)
             {
                 if(!isEscaped && c == '\n')
                 {
-                    i3--;
+                    pq.revertPop();
                     field = NULL;
                     state = STATE_STARTLINE;
                 }
@@ -479,8 +481,8 @@ void SyntaxHighlighterFortran::colorize(QString text)
             {
                 if(isSpecialChar(c) || c == ' ' || c == '\t' || c == '\n')
                 {
-                    i3--;
-
+                    pq.revertPop();
+                    
                     if(isKeyword(field->m_text))
                         field->m_type = TextField::KEYWORD;
                 

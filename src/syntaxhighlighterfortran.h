@@ -17,7 +17,7 @@
 
 #include "settings.h"
 #include "syntaxhighlighter.h"
-
+#include "parsecharqueue.h"
 
 
 class SyntaxHighlighterFortran : public SyntaxHighlighter
@@ -27,6 +27,7 @@ public:
     virtual ~SyntaxHighlighterFortran();
     
     void colorize(QString text);
+    void colorize(ParseCharQueue text);
 
     QVector<TextField*> getRow(unsigned int rowIdx);
     unsigned int getRowCount() { return m_rows.size(); };
@@ -36,6 +37,7 @@ public:
     bool isSpecialChar(char c) const;
     bool isSpecialChar(TextField *field) const;
     void setConfig(Settings *cfg);
+    bool isSpecialChar(QChar c) const;
 
 private:
     class Row
