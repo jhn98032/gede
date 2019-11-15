@@ -14,6 +14,11 @@ SOURCES+=../../src/syntaxhighlighterrust.cpp
 HEADERS+=../../src/syntaxhighlighter.h ../../src/syntaxhighlighterbasic.h ../../src/syntaxhighlightercxx.h
 HEADERS+=../../src/syntaxhighlighterrust.h
 
+SOURCES+=../../src/syntaxhighlighterfortran.cpp
+HEADERS+=../../src/syntaxhighlighterfortran.h
+
+SOURCES+=../../src/parsecharqueue.cpp
+HEADERS+=../../src/parsecharqueue.h
 
 
 SOURCES+=../../src/settings.cpp ../../src/ini.cpp

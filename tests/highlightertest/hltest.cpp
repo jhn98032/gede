@@ -2,6 +2,7 @@
 #include "syntaxhighlighterrust.h"
 #include "syntaxhighlightercxx.h"
 #include "syntaxhighlighterbasic.h"
+#include "syntaxhighlighterfortran.h"
 #include "log.h"
 #include "util.h"
 
@@ -63,6 +64,8 @@ int main(int argc, char *argv[])
         scanner = new SyntaxHighlighterRust();
     else if(inputFilename.endsWith(".bas"))
         scanner = new SyntaxHighlighterBasic();
+    else if(inputFilename.endsWith(".f95"))
+        scanner = new SyntaxHighlighterFortran();
     else
         scanner = new SyntaxHighlighterCxx();
 
