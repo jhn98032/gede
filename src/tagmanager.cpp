@@ -77,7 +77,7 @@ void ScannerWorker::run()
 void ScannerWorker::waitAll()
 {
     m_mutex.lock();
-    while(!m_workQueue.isEmpty())
+    while(!m_workQueue.isEmpty() || m_isIdle == false)
     {
         m_doneCond.wait(&m_mutex);
     }
@@ -167,13 +167,16 @@ void TagManager::onScanDone(QString filePath, QList<Tag> *tags)
     if(m_worker.isIdle())
         emit onAllScansDone();
 
-
     delete tags;
 }
 
+/**
+ * @brief Tags a scan to be made later (in a seperate thread).
+ */
 int TagManager::queueScan(QStringList filePathList)
 {
     bool queuedAny = false;
+
     assert(m_dbgMainThread == QThread::currentThreadId ());
     for(int i = 0;i < filePathList.size();i++)
     {
