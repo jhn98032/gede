@@ -13,6 +13,7 @@
 #include <QApplication>
 #include <QMap>
 #include <QLabel>
+#include <QRegExp>
 
 #include "consolewidget.h"
 #include "ui_mainwindow.h"
@@ -191,8 +192,8 @@ private:
     int m_currentLine; //!< The linenumber (first=1) which the program counter points to.
     QList<StackFrameEntry> m_stackFrameList;
     QMenu m_popupMenu;
-    QStringList m_funcFilterText; //!< Filter for the function list.
-    QStringList m_classFilterText; //!< Filter for the class list.
+    QVector<QRegExp> m_funcFilterText; //!< Filter for the function list.
+    QVector<QRegExp> m_classFilterText; //!< Filter for the class list.
 
     
     Settings m_cfg;

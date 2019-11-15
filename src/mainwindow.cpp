@@ -2083,7 +2083,11 @@ void MainWindow::onFuncFilter_textChanged(const QString &text)
     {
         QString item = list[i].trimmed();
         if(!item.isEmpty())
-            m_funcFilterText.append(item);
+        {
+            QRegExp rx(item);
+            rx.setPatternSyntax(QRegExp::Wildcard);
+            m_funcFilterText.append(rx);
+        }
     }
     
     fillInFuncList();
@@ -2125,7 +2129,11 @@ void MainWindow::onClassFilter_textChanged(const QString &text)
     {
         QString item = list[i].trimmed();
         if(!item.isEmpty())
-            m_classFilterText.append(item);
+        {
+            QRegExp rx(item);
+            rx.setPatternSyntax(QRegExp::Wildcard);
+            m_classFilterText.append(rx);
+        }
     }
     
     fillInClassList();
@@ -2193,9 +2201,10 @@ void MainWindow::fillInClassList()
         bool isMatch = true;
         
         // Does the filter match the name?
-        for(int j = 0;j < m_classFilterText.size();j++)
+        for(int j = 0;j < m_classFilterText.size() && isMatch == true;j++)
         {
-            if(className.indexOf(m_classFilterText[j]) == -1)
+            QRegExp &rx = m_classFilterText[j];
+            if(rx.indexIn(className) == -1)
                 isMatch = false;
         }
 
@@ -2257,9 +2266,10 @@ void MainWindow::fillInFuncList()
 
             // Does the filter match the name?
             QString name = tag.getLongName();
-            for(int j = 0;j < m_funcFilterText.size();j++)
+            for(int j = 0;j < m_funcFilterText.size() && isMatch == true;j++)
             {
-                if(name.indexOf(m_funcFilterText[j]) == -1)
+                QRegExp &rx = m_funcFilterText[j];
+                if(rx.indexIn(name) == -1)
                     isMatch = false;
             }
 
