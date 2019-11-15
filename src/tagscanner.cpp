@@ -182,6 +182,9 @@ void TagScanner::init(Settings *cfg)
 }
 
 
+/**
+ * @brief Scans a sourcefile for tags.
+ */
 int TagScanner::scan(QString filepath, QList<Tag> *taglist)
 {
     
