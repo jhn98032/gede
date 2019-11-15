@@ -601,6 +601,7 @@ QStringList Settings::getDefaultBasicKeywordList()
     QStringList keywordList;
 
     keywordList += "print";
+    keywordList += "input";
     keywordList += "sleep";
     keywordList += "return";
 
@@ -608,6 +609,8 @@ QStringList Settings::getDefaultBasicKeywordList()
     keywordList += "loop";
     keywordList += "until";
     keywordList += "declare";
+    keywordList += "select";
+    keywordList += "case";
 
     keywordList += "cls";
     keywordList += "function";
