@@ -126,6 +126,8 @@ def detectQt():
         qmakeName = g_qmakeQt4;
     elif g_qmakeQt5:
         qmakeName = g_qmakeQt5;
+    elif g_qmakeQt4:
+        qmakeName = g_qmakeQt4;
     print("Using '" + qmakeName + "'")
 
     return qmakeName;
