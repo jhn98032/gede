@@ -814,9 +814,7 @@ void Core::stop()
         Tree resultData;
 
         // Send 'kill' to interrupt gdbserver
-        debugMsg("sending INTR to %d", m_pid);
         int gdbPid = com.getPid();
-            
         if(gdbPid != 0)
         {
             debugMsg("Sending SIGINT to %d", gdbPid);
@@ -834,9 +832,11 @@ void Core::stop()
     }
     else
     {
-        debugMsg("sending INTR to %d\n", m_pid);
         if(m_pid != 0)
+        {
+            debugMsg("sending SIGINT to %d\n", m_pid);
             kill(m_pid, SIGINT);
+        }
         else
             errorMsg("Failed to stop since PID not known");
     }
