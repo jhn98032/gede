@@ -102,7 +102,11 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="lineEdit_classFilter"/>
+              <widget class="QLineEdit" name="lineEdit_classFilter">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set class view filter. Seperate multiple patterns with a ';'.&lt;br/&gt;Some examples:&lt;/p&gt;&lt;p&gt;test;something =&amp;gt; will show classes &amp;quot;testsomething&amp;quot; and &amp;quot;test_something&amp;quot;.&lt;br/&gt;test =&amp;gt; will show classes &amp;quot;test&amp;quot; and &amp;quot;test99&amp;quot;.&lt;br/&gt;test() =&amp;gt; will only show class &amp;quot;test&amp;quot;.&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+              </widget>
              </item>
              <item>
               <widget class="QPushButton" name="pushButton_clearClassFilter">
@@ -185,6 +189,9 @@
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set view filter strings. Seperate multiple filters with a ';'.&lt;br/&gt;Some examples:&lt;/p&gt;&lt;p&gt;func;something =&amp;gt; will show funcsomething() and func_something()&lt;br/&gt;test =&amp;gt; will show test() and test99()&lt;br/&gt;test() =&amp;gt; will only show test().&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
               </widget>
              </item>
@@ -541,7 +548,7 @@
      <x>0</x>
      <y>0</y>
      <width>881</width>
-     <height>18</height>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
