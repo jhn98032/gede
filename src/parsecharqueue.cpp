@@ -2,10 +2,11 @@
 
 
 ParseCharQueue::ParseCharQueue(QString str)
-  : m_list(str),
-  m_idx(0)
+  : m_list(str)
+    ,m_idx(0)
+    ,m_isEscMode(false)
 {
-
+    
 }
 
 
@@ -15,39 +16,26 @@ ParseCharQueue::~ParseCharQueue()
 }
 
 
-QChar ParseCharQueue::getPrev()
-{
-    QChar c = ' ';
-    int prevIdx = m_idx-1;
-    if(0 <= prevIdx)
-        c = m_list[prevIdx];
-    return c;
-}
-
-QChar ParseCharQueue::getPrevPrev()
-{
-    QChar c = ' ';
-    int prevIdx = m_idx-2;
-    if(0 <= prevIdx)
-        c = m_list[prevIdx];
-    return c;
-}
-
 
 QChar ParseCharQueue::popNext(bool *isEscaped)
 {
     QChar c = ' ';
     if(isEscaped)
-    {
-        if(getPrev() == '\\' && getPrevPrev() != '\\')
-            *isEscaped = true;
-        else
-            *isEscaped = false;
-    }
+        *isEscaped = false;
 
     if(m_idx < m_list.size())
     {
         c = m_list[m_idx++];
+        if(m_isEscMode)
+        {
+            m_isEscMode = false;
+            if(isEscaped)
+                *isEscaped = true;
+        }
+        else if(c == '\\')
+        {
+            m_isEscMode = true;
+        }
     }
     return c;
 }
@@ -63,6 +51,19 @@ void ParseCharQueue::revertPop()
 {
     if(m_idx > 0)
         m_idx--;
+
+    if(m_isEscMode)
+        m_isEscMode = false;
+    else
+    {
+        if(m_idx > 1)
+        {
+            QChar prev = m_list[m_idx-1];
+            if(prev == '\\')
+                m_isEscMode = true;
+        }
+    }
 }
+
 
 

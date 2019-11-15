@@ -10,8 +10,6 @@ public:
     ParseCharQueue(QString str);
     virtual ~ParseCharQueue();
 
-    QChar getPrev();
-    QChar getPrevPrev();
     QChar popNext(bool *isEscaped = NULL);
     void revertPop();
     bool isEmpty();
@@ -19,6 +17,7 @@ public:
 private:
     QString m_list;
     int m_idx;
+    bool m_isEscMode;
 };
 
 

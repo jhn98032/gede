@@ -1,5 +1,11 @@
  ! comment
 
+#include "inc.f95"
+
+#ifdef NEVER
+    integer :: n
+#endif
+
 Subroutine sfunc1()
     print *, "Hello \\ World again!\\"
 end Subroutine sfunc1

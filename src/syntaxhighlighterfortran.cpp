@@ -74,6 +74,12 @@ SyntaxHighlighterFortran::SyntaxHighlighterFortran()
         m_keywords[keywordList[u]] = true;
     }
 
+    QStringList cppKeywordList = Settings::getDefaultCppKeywordList();
+    for(int u = 0;u < cppKeywordList.size();u++)
+    {
+        m_cppKeywords[cppKeywordList[u]] = true;
+    }
+
 
 }
 
@@ -124,6 +130,21 @@ bool SyntaxHighlighterFortran::isSpecialChar(TextField *field) const
     return false;
 }
 
+
+bool SyntaxHighlighterFortran::isCppKeyword(QString text) const
+{
+    if(text.isEmpty())
+        return false;
+
+    if(m_cppKeywords.contains(text))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 
 
 /**
@@ -219,11 +240,11 @@ void SyntaxHighlighterFortran::colorize(ParseCharQueue pq)
     enum {STATE_STARTLINE,
         STATE_MIDLINE,
         STATE_PRE_SPACES,
-        SPACES,
-        WORD,
-        STRING,
-        ESCAPED_CHAR,
-        INC_STRING
+        STATE_MID_SPACES,
+        STATE_WORD,
+        STATE_STRING,
+        STATE_ESCAPED_CHAR,
+        STATE_INC_STRING
         ,STATE_LINE_COMMENT
     } state = STATE_STARTLINE;
     QChar c = '\n';
@@ -286,7 +307,7 @@ void SyntaxHighlighterFortran::colorize(ParseCharQueue pq)
                 
                 if(c == ' ' || c == '\t')
                 {
-                    state = SPACES;
+                    state = STATE_MID_SPACES;
                     field = new TextField;
                     field->m_type = TextField::SPACES;
                     field->m_color = Qt::white;
@@ -301,7 +322,7 @@ void SyntaxHighlighterFortran::colorize(ParseCharQueue pq)
                 }
                 else if(c == '\'')
                 {
-                    state = ESCAPED_CHAR;
+                    state = STATE_ESCAPED_CHAR;
                     field = new TextField;
                     field->m_type = TextField::STRING;
                     currentRow->appendField(field);
@@ -309,7 +330,7 @@ void SyntaxHighlighterFortran::colorize(ParseCharQueue pq)
                 }
                 else if(c == '"')
                 {
-                    state = STRING;
+                    state = STATE_STRING;
                     field = new TextField;
                     if(currentRow->isCppRow)
                         field->m_type = TextField::INC_STRING;
@@ -334,7 +355,7 @@ void SyntaxHighlighterFortran::colorize(ParseCharQueue pq)
                     field->m_text = c;
                     if(isIncString)
                     {
-                        state = INC_STRING;
+                        state = STATE_INC_STRING;
                         field->m_type = TextField::INC_STRING;
                     }
                     else
@@ -385,7 +406,7 @@ void SyntaxHighlighterFortran::colorize(ParseCharQueue pq)
                 }
                 else
                 {
-                    state = WORD;
+                    state = STATE_WORD;
                     field = new TextField;
                     if(QChar(c).isDigit())
                         field->m_type = TextField::NUMBER;
@@ -416,7 +437,7 @@ void SyntaxHighlighterFortran::colorize(ParseCharQueue pq)
 
             };break;
             case STATE_PRE_SPACES:
-            case SPACES:
+            case STATE_MID_SPACES:
             {
                 if(c == ' ' || c == '\t')
                 {
@@ -439,7 +460,7 @@ void SyntaxHighlighterFortran::colorize(ParseCharQueue pq)
                         state = STATE_MIDLINE;
                 }  
             };break;
-            case ESCAPED_CHAR:
+            case STATE_ESCAPED_CHAR:
             {
                 
                 field->m_text += c;
@@ -449,7 +470,7 @@ void SyntaxHighlighterFortran::colorize(ParseCharQueue pq)
                     state = STATE_MIDLINE;
                 }
             };break;
-            case INC_STRING:
+            case STATE_INC_STRING:
             {
                 if(!isEscaped && c == '\n')
                 {
@@ -467,7 +488,7 @@ void SyntaxHighlighterFortran::colorize(ParseCharQueue pq)
                     }
                 }
             };break;
-            case STRING:
+            case STATE_STRING:
             {
                 field->m_text += c;
                 if(!isEscaped && c == '"')
@@ -477,15 +498,23 @@ void SyntaxHighlighterFortran::colorize(ParseCharQueue pq)
                 }
                   
             };break;
-            case WORD:
+            case STATE_WORD:
             {
                 if(isSpecialChar(c) || c == ' ' || c == '\t' || c == '\n')
                 {
                     pq.revertPop();
                     
-                    if(isKeyword(field->m_text))
-                        field->m_type = TextField::KEYWORD;
-                
+                        if(currentRow->isCppRow)
+                    {
+                        if(isCppKeyword(field->m_text))
+                            field->m_type = TextField::CPP_KEYWORD;
+                    }
+                    else
+                    {
+                        if(isKeyword(field->m_text))
+                            field->m_type = TextField::KEYWORD;
+                    }
+    
                 
                     field = NULL;
                     if(c == '\n')
