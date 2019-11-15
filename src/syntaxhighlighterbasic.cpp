@@ -485,7 +485,7 @@ void SyntaxHighlighterBasic::colorize(QString text)
             };break;
             case WORD:
             {
-                if(isSpecialChar(c) || c == ' ' || c == '\t' || c == '\n')
+                if(isSpecialChar(c) || c == ' ' || c == '\t' || c == '\n' || c == '"')
                 {
                     i--;
 
