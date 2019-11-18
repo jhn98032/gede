@@ -1,5 +1,7 @@
 Declare Function func(ByVal arg1 As Double) As Double
 
+#define TEXT_DEFINE "Hello"
+
 /' Multiline comment. Row1
    Row2.
 '/
@@ -20,6 +22,7 @@ end sub
 example_sub()
 
 PRINT "Looping"
+PRINT TEXT_DEFINE
 
 A=0
 DO

@@ -55,6 +55,7 @@ int SyntaxHighlighterBasic::Row::getCharCount()
     return len;
 }
 
+
 /**
  * @brief Appends a field to the row.
  */
@@ -113,6 +114,7 @@ bool SyntaxHighlighterBasic::isSpecialChar(char c) const
         return false;
 }
 
+
 /**
  * @brief Checks if a field is a special character (eg: '>').
  */
@@ -125,6 +127,21 @@ bool SyntaxHighlighterBasic::isSpecialChar(TextField *field) const
     return false;
 }
 
+
+bool SyntaxHighlighterBasic::isCppKeyword(QString text) const
+{
+    if(text.isEmpty())
+        return false;
+
+    if(m_cppKeywords.contains(text))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 
 
 /**
@@ -196,7 +213,7 @@ void SyntaxHighlighterBasic::reset()
 }
 
 /**
- * @brief Deallocates all the rows.
+ * @brief Sets the configuration to use.
  */
 void SyntaxHighlighterBasic::setConfig(Settings *cfg)
 {
@@ -496,7 +513,9 @@ void SyntaxHighlighterBasic::colorize(QString text)
                     }
                     else
                     {
-                        if(isKeyword(field->m_text))
+                        if(currentRow->isCppRow && isCppKeyword(field->m_text))
+                            field->m_type = TextField::CPP_KEYWORD;
+                        else if(isKeyword(field->m_text))
                             field->m_type = TextField::KEYWORD;
                     
                     

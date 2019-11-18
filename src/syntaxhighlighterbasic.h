@@ -32,6 +32,7 @@ public:
     unsigned int getRowCount() { return m_rows.size(); };
     void reset();
 
+    bool isCppKeyword(QString text) const;
     bool isKeyword(QString text) const;
     bool isSpecialChar(char c) const;
     bool isSpecialChar(TextField *field) const;
