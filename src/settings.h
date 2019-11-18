@@ -47,6 +47,7 @@ class Settings
         static QStringList getDefaultBasicKeywordList();
         static QStringList getDefaultRustKeywordList();
         static QStringList getDefaultFortranKeywordList();
+        static QStringList getDefaultGoKeywordList();
 
         QString getProgramPath();
 

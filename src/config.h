@@ -38,6 +38,9 @@
 // Which fileextension does rust use?
 #define RUST_FILE_EXTENSION  ".rs"
 
+// Which fileextension does go use?
+#define GOLANG_FILE_EXTENSION  ".go"
+
 #endif // FILE__CONFIG_H
 
 

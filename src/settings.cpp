@@ -534,6 +534,41 @@ QStringList Settings::getDefaultCxxKeywordList()
    return keywordList;
 }
 
+QStringList Settings::getDefaultGoKeywordList()
+{
+    QStringList keywordList;
+
+    keywordList += "break";
+    keywordList += "case";
+    keywordList += "chan";
+    keywordList += "const";
+    keywordList += "continue";
+    keywordList += "default";
+    keywordList += "defer";
+    keywordList += "else";
+    keywordList += "fallthrough";
+    keywordList += "for";
+    keywordList += "func";
+    keywordList += "go";
+    keywordList += "goto";
+    keywordList += "if";
+    keywordList += "import";
+    keywordList += "interface";
+    keywordList += "map";
+    keywordList += "package";
+    keywordList += "range";
+    keywordList += "return";
+    keywordList += "select";
+    keywordList += "struct";
+    keywordList += "switch";
+    keywordList += "type";
+    keywordList += "var";
+
+
+    
+    return keywordList;
+}
+
 
 QStringList Settings::getDefaultRustKeywordList()
 {
