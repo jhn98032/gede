@@ -30,7 +30,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit_address"/>
+      <widget class="QLineEdit" name="lineEdit_address">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Address in hex. Example 0x23.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="pushButton_update">
