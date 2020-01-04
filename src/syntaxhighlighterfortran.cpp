@@ -482,7 +482,7 @@ void SyntaxHighlighterFortran::colorize(ParseCharQueue pq)
             };break;
             case STATE_WORD:
             {
-                if(isSpecialChar(c) || c == ' ' || c == '\t' || c == '\n')
+                if(isSpecialChar(c) || c == ' ' || c == '\t' || c == '\n' || c == '"')
                 {
                     pq.revertPop();
                     
