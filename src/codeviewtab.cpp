@@ -79,10 +79,30 @@ int CodeViewTab::open(QString filename, QList<Tag> tagList)
         errorMsg("Failed to open '%s'", stringToCStr(filename));
         return -1;
     }
+    const int tabIndent = m_cfg->getTabIndentCount();
     while (!file.atEnd())
     {
-         QByteArray line = file.readLine();
-         text += line;
+        QByteArray line = file.readLine();
+
+        // Replace tabs with spaces
+        QByteArray expandedLine;
+        for(int i = 0;i < line.size();i++)
+        {
+            char c = line[i];
+            if(c == '\t')
+            {
+                if(tabIndent > 0)
+                {
+                    int spacesToAdd = tabIndent-(expandedLine.size()%tabIndent);
+                    const QByteArray spaces(spacesToAdd, ' ');
+                    expandedLine.append(spaces);
+                }
+            }
+            else
+                expandedLine += c;
+        } 
+
+        text += expandedLine;
     }
 
     if(extension.toLower() == ".bas")

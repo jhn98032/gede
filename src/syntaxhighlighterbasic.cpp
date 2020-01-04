@@ -240,7 +240,6 @@ void SyntaxHighlighterBasic::colorize(QString text)
     char prevC = ' ';
     char prevPrevC = ' ';
     bool isEscaped = false;
-    const int tabIndent = m_cfg->getTabIndentCount();
     reset();
 
     currentRow = new Row;
@@ -288,13 +287,7 @@ void SyntaxHighlighterBasic::colorize(QString text)
                     field = new TextField;
                     field->m_type = TextField::SPACES;
                     field->m_color = Qt::white;
-                    if(c == '\t')
-                    {
-                        int spacesToAdd = tabIndent-(currentRow->getCharCount()%tabIndent);
-                        field->m_text = QString(spacesToAdd, ' ');
-                    }
-                    else
-                        field->m_text = c;
+                    field->m_text = c;
                     currentRow->appendField(field);
                 }
                 else if(c == '\'')
@@ -447,14 +440,7 @@ void SyntaxHighlighterBasic::colorize(QString text)
             {
                 if(c == ' ' || c == '\t')
                 {
-                    if(c == '\t')
-                    {
-                        int spacesToAdd = tabIndent-(currentRow->getCharCount()%tabIndent);
-                        field->m_text += QString(spacesToAdd, ' ');
-                    }
-                    else
-                        field->m_text += c;
-                                                              
+                    field->m_text += c;
                 }
                 else
                 {
