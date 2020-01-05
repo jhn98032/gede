@@ -513,7 +513,7 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
     
     if(com.init(gdbPath, cfg->m_enableDebugLog))
     {
-        errorMsg("Failed to start gdb");
+        errorMsg("Failed to start gdb ('%s')", stringToCStr(gdbPath));
         return -1;
     }
 
