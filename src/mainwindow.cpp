@@ -1937,18 +1937,26 @@ void MainWindow::onBreakpointsRemoveSelected()
     Core &core = Core::getInstance();
     QList<BreakPoint*>  bklist = core.getBreakPoints();
     QList <int>idList;
+    QList<BreakPoint*>  toRemove;
     for(int u = 0;u < selectedItems.size();u++)
     {
         // Get the breakpoint
         QTreeWidgetItem *item = selectedItems[u];
+        assert(item != NULL);
         int idx = item->data(0, Qt::UserRole).toInt();
         if(0 <= idx && idx < bklist.size())
         {
             BreakPoint* bkpt = bklist[idx];
-
-            // Request that it is removed
-            core.gdbRemoveBreakpoint(bkpt);
+            toRemove.append(bkpt);
         }
+    }
+
+
+    for(int u = 0;u < toRemove.size();u++)
+    {
+        BreakPoint* bkpt = toRemove[u];
+        // Request that it is removed
+        core.gdbRemoveBreakpoint(bkpt);
     }
 
 }
