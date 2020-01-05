@@ -19,7 +19,7 @@
 
 SyntaxHighlighterRust::Row::Row()
 {
-};
+}
 
 
 /**

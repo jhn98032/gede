@@ -25,7 +25,7 @@ TreeNode::TreeNode(QString name)
     ,m_name(name)
 {
     
-};
+}
 
 int TreeNode::getDataInt(int defaultValue) const
 {

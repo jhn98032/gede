@@ -19,7 +19,7 @@
 
 SyntaxHighlighterGo::Row::Row()
 {
-};
+}
 
 
 /**

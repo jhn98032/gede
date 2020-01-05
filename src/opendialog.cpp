@@ -323,12 +323,12 @@ void OpenDialog::saveConfig(Settings *cfg)
 bool OpenDialog::getDownload()
 {
     return m_ui.checkBox_download->checkState() == Qt::Checked ? true : false;
-};
+}
 
 void OpenDialog::setDownload(bool enable)
 {
     m_ui.checkBox_download->setChecked(enable);
-};
+}
 
 void OpenDialog::loadConfig(Settings &cfg)
 {

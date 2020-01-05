@@ -19,7 +19,7 @@
 SyntaxHighlighterFortran::Row::Row()
     : isCppRow(0)
 {
-};
+}
 
 
 /**

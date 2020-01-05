@@ -65,7 +65,7 @@ class ComListener : public QObject
 {
     
 private:
-    Q_OBJECT;
+    Q_OBJECT
     
     public:
 
@@ -164,7 +164,7 @@ class Com : public QObject
 {
     private:
 
-        Q_OBJECT;
+        Q_OBJECT
 
         Com();
         ~Com();

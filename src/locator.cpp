@@ -29,7 +29,7 @@ void Location::dump()
 {
     qDebug() << "Filename:" << m_filename;
     qDebug() << "Lineno:  " << m_lineNo;
-};
+}
 
 Locator::Locator(TagManager *mgr, QList<FileInfo> *sourceFiles)
     : m_mgr(mgr)

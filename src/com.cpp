@@ -52,7 +52,7 @@ const char *Token::toString()
     strcpy(m_tmpBuff, (const char*)stringToCStr(m_text));
         
     return m_tmpBuff;
-};
+}
 
 
 const char *Token::typeToString(Type type)

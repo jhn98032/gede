@@ -20,7 +20,7 @@
 SyntaxHighlighterCxx::Row::Row()
     : isCppRow(0)
 {
-};
+}
 
 
 /**

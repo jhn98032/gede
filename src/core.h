@@ -203,7 +203,7 @@ class ICore
 class Core : public ComListener
 {
 private:
-    Q_OBJECT;
+    Q_OBJECT
     
 private:
 
