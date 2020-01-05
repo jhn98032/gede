@@ -12,6 +12,7 @@
 #include <QTime>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QMessageBox>
 
 
 static QMutex g_mutex;
@@ -66,6 +67,8 @@ void errorMsg(const char *fmt, ...)
     printf(RED_CODE "%2d.%03d| ERROR | %s" NO_CODE "\n",
         curTime.second()%100, curTime.msec(),
         buffer);
+
+    QMessageBox::critical(NULL, QString("Gede - Error"), QString(buffer));
 }
 
 
@@ -86,6 +89,9 @@ void warnMsg(const char *fmt, ...)
     printf(YELLOW_CODE "%2d.%03d| WARN  | %s" NO_CODE "\n",
         curTime.second()%100, curTime.msec(),
         buffer);
+
+
+    QMessageBox::warning(NULL, QString("Gede - Warning"), QString(buffer));
 }
 
 
