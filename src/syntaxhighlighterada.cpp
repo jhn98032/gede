@@ -72,7 +72,8 @@ SyntaxHighlighterAda::SyntaxHighlighterAda()
     QStringList keywordList = Settings::getDefaultAdaKeywordList();
     for(int u = 0;u < keywordList.size();u++)
     {
-        m_keywords[keywordList[u]] = true;
+        QString kw = keywordList[u].toLower();
+        m_keywords[kw] = true;
     }
 
 
@@ -129,6 +130,7 @@ bool SyntaxHighlighterAda::isSpecialChar(TextField *field) const
  */
 bool SyntaxHighlighterAda::isKeyword(QString text) const
 {
+    text = text.toLower();
     if(text.isEmpty())
         return false;
     if(m_keywords.contains(text))

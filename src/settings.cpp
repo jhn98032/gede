@@ -584,19 +584,27 @@ QStringList Settings::getDefaultAdaKeywordList()
     keywordList += "begin";
     keywordList += "end";
     keywordList += "then";
+    keywordList += "return";
 
     keywordList += "with";
     keywordList += "use";
     keywordList += "in";
     keywordList += "is";
+    keywordList += "of";
 
     keywordList += "procedure";
+    keywordList += "function";
 
     keywordList += "pragma";
+    keywordList += "renames";
+    keywordList += "import";
 
 
-    keywordList += "Integer";
-    keywordList += "Array";
+    keywordList += "integer";
+    keywordList += "array";
+    keywordList += "string";
+    keywordList += "character";
+    keywordList += "natural";
 
     return keywordList;
 }
