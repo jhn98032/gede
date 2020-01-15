@@ -574,6 +574,34 @@ QStringList Settings::getDefaultGoKeywordList()
 }
 
 
+QStringList Settings::getDefaultAdaKeywordList()
+{
+    QStringList keywordList;
+
+    keywordList += "if";
+    keywordList += "loop";
+    keywordList += "for";
+    keywordList += "begin";
+    keywordList += "end";
+    keywordList += "then";
+
+    keywordList += "with";
+    keywordList += "use";
+    keywordList += "in";
+    keywordList += "is";
+
+    keywordList += "procedure";
+
+    keywordList += "pragma";
+
+
+    keywordList += "Integer";
+    keywordList += "Array";
+
+    return keywordList;
+}
+
+
 QStringList Settings::getDefaultRustKeywordList()
 {
     QStringList keywordList;

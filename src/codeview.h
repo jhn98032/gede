@@ -16,6 +16,9 @@
 #include "syntaxhighlighterfortran.h"
 #include "syntaxhighlightergolang.h"
 #include "syntaxhighlighterrust.h"
+#include "syntaxhighlighterada.h"
+
+
 #include "settings.h"
 #include <QTimer>
 #include "variableinfowindow.h"
@@ -43,7 +46,7 @@ public:
     CodeView();
     virtual ~CodeView();
 
-    typedef enum {CODE_CXX, CODE_FORTRAN, CODE_BASIC,CODE_RUST, CODE_GOLANG} CodeType;
+    typedef enum {CODE_CXX, CODE_FORTRAN, CODE_BASIC,CODE_RUST, CODE_GOLANG, CODE_ADA} CodeType;
     
     void setPlainText(QString content, CodeType type);
 

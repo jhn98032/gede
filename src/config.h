@@ -41,6 +41,11 @@
 // Which fileextension does go use?
 #define GOLANG_FILE_EXTENSION  ".go"
 
+// Which fileextension does ada use?
+#define ADA_FILE_EXTENSION  ".adb"
+
+
+
 #endif // FILE__CONFIG_H
 
 

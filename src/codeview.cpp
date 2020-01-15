@@ -170,6 +170,8 @@ void CodeView::setPlainText(QString text, CodeType type)
         m_highlighter = new SyntaxHighlighterFortran();
     else if(type == CODE_RUST)
         m_highlighter = new SyntaxHighlighterRust();
+    else if(type == CODE_ADA)
+        m_highlighter = new SyntaxHighlighterAda();
     else if(type == CODE_GOLANG)
         m_highlighter = new SyntaxHighlighterGo();
     else

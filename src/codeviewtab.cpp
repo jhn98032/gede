@@ -112,6 +112,8 @@ int CodeViewTab::open(QString filename, QList<Tag> tagList)
         m_ui.codeView->setPlainText(text, CodeView::CODE_FORTRAN);
     else if(extension.toLower() == RUST_FILE_EXTENSION)
         m_ui.codeView->setPlainText(text, CodeView::CODE_RUST);
+    else if(extension.toLower() == ADA_FILE_EXTENSION)
+        m_ui.codeView->setPlainText(text, CodeView::CODE_ADA);
     else if(extension.toLower() == GOLANG_FILE_EXTENSION)
         m_ui.codeView->setPlainText(text, CodeView::CODE_GOLANG);
     else
