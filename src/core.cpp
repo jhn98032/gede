@@ -1967,3 +1967,20 @@ quint64 Core::getAddress(VarWatch &w)
 
 
 
+/**
+* @brief Checks if the target is running (or if it is stopped or finnished).
+* @return true if the target is running.
+*/ 
+bool Core::isRunning()
+{
+    if(m_targetState == ICore::TARGET_STARTING ||
+        m_targetState == ICore::TARGET_RUNNING)
+    {
+        return true;
+    }
+    return false;
+}
+
+
+
+    

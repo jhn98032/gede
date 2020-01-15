@@ -19,6 +19,7 @@
 #include "log.h"
 #include "syntaxhighlighter.h"
 #include "util.h"
+#include "core.h"
 
 
  
@@ -87,7 +88,14 @@ void CodeView::onTimerTimeout()
 {
     QPoint globalCursorPos = QCursor::pos();
     QPoint mousePos = mapFromGlobal(globalCursorPos);
-
+    Core &core = Core::getInstance();
+        
+    if((!m_highlighter) || core.isRunning())
+    {
+        m_infoWindow.hide();
+        return;
+    }
+   
     // Hover mouse over a text row?
     TextField *foundField = NULL;
     int rowHeight = getRowHeight();
@@ -184,6 +192,7 @@ void CodeView::setPlainText(QString text, CodeType type)
 int CodeView::getRowHeight()
 {
     int rowHeight = m_fontInfo->lineSpacing()+2;
+    assert(rowHeight > 0);
     return rowHeight;
 }
 

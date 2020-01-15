@@ -291,6 +291,8 @@ public:
     QVector <SourceFile*> getSourceFiles() { return m_sourceFiles; };
 
     void writeTargetStdin(QString text);
+
+    bool isRunning();
     
 private slots:
         void onGdbOutput(int socketNr);
