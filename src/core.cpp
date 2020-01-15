@@ -354,7 +354,7 @@ int Core::initPid(Settings *cfg, QString gdbPath, QString programPath, int pid)
     if(gdbSetBreakpointAtFunc(cfg->m_initialBreakpoint))
     {
         rc = 1;
-        errorMsg("Failed to set breakpoint at %s", stringToCStr(cfg->m_initialBreakpoint));
+        warnMsg("Failed to set breakpoint at %s", stringToCStr(cfg->m_initialBreakpoint));
     }
 
     runInitCommands(cfg);
@@ -437,7 +437,7 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
     if(gdbSetBreakpointAtFunc(cfg->m_initialBreakpoint))
     {
         rc = 1;
-        errorMsg("Failed to set breakpoint at %s", stringToCStr(cfg->m_initialBreakpoint));
+        warnMsg("Failed to set breakpoint at %s", stringToCStr(cfg->m_initialBreakpoint));
     }
 
 
@@ -538,8 +538,11 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
     // Get memory depth (32 or 64)
     detectMemoryDepth();
 
-    gdbSetBreakpointAtFunc(cfg->m_initialBreakpoint);
-    
+    if(gdbSetBreakpointAtFunc(cfg->m_initialBreakpoint))
+    {
+        warnMsg("Failed to set breakpoint at %s", stringToCStr(cfg->m_initialBreakpoint));
+    }
+
     gdbGetFiles();
 
     
