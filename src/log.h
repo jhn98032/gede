@@ -11,6 +11,18 @@
 
 #include <QDebug>
 
+class ILogger
+{
+public:
+    ILogger() {};
+    virtual ~ILogger() {};
+
+    virtual void ILogger_onWarnMsg(QString text) = 0;
+    virtual void ILogger_onErrorMsg(QString text) = 0;
+    virtual void ILogger_onInfoMsg(QString text) = 0;
+
+};
+
 #ifndef ENABLE_DEBUGMSG
 #define debugMsg(fmt...)  do{}while(0)
 #else
@@ -22,6 +34,9 @@ void errorMsg(const char *fmt,...);
 void warnMsg(const char *fmt,...);
 void infoMsg(const char *fmt,...);
 
+
+void loggerRegister(ILogger *logger);
+void loggerUnregister(ILogger *logger);
 
 
 #endif // FILE__LOG_H

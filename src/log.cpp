@@ -29,6 +29,22 @@ static QMutex g_mutex;
 #define NO_CODE     "\033[1;0m"
 #endif
 
+
+static ILogger *g_logger = NULL;
+
+void loggerRegister(ILogger *logger)
+{
+    g_logger = logger;
+}
+
+void loggerUnregister(ILogger *logger)
+{
+    Q_UNUSED(logger);
+    
+    g_logger = NULL;
+}
+
+
 void debugMsg_(const char *filename, int lineNo, const char *fmt, ...)
 {
     va_list ap;
@@ -64,11 +80,18 @@ void errorMsg(const char *fmt, ...)
 
     va_end(ap);
 
-    printf(RED_CODE "%2d.%03d| ERROR | %s" NO_CODE "\n",
-        curTime.second()%100, curTime.msec(),
-        buffer);
 
+    if(g_logger)
+        g_logger->ILogger_onErrorMsg(buffer);
+    else
+    {
+        printf(RED_CODE "%2d.%03d| ERROR | %s" NO_CODE "\n",
+            curTime.second()%100, curTime.msec(),
+            buffer);
+
+    }
     QMessageBox::critical(NULL, QString("Gede - Error"), QString(buffer));
+
 }
 
 
@@ -86,12 +109,15 @@ void warnMsg(const char *fmt, ...)
 
     va_end(ap);
 
-    printf(YELLOW_CODE "%2d.%03d| WARN  | %s" NO_CODE "\n",
-        curTime.second()%100, curTime.msec(),
-        buffer);
 
-
-    QMessageBox::warning(NULL, QString("Gede - Warning"), QString(buffer));
+    if(g_logger)
+        g_logger->ILogger_onWarnMsg(buffer);
+    else
+    {
+        printf(YELLOW_CODE "%2d.%03d| WARN  | %s" NO_CODE "\n",
+            curTime.second()%100, curTime.msec(),
+            buffer);
+    }
 }
 
 
@@ -110,9 +136,14 @@ void infoMsg(const char *fmt, ...)
 
     va_end(ap);
 
-    printf("%2d.%03d| INFO  | %s\n",
+    if(g_logger)
+        g_logger->ILogger_onInfoMsg(buffer);
+    else
+    {
+        printf("%2d.%03d| INFO  | %s\n",
             curTime.second()%100, curTime.msec(),
             buffer);
+    }
 }
 
 

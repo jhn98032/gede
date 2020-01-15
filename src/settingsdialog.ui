@@ -505,7 +505,7 @@ QGroupBox::title {
      </widget>
      <widget class="QWidget" name="tab_3">
       <attribute name="title">
-       <string>Program Console</string>
+       <string>Target Console</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_7">
        <item>

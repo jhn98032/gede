@@ -31,6 +31,7 @@ Settings::Settings()
     m_viewWindowWatch = true;
     m_viewWindowAutoVariables = true;
     m_viewWindowTargetOutput = true;
+    m_viewWindowGedeOutput = true;
     m_viewWindowGdbOutput = true;
     m_viewWindowFileBrowser = true;
     m_enableDebugLog = false;
@@ -197,6 +198,7 @@ void Settings::loadGlobalConfig()
     m_viewWindowWatch = tmpIni.getBool("GuiState/EnableWindowWatch", m_viewWindowWatch);
     m_viewWindowAutoVariables = tmpIni.getBool("GuiState/EnableWindowAuto", m_viewWindowAutoVariables);
     m_viewWindowTargetOutput = tmpIni.getBool("GuiState/EnableWindowTargetOutput", m_viewWindowTargetOutput);
+    m_viewWindowGedeOutput = tmpIni.getBool("GuiState/EnableWindowGedeOutput", m_viewWindowGedeOutput);
     m_viewWindowGdbOutput = tmpIni.getBool("GuiState/EnableWindowGdbOutput", m_viewWindowGdbOutput);
     m_viewWindowFileBrowser = tmpIni.getBool("GuiState/EnableWindowFileBrowser", m_viewWindowFileBrowser);
     m_viewFuncFilter = tmpIni.getBool("GuiState/EnableFuncFilter", m_viewFuncFilter);
@@ -417,6 +419,7 @@ void Settings::saveGlobalConfig()
     tmpIni.setBool("GuiState/EnableWindowWatch", m_viewWindowWatch);
     tmpIni.setBool("GuiState/EnableWindowAuto", m_viewWindowAutoVariables);
     tmpIni.setBool("GuiState/EnableWindowTargetOutput", m_viewWindowTargetOutput);
+    tmpIni.setBool("GuiState/EnableWindowGedeOutput", m_viewWindowGedeOutput);
     tmpIni.setBool("GuiState/EnableWindowGdbOutput", m_viewWindowGdbOutput);
     tmpIni.setBool("GuiState/EnableWindowFileBrowser", m_viewWindowFileBrowser);
     tmpIni.setBool("GuiState/EnableFuncFilter", m_viewFuncFilter);

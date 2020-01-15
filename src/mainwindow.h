@@ -25,6 +25,7 @@
 #include "watchvarctl.h"
 #include "codeviewtab.h"
 #include "tagmanager.h"
+#include "log.h"
 
 
 class FileInfo
@@ -37,7 +38,7 @@ public:
 #include "locator.h"
 
 
-class MainWindow : public QMainWindow, public ICore, public ICodeView
+class MainWindow : public QMainWindow, public ICore, public ICodeView, public ILogger
 {
   Q_OBJECT
 public:
@@ -75,6 +76,13 @@ public:
     void ICodeView_onContextMenuIncFile(QPoint pos, int lineNo, QString incFile);
     
     void ICore_onWatchVarChildAdded(VarWatch &watch);
+
+    
+    
+    void ILogger_onWarnMsg(QString text);
+    void ILogger_onErrorMsg(QString text);
+    void ILogger_onInfoMsg(QString text);
+
     
 private:
     void showEvent(QShowEvent *);
@@ -160,6 +168,7 @@ public slots:
     void onViewWatch();
     void onViewAutoVariables();
     void onViewTargetOutput();
+    void onViewGedeOutput();
     void onViewGdbOutput();
     void onViewFileBrowser();
     void onViewFuncFilter();

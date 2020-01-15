@@ -340,11 +340,11 @@
        </widget>
        <widget class="QTabWidget" name="tabWidget_2">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="tab_4">
          <attribute name="title">
-          <string>GDB Output</string>
+          <string>&lt;GDB Output&gt;</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_5">
           <item>
@@ -361,13 +361,19 @@
               <height>40</height>
              </size>
             </property>
+            <property name="undoRedoEnabled">
+             <bool>false</bool>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
          </layout>
         </widget>
         <widget class="QWidget" name="tab_5">
          <attribute name="title">
-          <string>Program Console</string>
+          <string>&lt;Target Console&gt;</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_6">
           <property name="spacing">
@@ -421,6 +427,26 @@
               </widget>
              </item>
             </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_2">
+         <attribute name="title">
+          <string>&lt;Gede Output&gt;</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_11">
+          <item>
+           <widget class="QPlainTextEdit" name="gedeOutputWidget">
+            <property name="undoRedoEnabled">
+             <bool>false</bool>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+            <property name="backgroundVisible">
+             <bool>false</bool>
+            </property>
            </widget>
           </item>
          </layout>
@@ -551,7 +577,7 @@
      <x>0</x>
      <y>0</y>
      <width>881</width>
-     <height>19</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -592,6 +618,7 @@
     <addaction name="actionViewAutoVariables"/>
     <addaction name="separator"/>
     <addaction name="actionViewTargetOutput"/>
+    <addaction name="actionViewGedeOutput"/>
     <addaction name="actionViewGdbOutput"/>
     <addaction name="actionViewFileBrowser"/>
     <addaction name="separator"/>
@@ -777,7 +804,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>Program Console</string>
+    <string>Target Console</string>
    </property>
   </action>
   <action name="actionViewGdbOutput">
@@ -836,6 +863,14 @@
    </property>
    <property name="text">
     <string>Class Filter</string>
+   </property>
+  </action>
+  <action name="actionViewGedeOutput">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Gede Output</string>
    </property>
   </action>
  </widget>

@@ -33,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent)
       ,m_locator(&m_tagManager, &m_sourceFiles)
 {
     QStringList names;
+
+    loggerRegister(this);
     
     m_ui.setupUi(this);
 
@@ -147,6 +149,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ui.actionViewWatch, SIGNAL(triggered()), SLOT(onViewWatch()));
     connect(m_ui.actionViewAutoVariables, SIGNAL(triggered()), SLOT(onViewAutoVariables()));
     connect(m_ui.actionViewTargetOutput, SIGNAL(triggered()), SLOT(onViewTargetOutput()));
+    connect(m_ui.actionViewGedeOutput, SIGNAL(triggered()), SLOT(onViewGedeOutput()));
     connect(m_ui.actionViewGdbOutput, SIGNAL(triggered()), SLOT(onViewGdbOutput()));
     connect(m_ui.actionViewFileBrowser, SIGNAL(triggered()), SLOT(onViewFileBrowser()));
     connect(m_ui.actionViewClassFilter, SIGNAL(triggered()), SLOT(onViewClassFilter()));
@@ -229,6 +232,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    loggerUnregister(this);
  
 }
 
@@ -293,7 +297,9 @@ void MainWindow::showWidgets()
     currentSelection = m_ui.tabWidget_2->currentWidget();
     m_ui.tabWidget_2->clear();
     if(m_cfg.m_viewWindowTargetOutput)
-        m_ui.tabWidget_2->insertTab(0, m_ui.widget_console, "Program Console");
+        m_ui.tabWidget_2->insertTab(0, m_ui.widget_console, "Target Console");
+    if(m_cfg.m_viewWindowGedeOutput)
+        m_ui.tabWidget_2->insertTab(0, m_ui.gedeOutputWidget, "Gede Output");
     if(m_cfg.m_viewWindowGdbOutput)
         m_ui.tabWidget_2->insertTab(0, m_ui.logView, "GDB Output");
     selectionIdx = m_ui.tabWidget_2->indexOf(currentSelection);
@@ -336,6 +342,7 @@ void MainWindow::onDefaultViewSetup()
     m_ui.actionViewWatch->setChecked(m_cfg.m_viewWindowWatch);
     m_ui.actionViewAutoVariables->setChecked(m_cfg.m_viewWindowAutoVariables);
     m_ui.actionViewTargetOutput->setChecked(m_cfg.m_viewWindowTargetOutput);
+    m_ui.actionViewGedeOutput->setChecked(m_cfg.m_viewWindowGedeOutput);
     m_ui.actionViewGdbOutput->setChecked(m_cfg.m_viewWindowGdbOutput);
     m_ui.actionViewFileBrowser->setChecked(m_cfg.m_viewWindowFileBrowser);
     m_ui.actionViewFunctionFilter->setChecked(m_cfg.m_viewFuncFilter);
@@ -392,6 +399,14 @@ void MainWindow::onViewTargetOutput()
     showWidgets();
 }
 
+
+void MainWindow::onViewGedeOutput()
+{
+    m_cfg.m_viewWindowGedeOutput = m_cfg.m_viewWindowGedeOutput ? false : true;
+     
+    showWidgets();
+}
+
 void MainWindow::onViewGdbOutput()
 {
       m_cfg.m_viewWindowGdbOutput = m_cfg.m_viewWindowGdbOutput ? false : true;
@@ -439,6 +454,7 @@ void MainWindow::loadConfig()
     m_ui.actionViewWatch->setChecked(m_cfg.m_viewWindowWatch);
     m_ui.actionViewAutoVariables->setChecked(m_cfg.m_viewWindowAutoVariables);
     m_ui.actionViewTargetOutput->setChecked(m_cfg.m_viewWindowTargetOutput);
+    m_ui.actionViewGedeOutput->setChecked(m_cfg.m_viewWindowGedeOutput);
     m_ui.actionViewGdbOutput->setChecked(m_cfg.m_viewWindowGdbOutput);
     m_ui.actionViewFileBrowser->setChecked(m_cfg.m_viewWindowFileBrowser);
     m_ui.actionViewFunctionFilter->setChecked(m_cfg.m_viewFuncFilter);
@@ -510,9 +526,6 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
  */
 void MainWindow::ICore_onStopped(ICore::StopReason reason, QString path, int lineNo)
 {
-    Q_UNUSED(reason);
-
-
     if(reason == ICore::EXITED_NORMALLY || reason == ICore::EXITED)
     {
         QString title = "Program exited";
@@ -800,7 +813,23 @@ void MainWindow::ICodeView_onRowDoubleClick(int lineNo)
         core.gdbSetBreakpoint(currentCodeViewTab->getFilePath(), lineNo);
 }
 
+
     
+void MainWindow::ILogger_onWarnMsg(QString text)
+{
+    m_ui.gedeOutputWidget->appendPlainText(text);
+}
+
+void MainWindow::ILogger_onErrorMsg(QString text)
+{
+    m_ui.gedeOutputWidget->appendPlainText(text);
+}
+
+void MainWindow::ILogger_onInfoMsg(QString text)
+{
+    m_ui.gedeOutputWidget->appendPlainText(text);
+}
+
 
 void MainWindow::ICore_onConsoleStream(QString text)
 {

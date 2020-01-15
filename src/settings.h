@@ -118,6 +118,7 @@ class Settings
         bool m_viewWindowWatch;
         bool m_viewWindowAutoVariables;
         bool m_viewWindowTargetOutput;
+        bool m_viewWindowGedeOutput;
         bool m_viewWindowGdbOutput;
         bool m_viewWindowFileBrowser;
         bool m_viewFuncFilter;
