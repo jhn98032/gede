@@ -212,7 +212,6 @@ void SyntaxHighlighterAda::colorize(QString text)
     Row *currentRow;
     TextField *field = NULL;
     enum {IDLE,
-        MULTI_COMMENT,
         SPACES,
         WORD, GLOBAL_INCLUDE_FILE, COMMENT1,COMMENT,
         STRING,
@@ -247,7 +246,7 @@ void SyntaxHighlighterAda::colorize(QString text)
         {   
             case IDLE:
             {
-                if(c == '/')
+                if(c == '-')
                 {
                     state = COMMENT1;
                     field = new TextField;
@@ -324,15 +323,7 @@ void SyntaxHighlighterAda::colorize(QString text)
             };break;
             case COMMENT1:
             {
-                if(c == '*')
-                {
-                    field->m_text += c;
-                    field->m_type = TextField::COMMENT;
-                    field->m_color = Qt::green;
-                    state = MULTI_COMMENT;
-                    
-                }
-                else if(c == '/')
+                if(c == '-')
                 {
                     field->m_text += c;
                     field->m_type = TextField::COMMENT;
@@ -343,28 +334,6 @@ void SyntaxHighlighterAda::colorize(QString text)
                 {
                     i--;
                     state = IDLE;
-                }
-            };break;
-            case MULTI_COMMENT:
-            {
-                if(c == '\n')
-                {
-                    currentRow = new Row;
-                    m_rows.push_back(currentRow);
-
-                    field = new TextField;
-                    field->m_type = TextField::COMMENT;
-                    currentRow->appendField(field);
-                    
-                }
-                else if(text[i-1].toLatin1() == '*' && c == '/')
-                {
-                    field->m_text += c;
-                    state = IDLE;
-                }
-                else
-                {
-                    field->m_text += c;
                 }
             };break;
             case COMMENT:

@@ -1,3 +1,8 @@
+--------------------------
+-- A simple ada example
+--
+---------------------------
+
 with Text_IO; use Text_IO;
 
 procedure test is
