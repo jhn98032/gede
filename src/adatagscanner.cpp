@@ -330,10 +330,9 @@ void AdaTagScanner::tokenize(QString text2)
     int lineNr = 1;
     enum {IDLE,
         SPACES,
-        WORD, GLOBAL_INCLUDE_FILE, COMMENT1,COMMENT,
+        WORD, COMMENT1,COMMENT,
         STRING,
         ESCAPED_CHAR,
-        INC_STRING,
         MINUS
     } state = IDLE;
     char c = '\n';
@@ -450,22 +449,6 @@ void AdaTagScanner::tokenize(QString text2)
                     state = IDLE;
                 }  
             };break;
-            case GLOBAL_INCLUDE_FILE:
-            {
-                if(!isEscaped && c == '\n')
-                {
-                    state = IDLE;
-                }
-                else
-                {
-                    text += c;
-                    if(c == '>')
-                    {
-                        pushToken(text, Token::COMMENT, lineNr);
-                        state = IDLE;
-                    }
-                }
-            };break;
             case ESCAPED_CHAR:
             {
                 text += c;
@@ -473,24 +456,6 @@ void AdaTagScanner::tokenize(QString text2)
                 {
                     pushToken(text, Token::STRING, lineNr);
                     state = IDLE;
-                }
-            };break;
-            case INC_STRING:
-            {
-                if(!isEscaped && c == '\n')
-                {
-                    i--;
-                    pushToken(text, Token::STRING, lineNr);
-                    state = IDLE;
-                }
-                else
-                {
-                    text += c;
-                    if(!isEscaped && c == '>')
-                    {
-                        pushToken(text, Token::STRING, lineNr);
-                        state = IDLE;
-                    }
                 }
             };break;
             case STRING:
