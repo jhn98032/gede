@@ -214,6 +214,7 @@ private:
     WatchVarCtl m_watchVarCtl;
     QFont m_outputFont;
     QFont m_gdbOutputFont;
+    QFont m_gedeOutputFont;
     QLabel m_statusLineWidget;
     Locator m_locator;
 };

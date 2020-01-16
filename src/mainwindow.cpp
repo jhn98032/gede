@@ -1826,6 +1826,9 @@ void MainWindow::setConfig()
     m_gdbOutputFont = QFont(m_cfg.m_gdbOutputFontFamily, m_cfg.m_gdbOutputFontSize);
     m_ui.logView->setFont(m_gdbOutputFont);
 
+    m_gedeOutputFont = QFont(m_cfg.m_gedeOutputFontFamily, m_cfg.m_gedeOutputFontSize);
+    m_ui.gedeOutputWidget->setFont(m_gedeOutputFont);
+
     m_outputFont = QFont(m_cfg.m_outputFontFamily, m_cfg.m_outputFontSize);
     m_ui.targetOutputView->setMonoFont(m_outputFont);
     

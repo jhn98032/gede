@@ -28,6 +28,7 @@ SettingsDialog::SettingsDialog(QWidget *parent, Settings *cfg)
     connect(m_ui.pushButton_selectMemoryFont, SIGNAL(clicked()), SLOT(onSelectMemoryFont()));
     connect(m_ui.pushButton_selectOutputFont, SIGNAL(clicked()), SLOT(onSelectOutputFont()));
     connect(m_ui.pushButton_selectGdbOutputFont, SIGNAL(clicked()), SLOT(onSelectGdbOutputFont()));
+    connect(m_ui.pushButton_selectGedeOutputFont, SIGNAL(clicked()), SLOT(onSelectGedeOutputFont()));
 
     QObject::connect(m_ui.buttonBox, SIGNAL(clicked(QAbstractButton*)), this, SLOT(onButtonBoxClicked(QAbstractButton*)));
 
@@ -78,6 +79,10 @@ void SettingsDialog::updateGui()
 
     labelText.sprintf("%s  %d", stringToCStr(m_settingsGdbOutputFontFamily), m_settingsGdbOutputFontSize);
     m_ui.pushButton_selectGdbOutputFont->setText(labelText);
+
+    labelText.sprintf("%s  %d", stringToCStr(m_settingsGedeOutputFontFamily), m_settingsGedeOutputFontSize);
+    m_ui.pushButton_selectGedeOutputFont->setText(labelText);
+
 }    
 
 void SettingsDialog::loadConfig()
@@ -92,6 +97,8 @@ void SettingsDialog::loadConfig()
     m_settingsOutputFontSize = m_cfg->m_outputFontSize;
     m_settingsGdbOutputFontFamily = m_cfg->m_gdbOutputFontFamily;
     m_settingsGdbOutputFontSize = m_cfg->m_gdbOutputFontSize;
+    m_settingsGedeOutputFontFamily = m_cfg->m_gedeOutputFontFamily;
+    m_settingsGedeOutputFontSize = m_cfg->m_gedeOutputFontSize;
 
     m_ui.spinBox_tabIndent->setValue(m_cfg->getTabIndentCount());
 
@@ -178,7 +185,9 @@ void SettingsDialog::getConfig(Settings *cfg)
 
     cfg->m_gdbOutputFontFamily = m_settingsGdbOutputFontFamily;
     cfg->m_gdbOutputFontSize = m_settingsGdbOutputFontSize;
-
+    cfg->m_gedeOutputFontFamily = m_settingsGedeOutputFontFamily;
+    cfg->m_gedeOutputFontSize = m_settingsGedeOutputFontSize;
+    
     cfg->m_maxTabs = m_ui.spinBox_maxTabs->value();
 
     cfg->m_tabIndentCount = m_ui.spinBox_tabIndent->value();
@@ -289,6 +298,12 @@ void SettingsDialog::onSelectMemoryFont()
 void SettingsDialog::onSelectOutputFont()
 {
     showFontSelection(&m_settingsOutputFontFamily, &m_settingsOutputFontSize);
+}
+
+
+void SettingsDialog::onSelectGedeOutputFont()
+{
+    showFontSelection(&m_settingsGedeOutputFontFamily, &m_settingsGedeOutputFontSize);
 }
 
 void SettingsDialog::onSelectGdbOutputFont()

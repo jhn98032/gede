@@ -87,6 +87,8 @@ class Settings
         int m_outputFontSize;
         QString m_gdbOutputFontFamily;
         int m_gdbOutputFontSize;
+        QString m_gedeOutputFontFamily;
+        int m_gedeOutputFontSize;
 
         QStringList m_sourceIgnoreDirs;
 

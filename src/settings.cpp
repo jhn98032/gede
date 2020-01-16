@@ -65,6 +65,8 @@ void Settings::loadDefaultsGui()
     m_outputFontSize = 8;
     m_gdbOutputFontFamily = "Monospace";
     m_gdbOutputFontSize = 8;
+    m_gedeOutputFontFamily = "Monospace";
+    m_gedeOutputFontSize = 8;
 
 
     m_clrBackground = Qt::black;
@@ -175,6 +177,8 @@ void Settings::loadGlobalConfig()
     m_outputFontSize = tmpIni.getInt("Gui/OutputFontSize", m_outputFontSize);
     m_gdbOutputFontFamily = tmpIni.getString("Gui/GdbOutputFont", m_outputFontFamily);
     m_gdbOutputFontSize = tmpIni.getInt("Gui/GdbOutputFontSize", m_outputFontSize);
+    m_gedeOutputFontFamily = tmpIni.getString("Gui/GedeOutputFont", m_outputFontFamily);
+    m_gedeOutputFontSize = tmpIni.getInt("Gui/GedeOutputFontSize", m_outputFontSize);
 
     m_tagSortByName = tmpIni.getBool("Gui/TagsSortByName", false);
     m_tagShowLineNumbers = tmpIni.getBool("Gui/TagsShowLinenumber", true);
@@ -396,6 +400,8 @@ void Settings::saveGlobalConfig()
     tmpIni.setInt("Gui/OutputFontSize", m_outputFontSize);
     tmpIni.setString("Gui/GdbOutputFont", m_gdbOutputFontFamily);
     tmpIni.setInt("Gui/GdbOutputFontSize", m_gdbOutputFontSize);
+    tmpIni.setString("Gui/GedeOutputFont", m_gedeOutputFontFamily);
+    tmpIni.setInt("Gui/GedeOutputFontSize", m_gedeOutputFontSize);
 
     tmpIni.setBool("Gui/TagsSortByName", m_tagSortByName);
     tmpIni.setBool("Gui/TagsShowLinenumber", m_tagShowLineNumbers);
