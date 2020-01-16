@@ -139,6 +139,7 @@ if __name__ == "__main__":
         do_clean = False
         do_install = False
         do_build = True
+        do_buildAll = False
         
         for arg in sys.argv[1:]:
             if arg == "clean":
@@ -151,6 +152,8 @@ if __name__ == "__main__":
                 exit( dump_usage())
             elif arg == "--verbose":
                 g_verbose = True
+            elif arg == "--buildall":
+                do_buildAll = True
             elif arg.find("--prefix=") == 0:
                 g_dest_path = arg[9:]
             elif arg == "--use-qt4":
@@ -163,19 +166,28 @@ if __name__ == "__main__":
         if do_clean:
             doClean();
         if do_build:
-            os.chdir("src")
-            if not os.path.exists("Makefile"):
-                ensureExist("make")
-                ensureExist("gcc")
-                ensureExist("ctags")
-                qmakeName = detectQt();
-                print("Generating makefile")
-                if subprocess.call([qmakeName]):
+            ensureExist("make")
+            ensureExist("gcc")
+            ensureExist("ctags")
+            sys.stdout.flush()
+            
+            olddir = os.getcwd()
+            if do_buildAll:
+                srcDirList = ["src", "tests/tagtest", "tests/highlightertest"]
+            else:
+                srcDirList = ["src"]
+            for srcdir in srcDirList:
+                os.chdir(srcdir)
+                if not os.path.exists("Makefile"):
+                    qmakeName = detectQt();
+                    print("Generating makefile")
+                    if subprocess.call([qmakeName]):
+                        exit(1)
+                print("Compiling in " + srcdir + " (please wait)")
+                if run_make(["-j4"]):
                     exit(1)
-            print("Compiling (please wait)")
-            if run_make(["-j4"]):
-                exit(1)
-            os.chdir("..")
+                os.chdir(olddir)
+                
         if do_install:
             os.chdir("src")
             print("Installing to '%s'" % (g_dest_path) )
