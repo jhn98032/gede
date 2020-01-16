@@ -146,64 +146,104 @@ bool AdaTagScanner::eatToken(QString text)
 
 void AdaTagScanner::parse(QList<Tag> *taglist)
 {
-    
     Token *tok;
-    enum { IDLE, FN_KW} state = IDLE;
+    enum { IDLE, STATE_PROC, STATE_FUNC} state = IDLE;
     do
     {
         tok = popToken();
         if(tok)
         {
+            debugMsg("tok: %s", qPrintable(tok->toDesc()));
+                    
             switch(state)
             {
                 case IDLE:
                 {
-                    debugMsg("tok: %s", qPrintable(tok->toDesc()));
                     if(tok->getText() == "procedure")
-                        state = FN_KW;
+                        state = STATE_PROC;
+                    else if(tok->getText() == "function")
+                        state = STATE_FUNC;
                 };break;
-                case FN_KW:
+                case STATE_PROC:
                 {
-                    debugMsg("found: '%s' at L%d", qPrintable(tok->getText()), tok->getLineNr());
-                    Tag tag;
-                    tag.setLineNo(tok->getLineNr());
-                    tag.m_name = tok->getText();
-                    tag.m_filepath = m_filepath;
-                    tag.m_type = Tag::TAG_FUNC;
-                    state = IDLE;
-
+                    QString name = tok->getText();
+                    int lineNr = tok->getLineNr();
                     // Parse signature
-                    if(eatToken("("))
+                    if(!eatToken("is"))
                     {
-                    }
-                    else
-                    {
+                        debugMsg("found: '%s' at L%d", qPrintable(name), lineNr);
+                        Tag tag;
+                        tag.setLineNo(lineNr);
+                        tag.m_name = name;
+                        tag.m_filepath = m_filepath;
+                        tag.m_type = Tag::TAG_FUNC;
+                    
                         QString tokText;
                         QString signature;
                         signature += "(";
-                        do
-                        {
-                            Token *tok2 = popToken();
-                            if(tok2)
-                            {
-                                tokText = tok2->getText();
-                                signature += tokText;
-                                if(tokText == ",")
-                                    signature += " ";
-                                delete tok2;
-                            }
-                            else
-                                tokText = "";
-                            
-                        }while(tokText != ")");
-
+                        signature += ")";
                         debugMsg("Found signature:%s", qPrintable(signature));
                         tag.setSignature(signature);
+                    
+                        // Add the tag to the list
+                        taglist->append(tag);
                     }
 
+                    state = IDLE;
+                    
+                };break;
+                case STATE_FUNC:
+                {
+                    QString name = tok->getText();
+                    int lineNr = tok->getLineNr();
+
+                    debugMsg("found: '%s' at L%d", qPrintable(name), lineNr);
+                    Tag tag;
+                    tag.setLineNo(lineNr);
+                    tag.m_name = name;
+                    tag.m_filepath = m_filepath;
+                    tag.m_type = Tag::TAG_FUNC;
+                    
+                    // Parse signature
+                    QString tokText;
+                    QString signature;
+                    signature += "(";
+                    do
+                    {
+                        Token *tok2;
+                        tok2 = popToken();
+                        if(tok2)
+                        {
+                            tokText = tok2->getText();
+                            delete tok2;
+                        }
+                        else
+                            tokText = "";
+
+                        if(tokText != "is")
+                        {
+                            if(tokText == "(" || tokText == ")" || tokText == ";")
+                                signature += tokText + " ";
+                            else if(tokText == "return")
+                                signature += " " + tokText + " ";
+                            else if(tokText == ":")
+                                signature += " " + tokText + " ";
+                            else
+                                signature += tokText;
+                        }
+
+                    }while(tokText != "is" && tokText != "");
+                    signature += ")";
+                    
+                    debugMsg("Found signature:%s", qPrintable(signature));
+                    tag.setSignature(signature);
+                
                     // Add the tag to the list
                     taglist->append(tag);
                 
+
+                    state = IDLE;
+                    
                 };break;
                 default:;break;
             }
@@ -391,7 +431,7 @@ void AdaTagScanner::tokenize(QString text2)
             {
                 if(c == '\n')
                 {
-                    pushToken(text, Token::COMMENT, lineNr);
+                    pushToken(text, Token::COMMENT, lineNr-1);
                     state = IDLE;
                 }
                 else
@@ -467,7 +507,8 @@ void AdaTagScanner::tokenize(QString text2)
             {
                 if(isSpecialChar(c) || c == ' ' || c == '\t' || c == '\n')
                 {
-                    i--;
+                    if(c != '\n')
+                        i--;
 
                     if(QChar(text[0]).isDigit())
                         pushToken(text, Token::NUMBER, lineNr);

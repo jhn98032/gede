@@ -10,6 +10,16 @@ procedure test is
     str : string(1..5);
     c   : character;
     n   : natural;
+
+    function min(a, b : integer) return integer is
+    begin
+        if a < b then
+            return a;
+        else
+            return b;
+        end if;
+    end min;
+
 begin
 
     str := "hej" & "!!";
@@ -18,7 +28,7 @@ begin
     
     c := 'a';
     
-    j := 1;
+    j := min(1, 12);
     j := 2**3;
     Put_Line("Hello world!!");
     
