@@ -16,6 +16,8 @@
 #include "log.h"
 #include "util.h"
 #include "rusttagscanner.h"
+#include "adatagscanner.h"
+
 
 static bool g_ctagsExist = true;
 static bool g_doneCtagCheck = false;
@@ -196,7 +198,14 @@ int TagScanner::scan(QString filepath, QList<Tag> *taglist)
         rs.setConfig(m_cfg);
         return rs.scan(filepath, taglist);
     }
-    
+    if(extension.toLower() == ADA_FILE_EXTENSION)
+    {
+        AdaTagScanner rs;
+        rs.setConfig(m_cfg);
+        return rs.scan(filepath, taglist);
+    }
+
+
 
     if(!g_ctagsExist)
         return 0;
