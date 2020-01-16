@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Johan Henriksson.
+ * Copyright (C) 2018-2020 Johan Henriksson.
  * All rights reserved.
  *
  * This software may be modified and distributed under the terms
@@ -417,7 +417,7 @@ void RustTagScanner::tokenize(QString text2)
             {
                 if(c == '\n')
                 {
-                    pushToken(text, Token::COMMENT, lineNr);
+                    pushToken(text, Token::COMMENT, lineNr-1);
                     state = IDLE;
                 }
                 else
@@ -493,7 +493,8 @@ void RustTagScanner::tokenize(QString text2)
             {
                 if(isSpecialChar(c) || c == ' ' || c == '\t' || c == '\n')
                 {
-                    i--;
+                    if(c != '\n')
+                        i--;
 
                     if(QChar(text[0]).isDigit())
                         pushToken(text, Token::NUMBER, lineNr);
