@@ -200,7 +200,7 @@ class ICore
 
 
 
-class Core : public ComListener
+class Core : public GdbComListener
 {
 private:
     Q_OBJECT

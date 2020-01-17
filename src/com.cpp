@@ -22,25 +22,25 @@
 
 
 
-const char* Com::asyncClassToString(ComListener::AsyncClass ac)
+const char* GdbCom::asyncClassToString(GdbComListener::AsyncClass ac)
 {
     switch(ac)
     {
-        case ComListener::AC_STOPPED:return "stopped";break;
-        case ComListener::AC_RUNNING:return "running";break;
-        case ComListener::AC_THREAD_CREATED:return "thread_created";break;
-        case ComListener::AC_THREAD_GROUP_ADDED:return "thread_group_added";break;
-        case ComListener::AC_THREAD_GROUP_STARTED:return "thread_group_started";break;
-        case ComListener::AC_LIBRARY_LOADED:return "library_loaded";break;
-        case ComListener::AC_BREAKPOINT_MODIFIED: return "breakpoint_modified";break;
-        case ComListener::AC_BREAKPOINT_DELETED: return "breakpoint_deleted";break;
-        case ComListener::AC_THREAD_EXITED: return "thread_exited";break;
-        case ComListener::AC_THREAD_GROUP_EXITED: return "thread_group_exited";break;
-        case ComListener::AC_LIBRARY_UNLOADED: return "library_unloaded";break;
-        case ComListener::AC_THREAD_SELECTED: return "thread_selected";break;
-        case ComListener::AC_DOWNLOAD: return "download";break;
-        case ComListener::AC_CMD_PARAM_CHANGED: return "cmd_param_changed";break;
-        case ComListener::AC_UNKNOWN: return "unknown";break;
+        case GdbComListener::AC_STOPPED:return "stopped";break;
+        case GdbComListener::AC_RUNNING:return "running";break;
+        case GdbComListener::AC_THREAD_CREATED:return "thread_created";break;
+        case GdbComListener::AC_THREAD_GROUP_ADDED:return "thread_group_added";break;
+        case GdbComListener::AC_THREAD_GROUP_STARTED:return "thread_group_started";break;
+        case GdbComListener::AC_LIBRARY_LOADED:return "library_loaded";break;
+        case GdbComListener::AC_BREAKPOINT_MODIFIED: return "breakpoint_modified";break;
+        case GdbComListener::AC_BREAKPOINT_DELETED: return "breakpoint_deleted";break;
+        case GdbComListener::AC_THREAD_EXITED: return "thread_exited";break;
+        case GdbComListener::AC_THREAD_GROUP_EXITED: return "thread_group_exited";break;
+        case GdbComListener::AC_LIBRARY_UNLOADED: return "library_unloaded";break;
+        case GdbComListener::AC_THREAD_SELECTED: return "thread_selected";break;
+        case GdbComListener::AC_DOWNLOAD: return "download";break;
+        case GdbComListener::AC_CMD_PARAM_CHANGED: return "cmd_param_changed";break;
+        case GdbComListener::AC_UNKNOWN: return "unknown";break;
 
     };
     return "?";
@@ -89,7 +89,7 @@ bool Resp::isResult()
 }
 
         
-Com::Com()
+GdbCom::GdbCom()
  : m_listener(NULL)
  ,m_logFile(GDB_LOG_FILE)
  ,m_busy(0)
@@ -109,7 +109,7 @@ Com::Com()
 
 }
 
-Com::~Com()
+GdbCom::~GdbCom()
 {
     // Send the command to gdb to exit cleanly
     QString text = "-gdb-exit\n";
@@ -140,7 +140,7 @@ Com::~Com()
 }
 
 
-GdbResult Com::commandF(Tree *resultData, const char *cmdFmt, ...)
+GdbResult GdbCom::commandF(Tree *resultData, const char *cmdFmt, ...)
 {
       va_list ap;
     char buffer[1024];
@@ -159,7 +159,7 @@ GdbResult Com::commandF(Tree *resultData, const char *cmdFmt, ...)
 /**
  * @brief Creates tokens from a single GDB output row.
  */
-QList<Token*> Com::tokenize(QString str)
+QList<Token*> GdbCom::tokenize(QString str)
 {
     enum { IDLE, END_CODE, STRING, VAR} state = IDLE;
     QList<Token*> list;
@@ -306,7 +306,7 @@ QList<Token*> Com::tokenize(QString str)
     return list;
 }
 
-Token* Com::pop_token()
+Token* GdbCom::pop_token()
 {
     if(m_list.empty())
         return NULL;
@@ -317,7 +317,7 @@ Token* Com::pop_token()
 }
 
 
-Token* Com::peek_token()
+Token* GdbCom::peek_token()
 {
     readTokens();
     
@@ -332,7 +332,7 @@ Token* Com::peek_token()
  * @brief Parses 'ASYNC-OUTPUT'
  * @return 0 on success
  */
-int Com::parseAsyncOutput(Resp *resp, ComListener::AsyncClass *ac)
+int GdbCom::parseAsyncOutput(Resp *resp, GdbComListener::AsyncClass *ac)
 {
     Token *tokVar;
     int rc = 0;
@@ -347,71 +347,71 @@ int Com::parseAsyncOutput(Resp *resp, ComListener::AsyncClass *ac)
     
     if(acString == "stopped")
     {
-        *ac = ComListener::AC_STOPPED;
+        *ac = GdbComListener::AC_STOPPED;
     }
     else if(acString == "running")
     {
-        *ac = ComListener::AC_RUNNING;
+        *ac = GdbComListener::AC_RUNNING;
     }
     else if(acString == "thread-created")
     {
-        *ac = ComListener::AC_THREAD_CREATED;
+        *ac = GdbComListener::AC_THREAD_CREATED;
     }
     else if(acString == "thread-group-added")
     {
-        *ac = ComListener::AC_THREAD_GROUP_ADDED;
+        *ac = GdbComListener::AC_THREAD_GROUP_ADDED;
     }
     else if(acString == "thread-group-started")
     {
-        *ac = ComListener::AC_THREAD_GROUP_STARTED;
+        *ac = GdbComListener::AC_THREAD_GROUP_STARTED;
     }
     else if(acString == "library-loaded")
     {
-        *ac = ComListener::AC_LIBRARY_LOADED;
+        *ac = GdbComListener::AC_LIBRARY_LOADED;
     }
     else if(acString == "breakpoint-modified")
     {
-        *ac = ComListener::AC_BREAKPOINT_MODIFIED;
+        *ac = GdbComListener::AC_BREAKPOINT_MODIFIED;
     }
     else if(acString == "breakpoint-deleted")
     {
-        *ac = ComListener::AC_BREAKPOINT_DELETED;
+        *ac = GdbComListener::AC_BREAKPOINT_DELETED;
     }
     else if(acString == "thread-exited")
     {
-        *ac = ComListener::AC_THREAD_EXITED;
+        *ac = GdbComListener::AC_THREAD_EXITED;
     }
     else if(acString == "thread-group-exited")
     {
-        *ac = ComListener::AC_THREAD_GROUP_EXITED;
+        *ac = GdbComListener::AC_THREAD_GROUP_EXITED;
     }
     else if(acString == "library-unloaded")
     {
-        *ac = ComListener::AC_LIBRARY_UNLOADED;
+        *ac = GdbComListener::AC_LIBRARY_UNLOADED;
     }
     else if(acString == "thread-selected")
     {
-        *ac = ComListener::AC_THREAD_SELECTED;
+        *ac = GdbComListener::AC_THREAD_SELECTED;
     }
     else if(acString == "download")
     {
-        *ac = ComListener::AC_DOWNLOAD;
+        *ac = GdbComListener::AC_DOWNLOAD;
     }
     else if(acString == "cmd-param-changed")
     {
-        *ac = ComListener::AC_CMD_PARAM_CHANGED;
+        *ac = GdbComListener::AC_CMD_PARAM_CHANGED;
     }
     else if(acString == "tsv-created" ||
             acString == "tsv-deleted" ||
             acString == "tsv-modified")
     {
-        *ac = ComListener::AC_UNKNOWN;
+        *ac = GdbComListener::AC_UNKNOWN;
     }
     else
     {
         warnMsg("Unexpected response '%s'", stringToCStr(acString));
         assert(0);
-        *ac = ComListener::AC_UNKNOWN;
+        *ac = GdbComListener::AC_UNKNOWN;
     }
 
 
@@ -425,7 +425,7 @@ int Com::parseAsyncOutput(Resp *resp, ComListener::AsyncClass *ac)
 }
 
 
-Resp* Com::parseExecAsyncOutput()
+Resp* GdbCom::parseExecAsyncOutput()
 {
     Token *tokVar;
     Resp *resp = NULL;
@@ -449,7 +449,7 @@ Resp* Com::parseExecAsyncOutput()
 
 
 
-Resp *Com::parseStatusAsyncOutput()
+Resp *GdbCom::parseStatusAsyncOutput()
 {
     Resp *resp = NULL;
     Token *tokVar;
@@ -471,7 +471,7 @@ Resp *Com::parseStatusAsyncOutput()
 }
 
 
-Resp *Com::parseNotifyAsyncOutput()
+Resp *GdbCom::parseNotifyAsyncOutput()
 {
     Resp *resp = NULL;
     Token *tokVar;
@@ -495,7 +495,7 @@ Resp *Com::parseNotifyAsyncOutput()
 
     
 
-Resp *Com::parseAsyncRecord()
+Resp *GdbCom::parseAsyncRecord()
 {
     Resp *resp = NULL;
     if(isTokenPending() && resp == NULL)
@@ -509,7 +509,7 @@ Resp *Com::parseAsyncRecord()
 
 
 
-Resp *Com::parseStreamRecord()
+Resp *GdbCom::parseStreamRecord()
 {
     Resp *resp = NULL;
     Token *tok;
@@ -546,7 +546,7 @@ Resp *Com::parseStreamRecord()
 
 
 
-Token* Com::eatToken(Token::Type type)
+Token* GdbCom::eatToken(Token::Type type)
 {
     Token *tok = peek_token();
     while(tok == NULL)
@@ -569,7 +569,7 @@ Token* Com::eatToken(Token::Type type)
 /**
  * @brief Checks if the read queue is empty.
  */
-bool Com::isTokenPending()
+bool GdbCom::isTokenPending()
 {
     Token *tok = peek_token();
     if(tok == NULL)
@@ -585,7 +585,7 @@ bool Com::isTokenPending()
  * @brief Checks and pops a token if the kind is as expected.
  * @return The found token or NULL if no hit.
  */
-Token* Com::checkToken(Token::Type type)
+Token* GdbCom::checkToken(Token::Type type)
 {
     Token *tok = peek_token();
     if(tok == NULL)
@@ -604,7 +604,7 @@ Token* Com::checkToken(Token::Type type)
  * @param item   The tree item to put the result of the parse in.
  * @return 0 on success.
  */
-int Com::parseValue(TreeNode *item)
+int GdbCom::parseValue(TreeNode *item)
 {
     Token *tok;
     int rc = 0;
@@ -676,7 +676,7 @@ int Com::parseValue(TreeNode *item)
  * @brief Parses 'RESULT'
  * @return 0 on success.
  */
-int Com::parseResult(TreeNode *parent)
+int GdbCom::parseResult(TreeNode *parent)
 {
     QString name;
 
@@ -706,7 +706,7 @@ int Com::parseResult(TreeNode *parent)
 }
 
 
-Resp *Com::parseResultRecord()
+Resp *GdbCom::parseResultRecord()
 {
     Token *tokVar;
     Resp *resp = NULL;
@@ -771,7 +771,7 @@ Resp *Com::parseResultRecord()
 
 
 
-Resp* Com::parseOutOfBandRecord()
+Resp* GdbCom::parseOutOfBandRecord()
 {
     Resp *resp = NULL;
     
@@ -784,7 +784,7 @@ Resp* Com::parseOutOfBandRecord()
 }
 
     
-Resp *Com::parseOutput()
+Resp *GdbCom::parseOutput()
 {
     Resp *resp = NULL;
     
@@ -814,7 +814,7 @@ Resp *Com::parseOutput()
 }
 
 
-void Com::writeLogEntry(QString logText)
+void GdbCom::writeLogEntry(QString logText)
 {
     assert(m_enableLog == true);
 
@@ -833,7 +833,7 @@ void Com::writeLogEntry(QString logText)
 /**
  * @brief Reads output from GDB.
  */
-void Com::readTokens()
+void GdbCom::readTokens()
 {
     m_inputBuffer += m_process.readAllStandardOutput();
 
@@ -903,7 +903,7 @@ void Com::readTokens()
  * @brief Reads response from GDB
  * @return 0 on success otherwise an errorcode.
  */
-int Com::readFromGdb(GdbResult *m_result, Tree *m_resultData)
+int GdbCom::readFromGdb(GdbResult *m_result, Tree *m_resultData)
 {
     int rc = 0;
     //debugMsg("## '%s'",stringToCStr(row));
@@ -1014,7 +1014,7 @@ int Com::readFromGdb(GdbResult *m_result, Tree *m_resultData)
 }
 
 
-GdbResult Com::command(Tree *resultData, QString text)
+GdbResult GdbCom::command(Tree *resultData, QString text)
 {
     Tree resultDataNull;
     int rc = 0;
@@ -1089,7 +1089,7 @@ GdbResult Com::command(Tree *resultData, QString text)
  * @brief Starts gdb
  * @return 0 on success and gdb was started.
  */
-int Com::init(QString gdbPath, bool enableDebugLog)
+int GdbCom::init(QString gdbPath, bool enableDebugLog)
 {
     QString commandLine;
 
@@ -1121,21 +1121,21 @@ int Com::init(QString gdbPath, bool enableDebugLog)
 }
 
 
-int Com::getPid()
+int GdbCom::getPid()
 {
     return m_process.pid();
 }
 
 
-Com& Com::getInstance()
+GdbCom& GdbCom::getInstance()
 {
-    static Com core;
+    static GdbCom core;
     return core;
 }
 
 
 
-void Com::onReadyReadStandardError ()
+void GdbCom::onReadyReadStandardError ()
 {
     // Dump all stderr content
     QByteArray stderrBuffer = m_process.readAllStandardError();
@@ -1154,7 +1154,7 @@ void Com::onReadyReadStandardError ()
 
 }
 
-void Com::onReadyReadStandardOutput ()
+void GdbCom::onReadyReadStandardOutput ()
 {
     if(m_busy != 0)
         return;
@@ -1173,7 +1173,7 @@ void Com::onReadyReadStandardOutput ()
 }
 
 
-void Com::dispatchResp()
+void GdbCom::dispatchResp()
 {
     
     // Dispatch the response
@@ -1204,7 +1204,7 @@ void Com::dispatchResp()
 
 }
 
-void Com::enableLog(bool enable)
+void GdbCom::enableLog(bool enable)
 {
     if(m_enableLog == enable)
         return;

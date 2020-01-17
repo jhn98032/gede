@@ -61,7 +61,7 @@ class Token
 
 
 
-class ComListener : public QObject
+class GdbComListener : public QObject
 {
     
 private:
@@ -152,7 +152,7 @@ class Resp
         QString m_dataStr;
     public:
         Tree tree;
-        ComListener::AsyncClass reason;
+        GdbComListener::AsyncClass reason;
         GdbResult m_result;
         
         
@@ -160,24 +160,24 @@ class Resp
 
 
 
-class Com : public QObject
+class GdbCom : public QObject
 {
     private:
 
         Q_OBJECT
 
-        Com();
-        ~Com();
+        GdbCom();
+        ~GdbCom();
 
     public:
 
 
-        static const char* asyncClassToString(ComListener::AsyncClass ac);
+        static const char* asyncClassToString(GdbComListener::AsyncClass ac);
 
-        static Com& getInstance();
+        static GdbCom& getInstance();
         int init(QString gdbPath, bool enableDebugLog);
 
-        void setListener(ComListener *listener) { m_listener = listener; };
+        void setListener(GdbComListener *listener) { m_listener = listener; };
 
         int getPid();
 
@@ -189,7 +189,7 @@ class Com : public QObject
         void enableLog(bool enable);
         
     private:
-        int parseAsyncOutput(Resp *resp, ComListener::AsyncClass *ac);
+        int parseAsyncOutput(Resp *resp, GdbComListener::AsyncClass *ac);
         Resp *parseAsyncRecord();
         Resp *parseExecAsyncOutput();
         Resp *parseNotifyAsyncOutput();
@@ -224,7 +224,7 @@ class Com : public QObject
         QProcess m_process;
         QList<Resp*> m_respQueue; //!< List of responses received from GDB
         QList<PendingCommand> m_pending;
-        ComListener *m_listener;
+        GdbComListener *m_listener;
         
         QList<Token*> m_freeTokens; //!< List of tokens allocated but not in use.
         QList<Token*> m_list;

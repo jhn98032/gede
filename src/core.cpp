@@ -240,7 +240,7 @@ Core::Core()
     ,m_memDepth(32)
 {
     
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     com.setListener(this);
 
     m_ptsFd = openPseudoTerminal();
@@ -266,7 +266,7 @@ Core::~Core()
 
     delete m_ptsListener;
     m_ptsListener = NULL;
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     com.setListener(NULL);
 
     close(m_ptsFd);
@@ -296,7 +296,7 @@ int Core::getMemoryDepth()
 void Core::detectMemoryDepth()
 {
     Tree resultData;
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     if(com.commandF(&resultData, "-data-evaluate-expression \"sizeof(void *)\""))
     {
         warnMsg("Failed to detect memory depth");    
@@ -316,7 +316,7 @@ void Core::detectMemoryDepth()
  */
 int Core::initPid(Settings *cfg, QString gdbPath, QString programPath, int pid)
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
     int rc = 0;
 
@@ -370,7 +370,7 @@ int Core::initPid(Settings *cfg, QString gdbPath, QString programPath, int pid)
  */
 int Core::runInitCommands(Settings *cfg)
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
 
     // Loop through the initializing commands
     for(int i = 0;i < cfg->m_initCommands.size();i++)
@@ -392,7 +392,7 @@ int Core::runInitCommands(Settings *cfg)
 
 int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QStringList argumentList)
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
     int rc = 0;
 
@@ -453,7 +453,7 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
  */
 int Core::initCoreDump(Settings *cfg, QString gdbPath, QString programPath, QString coreDumpFile)
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
     int rc = 0;
 
@@ -506,7 +506,7 @@ int Core::initCoreDump(Settings *cfg, QString gdbPath, QString programPath, QStr
 
 int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QString tcpHost, int tcpPort)
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
 
     m_isRemote = true;
@@ -597,7 +597,7 @@ void Core::onGdbOutput(int socketFd)
  */
 int Core::gdbGetMemory(quint64 addr, size_t count, QByteArray *data)
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
 
     int rc = 0;
@@ -633,7 +633,7 @@ int Core::gdbGetMemory(quint64 addr, size_t count, QByteArray *data)
 */
 bool Core::gdbGetFiles()
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
     QMap<QString, bool> fileLookup;
     bool modified = false;
@@ -715,7 +715,7 @@ bool Core::gdbGetFiles()
  */
 int Core::gdbSetBreakpointAtFunc(QString func)
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
     int rc = 0;
     int res;
@@ -737,7 +737,7 @@ int Core::gdbSetBreakpointAtFunc(QString func)
  */
 void Core::gdbRun()
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
     ICore::TargetState oldState;
 
@@ -772,7 +772,7 @@ void Core::gdbRun()
  */
 void Core::gdbContinue()
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
 
     if(m_targetState == ICore::TARGET_STARTING || m_targetState == ICore::TARGET_RUNNING)
@@ -813,7 +813,7 @@ void Core::stop()
 
     if(m_isRemote)
     {
-        Com& com = Com::getInstance();
+        GdbCom& com = GdbCom::getInstance();
         Tree resultData;
 
         // Send 'kill' to interrupt gdbserver
@@ -851,7 +851,7 @@ void Core::stop()
  */
 void Core::gdbNext()
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
 
     if(m_targetState != ICore::TARGET_STOPPED)
@@ -874,7 +874,7 @@ void Core::gdbNext()
 int Core::jump(QString filename, int lineNo)
 {
     int res;
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
 
     if(m_targetState != ICore::TARGET_STOPPED)
@@ -903,7 +903,7 @@ int Core::jump(QString filename, int lineNo)
  */
 void Core::getStackFrames()
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
     com.command(&resultData, "-stack-list-frames");
 
@@ -915,7 +915,7 @@ void Core::getStackFrames()
  */
 void Core::gdbStepIn()
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
 
     if(m_targetState != ICore::TARGET_STOPPED)
@@ -937,7 +937,7 @@ void Core::gdbStepIn()
  */
 void Core::gdbStepOut()
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
 
     if(m_targetState != ICore::TARGET_STOPPED)
@@ -966,7 +966,7 @@ Core& Core::getInstance()
  */
 int Core::evaluateExpression(QString expr, QString *data)
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
     GdbResult res;
     int rc = 0;
@@ -1028,7 +1028,7 @@ QList <VarWatch*> Core::getWatchChildren(VarWatch &parentWatch)
  */
 int Core::gdbAddVarWatch(QString varName, VarWatch** watchPtr)
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
     QString watchId;
     GdbResult res;
@@ -1080,7 +1080,7 @@ int Core::gdbExpandVarWatchChildren(QString watchId)
 {
     int res;
     Tree resultData;
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
 
     assert(getVarWatchInfo(watchId) != NULL);
 
@@ -1153,7 +1153,7 @@ QString Core::gdbGetVarWatchName(QString watchId)
  */
 void Core::gdbRemoveVarWatch(QString watchId)
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
     
     ensureStopped();
@@ -1193,15 +1193,15 @@ void Core::gdbRemoveVarWatch(QString watchId)
 
 void Core::onNotifyAsyncOut(Tree &tree, AsyncClass ac)
 {
-    debugMsg("NotifyAsyncOut> %s", Com::asyncClassToString(ac));
+    debugMsg("NotifyAsyncOut> %s", GdbCom::asyncClassToString(ac));
 
 
-    if(ac == ComListener::AC_BREAKPOINT_DELETED)
+    if(ac == GdbComListener::AC_BREAKPOINT_DELETED)
     {
         int id = tree.getInt("id");
         dispatchBreakpointDeleted(id);
     }
-    else if(ac == ComListener::AC_BREAKPOINT_MODIFIED)
+    else if(ac == GdbComListener::AC_BREAKPOINT_MODIFIED)
     {
         for(int i = 0;i < tree.getRootChildCount();i++)
         {
@@ -1215,12 +1215,12 @@ void Core::onNotifyAsyncOut(Tree &tree, AsyncClass ac)
         }
     }
     // A new thread has been created
-    else if(ac == ComListener::AC_THREAD_CREATED)
+    else if(ac == GdbComListener::AC_THREAD_CREATED)
     {
         gdbGetThreadList();
         
     }
-    else if(ac == ComListener::AC_LIBRARY_LOADED)
+    else if(ac == GdbComListener::AC_LIBRARY_LOADED)
     {
         m_scanSources = true;
     }
@@ -1252,14 +1252,14 @@ ICore::StopReason Core::parseReasonString(QString reasonString)
 
 void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
 
-    debugMsg("ExecAsyncOut> %s", Com::asyncClassToString(ac));
+    debugMsg("ExecAsyncOut> %s", GdbCom::asyncClassToString(ac));
     
     //tree.dump();
 
     // The program has stopped
-    if(ac == ComListener::AC_STOPPED)
+    if(ac == GdbComListener::AC_STOPPED)
     {
         m_targetState = ICore::TARGET_STOPPED;
 
@@ -1343,7 +1343,7 @@ void Core::onExecAsyncOut(Tree &tree, AsyncClass ac)
 
         }
     }
-    else if(ac == ComListener::AC_RUNNING)
+    else if(ac == GdbComListener::AC_RUNNING)
     {
         m_targetState = ICore::TARGET_RUNNING;
 
@@ -1383,7 +1383,7 @@ void Core::gdbRemoveAllBreakpoints()
     m_breakpoints.clear();
 
     // Remove all
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
     for(int u = 0;u < idList.size();u++)
     {
@@ -1403,7 +1403,7 @@ void Core::gdbRemoveAllBreakpoints()
  */
 void Core::gdbRemoveBreakpoint(BreakPoint* bkpt)
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
 
     assert(bkpt != NULL);
@@ -1422,7 +1422,7 @@ void Core::gdbRemoveBreakpoint(BreakPoint* bkpt)
 
 void Core::gdbGetThreadList()
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
 
     if(m_targetState == ICore::TARGET_STARTING || m_targetState == ICore::TARGET_RUNNING)
@@ -1753,7 +1753,7 @@ void Core::onResult(Tree &tree)
 
 void Core::onStatusAsyncOut(Tree &tree, AsyncClass ac)
 {
-    infoMsg("StatusAsyncOut> %s", Com::asyncClassToString(ac));
+    infoMsg("StatusAsyncOut> %s", GdbCom::asyncClassToString(ac));
     tree.dump();
 }
 
@@ -1800,7 +1800,7 @@ void Core::onLogStreamOutput(QString str)
  */
 int Core::gdbSetBreakpoint(QString filename, int lineNo)
 {
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
     int rc = 0;
     
@@ -1838,7 +1838,7 @@ void Core::selectThread(int threadId)
     if(m_selectedThreadId == threadId)
         return;
 
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
     
     
@@ -1858,7 +1858,7 @@ void Core::selectThread(int threadId)
 void Core::selectFrame(int selectedFrameIdx)
 {
     
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
 
     if(m_targetState == ICore::TARGET_STARTING || m_targetState == ICore::TARGET_RUNNING)
@@ -1884,7 +1884,7 @@ void Core::selectFrame(int selectedFrameIdx)
 int Core::changeWatchVariable(QString watchId, QString newValue)
 {
     QString dataStr;
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
     int rc = 0;
     GdbResult gdbRes = GDB_ERROR;
@@ -1931,7 +1931,7 @@ quint64 Core::getAddress(VarWatch &w)
     int rc = 0;
     quint64 addr = 0;
     GdbResult gdbRes = GDB_ERROR;
-    Com& com = Com::getInstance();
+    GdbCom& com = GdbCom::getInstance();
     Tree resultData;
 
     // Get the expression of the watch
