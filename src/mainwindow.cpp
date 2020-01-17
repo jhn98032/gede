@@ -34,7 +34,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     QStringList names;
 
-    loggerRegister(this);
     
     m_ui.setupUi(this);
 
@@ -225,6 +224,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ui.verticalScrollBar_console, SIGNAL(valueChanged(int)), m_ui.targetOutputView, SLOT(onScrollBar_valueChanged(int)));
 
     m_ui.targetOutputView->setScrollBar(m_ui.verticalScrollBar_console);
+
+    loggerRegister(this);
 
 }
 
@@ -817,17 +818,26 @@ void MainWindow::ICodeView_onRowDoubleClick(int lineNo)
     
 void MainWindow::ILogger_onWarnMsg(QString text)
 {
-    m_ui.gedeOutputWidget->appendPlainText(text);
+    text = "WARN | " + text; 
+    text.replace(" ", "&nbsp;");
+    text = "<font color=\"Purple\">" + text + "</font>";
+    m_ui.gedeOutputWidget->append(text);
 }
 
 void MainWindow::ILogger_onErrorMsg(QString text)
 {
-    m_ui.gedeOutputWidget->appendPlainText(text);
+    text = "ERROR| " + text; 
+    text.replace(" ", "&nbsp;");
+    text = "<font color=\"Red\">" + text + "</font>";
+    m_ui.gedeOutputWidget->append(text);
 }
 
 void MainWindow::ILogger_onInfoMsg(QString text)
 {
-    m_ui.gedeOutputWidget->appendPlainText(text);
+    text = "     | " + text; 
+    text.replace(" ", "&nbsp;");
+    text = "<font color=\"Black\">" + text + "</font>";
+    m_ui.gedeOutputWidget->append(text);
 }
 
 

@@ -14,8 +14,30 @@
 #include <QMutexLocker>
 #include <QMessageBox>
 
+namespace gedelog
+{
+struct LogEntry
+{
+public:
+    typedef enum { TYPE_WARN, TYPE_INFO, TYPE_ERROR} Type;
+
+    LogEntry(Type t, QString msg) : m_type(t), m_text(msg) {};
+    virtual ~LogEntry() {};
+    
+
+    Type m_type;
+    QString m_text;
+    
+};
+}
+
+using namespace gedelog;
+
 
 static QMutex g_mutex;
+static ILogger *g_logger = NULL;
+static QList<gedelog::LogEntry> m_pendingEntries;
+
 
 #ifdef WIN32
 #define YELLOW_CODE ""
@@ -30,15 +52,28 @@ static QMutex g_mutex;
 #endif
 
 
-static ILogger *g_logger = NULL;
 
 void loggerRegister(ILogger *logger)
 {
+    QMutexLocker locker(&g_mutex);
     g_logger = logger;
+
+    while(!m_pendingEntries.isEmpty())
+    {
+        LogEntry entry = m_pendingEntries.takeFirst();
+        if(entry.m_type == LogEntry::TYPE_INFO)
+            g_logger->ILogger_onInfoMsg(entry.m_text);
+        else if(entry.m_type == LogEntry::TYPE_WARN)
+            g_logger->ILogger_onWarnMsg(entry.m_text);
+        else
+            g_logger->ILogger_onErrorMsg(entry.m_text);
+    }
+    
 }
 
 void loggerUnregister(ILogger *logger)
 {
+    QMutexLocker locker(&g_mutex);
     Q_UNUSED(logger);
     
     g_logger = NULL;
@@ -85,6 +120,8 @@ void errorMsg(const char *fmt, ...)
         g_logger->ILogger_onErrorMsg(buffer);
     else
     {
+        m_pendingEntries.append(LogEntry(LogEntry::TYPE_ERROR, buffer));
+
         printf(RED_CODE "%2d.%03d| ERROR | %s" NO_CODE "\n",
             curTime.second()%100, curTime.msec(),
             buffer);
@@ -114,6 +151,8 @@ void warnMsg(const char *fmt, ...)
         g_logger->ILogger_onWarnMsg(buffer);
     else
     {
+        m_pendingEntries.append(LogEntry(LogEntry::TYPE_WARN, buffer));
+
         printf(YELLOW_CODE "%2d.%03d| WARN  | %s" NO_CODE "\n",
             curTime.second()%100, curTime.msec(),
             buffer);
@@ -140,6 +179,8 @@ void infoMsg(const char *fmt, ...)
         g_logger->ILogger_onInfoMsg(buffer);
     else
     {
+        m_pendingEntries.append(LogEntry(LogEntry::TYPE_INFO, buffer));
+
         printf("%2d.%03d| INFO  | %s\n",
             curTime.second()%100, curTime.msec(),
             buffer);
