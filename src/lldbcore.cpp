@@ -97,6 +97,13 @@ void LldbThread::run()
 
       if (listener.WaitForEvent(infinite_timeout, event))
       {
+          debugMsg("s : %d", event.GetType());
+          if(event.GetType() & SBProcess::eBroadcastBitSTDOUT)
+          {
+              char stdio_buffer[128];
+              process.GetSTDOUT(stdio_buffer, sizeof(stdio_buffer));
+              debugMsg("stdout: >%s<", stdio_buffer);
+          }
         if (SBProcess::EventIsProcessEvent (event))
         {
             
