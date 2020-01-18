@@ -127,7 +127,7 @@ void AutoVarCtl::onContextMenu ( const QPoint &pos)
  */
 quint64 AutoVarCtl::getAddress(VarWatch &w)
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     if(w.hasPointerAddress())
     {
         return w.getPointerAddress();
@@ -138,7 +138,7 @@ quint64 AutoVarCtl::getAddress(VarWatch &w)
 void AutoVarCtl::onShowMemory()
 {
     QList<QTreeWidgetItem *> selectedItems = m_autoWidget->selectedItems();
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     if(!selectedItems.empty())
     {
         QTreeWidgetItem *item = selectedItems[0];
@@ -185,7 +185,7 @@ void AutoVarCtl::onAutoWidgetItemExpanded(QTreeWidgetItem *item)
     else
     assert(0);
 
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     //QTreeWidget *varWidget = m_autoWidget;
 
     // Get watchid of the item
@@ -260,7 +260,7 @@ QString AutoVarCtl::getWatchId(QTreeWidgetItem* item)
 
 void AutoVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     QTreeWidget *varWidget = m_autoWidget;
     QString watchId = watch.getWatchId();
     QString name = watch.getName();
@@ -413,7 +413,7 @@ void AutoVarCtl::ICore_onLocalVarChanged(QStringList varNames)
 QString AutoVarCtl::getDisplayString(QString watchId, QString varPath)
 {
     QString displayValue;
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
 
     //debugMsg("%s(watchId:'%s' varPath:'%s')", __func__, qPrintable(watchId), qPrintable(varPath));
 
@@ -475,7 +475,7 @@ void AutoVarCtl::clear()
         QTreeWidgetItem *item = items.takeFirst();
     
         // Delete the item
-        Core &core = Core::getInstance();
+        Core &core = *Core::getInstance();
         QString watchId = getWatchId(item);
         if(watchId != "")
         {
@@ -525,7 +525,7 @@ void
 AutoVarCtl::onAutoWidgetCurrentItemChanged( QTreeWidgetItem * current, int column )
 {
     //QTreeWidget *varWidget = m_autoWidget;
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     QString oldKey = getWatchId(current);
     
     if(column != COLUMN_VALUE)
@@ -609,7 +609,7 @@ void AutoVarCtl::selectedChangeDisplayFormat(VarCtl::DispFormat fmt)
 void AutoVarCtl::addNewWatch(QString varName)
 {
     QString newName = varName;
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     
      //debugMsg("%s", stringToCStr(current->text(0)));
         VarWatch *watch = NULL;

@@ -1220,7 +1220,7 @@ void GdbCom::enableLog(bool enable)
     {
         if(m_logFile.open(QIODevice::Truncate | QIODevice::WriteOnly | QIODevice::Text))
         {
-            infoMsg("Created %s", (const char*)GDB_LOG_FILE);
+            warnMsg("Created %s", (const char*)GDB_LOG_FILE);
 
             m_enableLog = true;
 

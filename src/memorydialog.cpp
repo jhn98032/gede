@@ -16,7 +16,7 @@
 
 QByteArray MemoryDialog::getMemory(quint64 startAddress, int count)
 {
-     Core &core = Core::getInstance();
+     Core &core = *Core::getInstance();
    
     QByteArray b;
     core.gdbGetMemory(startAddress, count, &b);

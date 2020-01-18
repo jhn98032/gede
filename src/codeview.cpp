@@ -88,7 +88,7 @@ void CodeView::onTimerTimeout()
 {
     QPoint globalCursorPos = QCursor::pos();
     QPoint mousePos = mapFromGlobal(globalCursorPos);
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
         
     if((!m_highlighter) || core.isRunning())
     {

@@ -1,3 +1,4 @@
+include(build.cfg)
 
 lessThan(QT_MAJOR_VERSION, 5) {
     QT += gui core
@@ -23,8 +24,14 @@ HEADERS+=codeview.h
 SOURCES+=gdbmiparser.cpp core.cpp
 HEADERS+=gdbmiparser.h core.h
 
-SOURCES+=com.cpp
-HEADERS+=com.h
+SOURCES+=gdbcore.cpp com.cpp
+HEADERS+=gdbcore.h com.h
+
+contains(buildopt, lldb) {
+  QMAKE_CXXFLAGS += -DENABLE_LLDB
+  SOURCES+=lldbcore.cpp
+  HEADERS+=lldbcore.h
+}
 
 SOURCES+=log.cpp
 HEADERS+=log.h

@@ -588,7 +588,7 @@ void ConsoleWidget::decodeCSI(QChar c)
             {
                 QString resp;
                 resp.sprintf(ANSI_CSI "%d;%dR", m_cursorY+1, m_cursorX+1);
-                Core &core = Core::getInstance();
+                Core &core = *Core::getInstance();
                 core.writeTargetStdin(resp);
                 debugMsg("Sending cursor position to target 'CSI%s'", qPrintable(resp.mid(2)));
             }
@@ -780,7 +780,7 @@ bool ConsoleWidget::eventFilter(QObject *obj, QEvent *event)
 
             if(keyEvent->key() == Qt::Key_Tab)
             {
-                Core &core = Core::getInstance();
+                Core &core = *Core::getInstance();
                 QString text = "\t";
                 core.writeTargetStdin(text); 
       
@@ -819,7 +819,7 @@ void ConsoleWidget::showPopupMenu(QPoint pos)
 
 void ConsoleWidget::keyPressEvent ( QKeyEvent * event )
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     assert(m_cfg != NULL);
     
     debugMsg("%s()", __func__);

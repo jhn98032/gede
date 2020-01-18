@@ -17,7 +17,8 @@
 #include <QDir>
 
 #include "mainwindow.h"
-#include "core.h"
+#include "gdbcore.h"
+#include "lldbcore.h"
 #include "log.h"
 #include "util.h"
 #include "tree.h"
@@ -180,9 +181,12 @@ int main(int argc, char *argv[])
         errorMsg("No program to debug");
         return 1;
     }
-    
-    Core &core = Core::getInstance();
 
+    LldbCore core;
+//    GdbCore core;
+    Core::setInstance(&core);
+    
+    
     
     MainWindow w(NULL);
 

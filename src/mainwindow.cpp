@@ -162,7 +162,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     
 
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     core.setListener(this);
 
     connect(&m_tagManager, SIGNAL(onAllScansDone()), SLOT(onAllTagScansDone()));
@@ -677,7 +677,7 @@ void MainWindow::wrapSourceTree(QTreeWidget *treeWidget)
 void MainWindow::insertSourceFiles()
 {
     QTreeWidget *treeWidget = m_ui.treeWidget_file;
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
 
     m_tagManager.abort();
 
@@ -800,7 +800,7 @@ void MainWindow::ICore_onSourceFileListChanged()
  */
 void MainWindow::ICodeView_onRowDoubleClick(int lineNo)
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
 
     CodeViewTab* currentCodeViewTab = currentTab();
     assert(currentCodeViewTab != NULL);
@@ -855,7 +855,7 @@ void MainWindow::ICore_onMessage(QString message)
 
 void MainWindow::fillInStack()
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     
     core.getStackFrames();
 
@@ -875,14 +875,14 @@ MainWindow::onThreadWidgetSelectionChanged( )
         int selectedThreadId = currentItem->data(0, Qt::UserRole).toInt();
 
         // Select the thread
-        Core &core = Core::getInstance();
+        Core &core = *Core::getInstance();
         core.selectThread(selectedThreadId);
     }
 }
 
 void MainWindow::onStackWidgetSelectionChanged()
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
         
     int selectedFrame = -1;
     // Get the new selected frame
@@ -1187,13 +1187,13 @@ void MainWindow::onQuit()
 
 void MainWindow::onStop()
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     core.stop();
 }
 
 void MainWindow::onNext()
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     core.gdbNext();
     
 }
@@ -1271,7 +1271,7 @@ void MainWindow::onGoToLine()
 
 void MainWindow::onRun()
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
 
     m_ui.targetOutputView->clearAll();
 
@@ -1281,7 +1281,7 @@ void MainWindow::onRun()
 
 void MainWindow::onContinue()
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     core.gdbContinue();
 
     onCurrentLineDisabled();
@@ -1290,14 +1290,14 @@ void MainWindow::onContinue()
 
 void MainWindow::onStepIn()
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     core.gdbStepIn();
     
 }
 
 void MainWindow::onStepOut()
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     core.gdbStepOut();
     
 }
@@ -1305,7 +1305,7 @@ void MainWindow::onStepOut()
 
 void MainWindow::ICore_onThreadListChanged()
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
 
     QTreeWidget *threadWidget = m_ui.treeWidget_threads;
     threadWidget->clear();
@@ -1360,7 +1360,7 @@ void MainWindow::ICore_onCurrentThreadChanged(int threadId)
 
 void MainWindow::ICore_onBreakpointsChanged()
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     QList<BreakPoint*>  bklist = core.getBreakPoints();
     
 
@@ -1508,7 +1508,7 @@ void MainWindow::onBreakpointsWidgetItemDoubleClicked(QTreeWidgetItem * item,int
 {
     Q_UNUSED(column);
 
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     QList<BreakPoint*>  bklist = core.getBreakPoints();
     int idx = item->data(0, Qt::UserRole).toInt();
     BreakPoint* bk = bklist[idx];
@@ -1677,7 +1677,7 @@ void MainWindow::onCodeViewContextMenuJumpToLocation()
 {
     QAction *action = static_cast<QAction *>(sender ());
     int lineNo = action->data().toInt();
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
 
     CodeViewTab* currentCodeViewTab = currentTab();
     if(!currentCodeViewTab)
@@ -1693,7 +1693,7 @@ void MainWindow::onCodeViewContextMenuToggleBreakpoint()
 {
     QAction *action = static_cast<QAction *>(sender ());
     int lineNo = action->data().toInt();
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
 
     CodeViewTab* currentCodeViewTab = currentTab();
     if(!currentCodeViewTab)
@@ -1965,7 +1965,7 @@ void MainWindow::setStatusLine(Settings &cfg)
 
 void MainWindow::onBreakpointsRemoveAll()
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     core.gdbRemoveAllBreakpoints();
 }
 
@@ -1976,7 +1976,7 @@ void MainWindow::onBreakpointsRemoveSelected()
     QList<QTreeWidgetItem *> selectedItems = bkptWidget->selectedItems();
 
     // Get a list of breakpoints
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     QList<BreakPoint*>  bklist = core.getBreakPoints();
     QList <int>idList;
     QList<BreakPoint*>  toRemove;
@@ -2013,7 +2013,7 @@ void MainWindow::onBreakpointsGoTo()
     QList<QTreeWidgetItem *> selectedItems = bkptWidget->selectedItems();
 
     // Get a list of breakpoints
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     QList<BreakPoint*>  bklist = core.getBreakPoints();
     QList <int>idList;
     if(!selectedItems.empty())

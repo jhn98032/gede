@@ -21,6 +21,7 @@
 
 
 class Core;
+class GdbCore;
 
 struct ThreadInfo
 {
@@ -44,6 +45,9 @@ struct StackFrameEntry
 class SourceFile
 {
 public:
+    SourceFile() {};
+    
+    SourceFile(QString fullName, QString name) : m_name(name), m_fullName(fullName)  {};
     QString m_name;
     QString m_fullName;
 };
@@ -94,7 +98,6 @@ public:
 
     bool hasChildren() { return m_hasChildren; };
     
-    void valueFromGdbString(QString data);
 
 private:
     void clear();
@@ -126,7 +129,8 @@ class VarWatch
         QString getVarType() { return m_varType; };
         QString getValue(CoreVar::DispFormat fmt = CoreVar::FMT_NATIVE) { return m_var.getData(fmt); };
 
-        void setValue(QString value);
+        CoreVar& getVar() { return m_var; };
+        
         long long getPointerAddress() { return m_var.getPointerAddress(); };
         bool hasPointerAddress() { return m_var.hasPointerAddress(); };
 
@@ -142,6 +146,8 @@ class VarWatch
         QString m_parentWatchId;
 
     friend Core;
+    friend GdbCore;
+    
 };
 
 
@@ -200,122 +206,82 @@ class ICore
 
 
 
-class Core : public GdbComListener
+class Core  : public QObject
 {
 private:
     Q_OBJECT
     
-private:
+protected:
 
-    Core();
-    ~Core();
+    Core(){};
+    virtual ~Core(){};
 
 public:
+
+    static Core* getInstance();
+    static void setInstance(Core *c);
     
 
-    static Core& getInstance();
-    int initPid(Settings *cfg, QString gdbPath, QString programPath, int pid);
-    int initLocal(Settings *cfg, QString gdbPath, QString programPath, QStringList argumentList);
-    int initCoreDump(Settings *cfg, QString gdbPath, QString programPath, QString coreDumpFile);
-    int initRemote(Settings *cfg, QString gdbPath, QString programPath, QString tcpHost, int tcpPort);
-    int evaluateExpression(QString expr, QString *data);
+    virtual int initPid(Settings *cfg, QString gdbPath, QString programPath, int pid) = 0;
+    virtual int initLocal(Settings *cfg, QString gdbPath, QString programPath, QStringList argumentList) = 0;
+    virtual int initCoreDump(Settings *cfg, QString gdbPath, QString programPath, QString coreDumpFile) = 0;
+    virtual int initRemote(Settings *cfg, QString gdbPath, QString programPath, QString tcpHost, int tcpPort) = 0;
+    virtual int evaluateExpression(QString expr, QString *data) = 0;
     
-    void setListener(ICore *inf) { m_inf = inf; };
-
+    virtual void setListener(ICore *inf) = 0;
     
-private:
     
-     void onNotifyAsyncOut(Tree &tree, AsyncClass ac);
-     void onExecAsyncOut(Tree &tree, AsyncClass ac);
-     void onResult(Tree &tree);
-     void onStatusAsyncOut(Tree &tree, AsyncClass ac);
-     void onConsoleStreamOutput(QString str);
-     void onTargetStreamOutput(QString str);
-     void onLogStreamOutput(QString str);
+    virtual int gdbSetBreakpointAtFunc(QString func) = 0;
+    virtual void gdbNext() = 0;
+    virtual void gdbStepIn() = 0;
+    virtual void gdbStepOut() = 0;
+    virtual void gdbContinue() = 0;
+    virtual void gdbRun() = 0;
+    virtual bool gdbGetFiles() = 0;
 
-    void dispatchBreakpointDeleted(int id);
-    void dispatchBreakpointTree(Tree &tree);
-    static ICore::StopReason parseReasonString(QString string);
-    void detectMemoryDepth();
-    static int openPseudoTerminal();
-    void ensureStopped();
-    int runInitCommands(Settings *cfg);
+    virtual int getMemoryDepth() = 0;
+
+    virtual int changeWatchVariable(QString variable, QString newValue) = 0;
     
-public:
-    int gdbSetBreakpointAtFunc(QString func);
-    void gdbNext();
-    void gdbStepIn();
-    void gdbStepOut();
-    void gdbContinue();
-    void gdbRun();
-    bool gdbGetFiles();
-
-    int getMemoryDepth();
-
-    int changeWatchVariable(QString variable, QString newValue);
+    virtual QStringList getLocalVars() = 0;
     
-    QStringList getLocalVars() { return m_localVars; };
-
-    quint64 getAddress(VarWatch &w);
+    virtual quint64 getAddress(VarWatch &w) = 0;
     
 
-    int jump(QString filename, int lineNo);
+    virtual int jump(QString filename, int lineNo) = 0;
 
-    int gdbSetBreakpoint(QString filename, int lineNo);
-    void gdbGetThreadList();
-    void getStackFrames();
-    void stop();
-    int gdbExpandVarWatchChildren(QString watchId);
-    int gdbGetMemory(quint64 addr, size_t count, QByteArray *data);
+    virtual int gdbSetBreakpoint(QString filename, int lineNo) = 0;
+    virtual void gdbGetThreadList() = 0;
+    virtual void getStackFrames() = 0;
+    virtual void stop() = 0;
+    virtual int gdbExpandVarWatchChildren(QString watchId) = 0;
+    virtual int gdbGetMemory(quint64 addr, size_t count, QByteArray *data) = 0;
     
-    void selectThread(int threadId);
-    void selectFrame(int selectedFrameIdx);
+    virtual void selectThread(int threadId) = 0;
+    virtual void selectFrame(int selectedFrameIdx) = 0;
 
     // Breakpoints
-    QList<BreakPoint*> getBreakPoints() { return m_breakpoints; };
-    BreakPoint* findBreakPoint(QString fullPath, int lineNo);
-    BreakPoint* findBreakPointByNumber(int number);
-    void gdbRemoveBreakpoint(BreakPoint* bkpt);
-    void gdbRemoveAllBreakpoints();
+    virtual QList<BreakPoint*> getBreakPoints() = 0;
+    virtual BreakPoint* findBreakPoint(QString fullPath, int lineNo) = 0;
+    virtual BreakPoint* findBreakPointByNumber(int number) = 0;
+    virtual void gdbRemoveBreakpoint(BreakPoint* bkpt) = 0;
+    virtual void gdbRemoveAllBreakpoints() = 0;
 
-    QList<ThreadInfo> getThreadList();
+    virtual QList<ThreadInfo> getThreadList() = 0;
 
     // Watch
-    VarWatch *getVarWatchInfo(QString watchId);
-    QList <VarWatch*> getWatchChildren(VarWatch &watch);
-    int gdbAddVarWatch(QString varName, VarWatch **watchPtr);
-    void gdbRemoveVarWatch(QString watchId);
-    QString gdbGetVarWatchName(QString watchId);
+    virtual VarWatch *getVarWatchInfo(QString watchId) = 0;
+    virtual QList <VarWatch*> getWatchChildren(VarWatch &watch) = 0;
+    virtual int gdbAddVarWatch(QString varName, VarWatch **watchPtr) = 0;
+    virtual void gdbRemoveVarWatch(QString watchId) = 0;
+    virtual QString gdbGetVarWatchName(QString watchId) = 0;
 
     
-    QVector <SourceFile*> getSourceFiles() { return m_sourceFiles; };
-
-    void writeTargetStdin(QString text);
-
-    bool isRunning();
+    virtual QVector <SourceFile*> getSourceFiles() = 0;
     
-private slots:
-        void onGdbOutput(int socketNr);
+    virtual void writeTargetStdin(QString text) = 0;
 
-private:
-    ICore *m_inf;
-    QList<BreakPoint*> m_breakpoints;
-    QVector <SourceFile*> m_sourceFiles;
-    QMap <int, ThreadInfo> m_threadList;
-    int m_selectedThreadId;
-    ICore::TargetState m_targetState;
-    ICore::TargetState m_lastTargetState;
-    int m_pid;
-    int m_currentFrameIdx;
-    QList <VarWatch*> m_watchList;
-    int m_varWatchLastId;
-    bool m_isRemote; //!< True if "remote target" or false if it is a "local target".
-    int m_ptsFd;
-    bool m_scanSources; //!< True if the source filelist may have changed
-    QSocketNotifier  *m_ptsListener;
-
-    QStringList m_localVars;
-    int m_memDepth; //!< The memory depth. (Either 64 or 32).
+    virtual bool isRunning() = 0;
 };
 
 

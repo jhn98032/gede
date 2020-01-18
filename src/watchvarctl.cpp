@@ -59,7 +59,7 @@ void WatchVarCtl::setWidget(QTreeWidget *varWidget)
 void WatchVarCtl::ICore_onWatchVarChanged(VarWatch &watch)
 {
     QTreeWidget *varWidget = m_varWidget;
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
 
     AutoSignalBlocker autoBlocker(m_varWidget);
 
@@ -89,7 +89,7 @@ QString WatchVarCtl::getWatchId(QTreeWidgetItem* item)
 
 void WatchVarCtl::sync(QTreeWidgetItem* parentItem, VarWatch &watch)
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     QString watchId = watch.getWatchId();
     QString name = watch.getName();
     QString varType = watch.getVarType();
@@ -203,7 +203,7 @@ void WatchVarCtl::sync(QTreeWidgetItem* parentItem, VarWatch &watch)
 
 void WatchVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
 {
-    //Core &core = Core::getInstance();
+    //Core &core = *Core::getInstance();
     QTreeWidget *varWidget = m_varWidget;
     QString watchId = watch.getWatchId();
     QString name = watch.getName();
@@ -316,7 +316,7 @@ void WatchVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
 QString WatchVarCtl::getDisplayString(QString watchId)
 {
     QString displayValue;
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     VarWatch *watch = core.getVarWatchInfo(watchId);
     if(watch)
     {
@@ -371,7 +371,7 @@ void WatchVarCtl::selectedChangeDisplayFormat(VarCtl::DispFormat fmt)
         QString varName = item->text(COLUMN_NAME);
         QString watchId = item->data(DATA_COLUMN, Qt::UserRole).toString();
 
-        Core &core = Core::getInstance();
+        Core &core = *Core::getInstance();
         VarWatch *watch = core.getVarWatchInfo(watchId);
         
         if(watch != NULL && m_watchVarDispInfo.contains(watchId))
@@ -459,7 +459,7 @@ void
 WatchVarCtl::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int column )
 {
     QTreeWidget *varWidget = m_varWidget;
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     QString oldKey = current->data(DATA_COLUMN, Qt::UserRole).toString();
     QString oldName  = oldKey == "" ? "" : core.gdbGetVarWatchName(oldKey);
     QString newName = current->text(COLUMN_NAME);
@@ -625,7 +625,7 @@ WatchVarCtl::onWatchWidgetCurrentItemChanged( QTreeWidgetItem * current, int col
 
 void WatchVarCtl::onWatchWidgetItemExpanded(QTreeWidgetItem *item )
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
     //QTreeWidget *varWidget = m_varWidget;
 
     // Get watchid of the item
@@ -750,7 +750,7 @@ void WatchVarCtl::deleteSelected()
         QTreeWidgetItem *item = *setItr;
     
         // Delete the item
-        Core &core = Core::getInstance();
+        Core &core = *Core::getInstance();
         QString watchId = item->data(DATA_COLUMN, Qt::UserRole).toString();
         if(watchId != "")
         {

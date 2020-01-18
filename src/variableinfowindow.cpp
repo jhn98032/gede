@@ -32,7 +32,7 @@ void VariableInfoWindow::hide()
 
 void VariableInfoWindow::show(QString expr)
 {
-    Core &core = Core::getInstance();
+    Core &core = *Core::getInstance();
 
     if(expr != m_expr)
     {

@@ -61,11 +61,10 @@ class Token
 
 
 
-class GdbComListener : public QObject
+class GdbComListener
 {
     
 private:
-    Q_OBJECT
     
     public:
 

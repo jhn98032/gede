@@ -96,6 +96,15 @@ def ensureExist(name):
     else:
         printRed(" not found!!")
 
+def detectLldb():
+    sys.stdout.write("Checking for LLDB\n");
+    sys.stdout.flush();
+    f = open("build.cfg", "w")
+    f.write("buildopt = lldb\n"); 
+    f.write("QMAKE_CXXFLAGS += -I/usr/lib/llvm-7/include\n")
+    f.write("LIBS+= -llldb-7\n");
+    f.write("\n");
+
 def detectQt():
     """ @brief Detects the Qt version installed in the system.
         @return The name of the qmake executable. 
@@ -178,6 +187,7 @@ if __name__ == "__main__":
                 srcDirList = ["src"]
             for srcdir in srcDirList:
                 os.chdir(srcdir)
+                detectLldb()
                 if not os.path.exists("Makefile"):
                     qmakeName = detectQt();
                     print("Generating makefile")
