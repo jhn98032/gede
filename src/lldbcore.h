@@ -5,7 +5,43 @@
 
 #include "core.h"
 
+#include <lldb/API/SBDebugger.h>
+#include <lldb/API/SBThread.h>
+#include <lldb/API/SBTarget.h>
+#include <lldb/API/SBLaunchInfo.h>
+#include <lldb/API/SBError.h>
+#include <lldb/API/SBProcess.h>
+#include <lldb/API/SBListener.h>
+#include <lldb/API/SBEvent.h>
+
+
 class LldbThread;
+
+
+class LldbThread : public QThread
+{
+    Q_OBJECT
+public:
+
+    LldbThread();
+    virtual ~LldbThread();
+
+    void run();
+
+  int test(QString exeNameStr);
+    QVector<SourceFile*> detectSourceFiles();
+    void sendStepOver();
+
+signals:
+        void onEvent(int evt);
+
+public:    
+lldb::SBBroadcaster gui_event_broadcaster;
+lldb::SBTarget target;
+lldb::SBListener listener;
+lldb::SBProcess process;
+};
+
 
 class LldbCore : public Core
 {
@@ -28,6 +64,8 @@ public:
     
     void setListener(ICore *inf);
     
+private slots:
+    void onEvent(int evt);
     
 public:
     int gdbSetBreakpointAtFunc(QString func);

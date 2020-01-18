@@ -1,6 +1,7 @@
 #include "lldbcore.h"
 
 #include <lldb/API/SBDebugger.h>
+#include <lldb/API/SBThread.h>
 #include <lldb/API/SBTarget.h>
 #include <lldb/API/SBLaunchInfo.h>
 #include <lldb/API/SBError.h>
@@ -15,37 +16,11 @@
 using namespace lldb;
 
 
-class LldbThread : public QThread
-{
 
-public:
-
-    LldbThread();
-    virtual ~LldbThread();
-
-    void run();
-
-  int test(QString exeNameStr);
-    QVector<SourceFile*> detectSourceFiles();
-    
-SBTarget target;
-SBListener listener;
-SBProcess process;
-};
-
-
-// Define the event bits we will use for gui_event_broadcaster
 enum
 {
-  eGUIEventBitLaunch   = (1u << 0),
-  eGUIEventBitKill     = (1u << 1),
-  eGUIEventBitStepOver = (1u << 2),
-  eGUIEventBitStepOut  = (1u << 3),
-  eGUIEventBitStepInto = (1u << 4),
-  eGUIEventBitContinue = (1u << 5),
-  eGUIEventBitHalt     = (1u << 6),
-  eGUIEventBitQuit     = (1u << 7),
-  eGUIEventAll         = UINT32_MAX
+    LLDBCTRL_STEPOVER = (1<<0),
+    LLDBCTRL_EVENT_ALL  = UINT32_MAX
 };
 
 const char *stateToDesc(StateType process_state)
@@ -66,6 +41,7 @@ return desc;
 
 
 LldbThread::LldbThread()
+ : gui_event_broadcaster("gui-events")
 {
 
 }
@@ -75,8 +51,17 @@ LldbThread::~LldbThread()
 
 }
 
+QString fullPath(SBFileSpec spec)
+{
+    QString path;
+    path.sprintf("%s/%s", spec.GetDirectory(), spec.GetFilename());
+    return path;
+}
+
+
 QVector<SourceFile*> LldbThread::detectSourceFiles()
 {
+    debugMsg("%s()", __func__);
     QVector<SourceFile*> list;
     for(uint32_t modIdx = 0;modIdx < target.GetNumModules();modIdx++)
     {
@@ -87,7 +72,7 @@ QVector<SourceFile*> LldbThread::detectSourceFiles()
             SBFileSpec spec = cu.GetFileSpec();
             QString path;
             path.sprintf("%s/%s", spec.GetDirectory(), spec.GetFilename());
-            debugMsg("d:'%s'", qPrintable(path));
+            // debugMsg("d:'%s'", qPrintable(path));
             SourceFile *sf = new SourceFile(path, QString(spec.GetFilename()));
             list.append(sf);
         }
@@ -95,7 +80,6 @@ QVector<SourceFile*> LldbThread::detectSourceFiles()
     }
     return list;
 }
-
 
     
 void LldbThread::run()
@@ -115,34 +99,30 @@ void LldbThread::run()
       {
         if (SBProcess::EventIsProcessEvent (event))
         {
+            
           process_state = SBProcess::GetStateFromEvent (event);
     printf(">%s\n", stateToDesc(process_state));
-          switch (process_state)
-          {
-          case eStateStopped:
-          case eStateRunning:
-          case eStateExited:
-          case eStateDetached:
-          default:;break;
-          }
+
+        emit onEvent(process_state);
+
+         
         }
-        /*
         else if (event.BroadcasterMatchesRef(gui_event_broadcaster))
         {
-          switch (event_type)
+            debugMsg("brd");
+            int type = event.GetType();
+          switch (type)
           {
-            case eGUIEventBitLaunch:
-        case eGUIEventBitKill:
-        case eGUIEventBitStepOver:
-        case eGUIEventBitStepOut:
-        case eGUIEventBitStepInto:
-            case eGUIEventBitContinue:
-        case eGUIEventBitHalt:
-        case eGUIEventBitQuit:
-          default:;break;
-          }
+            case LLDBCTRL_STEPOVER:
+            {
+                debugMsg("stepping over");
+                       SBThread thisThread = process.GetSelectedThread();
+                thisThread.StepOver();
+                };
+                default:;break;
+                }
         }
-        * */
+        
       }
     }
 
@@ -152,10 +132,15 @@ void LldbThread::run()
 
 }
     
+void LldbThread::sendStepOver()
+{
+    gui_event_broadcaster.BroadcastEventByType(LLDBCTRL_STEPOVER);
+}
 
       
-int LldbThread::test(QString exeNameStr)
+int LldbThread::test(QString exeName)
 {
+        char *exeNameCStr = strdup(qPrintable(exeName));
 
 setenv("LLDB_DEBUGSERVER_PATH","/usr/bin/lldb-server", 1);
 
@@ -173,23 +158,19 @@ setenv("LLDB_DEBUGSERVER_PATH","/usr/bin/lldb-server", 1);
 
 debugger.SetAsync (true);
 
-SBBroadcaster gui_event_broadcaster("gui-events");
-SBListener run_loop_listener("run-loop-listener");
-// Listen for any event from gui_event_broadcaster by listening to all event bits
-run_loop_listener.StartListeningForEvents(gui_event_broadcaster, eGUIEventAll);
 
 
-target = debugger.CreateTargetWithFileAndArch (qPrintable(exeNameStr), NULL);//LLDB_ARCH_DEFAULT);
+target = debugger.CreateTargetWithFileAndArch (exeNameCStr, NULL);//LLDB_ARCH_DEFAULT);
 
 if(!target.IsValid())
     printf("target failed\r\n");
 else
 printf("target ok\r\n");
 
-        
-const char *argv[] = { qPrintable(exeNameStr), "-l", "-A", "-F", nullptr };
+const char *argv[] = { exeNameCStr, "-l", "-A", "-F", nullptr };
 SBLaunchInfo launch_info(argv);
 launch_info.SetWorkingDirectory(".");
+
 
 SBBreakpoint main_bp = target.BreakpointCreateByName ("main", target.GetExecutable().GetFilename());
 printf("main_bp: %s\n", main_bp.IsValid() ? "valid" : "invalid");
@@ -197,6 +178,7 @@ printf("main_bp: %s\n", main_bp.IsValid() ? "valid" : "invalid");
 
 listener = debugger.GetListener();
 
+listener.StartListeningForEvents(gui_event_broadcaster, LLDBCTRL_EVENT_ALL);
     
 SBError error3;
 
@@ -214,12 +196,13 @@ printf("process: %s (%s)\n", process.IsValid() ? "valid" : "invalid", error3.Get
 process.GetBroadcaster().AddListener(listener,
         SBProcess::eBroadcastBitStateChanged | SBProcess::eBroadcastBitSTDOUT);
 
-process.Continue();
+// process.Continue();
 
  StateType state4 = process.GetState(); // is stopped
 printf("state4:%s\n", stateToDesc(state4));
     
 
+free(exeNameCStr);
 
 
 return 0;
@@ -230,6 +213,8 @@ return 0;
 LldbCore::LldbCore()
 {   
     m_thread = new LldbThread();
+
+    connect(m_thread, SIGNAL(onEvent(int)), this, SLOT(onEvent(int)));
 }
 
 
@@ -237,6 +222,36 @@ LldbCore::~LldbCore()
 {
     m_thread->quit();
     delete m_thread;
+}
+
+
+void LldbCore::onEvent(int evt)
+{
+int process_state = evt;
+
+debugMsg("%s(%d)", __func__, evt);
+
+ switch (process_state)
+          {
+          case eStateStopped:
+          {
+                //SBThread thisThread = process.GetSelectedThread();
+                    SBThread thisThread = m_thread->process.GetSelectedThread();
+                    if(!thisThread.IsValid())
+                        debugMsg("Invalid thread_");
+                    SBFrame frame = thisThread.GetSelectedFrame();
+                    int line = frame.GetLineEntry().GetLine();
+                    debugMsg("stop at %s %d", frame.GetFunctionName(), line);
+
+                    QString filename = fullPath(frame.GetCompileUnit().GetFileSpec());
+                    m_inf->ICore_onStopped(ICore::UNKNOWN, filename, line);
+          };break;
+          case eStateRunning:
+          case eStateExited:
+          case eStateDetached:
+          default:;break;
+          }
+          
 }
 
 int LldbCore::initPid(Settings *cfg, QString gdbPath, QString programPath, int pid)
@@ -308,6 +323,8 @@ int LldbCore::gdbSetBreakpointAtFunc(QString func)
 
 void LldbCore::gdbNext()
 {
+    debugMsg("LldbCore::%s()", __func__); 
+    m_thread->sendStepOver();
 }
 
 void LldbCore::gdbStepIn()
