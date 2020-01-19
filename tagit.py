@@ -32,6 +32,8 @@ with open("src/version.h", "r") as f:
         tagName = ("rel-%s.%s.%s" % (major, minor, patch))
         print("Tagging with '%s'" % (tagName))
         os.system("git tag %s" % (tagName))
+        print("Push tag with command:")
+        print("  git push origin %s" % (tagName))
 
 
 
