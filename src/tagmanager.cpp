@@ -50,7 +50,6 @@ void ScannerWorker::run()
 {
     assert(m_dbgMainThread != QThread::currentThreadId ());
 
-    m_cfg.load();
     
     m_scanner.init(&m_cfg);
 
@@ -73,6 +72,14 @@ void ScannerWorker::run()
         m_doneCond.wakeAll();
     }
 }
+
+
+void ScannerWorker::setConfig(Settings cfg)
+{
+    QMutexLocker am(&m_mutex);
+    m_cfg = cfg;
+}
+
 
 void ScannerWorker::waitAll()
 {
@@ -112,19 +119,18 @@ void ScannerWorker::scan(QString filePath)
 }
 
 
-TagManager::TagManager()
+TagManager::TagManager(Settings &cfg)
 {
 #ifndef NDEBUG
     m_dbgMainThread = QThread::currentThreadId ();
 #endif
 
-    m_cfg.load();
-    
+    m_worker.setConfig(cfg);
     m_worker.start();
     
     connect(&m_worker, SIGNAL(onScanDone(QString, QList<Tag>* )), this, SLOT(onScanDone(QString, QList<Tag>* )));
     
-
+    m_cfg = cfg;
     m_tagScanner.init(&m_cfg);
 
 }
@@ -261,5 +267,10 @@ void TagManager::lookupTag(QString name, QList<Tag> *tagList)
 
 }
 
+void TagManager::setConfig(Settings &cfg)
+{
+    m_cfg = cfg;
+    m_worker.setConfig(cfg);
+};
 
 

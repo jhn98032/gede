@@ -30,6 +30,7 @@
 
 MainWindow::MainWindow(QWidget *parent)
       : QMainWindow(parent)
+      ,m_tagManager(m_cfg)
       ,m_locator(&m_tagManager, &m_sourceFiles)
 {
     QStringList names;
@@ -1844,6 +1845,7 @@ void MainWindow::setConfig()
     
     m_autoVarCtl.setConfig(&m_cfg);
 
+    m_tagManager.setConfig(m_cfg);
 }
 
 

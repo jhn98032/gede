@@ -35,6 +35,8 @@ class ScannerWorker : public QThread
         void queueScan(QString filePath);
 
         bool isIdle();
+
+        void setConfig(Settings cfg);
         
     private:
         void scan(QString filePath);
@@ -64,9 +66,11 @@ class TagManager : public QObject
 {
 
     Q_OBJECT
-    
+
+private:
+    TagManager(){};
 public:
-    TagManager();
+    TagManager(Settings &cfg);
     virtual ~TagManager();
 
 
@@ -81,6 +85,7 @@ public:
 
     void lookupTag(QString name, QList<Tag> *tagList);
 
+    void setConfig(Settings &cfg);
 signals:
     void onAllScansDone();
     
