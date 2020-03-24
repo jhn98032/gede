@@ -183,7 +183,16 @@ public slots:
     void onAllTagScansDone();
     void onFuncWidgetItemSelected(QTreeWidgetItem * item, int column);
     void onClassWidgetItemSelected(QTreeWidgetItem * item, int column);
+
     
+    void onNewInfoMsg(QString text);
+    void onNewWarnMsg(QString text);
+    void onNewErrorMsg(QString text);
+
+signals:
+    void newInfoMsg(QString text);
+    void newWarnMsg(QString text);
+    void newErrorMsg(QString text);
 
 private:
     QByteArray m_gui_default_mainwindowState;

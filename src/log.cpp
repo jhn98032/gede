@@ -127,7 +127,6 @@ void errorMsg(const char *fmt, ...)
             buffer);
 
     }
-    QMessageBox::critical(NULL, QString("Gede - Error"), QString(buffer));
 
 }
 

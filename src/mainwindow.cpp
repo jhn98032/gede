@@ -226,6 +226,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_ui.targetOutputView->setScrollBar(m_ui.verticalScrollBar_console);
 
+    connect(this, SIGNAL(newInfoMsg(QString)), SLOT(onNewInfoMsg(QString)));
+    connect(this, SIGNAL(newWarnMsg(QString)), SLOT(onNewWarnMsg(QString)));
+    connect(this, SIGNAL(newErrorMsg(QString)), SLOT(onNewErrorMsg(QString)));
+
     loggerRegister(this);
 
 }
@@ -817,28 +821,49 @@ void MainWindow::ICodeView_onRowDoubleClick(int lineNo)
 
 
     
-void MainWindow::ILogger_onWarnMsg(QString text)
+
+void MainWindow::onNewWarnMsg(QString msg)
 {
-    text = "WARN | " + text; 
+    QString text = "WARN | " + msg; 
     text.replace(" ", "&nbsp;");
     text = "<font color=\"Purple\">" + text + "</font>";
     m_ui.gedeOutputWidget->append(text);
 }
 
-void MainWindow::ILogger_onErrorMsg(QString text)
+void MainWindow::onNewErrorMsg(QString msg)
 {
-    text = "ERROR| " + text; 
+    QString text = "ERROR| " + msg; 
     text.replace(" ", "&nbsp;");
     text = "<font color=\"Red\">" + text + "</font>";
+
     m_ui.gedeOutputWidget->append(text);
+
+    QMessageBox::critical(NULL, QString("Gede - Error"), QString(msg));
+}
+
+void MainWindow::onNewInfoMsg(QString msg)
+{
+    QString text = "     | " + msg; 
+    text.replace(" ", "&nbsp;");
+    text = "<font color=\"Black\">" + text + "</font>";
+
+    m_ui.gedeOutputWidget->append(text);
+}
+
+void MainWindow::ILogger_onWarnMsg(QString text)
+{
+    emit newWarnMsg(text);
+}
+
+
+void MainWindow::ILogger_onErrorMsg(QString text)
+{
+    emit newErrorMsg(text);
 }
 
 void MainWindow::ILogger_onInfoMsg(QString text)
 {
-    text = "     | " + text; 
-    text.replace(" ", "&nbsp;");
-    text = "<font color=\"Black\">" + text + "</font>";
-    m_ui.gedeOutputWidget->append(text);
+    emit newInfoMsg(text);
 }
 
 
