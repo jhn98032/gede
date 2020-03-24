@@ -233,7 +233,11 @@ int TagScanner::scan(QString filepath, QList<Tag> *taglist)
         QStringList outputList = all.split('\n', QString::SkipEmptyParts);
         for(int r = 0;r < outputList.size();r++)
         {
-            errorMsg("%s", stringToCStr(outputList[r]));
+            QString text = outputList[r];
+            if(text.contains("Warning"))
+                warnMsg("%s", stringToCStr(text));
+            else
+                errorMsg("%s", stringToCStr(text));
         } 
     }
 
