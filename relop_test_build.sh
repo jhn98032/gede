@@ -12,6 +12,7 @@ for td in testapps/*;do
     if [ -d "$td" ]; then
       echo "$td"
       pushd $td > /dev/null
+      make clean
       make
       popd > /dev/null
     fi
