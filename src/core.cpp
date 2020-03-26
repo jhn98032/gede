@@ -1814,7 +1814,7 @@ int Core::gdbSetBreakpoint(QString filename, int lineNo)
     if(res == GDB_ERROR)
     {
         rc = -1;
-        errorMsg("Failed to set breakpoint at %s:%d", stringToCStr(filename), lineNo);
+        warnMsg("Failed to set breakpoint at %s:%d", stringToCStr(filename), lineNo);
     }
     
     return rc;
