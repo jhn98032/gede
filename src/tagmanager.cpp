@@ -271,6 +271,6 @@ void TagManager::setConfig(Settings &cfg)
 {
     m_cfg = cfg;
     m_worker.setConfig(cfg);
-};
+}
 
 
