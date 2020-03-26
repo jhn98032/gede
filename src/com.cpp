@@ -129,11 +129,9 @@ GdbCom::~GdbCom()
         delete token;
     }
 
-
+    enableLog(false);
     if(m_enableLog)
     {
-        writeLogEntry("\n");
-        writeLogEntry("#\n");
         writeLogEntry("#\n");
         m_logFile.close();
     }
@@ -1212,6 +1210,10 @@ void GdbCom::enableLog(bool enable)
     if(m_enableLog)
     {
         writeLogEntry("#\n");
+        QDateTime now = QDateTime::currentDateTime();
+        QString logStr;
+        logStr = "# Closed: " + now.toString("yyyy-MM-dd hh:mm:ss") + "\n";
+        writeLogEntry(logStr);
         m_logFile.close();
     }
     m_enableLog = false;
