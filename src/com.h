@@ -96,7 +96,6 @@ private:
         virtual void onConsoleStreamOutput(QString str) = 0;
         virtual void onTargetStreamOutput(QString str) = 0;
         virtual void onLogStreamOutput(QString str) = 0;
-
 };
 
 enum GdbResult
@@ -206,7 +205,8 @@ class GdbCom : public QObject
     public slots:
         void onReadyReadStandardOutput ();
         void onReadyReadStandardError();
-
+        void onGdbStateChanged(QProcess::ProcessState newState );
+        
 
     private:
         int readFromGdb(GdbResult *m_result, Tree *m_resultData);

@@ -107,10 +107,13 @@ GdbCom::GdbCom()
 
     connect(&m_process, SIGNAL(readyReadStandardOutput ()), this, SLOT(onReadyReadStandardOutput()));
 
+    connect(&m_process, SIGNAL(stateChanged (QProcess::ProcessState)), this, SLOT(onGdbStateChanged(QProcess::ProcessState)));
 }
 
 GdbCom::~GdbCom()
 {
+    disconnect(&m_process, SIGNAL(stateChanged (QProcess::ProcessState)), this, SLOT(onGdbStateChanged(QProcess::ProcessState)));
+    
     // Send the command to gdb to exit cleanly
     QString text = "-gdb-exit\n";
     m_process.write((const char*)text.toLatin1());
@@ -1245,4 +1248,32 @@ void GdbCom::enableLog(bool enable)
     }
 }
 
+void GdbCom::onGdbStateChanged ( QProcess::ProcessState newState )
+{
+    if(m_enableLog)
+    {
+        QString logText;
+        logText = "# GDB process state changed to ";
+        switch(newState)
+        {
+            case QProcess::NotRunning:
+                logText += "'not running'";break;
+            case QProcess::Running:
+                logText += "'running'";break;
+            case QProcess::Starting:
+                logText += "'starting'";break;
+            default:
+                logText += "?";break;
+        };
+        logText += "\n";
+        writeLogEntry(logText);
+    }
+    if(newState == QProcess::NotRunning)
+    {
+        errorMsg("GDB unexpected terminated");
+    }
+}
+
+
+    
         
