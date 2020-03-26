@@ -1974,18 +1974,18 @@ void MainWindow::setStatusLine(Settings &cfg)
             argumentText = argumentText.left(50);
             argumentText += "...";
         }
-        statusText.sprintf("[%s] [%s]", stringToCStr(cfg.m_lastProgram), stringToCStr(argumentText));
+        statusText.sprintf("[%s] [%s]", stringToCStr(cfg.getProgramPath()), stringToCStr(argumentText));
     }
     else if(cfg.m_connectionMode == MODE_COREDUMP)
     {
-        statusText.sprintf("[%s] [%s]", stringToCStr(cfg.m_lastProgram), stringToCStr(cfg.m_coreDumpFile));
+        statusText.sprintf("[%s] [%s]", stringToCStr(cfg.getProgramPath()), stringToCStr(cfg.m_coreDumpFile));
     }
     else if(cfg.m_connectionMode == MODE_PID)
     {
-        statusText.sprintf("[%s] [PID:%d]", stringToCStr(cfg.m_lastProgram), cfg.m_runningPid);
+        statusText.sprintf("[%s] [PID:%d]", stringToCStr(cfg.getProgramPath()), cfg.m_runningPid);
     }
     else
-        statusText.sprintf("[%s] [%s:%d]", stringToCStr(cfg.m_lastProgram), stringToCStr(cfg.m_tcpHost), (int)cfg.m_tcpPort);
+        statusText.sprintf("[%s] [%s:%d]", stringToCStr(cfg.getProgramPath()), stringToCStr(cfg.m_tcpHost), (int)cfg.m_tcpPort);
     w.m_statusLineWidget.setText(statusText);
 }
 

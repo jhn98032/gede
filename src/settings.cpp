@@ -129,9 +129,25 @@ void Settings::loadDefaultsAdvanced()
 void Settings::load()
 {
     loadGlobalConfig();
-    loadProjectConfig();
+
+
+    loadProjectConfig(getProjectConfigPath());
 }
  
+
+/**
+* @brief Returns the path of the project config file.
+*/
+QString Settings::getProjectConfigPath() const
+{
+    // Get project config path
+    QString filepath;
+    if(m_globalProjConfig)
+        filepath = QDir::homePath() + "/"  GLOBAL_CONFIG_DIR + "/" + PROJECT_GLOBAL_CONFIG_FILENAME;
+    else
+        filepath = g_projConfigFilename;
+    return filepath;
+}
 
 
 void Settings::loadGlobalConfig()
@@ -189,6 +205,8 @@ void Settings::loadGlobalConfig()
 
     m_maxTabs = std::max(1, tmpIni.getInt("General/MaxTabs", m_maxTabs));
 
+    m_lastUsedProgramConfigs = tmpIni.getStringList("General/LastProjects", QStringList());
+
     tmpIni.getByteArray("GuiState/MainWindowState", &m_gui_mainwindowState);
     tmpIni.getByteArray("GuiState/MainWindowGeometry", &m_gui_mainwindowGeometry);
     tmpIni.getByteArray("GuiState/Splitter1State", &m_gui_splitter1State);
@@ -237,20 +255,14 @@ void Settings::loadGlobalConfig()
     
 }
 
-void Settings::loadProjectConfig()
+void Settings::loadProjectConfig(QString filepath)
 {
-    // Get project config path
-    QString filepath;
-    if(m_globalProjConfig)
-        filepath = QDir::homePath() + "/"  GLOBAL_CONFIG_DIR + "/" + PROJECT_GLOBAL_CONFIG_FILENAME;
-    else
-        filepath = g_projConfigFilename;
+    assert(!filepath.isEmpty());
 
     // Load from file
     Ini tmpIni;
     if(tmpIni.appendLoad(filepath))
         infoMsg("Failed to load project ini '%s'. File will be created.", stringToCStr(filepath));
-
 
     m_download = tmpIni.getBool("Download", true);
     switch(tmpIni.getInt("Mode", MODE_LOCAL))
@@ -279,6 +291,7 @@ void Settings::loadProjectConfig()
     m_gotoRuiList.clear();
     m_gotoRuiList = tmpIni.getStringList("GoToRecentlyUsed", m_gotoRuiList);
 
+    m_workingDir = tmpIni.getString("WorkingDirectory",QDir::currentPath());
 
     //
     QStringList breakpointStringList;
@@ -348,6 +361,7 @@ void Settings::saveProjectConfig()
 
     tmpIni.setStringList("GoToRecentlyUsed", m_gotoRuiList);
 
+    tmpIni.setString("WorkingDirectory", m_workingDir);
     
     //
     QStringList breakpointStringList;
@@ -411,6 +425,8 @@ void Settings::saveGlobalConfig()
     tmpIni.setInt("General/MaxTabs", m_maxTabs);
 
     tmpIni.setStringList("General/ScannerIgnoreDirs", m_sourceIgnoreDirs);
+
+    tmpIni.setStringList("General/LastProjects", m_lastUsedProgramConfigs);
 
     tmpIni.setByteArray("GuiState/MainWindowState", m_gui_mainwindowState);
     tmpIni.setByteArray("GuiState/MainWindowGeometry", m_gui_mainwindowGeometry);
@@ -743,10 +759,19 @@ QStringList Settings::getDefaultFortranKeywordList()
 /**
  * @brief Returns the path of the program to debug
  */
-QString Settings::getProgramPath()
+QString Settings::getProgramPath() const
 {
     return m_lastProgram;
 }
+
+/**
+ * @brief Returns the path of the program to debug
+ */
+void Settings::setProgramPath(QString path)
+{
+    m_lastProgram = path;
+}
+
 
 
 QStringList Settings::getGoToList()
@@ -760,5 +785,19 @@ void Settings::setGoToList(QStringList list)
         list.takeLast();
     m_gotoRuiList = list;
 }
+
+QStringList Settings::getLastUsedProjectConfigs()
+{
+    return m_lastUsedProgramConfigs;
+}
+
+void Settings::setLastUsedProjectConfig(QString filepath)
+{
+    // Save the config filename to the last used config files
+    QString fullConfigPath = QFileInfo(filepath).absoluteFilePath();
+    m_lastUsedProgramConfigs.removeAll(fullConfigPath);
+    m_lastUsedProgramConfigs.prepend(fullConfigPath);
+}
+
 
 

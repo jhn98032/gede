@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
             for(int u = i+1;u < argc;u++)
             {
                 if(u == i+1)
-                    cfg.m_lastProgram = argv[u];
+                    cfg.setProgramPath(argv[u]);
                 else
                     cfg.m_argumentList.push_back(argv[u]);
             }
@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
         QApplication::setStyle(cfg.m_guiStyleName);
     }
 
-    if(cfg.m_lastProgram.isEmpty())
+    if(cfg.getProgramPath().isEmpty())
         showConfigDialog = true;
         
     // Got a program to debug?
@@ -169,7 +169,13 @@ int main(int argc, char *argv[])
             return 1;
 
         dlg.saveConfig(&cfg);
+
+        // Change to correct working directory
+        infoMsg("Current directory is '%s'", stringToCStr(cfg.m_workingDir));
+        QDir::setCurrent(cfg.m_workingDir);
     }
+
+    cfg.setLastUsedProjectConfig(cfg.getProjectConfigPath());
 
     // Save config
     cfg.save();
@@ -187,13 +193,13 @@ int main(int argc, char *argv[])
     MainWindow w(NULL);
 
     if(cfg.m_connectionMode == MODE_LOCAL)
-        rc = core.initLocal(&cfg, cfg.m_gdbPath, cfg.m_lastProgram, cfg.m_argumentList);
+        rc = core.initLocal(&cfg, cfg.m_gdbPath, cfg.getProgramPath(), cfg.m_argumentList);
     else if(cfg.m_connectionMode == MODE_COREDUMP)
-        rc = core.initCoreDump(&cfg, cfg.m_gdbPath, cfg.m_lastProgram, cfg.m_coreDumpFile);
+        rc = core.initCoreDump(&cfg, cfg.m_gdbPath, cfg.getProgramPath(), cfg.m_coreDumpFile);
     else if(cfg.m_connectionMode == MODE_PID)
-        rc = core.initPid(&cfg, cfg.m_gdbPath, cfg.m_lastProgram, cfg.m_runningPid);
+        rc = core.initPid(&cfg, cfg.m_gdbPath, cfg.getProgramPath(), cfg.m_runningPid);
     else
-        rc = core.initRemote(&cfg, cfg.m_gdbPath, cfg.m_lastProgram, cfg.m_tcpHost, cfg.m_tcpPort);
+        rc = core.initRemote(&cfg, cfg.m_gdbPath, cfg.getProgramPath(), cfg.m_tcpHost, cfg.m_tcpPort);
 
     if(rc)
         return rc;

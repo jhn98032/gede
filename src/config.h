@@ -44,6 +44,9 @@
 // Which fileextension does ada use?
 #define ADA_FILE_EXTENSION  ".adb"
 
+// Max number of last used programs
+#define MAX_LAST_USED_PROGRAMS 10
+
 
 
 #endif // FILE__CONFIG_H

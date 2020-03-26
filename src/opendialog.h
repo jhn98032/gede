@@ -77,10 +77,11 @@ private slots:
     void onSelectCoreFile();
     
     void onSelectRunningPid();
+    void onProgramComboChanged(int idx);
 
 private:
     Ui_OpenDialog m_ui;
-    
+    QString m_workingDir;
 };
 
 #endif // FILE__ABOUTDIALOG_H

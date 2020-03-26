@@ -34,6 +34,7 @@ public:
 
 class Settings
 {
+
     public:
         Settings();
 
@@ -50,17 +51,22 @@ class Settings
         static QStringList getDefaultFortranKeywordList();
         static QStringList getDefaultGoKeywordList();
 
-        QString getProgramPath();
+        QString getProgramPath() const;
+        void setProgramPath(QString path);
 
         int getTabIndentCount() const { return m_tabIndentCount; };
 
         QStringList getGoToList();
         void setGoToList(QStringList list);
 
-        static void setProjectConfig(QString filename);
+        QStringList getLastUsedProjectConfigs();
+        void setLastUsedProjectConfig(QString filepath);
         
+        static void setProjectConfig(QString filename);
+        QString getProjectConfigPath() const;
+        
+        void loadProjectConfig(QString path);
     private:
-        void loadProjectConfig();
         void loadGlobalConfig();
 
         void saveProjectConfig();
@@ -75,7 +81,6 @@ class Settings
         QString m_tcpHost;
         QStringList m_initCommands;
         QString m_gdbPath;
-        QString m_lastProgram;
         QString m_coreDumpFile;
         bool m_download;
 
@@ -157,7 +162,11 @@ class Settings
 
         int m_variablePopupDelay; //!< Number of milliseconds before the variables value should be displayed in a popup.
         QStringList m_gotoRuiList;
-
+        QString m_workingDir; //!< The dir to change to before debugging
+         
+    private:
+        QStringList m_lastUsedProgramConfigs;
+        QString m_lastProgram;
     private:
         static QString g_projConfigFilename; //!< Filename of the project config file. 
 };

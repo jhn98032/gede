@@ -33,6 +33,7 @@ OpenDialog::OpenDialog(QWidget *parent)
     connect(m_ui.radioButton_gdbServerTcp, SIGNAL(toggled(bool)), SLOT(onConnectionTypeTcp(bool)));
     connect(m_ui.radioButton_openCoreDump, SIGNAL(toggled(bool)), SLOT(onConnectionTypeCoreDump(bool)));
 
+    connect(m_ui.comboBox_program, SIGNAL(activated(int)), SLOT(onProgramComboChanged(int)));
 
     m_ui.comboBox_gdbCommand->setSearchAreas(ExeComboBox::UseEnvPath);
     m_ui.comboBox_gdbCommand->setFilter(QRegExp("gdb(?!tui|server)"));
@@ -98,7 +99,7 @@ QString OpenDialog::getCoreDumpFile()
 
 QString OpenDialog::getProgram()
 {
-    return m_ui.lineEdit_program->text();
+    return m_ui.comboBox_program->currentText();
 }
 
 
@@ -129,7 +130,7 @@ void OpenDialog::setCoreDumpFile(QString coreDumpFile)
 
 void OpenDialog::setProgram(QString program)
 {
-    m_ui.lineEdit_program->setText(program);
+    m_ui.comboBox_program->setEditText(program);
 }
 
 void OpenDialog::setInitCommands(QStringList commandList)
@@ -172,12 +173,12 @@ void OpenDialog::onBrowseForProgram(QString *path)
 
 void OpenDialog::onSelectProgram()
 {
-    QString path = m_ui.lineEdit_program->text();
+    QString path = m_ui.comboBox_program->currentText();
 
     onBrowseForProgram(&path);
     
     // Fill in the selected path
-    m_ui.lineEdit_program->setText(path);
+    m_ui.comboBox_program->setEditText(path);
 
     //
     QString coreFilePath = m_ui.lineEdit_coreFile->text();
@@ -298,7 +299,7 @@ void OpenDialog::saveConfig(Settings *cfg)
 {
     OpenDialog &dlg = *this;
     cfg->m_coreDumpFile = dlg.getCoreDumpFile();
-    cfg->m_lastProgram = dlg.getProgram();
+    cfg->setProgramPath(dlg.getProgram());
     cfg->m_argumentList = dlg.getArguments().split(' ');
     cfg->m_connectionMode = dlg.getMode();
     cfg->m_tcpPort = dlg.getTcpRemotePort();
@@ -316,7 +317,7 @@ void OpenDialog::saveConfig(Settings *cfg)
     else
         cfg->m_reloadBreakpoints = false;
     
-    
+    cfg->m_workingDir = m_workingDir;
 
 }
 
@@ -346,12 +347,31 @@ void OpenDialog::loadConfig(Settings &cfg)
     dlg.setCoreDumpFile(cfg.m_coreDumpFile);
 
     dlg.setRunningPid(cfg.m_runningPid);
-    
-    
-    dlg.setProgram(cfg.m_lastProgram);
+
+    // Fill in the programs
+    dlg.m_ui.comboBox_program->clear();
+    QStringList projectFiles = cfg.getLastUsedProjectConfigs();
+    for(int i = 0;i < projectFiles.size();i++)
+    {
+        QString projConfPath = projectFiles[i];
+        if(!projConfPath.isEmpty())
+        {
+            Settings projCfg;
+            projCfg.loadProjectConfig(projConfPath);
+            if(!projCfg.getProgramPath().isEmpty())
+            {
+                QFileInfo progPath(QFileInfo(projConfPath).dir(), projCfg.getProgramPath());
+                dlg.m_ui.comboBox_program->insertItem(i, progPath.absoluteFilePath(), projConfPath);
+            }
+        }
+    }
+    dlg.setProgram(cfg.getProgramPath());
+
     QStringList defList;
     dlg.setArguments(cfg.m_argumentList.join(" "));
     dlg.setInitialBreakpoint(cfg.m_initialBreakpoint);
+
+    m_workingDir = cfg.m_workingDir;
 
 }
 
@@ -367,4 +387,18 @@ QString OpenDialog::getInitialBreakpoint()
 }
 
 
+void OpenDialog::onProgramComboChanged(int idx)
+{
+    // Which project config file was selected?
+    QString projConfPath = m_ui.comboBox_program->itemData(idx).toString();
+    if(!projConfPath.isEmpty())
+    {
+        // Load config file
+        Settings projCfg;
+        projCfg.setProjectConfig(projConfPath);
+        projCfg.load();
+
+        loadConfig(projCfg);        
+    }
+}
 
