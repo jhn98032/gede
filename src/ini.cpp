@@ -448,7 +448,7 @@ static bool compareEntry(const IniEntry* s1, const IniEntry* s2)
 int Ini::save(QString filename)
 {
     QFile file(filename);
-    if (!file.open(QIODevice::Truncate | QIODevice::ReadWrite | QIODevice::Text))
+    if (!file.open(QIODevice::Truncate | QIODevice::WriteOnly | QIODevice::Text))
         return 1;
 
     QVector<IniGroup*> entriesList;
