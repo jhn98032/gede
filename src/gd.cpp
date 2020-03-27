@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
     //
     if(cfg.getProgramPath().isEmpty())
     {
-        errorMsg("No program to debug");
+        critMsg("No program to debug");
         return 1;
     }
     

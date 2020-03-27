@@ -60,7 +60,7 @@ QString AboutDialog::getGdbVersion(QString gdbPath)
         QIODevice::ReadWrite | QIODevice::Text);
     if(!process.waitForFinished(2000))
     {
-        errorMsg("Failed to launch gdb to get version: %d", process.exitCode());
+        critMsg("Failed to launch gdb to get version: %d", process.exitCode());
     }
     else
     {

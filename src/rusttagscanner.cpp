@@ -48,7 +48,7 @@ int RustTagScanner::scan(QString filepath, QList<Tag> *taglist)
     QFile file(filepath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        warnMsg("Failed to open '%s'", stringToCStr(filepath));
+        errorMsg("Failed to open '%s'", stringToCStr(filepath));
         return -1;
     }
 

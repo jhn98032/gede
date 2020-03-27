@@ -1243,7 +1243,7 @@ void GdbCom::enableLog(bool enable)
 
         }
         else
-            warnMsg("Failed to create log file %s", (const char*)GDB_LOG_FILE);
+            critMsg("Failed to create log file %s", (const char*)GDB_LOG_FILE);
         
     }
 }
@@ -1270,7 +1270,7 @@ void GdbCom::onGdbStateChanged ( QProcess::ProcessState newState )
     }
     if(newState == QProcess::NotRunning)
     {
-        errorMsg("GDB unexpected terminated");
+        critMsg("GDB unexpected terminated");
     }
 }
 

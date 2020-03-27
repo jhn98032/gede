@@ -198,9 +198,9 @@ int Core::openPseudoTerminal()
     int ptsFd = posix_openpt(O_RDWR | O_NOCTTY);
    
     if(grantpt(ptsFd))
-        errorMsg("Failed to grantpt");
+        critMsg("Failed to grantpt");
     if(unlockpt(ptsFd))
-        errorMsg("Failed to unlock pt");
+        critMsg("Failed to unlock pt");
 
     // Set window size
     struct winsize term_winsize;
@@ -324,7 +324,7 @@ int Core::initPid(Settings *cfg, QString gdbPath, QString programPath, int pid)
 
     if(com.init(gdbPath, cfg->m_enableDebugLog))
     {
-        errorMsg("Failed to start gdb ('%s')", stringToCStr(gdbPath));
+        critMsg("Failed to start gdb ('%s')", stringToCStr(gdbPath));
         return -1;
     }
     
@@ -333,12 +333,12 @@ int Core::initPid(Settings *cfg, QString gdbPath, QString programPath, int pid)
     if(com.commandF(&resultData, "-inferior-tty-set %s", stringToCStr(ptsDevPath)))
     {
         rc = 1;
-        errorMsg("Failed to set inferior tty");
+        critMsg("Failed to set inferior tty");
     }
 
     if(com.commandF(&resultData, "-file-exec-and-symbols %s", stringToCStr(programPath)) == GDB_ERROR)
     {
-        errorMsg("Failed to load '%s'", stringToCStr(programPath));
+        critMsg("Failed to load '%s'", stringToCStr(programPath));
     }
 
 
@@ -347,7 +347,7 @@ int Core::initPid(Settings *cfg, QString gdbPath, QString programPath, int pid)
 
     if(com.commandF(NULL, "-target-attach %d", pid))
     {
-        errorMsg("Failed to attach to %d", pid);
+        critMsg("Failed to attach to %d", pid);
         return 1;
     }
     
@@ -400,7 +400,7 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
 
     if(com.init(gdbPath, cfg->m_enableDebugLog))
     {
-        errorMsg("Failed to start gdb ('%s')", stringToCStr(gdbPath));
+        critMsg("Failed to start gdb ('%s')", stringToCStr(gdbPath));
         return -1;
     }
     
@@ -409,12 +409,12 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
     if(com.commandF(&resultData, "-inferior-tty-set %s", stringToCStr(ptsDevPath)))
     {
         rc = 1;
-        errorMsg("Failed to set inferior tty");
+        critMsg("Failed to set inferior tty");
     }
 
     if(com.commandF(&resultData, "-file-exec-and-symbols %s", stringToCStr(programPath)) == GDB_ERROR)
     {
-        errorMsg("Failed to load '%s'", stringToCStr(programPath));
+        critMsg("Failed to load '%s'", stringToCStr(programPath));
     }
 
 
@@ -462,7 +462,7 @@ int Core::initCoreDump(Settings *cfg, QString gdbPath, QString programPath, QStr
 
     if(com.init(gdbPath, cfg->m_enableDebugLog))
     {
-        errorMsg("Failed to start gdb ('%s')", stringToCStr(gdbPath));
+        critMsg("Failed to start gdb ('%s')", stringToCStr(gdbPath));
         return -1;
     }
 
@@ -481,7 +481,7 @@ int Core::initCoreDump(Settings *cfg, QString gdbPath, QString programPath, QStr
     if(com.commandF(&resultData, "-inferior-tty-set %s", stringToCStr(ptsDevPath)))
     {
         rc = 1;
-        errorMsg("Failed to set inferior tty");
+        critMsg("Failed to set inferior tty");
     }
 
 
@@ -513,7 +513,7 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
     
     if(com.init(gdbPath, cfg->m_enableDebugLog))
     {
-        errorMsg("Failed to start gdb ('%s')", stringToCStr(gdbPath));
+        critMsg("Failed to start gdb ('%s')", stringToCStr(gdbPath));
         return -1;
     }
 
@@ -825,7 +825,7 @@ void Core::stop()
         }
         else
         {
-            errorMsg("Failed to stop since PID of Gdb not known");
+            critMsg("Failed to stop since PID of Gdb not known");
         }
 
 
@@ -841,7 +841,7 @@ void Core::stop()
             kill(m_pid, SIGINT);
         }
         else
-            errorMsg("Failed to stop since PID not known");
+            critMsg("Failed to stop since PID not known");
     }
 }
 

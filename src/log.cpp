@@ -19,7 +19,7 @@ namespace gedelog
 struct LogEntry
 {
 public:
-    typedef enum { TYPE_WARN, TYPE_INFO, TYPE_ERROR} Type;
+    typedef enum { TYPE_CRIT, TYPE_WARN, TYPE_INFO, TYPE_ERROR} Type;
 
     LogEntry(Type t, QString msg) : m_type(t), m_text(msg) {};
     virtual ~LogEntry() {};
@@ -65,6 +65,8 @@ void loggerRegister(ILogger *logger)
             g_logger->ILogger_onInfoMsg(entry.m_text);
         else if(entry.m_type == LogEntry::TYPE_WARN)
             g_logger->ILogger_onWarnMsg(entry.m_text);
+        else if(entry.m_type == LogEntry::TYPE_CRIT)
+            g_logger->ILogger_onCriticalMsg(entry.m_text);
         else
             g_logger->ILogger_onErrorMsg(entry.m_text);
     }
@@ -186,4 +188,31 @@ void infoMsg(const char *fmt, ...)
     }
 }
 
+
+
+void critMsg(const char *fmt, ...)
+{
+    va_list ap;
+    char buffer[1024];
+    QTime curTime = QTime::currentTime();
+
+    QMutexLocker locker(&g_mutex);
+
+    va_start(ap, fmt);
+    vsnprintf(buffer, sizeof(buffer), fmt, ap);
+
+
+    va_end(ap);
+
+    if(g_logger)
+        g_logger->ILogger_onCriticalMsg(buffer);
+    else
+    {
+        m_pendingEntries.append(LogEntry(LogEntry::TYPE_CRIT, buffer));
+
+        printf("%2d.%03d| ERROR | %s\n",
+            curTime.second()%100, curTime.msec(),
+            buffer);
+    }
+}
 

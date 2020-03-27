@@ -20,6 +20,7 @@ public:
     virtual void ILogger_onWarnMsg(QString text) = 0;
     virtual void ILogger_onErrorMsg(QString text) = 0;
     virtual void ILogger_onInfoMsg(QString text) = 0;
+    virtual void ILogger_onCriticalMsg(QString text) = 0;
 
 };
 
@@ -30,6 +31,7 @@ void debugMsg_(const char *file, int lineNo, const char *fmt,...);
 #define debugMsg(fmt...)  debugMsg_(__FILE__, __LINE__, fmt)
 #endif
 
+void critMsg(const char *fmt,...);
 void errorMsg(const char *fmt,...);
 void warnMsg(const char *fmt,...);
 void infoMsg(const char *fmt,...);

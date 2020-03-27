@@ -82,6 +82,7 @@ public:
     void ILogger_onWarnMsg(QString text);
     void ILogger_onErrorMsg(QString text);
     void ILogger_onInfoMsg(QString text);
+    void ILogger_onCriticalMsg(QString text);
 
     
 private:
@@ -188,12 +189,14 @@ public slots:
     void onNewInfoMsg(QString text);
     void onNewWarnMsg(QString text);
     void onNewErrorMsg(QString text);
+    void onNewCritMsg(QString text);
 
 signals:
     void newInfoMsg(QString text);
     void newWarnMsg(QString text);
     void newErrorMsg(QString text);
-
+    void newCritMsg(QString text);
+    
 private:
     QByteArray m_gui_default_mainwindowState;
     QByteArray m_gui_default_mainwindowGeometry;
