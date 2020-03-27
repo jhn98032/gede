@@ -234,8 +234,12 @@ int TagScanner::scan(QString filepath, QList<Tag> *taglist)
         for(int r = 0;r < outputList.size();r++)
         {
             QString text = outputList[r];
+            text = text.replace("ctags: ", "ctags | ");
             if(text.contains("Warning"))
+            {
+                text = text.replace("Warning: ", "");
                 warnMsg("%s", stringToCStr(text));
+            }
             else
                 errorMsg("%s", stringToCStr(text));
         } 
