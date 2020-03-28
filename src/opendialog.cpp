@@ -24,6 +24,8 @@ OpenDialog::OpenDialog(QWidget *parent)
     
     m_ui.setupUi(this);
 
+    m_ui.comboBox_projDir->setCurrentText(QDir::currentPath());
+
     connect(m_ui.pushButton_runningPid, SIGNAL(clicked()), SLOT(onSelectRunningPid()));
     connect(m_ui.pushButton_selectFile, SIGNAL(clicked()), SLOT(onSelectProgram()));
     connect(m_ui.pushButton_selectCoreFile, SIGNAL(clicked()), SLOT(onSelectCoreFile()));
@@ -33,7 +35,7 @@ OpenDialog::OpenDialog(QWidget *parent)
     connect(m_ui.radioButton_gdbServerTcp, SIGNAL(toggled(bool)), SLOT(onConnectionTypeTcp(bool)));
     connect(m_ui.radioButton_openCoreDump, SIGNAL(toggled(bool)), SLOT(onConnectionTypeCoreDump(bool)));
 
-    connect(m_ui.comboBox_program, SIGNAL(activated(int)), SLOT(onProgramComboChanged(int)));
+    connect(m_ui.comboBox_projDir, SIGNAL(activated(int)), SLOT(onProjDirComboChanged(int)));
 
     m_ui.comboBox_gdbCommand->setSearchAreas(ExeComboBox::UseEnvPath);
     m_ui.comboBox_gdbCommand->setFilter(QRegExp("gdb(?!tui|server)"));
@@ -99,7 +101,7 @@ QString OpenDialog::getCoreDumpFile()
 
 QString OpenDialog::getProgram()
 {
-    return m_ui.comboBox_program->currentText();
+    return m_ui.lineEdit_program->text();
 }
 
 
@@ -130,7 +132,7 @@ void OpenDialog::setCoreDumpFile(QString coreDumpFile)
 
 void OpenDialog::setProgram(QString program)
 {
-    m_ui.comboBox_program->setEditText(program);
+    m_ui.lineEdit_program->setText(program);
 }
 
 void OpenDialog::setInitCommands(QStringList commandList)
@@ -173,12 +175,12 @@ void OpenDialog::onBrowseForProgram(QString *path)
 
 void OpenDialog::onSelectProgram()
 {
-    QString path = m_ui.comboBox_program->currentText();
+    QString path = m_ui.lineEdit_program->text();
 
     onBrowseForProgram(&path);
     
     // Fill in the selected path
-    m_ui.comboBox_program->setEditText(path);
+    m_ui.lineEdit_program->setText(path);
 
     //
     QString coreFilePath = m_ui.lineEdit_coreFile->text();
@@ -317,7 +319,7 @@ void OpenDialog::saveConfig(Settings *cfg)
     else
         cfg->m_reloadBreakpoints = false;
     
-    cfg->m_workingDir = m_workingDir;
+    cfg->m_projDir = getProjectDir();
 
 }
 
@@ -348,30 +350,32 @@ void OpenDialog::loadConfig(Settings &cfg)
 
     dlg.setRunningPid(cfg.m_runningPid);
 
-    // Fill in the programs
-    dlg.m_ui.comboBox_program->clear();
-    QStringList projectFiles = cfg.getLastUsedProjectConfigs();
-    for(int i = 0;i < projectFiles.size();i++)
+    // Fill in the paths
+        QString currentProjDir = m_ui.comboBox_projDir->currentText();
+    if(dlg.m_ui.comboBox_projDir->count() == 0)
     {
-        QString projConfPath = projectFiles[i];
-        if(!projConfPath.isEmpty())
+    
+        dlg.m_ui.comboBox_projDir->clear();
+        QStringList projectDirs = cfg.getLastUsedProjectsDir();
+        projectDirs.append(currentProjDir);
+        projectDirs.removeDuplicates();
+        for(int i = 0;i < projectDirs.size();i++)
         {
-            Settings projCfg;
-            projCfg.loadProjectConfig(projConfPath);
-            if(!projCfg.getProgramPath().isEmpty())
+            QString projBasePath = projectDirs[i];
+            if(!projBasePath.isEmpty())
             {
-                QFileInfo progPath(QFileInfo(projConfPath).dir(), projCfg.getProgramPath());
-                dlg.m_ui.comboBox_program->insertItem(i, progPath.absoluteFilePath(), projConfPath);
+                QString projDir = QFileInfo(projBasePath).absolutePath();
+                dlg.m_ui.comboBox_projDir->insertItem(i, projDir, projBasePath);
             }
         }
     }
+    m_ui.comboBox_projDir->setCurrentText(currentProjDir);
     dlg.setProgram(cfg.getProgramPath());
 
     QStringList defList;
     dlg.setArguments(cfg.m_argumentList.join(" "));
     dlg.setInitialBreakpoint(cfg.m_initialBreakpoint);
 
-    m_workingDir = cfg.m_workingDir;
 
 }
 
@@ -387,16 +391,17 @@ QString OpenDialog::getInitialBreakpoint()
 }
 
 
-void OpenDialog::onProgramComboChanged(int idx)
+void OpenDialog::onProjDirComboChanged(int idx)
 {
     // Which project config file was selected?
-    QString projConfPath = m_ui.comboBox_program->itemData(idx).toString();
+    QString projConfPath = m_ui.comboBox_projDir->itemData(idx).toString();
     if(!projConfPath.isEmpty())
     {
         // Load config file
         Settings projCfg;
-        projCfg.setProjectConfig(projConfPath);
+        projCfg.setProjectConfig(projConfPath + "/" + PROJECT_CONFIG_FILENAME);
         projCfg.load();
+        projCfg.m_projDir = projConfPath;
 
         loadConfig(projCfg);        
     }

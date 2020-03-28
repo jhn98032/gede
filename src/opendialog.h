@@ -63,7 +63,7 @@ public:
     void loadConfig(Settings &cfg);
     void saveConfig(Settings *cfg);
 
-    
+    QString getProjectDir() { return m_projDir; };
 private:
     void onBrowseForProgram(QString *path);
     
@@ -77,11 +77,13 @@ private slots:
     void onSelectCoreFile();
     
     void onSelectRunningPid();
-    void onProgramComboChanged(int idx);
+    void onProjDirComboChanged(int idx);
 
 private:
+    QString m_projDir;
+
     Ui_OpenDialog m_ui;
-    QString m_workingDir;
+    
 };
 
 #endif // FILE__ABOUTDIALOG_H

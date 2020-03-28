@@ -25,6 +25,36 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="topMargin">
+          <number>6</number>
+         </property>
+         <property name="bottomMargin">
+          <number>6</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_5">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Project dir</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QComboBox" name="comboBox_projDir">
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
         <layout class="QGridLayout" name="gridLayout_3">
          <item row="0" column="0">
           <widget class="QLabel" name="label_6">
@@ -57,15 +87,12 @@
           </widget>
          </item>
          <item row="1" column="2">
-          <widget class="QComboBox" name="comboBox_program">
+          <widget class="QLineEdit" name="lineEdit_program">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
-           </property>
-           <property name="editable">
-            <bool>true</bool>
            </property>
            <property name="toolTip">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Program to debug&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>

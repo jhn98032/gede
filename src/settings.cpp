@@ -205,7 +205,7 @@ void Settings::loadGlobalConfig()
 
     m_maxTabs = std::max(1, tmpIni.getInt("General/MaxTabs", m_maxTabs));
 
-    m_lastUsedProgramConfigs = tmpIni.getStringList("General/LastProjects", QStringList());
+    m_lastUsedProjectsDir = tmpIni.getStringList("General/LastProjects", QStringList());
 
     tmpIni.getByteArray("GuiState/MainWindowState", &m_gui_mainwindowState);
     tmpIni.getByteArray("GuiState/MainWindowGeometry", &m_gui_mainwindowGeometry);
@@ -291,8 +291,7 @@ void Settings::loadProjectConfig(QString filepath)
     m_gotoRuiList.clear();
     m_gotoRuiList = tmpIni.getStringList("GoToRecentlyUsed", m_gotoRuiList);
 
-    m_workingDir = tmpIni.getString("WorkingDirectory",QDir::currentPath());
-
+    
     //
     QStringList breakpointStringList;
     breakpointStringList = tmpIni.getStringList("Breakpoints", breakpointStringList);
@@ -361,7 +360,6 @@ void Settings::saveProjectConfig()
 
     tmpIni.setStringList("GoToRecentlyUsed", m_gotoRuiList);
 
-    tmpIni.setString("WorkingDirectory", m_workingDir);
     
     //
     QStringList breakpointStringList;
@@ -426,7 +424,7 @@ void Settings::saveGlobalConfig()
 
     tmpIni.setStringList("General/ScannerIgnoreDirs", m_sourceIgnoreDirs);
 
-    tmpIni.setStringList("General/LastProjects", m_lastUsedProgramConfigs);
+    tmpIni.setStringList("General/LastProjects", m_lastUsedProjectsDir);
 
     tmpIni.setByteArray("GuiState/MainWindowState", m_gui_mainwindowState);
     tmpIni.setByteArray("GuiState/MainWindowGeometry", m_gui_mainwindowGeometry);
@@ -786,17 +784,17 @@ void Settings::setGoToList(QStringList list)
     m_gotoRuiList = list;
 }
 
-QStringList Settings::getLastUsedProjectConfigs()
+QStringList Settings::getLastUsedProjectsDir()
 {
-    return m_lastUsedProgramConfigs;
+    return m_lastUsedProjectsDir;
 }
 
-void Settings::setLastUsedProjectConfig(QString filepath)
+void Settings::setLastUsedProjectDir(QString dirpath)
 {
     // Save the config filename to the last used config files
-    QString fullConfigPath = QFileInfo(filepath).absoluteFilePath();
-    m_lastUsedProgramConfigs.removeAll(fullConfigPath);
-    m_lastUsedProgramConfigs.prepend(fullConfigPath);
+    QString fullConfigPath = QFileInfo(dirpath).absoluteFilePath();
+    m_lastUsedProjectsDir.removeAll(fullConfigPath);
+    m_lastUsedProjectsDir.prepend(fullConfigPath);
 }
 
 

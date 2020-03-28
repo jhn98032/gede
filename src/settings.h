@@ -59,13 +59,15 @@ class Settings
         QStringList getGoToList();
         void setGoToList(QStringList list);
 
-        QStringList getLastUsedProjectConfigs();
-        void setLastUsedProjectConfig(QString filepath);
+        QStringList getLastUsedProjectsDir();
+        void setLastUsedProjectDir(QString dirpath);
         
         static void setProjectConfig(QString filename);
         QString getProjectConfigPath() const;
         
         void loadProjectConfig(QString path);
+
+        QString getProjectDir() const { return m_projDir; };
     private:
         void loadGlobalConfig();
 
@@ -162,10 +164,10 @@ class Settings
 
         int m_variablePopupDelay; //!< Number of milliseconds before the variables value should be displayed in a popup.
         QStringList m_gotoRuiList;
-        QString m_workingDir; //!< The dir to change to before debugging
+        QString m_projDir; //!< The dir to change to before debugging
          
     private:
-        QStringList m_lastUsedProgramConfigs;
+        QStringList m_lastUsedProjectsDir;
         QString m_lastProgram;
     private:
         static QString g_projConfigFilename; //!< Filename of the project config file. 

@@ -171,11 +171,11 @@ int main(int argc, char *argv[])
         dlg.saveConfig(&cfg);
 
         // Change to correct working directory
-        infoMsg("Current directory is '%s'", stringToCStr(cfg.m_workingDir));
-        QDir::setCurrent(cfg.m_workingDir);
+        infoMsg("Current directory is '%s'", stringToCStr(cfg.getProjectDir()));
+        QDir::setCurrent(cfg.getProjectDir());
     }
 
-    cfg.setLastUsedProjectConfig(cfg.getProjectConfigPath());
+    cfg.setLastUsedProjectDir(cfg.getProjectDir());
 
     // Save config
     cfg.save();
