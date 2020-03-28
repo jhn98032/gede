@@ -294,6 +294,11 @@ void OpenDialog::setGdbPath(QString path)
     return m_ui.comboBox_gdbCommand->setEditText(path);
 }
 
+QString OpenDialog::getProjectDir()
+{
+    return m_ui.comboBox_projDir->currentText();
+}
+
 /**
  * @brief Returns the settings selected by the user.
  */
@@ -351,7 +356,7 @@ void OpenDialog::loadConfig(Settings &cfg)
     dlg.setRunningPid(cfg.m_runningPid);
 
     // Fill in the paths
-        QString currentProjDir = m_ui.comboBox_projDir->currentText();
+    QString currentProjDir = m_ui.comboBox_projDir->currentText();
     if(dlg.m_ui.comboBox_projDir->count() == 0)
     {
     
@@ -364,7 +369,7 @@ void OpenDialog::loadConfig(Settings &cfg)
             QString projBasePath = projectDirs[i];
             if(!projBasePath.isEmpty())
             {
-                QString projDir = QFileInfo(projBasePath).absolutePath();
+                QString projDir = QFileInfo(projBasePath).absoluteFilePath();
                 dlg.m_ui.comboBox_projDir->insertItem(i, projDir, projBasePath);
             }
         }
