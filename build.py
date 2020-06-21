@@ -129,6 +129,7 @@ def detectQt():
     elif g_qmakeQt4:
         qmakeName = g_qmakeQt4;
     print("Using '" + qmakeName + "'")
+    sys.stdout.flush()
 
     return qmakeName;
 
@@ -181,6 +182,7 @@ if __name__ == "__main__":
                 if not os.path.exists("Makefile"):
                     qmakeName = detectQt();
                     print("Generating makefile")
+                    sys.stdout.flush()
                     if subprocess.call([qmakeName]):
                         exit(1)
                 print("Compiling in " + srcdir + " (please wait)")
