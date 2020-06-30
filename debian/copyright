@@ -1,0 +1,8 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: gede
+Source: http://gede.acidron.com
+
+Files: *
+Copyright: 2014-2020 Johan Henriksson johan@gede.acidron.com
+License: BSD-2-clause
+

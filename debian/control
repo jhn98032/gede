@@ -1,0 +1,13 @@
+Source: gede
+Section: devel
+Priority: optional
+Maintainer: Johan H <johan@acidron.com>
+Build-Depends: debhelper (>= 11)
+Standards-Version: 4.1.3
+Homepage: http://gede.acidron.com 
+
+Package: gede
+Architecture: any
+Depends: exuberant-ctags, gdb, qtbase5-dev, ${misc:Depends}, ${shlibs:Depends}
+Description: gdb frontend written using Qt
+ A simple graphical frontend to Gdb.
