@@ -1023,20 +1023,17 @@ QList <VarWatch*> Core::getWatchChildren(VarWatch &parentWatch)
 /**
  * @brief Adds a watch for a variable.
  * @param varName   The name of the variable to watch
- * @param watchPtr  Pointer to a watch handle for the newly created watch.
+ * @param watch     Watch handle that will be used for the enw watch
  * @return 0 on success.
  */
-int Core::gdbAddVarWatch(QString varName, VarWatch** watchPtr)
+int Core::priv_gdbVarWatchCreate(QString varName, QString watchId, VarWatch* watch)
 {
     GdbCom& com = GdbCom::getInstance();
     Tree resultData;
-    QString watchId;
     GdbResult res;
     int rc = 0;
 
-    *watchPtr = NULL;
     
-    watchId.sprintf("w%d", m_varWatchLastId++);
 
     assert(varName.isEmpty() == false);
     
@@ -1057,17 +1054,42 @@ int Core::gdbAddVarWatch(QString varName, VarWatch** watchPtr)
 
     // debugMsg("%s = %s = %s\n", stringToCStr(varName2),stringToCStr(varValue2), stringToCStr(varType2));
 
-    VarWatch *w = new VarWatch(watchId,varName);
-    w->m_varType = varType2;
-    w->setValue(varValue2);
-    w->m_hasChildren = numChild > 0 ? true : false;
-    m_watchList.append(w);
-    
-        *watchPtr = w;
+    watch->m_varType = varType2;
+    watch->setValue(varValue2);
+    watch->m_hasChildren = numChild > 0 ? true : false;
         
     }
 
 
+    return rc;
+
+}
+
+
+/**
+ * @brief Adds a watch for a variable.
+ * @param varName   The name of the variable to watch
+ * @param watchPtr  Pointer to a watch handle for the newly created watch.
+ * @return 0 on success.
+ */
+int Core::gdbAddVarWatch(QString varName, VarWatch** watchPtr)
+{
+    int rc = 0;
+    QString watchId;
+    watchId.sprintf("w%d", m_varWatchLastId++);
+    VarWatch *w = new VarWatch(watchId,varName);
+    rc = priv_gdbVarWatchCreate(varName, watchId, w);
+    if(rc)
+    {
+        delete w;
+        w = NULL;
+    }
+    else
+    {
+        m_watchList.append(w);
+    }
+    
+    *watchPtr = w;
     return rc;
 }
 
@@ -1554,14 +1576,29 @@ void Core::onResult(Tree &tree)
             {
                 TreeNode *child = rootNode->getChild(j);
                 QString watchId = child->getChildDataString("name");
-                bool typeChanged = false;
-                if(child->getChildDataString("type_changed") == "true")
-                    typeChanged = true;
-                
                 VarWatch *watch = getVarWatchInfo(watchId);
 
+                bool typeChanged = false;
+                
+                // Watch no longer exist?
+                QString inscopeText = child->getChildDataString("in_scope");
+                if(inscopeText == "invalid")
+                {
+                    QString varName = watch->getName();
+                    
+                    m_inf->ICore_onWatchVarDeleted(*watch);
+
+                    gdbRemoveVarWatch(watchId);
+
+                    watch = NULL;
+                }
+                else
+                {
                 // If the type has changed then all of the children must be removed.
-                if(watch != NULL && typeChanged)
+                QString typeChangeText = child->getChildDataString("type_changed");
+                if(typeChangeText == "true")
+                    typeChanged = true;
+                else if(watch != NULL && typeChanged)
                 {
                     QString varName = watch->getName();
 
@@ -1607,6 +1644,7 @@ void Core::onResult(Tree &tree)
                 else
                 {
                     warnMsg("Received watch info for unknown watch %s", stringToCStr(watchId));
+                }
                 }
             }
             

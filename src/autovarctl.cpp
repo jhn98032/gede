@@ -256,6 +256,58 @@ QString AutoVarCtl::getWatchId(QTreeWidgetItem* item)
 }
 
 
+/**
+* @brief Locates a treeitem based on a watchid.
+* @param watchId    The id.
+* @return The found item or NULL if no was found.
+*/
+QTreeWidgetItem* AutoVarCtl::priv_findItemByWatchId(QString watchId)
+{
+    QTreeWidgetItem *item = NULL;
+    QTreeWidget *varWidget = m_autoWidget;
+
+
+    //
+    QTreeWidgetItem * rootItem = varWidget->invisibleRootItem();
+    QString thisWatchId;
+    QStringList watchIdParts = watchId.split('.');
+    for(int partIdx = 0; partIdx < watchIdParts.size();partIdx++)
+    {
+        // Get the watchid to look for
+        if(thisWatchId != "")
+            thisWatchId += ".";
+        thisWatchId += watchIdParts[partIdx];
+
+        // Look for the item with the specified watchId
+        QTreeWidgetItem* foundItem = NULL;
+        for(int i = 0;foundItem == NULL && i < rootItem->childCount();i++)
+        {
+            QTreeWidgetItem* item =  rootItem->child(i);
+            QString itemKey = item->data(DATA_COLUMN, Qt::UserRole).toString();
+
+            if(thisWatchId == itemKey)
+            {
+                foundItem = item;
+            }
+        }
+
+        // This watch belonged to the AutoWidget?
+        if(partIdx == 0 && foundItem == NULL)
+        {
+            return NULL;
+        }
+
+        if(foundItem == NULL)
+            return NULL;
+            
+        item = foundItem;
+        rootItem = foundItem;
+    }
+    
+    return item;
+    
+}
+
 
 
 void AutoVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
@@ -409,6 +461,7 @@ void AutoVarCtl::ICore_onLocalVarChanged(QStringList varNames)
 
 /**
  * @brief Returns the value text to show for an item.
+ * @param varPath    The path to the variable (Eg: "myStruct/var2")   
  */
 QString AutoVarCtl::getDisplayString(QString watchId, QString varPath)
 {
@@ -479,6 +532,7 @@ void AutoVarCtl::clear()
         QString watchId = getWatchId(item);
         if(watchId != "")
         {
+            //debugMsg("calling gdbRemoveVarWatch('%s')", stringToCStr(watchId));
             core.gdbRemoveVarWatch(watchId);
         }
     }
@@ -611,7 +665,9 @@ void AutoVarCtl::addNewWatch(QString varName)
     QString newName = varName;
     Core &core = Core::getInstance();
     
-     //debugMsg("%s", stringToCStr(current->text(0)));
+    //debugMsg("%s('%s')", __func__, stringToCStr(varName));
+
+
         VarWatch *watch = NULL;
         if(core.gdbAddVarWatch(newName, &watch) == 0)
         {
@@ -696,4 +752,40 @@ void AutoVarCtl::onKeyPress(QKeyEvent *keyEvent)
 }
     
 
-    
+/**
+* @brief Called when a watch is removed due to not being valid anymore.
+*/
+void AutoVarCtl::ICore_onWatchVarDeleted(VarWatch &watch)
+{
+    AutoSignalBlocker autoBlocker(m_autoWidget);
+
+    //debugMsg("%s('%s')", __func__, stringToCStr(watch.getWatchId()));
+
+    QTreeWidgetItem* item = priv_findItemByWatchId(watch.getWatchId());
+
+    if(!item)
+    {
+        //debugMsg("watch %s is not ours!", stringToCStr(watch.getWatchId()));
+        return;
+    }
+    // Get the root item for the item
+    while(item->parent() != NULL)
+    {
+        item = item->parent();
+    }
+
+
+    // Delete the item
+    QString watchId = item->data(DATA_COLUMN, Qt::UserRole).toString();
+    if(watchId != "")
+    {
+        QTreeWidgetItem *rootItem = m_autoWidget->invisibleRootItem();
+        rootItem->removeChild(item);
+    }
+
+
+
+
+}
+
+

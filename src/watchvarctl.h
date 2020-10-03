@@ -30,6 +30,8 @@ public:
 
     void ICore_onWatchVarChanged(VarWatch &watch);
     void ICore_onWatchVarChildAdded(VarWatch &watch);
+    void ICore_onWatchVarDeleted(VarWatch &watch);
+    
     void addNewWatch(QString varName);
     void deleteSelected();
 
@@ -43,6 +45,7 @@ private:
     QString getDisplayString(QString watchId);
     
     void sync(QTreeWidgetItem * parentItem, VarWatch &watch);
+    QTreeWidgetItem* priv_findItemByWatchId(QString watchId);
     
 public slots:
     void onWatchWidgetItemDoubleClicked(QTreeWidgetItem *item, int column);

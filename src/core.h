@@ -176,6 +176,7 @@ class ICore
     virtual void ICore_onFrameVarReset() = 0;
     virtual void ICore_onFrameVarChanged(QString name, QString value) = 0;
     virtual void ICore_onWatchVarChanged(VarWatch &watch) = 0;
+    virtual void ICore_onWatchVarDeleted(VarWatch &watch) = 0;
     virtual void ICore_onConsoleStream(QString text) = 0;
     virtual void ICore_onBreakpointsChanged() = 0;
     virtual void ICore_onThreadListChanged() = 0;
@@ -240,7 +241,8 @@ private:
     static int openPseudoTerminal();
     void ensureStopped();
     int runInitCommands(Settings *cfg);
-    
+    int priv_gdbVarWatchCreate(QString varName, QString watchId, VarWatch* watch);
+
 public:
     int gdbSetBreakpointAtFunc(QString func);
     void gdbNext();

@@ -1,3 +1,4 @@
+//#define ENABLE_DEBUGMSG
 /*
  * Copyright (C) 2014-2017 Johan Henriksson.
  * All rights reserved.
@@ -201,6 +202,62 @@ void WatchVarCtl::sync(QTreeWidgetItem* parentItem, VarWatch &watch)
 }
 
 
+/**
+* @brief Locates a treeitem based on a watchid.
+* @param watchId    The id.
+* @return The found item or NULL if no was found.
+*/
+QTreeWidgetItem* WatchVarCtl::priv_findItemByWatchId(QString watchId)
+{
+    QTreeWidgetItem *item = NULL;
+        QTreeWidget *varWidget = m_varWidget;
+    // Do we own this watch?
+    QStringList watchIdParts = watchId.split('.');
+    if(!m_watchVarDispInfo.contains(watchIdParts[0]))
+    {
+        return NULL;
+    }
+
+    //
+    QTreeWidgetItem * rootItem = varWidget->invisibleRootItem();
+    QString thisWatchId;
+    for(int partIdx = 0; partIdx < watchIdParts.size();partIdx++)
+    {
+        // Get the watchid to look for
+        if(thisWatchId != "")
+            thisWatchId += ".";
+        thisWatchId += watchIdParts[partIdx];
+
+        // Look for the item with the specified watchId
+        QTreeWidgetItem* foundItem = NULL;
+        for(int i = 0;foundItem == NULL && i < rootItem->childCount();i++)
+        {
+            QTreeWidgetItem* item =  rootItem->child(i);
+            QString itemKey = item->data(DATA_COLUMN, Qt::UserRole).toString();
+
+            if(thisWatchId == itemKey)
+            {
+                foundItem = item;
+            }
+        }
+
+        // This watch belonged to the AutoWidget?
+        if(partIdx == 0 && foundItem == NULL)
+        {
+            return NULL;
+        }
+
+        if(foundItem == NULL)
+            return NULL;
+            
+        item = foundItem;
+        rootItem = foundItem;
+    }
+    
+    return item;
+    
+}
+
 void WatchVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
 {
     //Core &core = Core::getInstance();
@@ -212,6 +269,8 @@ void WatchVarCtl::ICore_onWatchVarChildAdded(VarWatch &watch)
     QString valueString = watch.getValue();
     bool hasChildren  = watch.hasChildren();
     bool inScope = watch.inScope();
+    
+    debugMsg("%s(name:'%s')",__func__, stringToCStr(name));
 
     AutoSignalBlocker autoBlocker(m_varWidget);
 
@@ -782,6 +841,47 @@ void WatchVarCtl::onKeyPress(QKeyEvent *keyEvent)
     }
 
 }
-    
 
-    
+void WatchVarCtl::ICore_onWatchVarDeleted(VarWatch &watch)
+{
+    Core &core = Core::getInstance();
+    AutoSignalBlocker autoBlocker(m_varWidget);
+
+    debugMsg("%s('%s')", __func__, stringToCStr(watch.getWatchId()));
+
+    // Find the watch item
+    QStringList watchIdParts = watch.getWatchId().split('.');
+    VarWatch *rootWatch = core.getVarWatchInfo(watchIdParts[0]);
+    assert(rootWatch != NULL);
+    // Do we own this watch?
+    if(!m_watchVarDispInfo.contains(watchIdParts[0]))
+    {
+        debugMsg("watch %s is not ours!", stringToCStr(watchIdParts[0]));
+        return;
+    }
+
+    QTreeWidgetItem* item = priv_findItemByWatchId(watch.getWatchId());
+
+    // Get the root item for the item
+    while(item->parent() != NULL)
+    {
+        item = item->parent();
+    }
+
+
+    // Delete the item
+    QString watchId = item->data(DATA_COLUMN, Qt::UserRole).toString();
+    if(watchId != "")
+    {
+        QTreeWidgetItem *rootItem = m_varWidget->invisibleRootItem();
+        rootItem->removeChild(item);
+    }
+
+
+}
+
+
+
+
+
+

@@ -779,6 +779,12 @@ void MainWindow::ICore_onLocalVarChanged(QStringList varNames)
 }
 
 
+void MainWindow::ICore_onWatchVarDeleted(VarWatch &watch)
+{
+    m_watchVarCtl.ICore_onWatchVarDeleted(watch);
+    m_autoVarCtl.ICore_onWatchVarDeleted(watch);
+
+}
 
 void MainWindow::ICore_onWatchVarChanged(VarWatch &watch)
 {

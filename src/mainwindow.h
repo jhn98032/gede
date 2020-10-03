@@ -76,7 +76,8 @@ public:
     void ICodeView_onContextMenuIncFile(QPoint pos, int lineNo, QString incFile);
     
     void ICore_onWatchVarChildAdded(VarWatch &watch);
-
+    void ICore_onWatchVarDeleted(VarWatch &watch);
+    
     
     
     void ILogger_onWarnMsg(QString text);

@@ -33,6 +33,7 @@ public:
 
     void ICore_onWatchVarChanged(VarWatch &watch);
     void ICore_onWatchVarChildAdded(VarWatch &watch);
+    void ICore_onWatchVarDeleted(VarWatch &watch);
     void addNewWatch(QString varName);
 
 
@@ -44,6 +45,7 @@ public:
 
     void ICore_onStateChanged(ICore::TargetState state);
 private:
+    QTreeWidgetItem* priv_findItemByWatchId(QString watchId);
     quint64 getAddress(VarWatch &w);
     QString getWatchId(QTreeWidgetItem* item);
 
