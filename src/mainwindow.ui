@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>881</width>
-    <height>698</height>
+    <width>903</width>
+    <height>728</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -573,7 +573,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>881</width>
+     <width>903</width>
      <height>23</height>
     </rect>
    </property>
@@ -589,7 +589,7 @@
     <property name="title">
      <string>Execution</string>
     </property>
-    <addaction name="actionRun"/>
+    <addaction name="actionRestart"/>
     <addaction name="actionStop"/>
     <addaction name="separator"/>
     <addaction name="actionNext"/>
@@ -651,7 +651,7 @@
    </attribute>
    <addaction name="actionQuit"/>
    <addaction name="separator"/>
-   <addaction name="actionRun"/>
+   <addaction name="actionRestart"/>
    <addaction name="actionStop"/>
    <addaction name="separator"/>
    <addaction name="actionNext"/>
@@ -724,13 +724,13 @@
     <string>F8</string>
    </property>
   </action>
-  <action name="actionRun">
+  <action name="actionRestart">
    <property name="icon">
     <iconset resource="resource.qrc">
      <normaloff>:/images/res/restart.png</normaloff>:/images/res/restart.png</iconset>
    </property>
    <property name="text">
-    <string>Run</string>
+    <string>Restart</string>
    </property>
    <property name="shortcut">
     <string>F11</string>

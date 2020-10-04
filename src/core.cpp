@@ -12,6 +12,8 @@
 
 #include <QByteArray>
 #include <QDebug>
+#include <QFileInfo>
+
 #include <unistd.h>
 #include <assert.h>
 #include <signal.h>
@@ -689,6 +691,7 @@ bool Core::gdbGetFiles()
 
                         sourceFile->m_name = name;
                         sourceFile->m_fullName = fullname;
+                        sourceFile->m_modTime = QDateTime::currentDateTime();
 
                         m_sourceFiles.append(sourceFile);
                     }
@@ -733,7 +736,7 @@ int Core::gdbSetBreakpointAtFunc(QString func)
 
 
 /**
- * @brief Asks gdb to run the program.
+ * @brief Asks gdb to run the program from the beginning.
  */
 void Core::gdbRun()
 {
@@ -764,6 +767,29 @@ void Core::gdbRun()
         m_targetState = oldState;
 
 
+
+    if(!m_isRemote)
+    {
+        // Loop through all source files
+        for(int i = 0;i < m_sourceFiles.size();i++)
+        {
+            SourceFile *sourceFile = m_sourceFiles[i];
+
+            if(QFileInfo(sourceFile->m_fullName).exists())
+            {
+                // Has the file being modified?
+                QDateTime modTime = QFileInfo(sourceFile->m_fullName).lastModified();
+                if(sourceFile->m_modTime <  modTime)
+                {
+                    m_inf->ICore_onSourceFileChanged(sourceFile->m_fullName);
+                }
+            }
+        }
+
+        // Get all source files
+        gdbGetFiles();
+                                
+    }
 }
 
 

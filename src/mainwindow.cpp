@@ -140,7 +140,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ui.actionSearch, SIGNAL(triggered()), SLOT(onSearch()));
     connect(m_ui.actionStep_In, SIGNAL(triggered()), SLOT(onStepIn()));
     connect(m_ui.actionStep_Out, SIGNAL(triggered()), SLOT(onStepOut()));
-    connect(m_ui.actionRun, SIGNAL(triggered()), SLOT(onRun()));
+    connect(m_ui.actionRestart, SIGNAL(triggered()), SLOT(onRestart()));
     connect(m_ui.actionContinue, SIGNAL(triggered()), SLOT(onContinue()));
 
     connect(m_ui.actionViewStack, SIGNAL(triggered()), SLOT(onViewStack()));
@@ -801,6 +801,23 @@ void MainWindow::ICore_onWatchVarChildAdded(VarWatch &watch)
 }
 
 
+void MainWindow::ICore_onSourceFileChanged(QString filename)
+{
+    CodeViewTab* codeViewTab = findTab(filename);
+    if(codeViewTab)
+    {
+        // Get the tags in the file
+        QList<Tag> tagList;
+        m_tagManager.scan(filename, &tagList);
+
+        // Open the file
+        if(codeViewTab->open(filename,tagList))
+        {
+        }
+    }
+}
+
+
 void MainWindow::ICore_onSourceFileListChanged()
 {
     insertSourceFiles();
@@ -1077,6 +1094,23 @@ CodeViewTab* MainWindow::open(QString filename, int lineNo)
 
 
 /**
+* @brief Finds a tab that has a specific sourcefile opened.
+*/
+CodeViewTab* MainWindow::findTab(QString filename)
+{
+    for(int tabIdx = 0;tabIdx <  m_ui.editorTabWidget->count();tabIdx++)
+    {
+        CodeViewTab* tab = (CodeViewTab* )m_ui.editorTabWidget->widget(tabIdx);
+        if(tab->getFilePath() == filename)
+        {
+            //debugMsg("Found already opened '%s'", qPrintable(filename));
+            return tab;
+        }
+    }
+    return NULL;
+}
+
+/**
  * @brief Opens a source file in the sourcecode viewer.
  */
 CodeViewTab* MainWindow::open(QString filename)
@@ -1316,7 +1350,7 @@ void MainWindow::onGoToLine()
         warnMsg("Location not found!");
 }
 
-void MainWindow::onRun()
+void MainWindow::onRestart()
 {
     Core &core = Core::getInstance();
 
@@ -1961,7 +1995,7 @@ void MainWindow::ICore_onStateChanged(TargetState state)
     m_ui.actionStep_Out->setEnabled(isStopped);
     m_ui.actionStop->setEnabled(isRunning);
     m_ui.actionContinue->setEnabled(isStopped);
-    m_ui.actionRun->setEnabled(!isRunning);
+    m_ui.actionRestart->setEnabled(!isRunning);
 
     m_ui.varWidget->setEnabled(isStopped);
 

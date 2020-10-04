@@ -70,7 +70,8 @@ public:
     void ICore_onTargetOutput(QString msg);
     void ICore_onStateChanged(TargetState state);
     void ICore_onSourceFileListChanged();
-    
+    void ICore_onSourceFileChanged(QString filename);
+
     void ICodeView_onRowDoubleClick(int lineNo);
     void ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList text);
     void ICodeView_onContextMenuIncFile(QPoint pos, int lineNo, QString incFile);
@@ -116,6 +117,7 @@ private:
                 VarCtl::DispInfoMap *map,
                 QTreeWidgetItem *item, TreeNode *rootNode);
 
+    CodeViewTab* findTab(QString filename);
     CodeViewTab* createTab(QString filename);
     CodeViewTab* currentTab();
     void updateCurrentLine(QString filename, int lineno);
@@ -149,7 +151,7 @@ public slots:
     void onGoToMain();
     void onStop();
     void onBreakpointsWidgetItemDoubleClicked(QTreeWidgetItem * item,int column);
-    void onRun();
+    void onRestart();
     void onContinue();
     void onCodeViewContextMenuAddWatch();
     void onCodeViewContextMenuOpenFile();

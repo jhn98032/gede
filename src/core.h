@@ -15,6 +15,7 @@
 #include <QSocketNotifier>
 #include <QObject>
 #include <QVector>
+#include <QDateTime>
 
 #include "com.h"
 #include "settings.h"
@@ -46,6 +47,7 @@ class SourceFile
 public:
     QString m_name;
     QString m_fullName;
+    QDateTime m_modTime;
 };
 
 /**
@@ -186,6 +188,7 @@ class ICore
     virtual void ICore_onTargetOutput(QString message) = 0;
     virtual void ICore_onCurrentFrameChanged(int frameIdx) = 0;
     virtual void ICore_onSourceFileListChanged() = 0;
+    virtual void ICore_onSourceFileChanged(QString filename) = 0;
 
     /**
      * @brief Called when a new child item has been added for a watched item.
