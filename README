@@ -16,12 +16,15 @@ Make sure that you have all dependencies installed.
 
 On Debian/Ubuntu/Mint:
 
+    # sudo apt-get install gdb
     # sudo apt-get install g++
     # sudo apt-get install exuberant-ctags
-    # sudo apt-get install qt4-designer qt4-qmake libqt4-dev libssl-dev
+    # sudo apt-get install python
+    # sudo apt-get install qt5-qmake qtbase5-dev
 
 On Redhat/Centos:
 
+    # sudo yum install gdb
     # sudo yum install gcc
     # sudo yum install gcc-c++
     # sudo yum install ctags
@@ -33,6 +36,10 @@ On FreeBSD:
     # pkg install universal-ctags-g20180225
     # pkg install qt5
     # pkg install gcc
+
+If you want to use Qt4 on Debian/Ubuntu/Mint then add:
+
+    # sudo apt-get install qt4-designer qt4-qmake libqt4-dev libssl-dev
 
 
 Building
