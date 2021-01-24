@@ -10,7 +10,7 @@ terms of the NetBeans License Agreement.
 Dependencies
 ============
 
-Gede depends on Qt4/Qt5 and exuberant-ctags.
+Gede depends on Qt5 and exuberant-ctags.
 
 Make sure that you have all dependencies installed.
 
@@ -28,7 +28,7 @@ On Redhat/Centos:
     # sudo yum install gcc
     # sudo yum install gcc-c++
     # sudo yum install ctags
-    # sudo yum install qt4-designer qt-devel
+    # sudo yum install qt5-designer qt5-devel
 
 On FreeBSD:
 
@@ -37,9 +37,6 @@ On FreeBSD:
     # pkg install qt5
     # pkg install gcc
 
-If you want to use Qt4 on Debian/Ubuntu/Mint then add:
-
-    # sudo apt-get install qt4-designer qt4-qmake libqt4-dev libssl-dev
 
 
 Building
