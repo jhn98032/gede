@@ -24,7 +24,11 @@ OpenDialog::OpenDialog(QWidget *parent)
     
     m_ui.setupUi(this);
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
     m_ui.comboBox_projDir->setCurrentText(QDir::currentPath());
+#else
+    m_ui.comboBox_projDir->setEditText(QDir::currentPath());
+#endif
 
     connect(m_ui.pushButton_runningPid, SIGNAL(clicked()), SLOT(onSelectRunningPid()));
     connect(m_ui.pushButton_selectFile, SIGNAL(clicked()), SLOT(onSelectProgram()));
@@ -374,12 +378,17 @@ void OpenDialog::loadConfig(Settings &cfg)
             }
         }
     }
-    m_ui.comboBox_projDir->setCurrentText(currentProjDir);
     dlg.setProgram(cfg.getProgramPath());
 
     QStringList defList;
     dlg.setArguments(cfg.m_argumentList.join(" "));
     dlg.setInitialBreakpoint(cfg.m_initialBreakpoint);
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    m_ui.comboBox_projDir->setCurrentText(currentProjDir);
+#else
+    m_ui.comboBox_projDir->setEditText(currentProjDir);
+#endif
 
 
 }

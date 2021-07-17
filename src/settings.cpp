@@ -15,6 +15,7 @@
 #include "log.h"
 #include "ini.h"
 #include "config.h"
+#include <assert.h>
 
 
 QString Settings::g_projConfigFilename = PROJECT_CONFIG_FILENAME;
