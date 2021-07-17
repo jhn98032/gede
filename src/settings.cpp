@@ -328,12 +328,8 @@ void Settings::setProjectConfig(QString filename)
 void Settings::saveProjectConfig()
 {
 
-    QString filepath;
+    QString filepath = getProjectConfigPath();
 
-    if(m_globalProjConfig)
-        filepath = QDir::homePath() + "/"  GLOBAL_CONFIG_DIR + "/" + PROJECT_GLOBAL_CONFIG_FILENAME;
-    else
-        filepath = g_projConfigFilename;
     
     Ini tmpIni;
 

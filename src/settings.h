@@ -164,7 +164,7 @@ class Settings
 
         int m_variablePopupDelay; //!< Number of milliseconds before the variables value should be displayed in a popup.
         QStringList m_gotoRuiList;
-        QString m_projDir; //!< The dir to change to before debugging
+        QString m_projDir; //!< The dir to change to before debugging (Eg: "/a/path")
          
     private:
         QStringList m_lastUsedProjectsDir;

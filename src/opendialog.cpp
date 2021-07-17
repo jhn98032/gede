@@ -39,7 +39,7 @@ OpenDialog::OpenDialog(QWidget *parent)
     connect(m_ui.radioButton_gdbServerTcp, SIGNAL(toggled(bool)), SLOT(onConnectionTypeTcp(bool)));
     connect(m_ui.radioButton_openCoreDump, SIGNAL(toggled(bool)), SLOT(onConnectionTypeCoreDump(bool)));
 
-    connect(m_ui.comboBox_projDir, SIGNAL(activated(int)), SLOT(onProjDirComboChanged(int)));
+    connect(m_ui.comboBox_projDir, SIGNAL(currentIndexChanged(int)), SLOT(onProjDirComboChanged(int)));
 
     m_ui.comboBox_gdbCommand->setSearchAreas(ExeComboBox::UseEnvPath);
     m_ui.comboBox_gdbCommand->setFilter(QRegExp("gdb(?!tui|server)"));
@@ -365,8 +365,9 @@ void OpenDialog::loadConfig(Settings &cfg)
     {
     
         dlg.m_ui.comboBox_projDir->clear();
-        QStringList projectDirs = cfg.getLastUsedProjectsDir();
+        QStringList projectDirs;
         projectDirs.append(currentProjDir);
+        projectDirs.append(cfg.getLastUsedProjectsDir());
         projectDirs.removeDuplicates();
         for(int i = 0;i < projectDirs.size();i++)
         {
