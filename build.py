@@ -15,10 +15,23 @@ AUTODETECT=3
 g_dest_path = "/usr/local"
 g_verbose = False
 g_exeName = "gede"
-g_qtVersionToUse = AUTODETECT
+g_qtVersionToUse = FORCE_QT5
 g_qmakeQt4 = ""
 g_qmakeQt5 = ""
 
+# Detect which version of Qt that a qmake executable will use
+def detectQmakeQtVer(qmakeExe):
+    verStr = "?"
+    p = subprocess.Popen([qmakeExe, "--version"], stdout=subprocess.PIPE)
+    out, err = p.communicate()
+    errcode = p.returncode
+    if not err:
+        outRows = out.split('\n')
+        for row in outRows:
+            if row.startswith("Using Qt version "):
+                verStr = row.split(' ')[3]
+    return verStr
+    
         
 # Run the make command
 def run_make(a_list):
@@ -105,30 +118,42 @@ def detectQt():
     sys.stdout.write("Detecting Qt version... "),
     qtVerList = []
     if exeExist("qmake-qt4"):
-        qtVerList += ["Qt4"]
+        qtVerList += ["Qt4 (qmake-qt4)"]
         g_qmakeQt4 = "qmake-qt4";
     if exeExist("qmake-qt5"):
-        qtVerList += ["Qt5"]
+        qtVerList += ["Qt5 (qmake-qt5)"]
         g_qmakeQt5 = "qmake-qt5";
     if exeExist("qmake"):
-        qtVerList += ["Qt?"]
-        if not g_qmakeQt5:
+        ver = detectQmakeQtVer("qmake")[0]
+        if ver == "5":
             g_qmakeQt5 = "qmake";
-        else:
+            qtVerList += ["Qt5 (qmake)"]
+        elif ver == "4":
             g_qmakeQt4 = "qmake";
+            qtVerList += ["Qt4 (qmake)"]
+        else:
+            g_qmakeQt5 = "qmake";
+            qtVerList += ["Qt? (qmake)"]
     sys.stdout.write(", ".join(qtVerList) + "\n")
     if (not g_qmakeQt4) and (not g_qmakeQt5):
         print("No Qt found");
 
     # Which version to use?
-    qmakeName = "qmake"
-    if g_qtVersionToUse == FORCE_QT4 and g_qmakeQt4:
-        qmakeName = g_qmakeQt4;
+    qmakeName = ""
+    if g_qtVersionToUse == FORCE_QT4:
+        if g_qmakeQt4:
+            qmakeName = g_qmakeQt4;
+    elif g_qtVersionToUse == FORCE_QT5:
+        if g_qmakeQt5:
+            qmakeName = g_qmakeQt5;
     elif g_qmakeQt5:
         qmakeName = g_qmakeQt5;
     elif g_qmakeQt4:
         qmakeName = g_qmakeQt4;
-    print("Using '" + qmakeName + "'")
+    if qmakeName:
+        print("Using '" + qmakeName + "'")
+    else:
+        print("Failed to find suitable qmake")
     sys.stdout.flush()
 
     return qmakeName;
@@ -181,10 +206,14 @@ if __name__ == "__main__":
                 os.chdir(srcdir)
                 if not os.path.exists("Makefile"):
                     qmakeName = detectQt();
+                    if not qmakeName:
+                        exit(1)
                     print("Generating makefile")
                     sys.stdout.flush()
                     if subprocess.call([qmakeName]):
                         exit(1)
+                    print("Cleaning up in " + srcdir + " (please wait)")
+                    run_make(["clean"])
                 print("Compiling in " + srcdir + " (please wait)")
                 if run_make(["-j4"]):
                     exit(1)
@@ -208,8 +237,7 @@ if __name__ == "__main__":
                 raise
 
             print("")
-            print("Gede has been installed to " + g_dest_path + "/bin")
-            print("Start it by running gede") 
+            print(g_exeName + " has been installed to " + g_dest_path + "/bin")
 
     except IOError as e:
         print("I/O error({0}): {1}".format(e.errno, e.strerror))
