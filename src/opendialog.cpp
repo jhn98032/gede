@@ -209,9 +209,10 @@ void OpenDialog::onSelectRunningPid()
     dlg.selectPid(m_ui.lineEdit_pid->text().toInt());
     if(dlg.exec() == QDialog::Accepted)
     {
-        int selectedPid = dlg.getSelectedProcess();
-        m_ui.lineEdit_pid->setText( QString::number(selectedPid));
-        
+        ProcessInfo selectedProcess = dlg.getSelectedProcess();
+        m_ui.lineEdit_pid->setText( QString::number(selectedProcess.getPid()));
+
+        m_ui.lineEdit_program->setText(selectedProcess.getExePath());
     }
         
 }
@@ -246,6 +247,7 @@ void OpenDialog::onConnectionTypeTcp(bool checked)
 
 void OpenDialog::onConnectionTypePid(bool checked)
 {
+    m_ui.pushButton_selectFile->setEnabled(checked);
     m_ui.pushButton_runningPid->setEnabled(checked);
     m_ui.lineEdit_pid->setEnabled(checked);
 

@@ -21,11 +21,13 @@
 class ProcessInfo
 {
 public:
-    QString cmdline;
+    QString cmdline; // The command line (Eg: "./test")
     int pid;
     int uid;
     QDateTime mtime; // The start time of the process
-
+    QString m_exePath; // Path of executable. Eg: "/a/dir/test")
+    
+    QString getExePath() const { return m_exePath; };
     QString getCmdline() const { return cmdline; };
     int getPid() const { return pid;};
     int getUid() const { return uid; };
@@ -60,19 +62,21 @@ public:
     ProcessListDialog(QWidget *parent = NULL);
 
     void selectPid(int pid);
-    int getSelectedProcess();
-
+    int getSelectedPid();
+    ProcessInfo getSelectedProcess();
+    
 private slots:
 
     void onItemDoubleClicked(QTreeWidgetItem *item, int column);
 
 private:
     void fillInList();
-
+    ProcessInfo *findProcessByPid(int pid);
 private:
 
     Ui_ProcessListDialog m_ui;
-    
+    QList<ProcessInfo> m_processList;
+        
 };
 
 #endif // FILE__PROCESSLISTDIALOG_H

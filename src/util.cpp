@@ -338,6 +338,21 @@ bool exeExists(QString name, bool checkCurrentDir)
 }
 
 
+
+QByteArray fileToContent(QString filename)
+{
+    QByteArray cnt;
+    QFile f(filename);
+    if(!f.open(QIODevice::ReadOnly))
+    {
+    }
+    else
+    {
+        cnt = f.readAll();
+    }
+    return cnt;
+}
+
 #ifdef NEVER
 void testFuncs()
 {

@@ -10,6 +10,7 @@
 #define FILE__UTIL_H
 
 #include <QString>
+#include <QByteArray>
 
 #define MIN(a,b) ((a)<(b))
 #define MAX(a,b) ((a)>(b))
@@ -35,6 +36,8 @@ void detectDistro(DistroType *type, QString *distroDesc);
 QString addrToString(quint64 addr);
 
 bool exeExists(QString name, bool checkCurrentDir = false);
+
+QByteArray fileToContent(QString filename);
 
 
 

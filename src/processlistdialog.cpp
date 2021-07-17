@@ -69,19 +69,6 @@ bool ProcessListWidgetItem::operator<(const QTreeWidgetItem &other) const
 
 
 
-QByteArray fileToContent(QString filename)
-{
-    QByteArray cnt;
-    QFile f(filename);
-    if(!f.open(QIODevice::ReadOnly))
-    {
-    }
-    else
-    {
-        cnt = f.readAll();
-    }
-    return cnt;
-}
 
 
 QList<ProcessInfo> getProcessListByUser(int ownerUid)
@@ -112,7 +99,10 @@ QList<ProcessInfo> getProcessListByUser(int ownerUid)
                          prc.uid = buf.st_uid;
                          prc.pid = pid;
                          prc.mtime.setTime_t(buf.st_mtim.tv_sec);
-                        
+                         prc.m_exePath = procDirPath + "/exe";
+                         QFile f(prc.m_exePath);
+                         prc.m_exePath = f.symLinkTarget();
+                         
                         prc.cmdline = QString(fileToContent(procDirPath + "/cmdline")).trimmed();
 
                         lst.append(prc);
@@ -200,11 +190,27 @@ void ProcessListDialog::selectPid(int pid)
     }
 }
 
+/**
+* @brief Looks for info about a process
+*/
+ProcessInfo *ProcessListDialog::findProcessByPid(int pid)
+{
+    // Display the list
+    for(int pIdx = 0;pIdx < m_processList.size();pIdx++)
+    {
+        ProcessInfo &prc = m_processList[pIdx];
+        if(prc.getPid() == pid)
+            return &prc;
+    }
+    return NULL;
+}
+
+
 
 /**
  * @brief Returns the selected process PID
 */
-int ProcessListDialog::getSelectedProcess()
+int ProcessListDialog::getSelectedPid()
 {
     QTreeWidget *treeWidget = m_ui.treeWidget;
     int pid = -1;
@@ -227,6 +233,17 @@ int ProcessListDialog::getSelectedProcess()
 }
 
 /**
+* @brief Returns the selected process.
+*/
+ProcessInfo ProcessListDialog::getSelectedProcess()
+{
+    ProcessInfo *info = findProcessByPid(getSelectedPid());
+    if(info)
+        return *info;
+    return ProcessInfo();
+}
+
+/**
  * @brief Fill in the list of processes.
  */
 void ProcessListDialog::fillInList()
@@ -234,12 +251,12 @@ void ProcessListDialog::fillInList()
     m_ui.treeWidget->clear();
 
     // Get a list of processes
-    QList<ProcessInfo> list = getProcessListThisUser();
+    m_processList = getProcessListThisUser();
 
     // Display the list
-    for(int pIdx = 0;pIdx < list.size();pIdx++)
+    for(int pIdx = 0;pIdx < m_processList.size();pIdx++)
     {
-        ProcessInfo &prc = list[pIdx];
+        ProcessInfo &prc = m_processList[pIdx];
         ProcessListWidgetItem *item;
         item = new ProcessListWidgetItem(prc);
         item->setData(0, Qt::UserRole, prc.getPid());
