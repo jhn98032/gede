@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 #
-# Written by Johan Henriksson. Copyright (C) 2014-2017.
+# Written by Johan Henriksson. Copyright (C) 2014-2021.
 #
 import sys
 import os
