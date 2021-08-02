@@ -1,5 +1,7 @@
-#!/usr/bin/env python
-
+#!/usr/bin/env python3
+#
+# Written by Johan Henriksson. Copyright (C) 2014-2021.
+#
 import sys
 import os
 import subprocess
