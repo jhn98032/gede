@@ -83,7 +83,11 @@ QString longLongToHexString(long long num)
 {
     QString newStr;
     QString str;
+#if QT_VERSION >= QT_VERSION_CHECK(5,5,0)
+    str = QString::asprintf("%llx", num);
+#else
     str.sprintf("%llx", num);
+#endif
     if(num != 0)
     {
         while(str.length()%4 != 0)
@@ -151,9 +155,9 @@ QString simplifyPath(QString path)
 /**
 *  @brief Converts a hex two byte string to a unsigned char.
 */
-unsigned char hexStringToU8(const char *str)
+quint8 hexStringToU8(const char *str)
 {
-    unsigned char d = 0;
+    quint8 d = 0;
     char c1 = str[0];
     char c2 = str[1];
 
@@ -288,7 +292,11 @@ QString addrToString(quint64 addr)
 {
     QString valueText;
     QString text;
+#if QT_VERSION >= QT_VERSION_CHECK(5,5,0)
+    text = QString::asprintf("%llx", (unsigned long long) addr);
+#else
     text.sprintf("%llx", (unsigned long long) addr);
+#endif
 
     // Prefix the string with suitable number of zeroes
     while(text.length()%4 != 0 && text.length() > 4)

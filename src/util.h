@@ -23,7 +23,7 @@ QString getFilenamePart(QString fullPath);
 void dividePath(QString fullPath, QString *filename, QString *folderPath);
 QString getExtensionPart(QString filename);
 
-unsigned char hexStringToU8(const char *str);
+quint8 hexStringToU8(const char *str);
 long long stringToLongLong(const char* str);
 long long stringToLongLong(QString str);
 QString longLongToHexString(long long num);
