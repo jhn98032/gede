@@ -12,17 +12,27 @@ FORCE_QT4=1
 FORCE_QT5=2
 AUTODETECT=3
 
+#-----------------------------#
+# Configuration section
 g_dest_path = "/usr/local"
 g_verbose = False
 g_exeName = "gede"
 g_qtVersionToUse = FORCE_QT5
 g_qmakeQt4 = ""
 g_qmakeQt5 = ""
+g_allSrcDirs = ["./src",
+            "./tests/tagtest",
+            "./tests/highlightertest",
+            "./tests/ini"
+            ]
+g_mainSrcDir = ["./src" ]
+g_requiredPrograms = ["make", "gcc", "ctags" ]
+#-----------------------------#
 
 # Detect which version of Qt that a qmake executable will use
 def detectQmakeQtVer(qmakeExe):
     verStr = "?"
-    p = subprocess.Popen([qmakeExe, "--version"], stdout=subprocess.PIPE)
+    p = subprocess.Popen([qmakeExe, "--version"], stdout=subprocess.PIPE, text=True)
     out, err = p.communicate()
     errcode = p.returncode
     if not err:
@@ -38,7 +48,7 @@ def run_make(a_list):
     if g_verbose:
         errcode = subprocess.call(['make'] + a_list)
     else:
-        p = subprocess.Popen(['make'] + a_list, stdout=subprocess.PIPE)
+        p = subprocess.Popen(['make'] + a_list, stdout=subprocess.PIPE, text=True)
         out, err = p.communicate()
         errcode = p.returncode
         if err:
@@ -54,11 +64,7 @@ def removeFile(filename):
 
 # Do a cleanup
 def doClean():
-    for p in ["./src",
-            "./tests/tagtest",
-            "./tests/highlightertest",
-            "./tests/ini"
-            ]:
+    for p in g_allSrcDirs:
         print("Cleaning up in %s" % (p))
         oldP = os.getcwd()
         os.chdir(p)
@@ -84,6 +90,7 @@ def dump_usage():
     print("      --verbose         Verbose output.")
     print("      --use-qt4         Use qt4")
     print("      --use-qt5         Use qt5")
+    print("      --build-all       Build test programs also")
     print("")
     return 1
 
@@ -178,7 +185,7 @@ if __name__ == "__main__":
                 exit( dump_usage())
             elif arg == "--verbose":
                 g_verbose = True
-            elif arg == "--buildall":
+            elif arg == "--build-all":
                 do_buildAll = True
             elif arg.find("--prefix=") == 0:
                 g_dest_path = arg[9:]
@@ -192,16 +199,15 @@ if __name__ == "__main__":
         if do_clean:
             doClean();
         if do_build:
-            ensureExist("make")
-            ensureExist("gcc")
-            ensureExist("ctags")
+            for reqPrg in g_requiredPrograms:
+                ensureExist(reqPrg)
             sys.stdout.flush()
             
             olddir = os.getcwd()
             if do_buildAll:
-                srcDirList = ["src", "tests/tagtest", "tests/highlightertest"]
+                srcDirList = g_allSrcDirs
             else:
-                srcDirList = ["src"]
+                srcDirList = g_mainSrcDir
             for srcdir in srcDirList:
                 os.chdir(srcdir)
                 if not os.path.exists("Makefile"):
@@ -230,8 +236,8 @@ if __name__ == "__main__":
                 print("Failed to create dir")
                 exit(1)
             try:
-                shutil.copyfile("gede", g_dest_path + "/bin/gede")
-                os.chmod(g_dest_path + "/bin/gede", 0o775);
+                shutil.copyfile(g_exeName, g_dest_path + "/bin/" + g_exeName)
+                os.chmod(g_dest_path + "/bin/" + g_exeName, 0o775);
             except:
                 print("Failed to install files to " + g_dest_path)
                 raise
