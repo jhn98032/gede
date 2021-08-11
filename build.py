@@ -27,7 +27,28 @@ g_allSrcDirs = ["./src",
             ]
 g_mainSrcDir = ["./src" ]
 g_requiredPrograms = ["make", "gcc", "ctags" ]
+MIN_QT_VER = "4.0.0"
 #-----------------------------#
+
+
+# Check if Qt version is new enough.
+def verifyVersion(qtVer, minQtVer):
+    if len(qtVer.split(".")) != 3:
+        return -1
+    [f1,f2,f3] = qtVer.split(".")
+    [m1,m2,m3] = minQtVer.split(".")
+    if f1 < m1:
+        return 1
+    elif f1 == m1:
+        if f2 < m2:
+            return 1
+        elif f2 == m2:
+            if f3 < m3:
+                return 1
+    
+    return 0
+
+
 
 # Detect which version of Qt that a qmake executable will use
 def detectQmakeQtVer(qmakeExe):
@@ -78,7 +99,7 @@ def doClean():
         removeFile(".qmake.stash")
         os.chdir(oldP)
 
-    
+
 # Show usage
 def dump_usage():
     print("./build.py [OPTIONS]... COMMAND")
@@ -116,13 +137,32 @@ def ensureExist(name):
     else:
         printRed(" not found!!")
 
+# Return the version of Qt. Eg: getQtVersion("qmake") => "5.1.2".
+def getQtVersion(qmakeExe):
+    verStr = "?"
+    # Query qt version
+    print("Qt version:", end=' ')
+    try:
+        p = subprocess.Popen([qmakeExe, "-query", "QT_VERSION"], stdout=subprocess.PIPE, text=True)
+        out, err = p.communicate()
+        errcode = p.returncode
+        if err:
+            print(err)
+        else:
+            verStr = out.strip()
+            print(verStr)
+    except Exception as e:
+        print("Error occured: " + str(e))
+        raise
+    return verStr
+
 def detectQt():
     """ @brief Detects the Qt version installed in the system.
         @return The name of the qmake executable. 
     """
     global g_qmakeQt4
     global g_qmakeQt5
-    sys.stdout.write("Detecting Qt version... "),
+    sys.stdout.write("Detecting Qt version... ")
     qtVerList = []
     if exeExist("qmake-qt4"):
         qtVerList += ["Qt4 (qmake-qt4)"]
@@ -163,7 +203,8 @@ def detectQt():
         print("Failed to find suitable qmake")
     sys.stdout.flush()
 
-    return qmakeName;
+    verStr = getQtVersion(qmakeName)
+    return [qmakeName, verStr];
 
 
 # Main entry
@@ -211,15 +252,19 @@ if __name__ == "__main__":
             for srcdir in srcDirList:
                 os.chdir(srcdir)
                 if not os.path.exists("Makefile"):
-                    qmakeName = detectQt();
+                    [qmakeName, qtVer] = detectQt();
                     if not qmakeName:
                         exit(1)
-                    print("Generating makefile")
-                    sys.stdout.flush()
-                    if subprocess.call([qmakeName]):
-                        exit(1)
-                    print("Cleaning up in " + srcdir + " (please wait)")
-                    run_make(["clean"])
+                    if verifyVersion(qtVer, MIN_QT_VER):
+                        print("Unable to find Qt >=" + MIN_QT_VER)
+                    else:
+                
+                        print("Generating makefile")
+                        sys.stdout.flush()
+                        if subprocess.call([qmakeName]):
+                            exit(1)
+                        print("Cleaning up in " + srcdir + " (please wait)")
+                        run_make(["clean"])
                 print("Compiling in " + srcdir + " (please wait)")
                 if run_make(["-j4"]):
                     exit(1)
