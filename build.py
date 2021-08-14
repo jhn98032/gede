@@ -257,6 +257,7 @@ if __name__ == "__main__":
                         exit(1)
                     if verifyVersion(qtVer, MIN_QT_VER):
                         print("Unable to find Qt >=" + MIN_QT_VER)
+                        exit(1)
                     else:
                 
                         print("Generating makefile")
