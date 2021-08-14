@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2017 Johan Henriksson.
+ * Copyright (C) 2014-2021 Johan Henriksson.
  * All rights reserved.
  *
  * This software may be modified and distributed under the terms
@@ -106,7 +106,7 @@ private:
     void removeAll();
     IniEntry *findEntry(QString name);
     IniEntry *addEntry(QString name, IniEntry::EntryType type);
-    int decodeValueString(IniEntry *entry, QString specialKind, QByteArray valueStr);
+    int decodeValueString(IniEntry *entry, QString specialKind, QString  valueStr);
     QString encodeValueString(const IniEntry &entry);
     
 private:

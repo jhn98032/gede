@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2017 Johan Henriksson.
+ * Copyright (C) 2014-2021 Johan Henriksson.
  * All rights reserved.
  *
  * This software may be modified and distributed under the terms
@@ -24,6 +24,13 @@
 //     -- IniEntry --
 //
 //----------------------------------------------------------------
+
+#if QT_VERSION >= QT_VERSION_CHECK(5,5,0)
+#define formatString(str, fmt...)   (str) = QString::asprintf(fmt)
+#else
+#define formatString(str, fmt...)   (str).sprintf(fmt)
+#endif
+
 
 IniEntry::IniEntry(QString name_)
  : m_name(name_)
@@ -415,7 +422,7 @@ void Ini::setColor(QString name, QColor value)
 {
     IniEntry *entry = addEntry(name, IniEntry::TYPE_COLOR);
     QString valueStr;
-    valueStr.sprintf("#%02x%02x%02x", value.red(), value.green(), value.blue());
+    formatString(valueStr,"#%02x%02x%02x", value.red(), value.green(), value.blue());
     entry->m_value = valueStr;
 }
 
@@ -454,7 +461,11 @@ int Ini::save(QString filename)
     QVector<IniGroup*> entriesList;
     entriesList = m_entries;
 #ifdef INI_SORT_ENTRIES
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    std::sort(entriesList.begin(), entriesList.end(), compareGroup);
+#else
     qSort(entriesList.begin(), entriesList.end(), compareGroup);
+#endif
 #endif
     
     for(int j = 0;j < entriesList.size();j++)
@@ -470,7 +481,11 @@ int Ini::save(QString filename)
 
         QVector<IniEntry*> entryList = group->m_entries;
 #ifdef INI_SORT_ENTRIES
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+        std::sort(entryList.begin(), entryList.end(), compareEntry);
+#else
         qSort(entryList.begin(), entryList.end(), compareEntry);
+#endif
 #endif
         for(int i = 0;i < entryList.size();i++)
         {
@@ -493,7 +508,7 @@ int Ini::save(QString filename)
 /**
  * @brief Fills in a entry from a ini-file string.
  */
-int Ini::decodeValueString(IniEntry *entry, QString specialKind, QByteArray dataArray)
+int Ini::decodeValueString(IniEntry *entry, QString specialKind, QString dataArray)
 {
     int rc = 0;
     if(specialKind == "ByteArray")
@@ -512,7 +527,7 @@ int Ini::decodeValueString(IniEntry *entry, QString specialKind, QByteArray data
                     if(c == '\\')
                         state = ESC;
                     else
-                        byteArray += c;
+                        byteArray += c.toLatin1();
                     
                 };break;
                 case ESC:
@@ -536,7 +551,7 @@ int Ini::decodeValueString(IniEntry *entry, QString specialKind, QByteArray data
                         state = IDLE;
                     else
                     {
-                        byteArray += c;
+                        byteArray += c.toLatin1();
                         state = IDLE;
                     }
                     
@@ -573,15 +588,16 @@ int Ini::decodeValueString(IniEntry *entry, QString specialKind, QByteArray data
     }
     else if(specialKind == "")
     {
-        entry->m_value =  QString::fromUtf8(dataArray);
+        entry->m_value =  dataArray;
     }
     else
     {
-        entry->m_value = QString::fromUtf8(dataArray);
+        entry->m_value = dataArray;
         rc = -1;
     }
     return rc;
 }
+
 
 /**
  * @brief Converts a entry to a string suitable to storing in a ini file.
@@ -596,7 +612,7 @@ QString Ini::encodeValueString(const IniEntry &entry)
         for (int i = 0;i < byteArray.size();i++)
         {
             QString subStr;
-            subStr.sprintf("\\x%02x", (unsigned char)byteArray[i]);
+            formatString(subStr,"\\x%02x", (unsigned char)byteArray[i]);
             value += subStr;
         }
         value += ")";
@@ -604,7 +620,7 @@ QString Ini::encodeValueString(const IniEntry &entry)
     else if(entry.m_type == IniEntry::TYPE_SIZE)
     {
         QSize s = entry.m_value.toSize();
-        value.sprintf("@Size(%d %d)", s.width(), s.height());
+        formatString(value, "@Size(%d %d)", s.width(), s.height());
     }
     else if(entry.m_type == IniEntry::TYPE_INT)
     {
@@ -629,7 +645,7 @@ int Ini::appendLoad(QString filename)
     int lineNo = 1;
     QString str;
     QString name;
-    QByteArray value2;
+    QString value2;
     QString specialKind;
     QString groupName;
 
@@ -790,7 +806,7 @@ int Ini::appendLoad(QString filename)
                 if(c == QChar('"'))
                 {
                     IniEntry *entry = addEntry(groupName, name.trimmed(), IniEntry::TYPE_STRING);
-                    entry->m_value = QString::fromUtf8(value2);
+                    entry->m_value = value2;
                              
                     state = STATE_IDLE;
                 }
