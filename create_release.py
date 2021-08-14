@@ -10,7 +10,7 @@ import subprocess
 if len(sys.argv) < 2:
     print("Usage: ./create_release.py VERSION")
     print("Available versions:")
-    p = subprocess.Popen(['git', 'tag'], stdout=subprocess.PIPE)
+    p = subprocess.Popen(['git', 'tag'], stdout=subprocess.PIPE, text=True)
     out, err = p.communicate()
     errcode = p.returncode
     for line in out.split('\n'):
