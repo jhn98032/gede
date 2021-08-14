@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 #
+# Creates a debian package of gede in the parent directory.
+#
 # Written by Johan Henriksson. Copyright (C) 2014-2021.
 #
 import sys
@@ -42,7 +44,7 @@ def getGedeVersion():
 # Create a debian package
 def doDeb():
     verMajor,verMinor,verPatch = getGedeVersion()
-    from email.Utils import formatdate
+    from email.utils import formatdate
     with open("debian/changelog", "w+") as f:
         f.write("gede (%s.%s.%s) unstable; urgency=medium\n" % (verMajor,verMinor,verPatch))
         f.write("\n")
@@ -56,20 +58,32 @@ def doDeb():
 
     
 # Show usage
-def dump_usage():
-    print("./package.py [OPTIONS]...")
+def dumpUsage():
+    print("./create_debian_package.py [OPTIONS]...")
     print("where OPTIONS are:")
     print("      --verbose         Verbose output.")
-    print("")
+    print("");
+    print("Creates a debian package for gede.")
+    print("The deb files are placed in the parent directory");
+    
     return 1
 
+
+def main(argv):
+    for arg in argv[1:]:
+        if arg == "--help":
+            return dumpUsage()
+        else:
+            return dumpUsage()
+        
+    doDeb()
 
 
 # Main entry
 if __name__ == "__main__":
 
     try:
-        doDeb()
+        main(sys.argv)
         
     except IOError as e:
         print("I/O error({0}): {1}".format(e.errno, e.strerror))
