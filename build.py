@@ -188,9 +188,11 @@ def detectQt():
     # Which version to use?
     qmakeName = ""
     if g_qtVersionToUse == FORCE_QT4:
+        os.environ["QT_SELECT"] = "qt4"
         if g_qmakeQt4:
             qmakeName = g_qmakeQt4;
     elif g_qtVersionToUse == FORCE_QT5:
+        os.environ["QT_SELECT"] = "qt5"
         if g_qmakeQt5:
             qmakeName = g_qmakeQt5;
     elif g_qmakeQt5:
