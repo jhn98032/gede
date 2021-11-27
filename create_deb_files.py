@@ -86,7 +86,7 @@ if __name__ == "__main__":
         main(sys.argv)
         
     except IOError as e:
-        print("I/O error({0}): {1}".format(e.errno, e.strerror))
+        print("I/O error {0}".format(e))
     except SystemExit as e:
         pass
         raise e
