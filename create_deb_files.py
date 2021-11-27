@@ -50,7 +50,7 @@ def doDeb():
         f.write("\n")
         f.write("  * See homepage\n")
         f.write("\n")
-        f.write(" -- johan <johan@gede.acidron.com>  " + formatdate() + "\n")
+        f.write(" -- johan <johan@gede.dexar.se>  " + formatdate() + "\n")
     
     errcode = subprocess.call(['debuild','-us','-uc'])
     return errcode
