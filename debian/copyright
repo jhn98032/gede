@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: gede
 Upstream-Contact: johan@dexar.se
-Source: http://gede.dexar.com
+Source: http://gede.dexar.se
 
 Files: *
 Copyright: 2014-2020 Johan Henriksson johan@gede.acidron.com
