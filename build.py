@@ -53,7 +53,7 @@ def verifyVersion(qtVer, minQtVer):
 # Detect which version of Qt that a qmake executable will use
 def detectQmakeQtVer(qmakeExe):
     verStr = "?"
-    p = subprocess.Popen([qmakeExe, "--version"], stdout=subprocess.PIPE, text=True)
+    p = subprocess.Popen([qmakeExe, "--version"], stdout=subprocess.PIPE, universal_newlines=True)
     out, err = p.communicate()
     errcode = p.returncode
     if not err:
@@ -69,7 +69,7 @@ def run_make(a_list):
     if g_verbose:
         errcode = subprocess.call(['make'] + a_list)
     else:
-        p = subprocess.Popen(['make'] + a_list, stdout=subprocess.PIPE, text=True)
+        p = subprocess.Popen(['make'] + a_list, stdout=subprocess.PIPE, universal_newlines=True)
         out, err = p.communicate()
         errcode = p.returncode
         if err:
@@ -143,7 +143,7 @@ def getQtVersion(qmakeExe):
     # Query qt version
     print("Qt version:", end=' ')
     try:
-        p = subprocess.Popen([qmakeExe, "-query", "QT_VERSION"], stdout=subprocess.PIPE, text=True)
+        p = subprocess.Popen([qmakeExe, "-query", "QT_VERSION"], stdout=subprocess.PIPE, universal_newlines=True)
         out, err = p.communicate()
         errcode = p.returncode
         if err:
