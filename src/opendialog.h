@@ -59,6 +59,7 @@ public:
     int getRunningPid();
     void setRunningPid(int pid);
 
+    void forceProjectConfig(QString customProjectConfig);
     
     void loadConfig(Settings &cfg);
     void saveConfig(Settings *cfg);
@@ -81,6 +82,7 @@ private slots:
 
 private:
     Ui_OpenDialog m_ui;
+    QString m_customProjectConfig;
     
 };
 

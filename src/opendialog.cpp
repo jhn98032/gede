@@ -407,6 +407,13 @@ QString OpenDialog::getInitialBreakpoint()
     return m_ui.lineEdit_initialBreakpoint->text();
 }
 
+/**
+* @brief Forces the use of a specific config file.
+*/
+void OpenDialog::forceProjectConfig(QString customProjectConfig)
+{
+    m_customProjectConfig = customProjectConfig;
+}
 
 void OpenDialog::onProjDirComboChanged(int idx)
 {
@@ -416,7 +423,10 @@ void OpenDialog::onProjDirComboChanged(int idx)
     {
         // Load config file
         Settings projCfg;
-        projCfg.setProjectConfig(projConfPath + "/" + PROJECT_CONFIG_FILENAME);
+        if(!m_customProjectConfig.isEmpty())
+            projCfg.setProjectConfig(m_customProjectConfig);
+        else
+            projCfg.setProjectConfig(projConfPath + "/" + PROJECT_CONFIG_FILENAME);
         projCfg.load();
         projCfg.m_projDir = projConfPath;
 

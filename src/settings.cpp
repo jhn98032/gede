@@ -264,6 +264,10 @@ void Settings::loadProjectConfig(QString filepath)
     Ini tmpIni;
     if(tmpIni.appendLoad(filepath))
         infoMsg("Failed to load project ini '%s'. File will be created.", stringToCStr(filepath));
+    else
+    {
+          debugMsg("Loaded config from %s", qPrintable(filepath));
+    }
 
     m_download = tmpIni.getBool("Download", true);
     switch(tmpIni.getInt("Mode", MODE_LOCAL))
@@ -330,7 +334,8 @@ void Settings::saveProjectConfig()
 
     QString filepath = getProjectConfigPath();
 
-    
+    debugMsg("Saving config to %s", qPrintable(filepath));
+
     Ini tmpIni;
 
     tmpIni.appendLoad(filepath);

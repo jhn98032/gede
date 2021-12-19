@@ -84,7 +84,8 @@ int main(int argc, char *argv[])
     int rc = 0;
     Settings cfg;
     bool showConfigDialog = true;
-
+    QString customProjectConfig;
+    
     // Ensure that the config dir exist
     QDir d;
     d.mkdir(QDir::homePath() + "/" + GLOBAL_CONFIG_DIR);
@@ -105,7 +106,8 @@ int main(int argc, char *argv[])
             && i+1 < argc)
         {
             i++;
-            cfg.setProjectConfig(argv[i]);
+            customProjectConfig = argv[i];
+            cfg.setProjectConfig(customProjectConfig);
         }
         
     }
@@ -146,7 +148,8 @@ int main(int argc, char *argv[])
             return dumpUsage();
         }
     }
-
+    cfg.save();
+    
     QApplication app(argc, argv);
 
     if(!cfg.m_guiStyleName.isEmpty())
@@ -162,7 +165,10 @@ int main(int argc, char *argv[])
     {
         // Ask user for program
         OpenDialog dlg(NULL);
-        
+
+        if(!customProjectConfig.isEmpty())
+            dlg.forceProjectConfig(customProjectConfig);
+
         dlg.loadConfig(cfg);
 
         if(dlg.exec() != QDialog::Accepted)
