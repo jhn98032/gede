@@ -160,6 +160,8 @@ void SettingsDialog::loadConfig()
     m_ui.comboBox_deleteKey->setCurrentIndex(m_cfg->m_progConDelKey);
 
     m_ui.checkBox_globalProjConfig->setCheckState(m_cfg->m_globalProjConfig ? Qt::Checked : Qt::Unchecked);
+
+    m_ui.checkBox_focusOnStop->setCheckState(m_cfg->m_focusOnStop ? Qt::Checked : Qt::Unchecked);
     
             
     int comboIdx = 0;
@@ -259,7 +261,7 @@ void SettingsDialog::getConfig(Settings *cfg)
 
     m_cfg->m_progConBackspaceKey = m_ui.comboBox_backspaceKey->currentIndex();
     m_cfg->m_progConDelKey = m_ui.comboBox_deleteKey->currentIndex();
-
+    m_cfg->m_focusOnStop = (m_ui.checkBox_focusOnStop->checkState() == Qt::Unchecked) ? false : true;
     m_cfg->m_globalProjConfig = (m_ui.checkBox_globalProjConfig->checkState() == Qt::Unchecked) ? false : true;
 }
 

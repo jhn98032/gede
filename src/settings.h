@@ -164,6 +164,8 @@ class Settings
 
         int m_variablePopupDelay; //!< Number of milliseconds before the variables value should be displayed in a popup.
         QStringList m_gotoRuiList;
+
+        bool m_focusOnStop; //!< Raise and focus the window when breakpoint hit
         QString m_projDir; //!< The dir to change to before debugging (Eg: "/a/path")
          
     private:

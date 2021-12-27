@@ -533,6 +533,9 @@ bool MainWindow::eventFilter(QObject *obj, QEvent *event)
  */
 void MainWindow::ICore_onStopped(ICore::StopReason reason, QString path, int lineNo)
 {
+    if(m_cfg.m_focusOnStop)
+        activateWindow();
+    
     if(reason == ICore::EXITED_NORMALLY || reason == ICore::EXITED)
     {
         QString title = "Program exited";

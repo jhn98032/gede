@@ -248,6 +248,16 @@ QGroupBox::title {
         </layout>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkBox_focusOnStop">
+         <property name="toolTip">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enabling this makes gede get focus after the debugged program stops.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+         <property name="text">
+          <string>Focus after stop</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>

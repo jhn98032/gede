@@ -39,7 +39,7 @@ Settings::Settings()
     m_tabIndentCount = 4;
     m_viewFuncFilter = true;
     m_viewClassFilter = true;
-        
+    m_focusOnStop = true;
     
     // Set cleanlooks as default on Debian
     DistroType distroType = DISTRO_UNKNOWN;
@@ -114,6 +114,7 @@ void Settings::loadDefaultsGui()
 
     m_progConBackspaceKey = 0;
     m_progConDelKey = 2;
+    m_focusOnStop = true;
 
     m_variablePopupDelay = 300;
 }
@@ -253,6 +254,7 @@ void Settings::loadGlobalConfig()
     }
     m_progConBackspaceKey = tmpIni.getInt("ProgramConsole/BackspaceKey", m_progConBackspaceKey);
     m_progConDelKey = tmpIni.getInt("ProgramConsole/DelKey", m_progConDelKey);
+    m_focusOnStop = tmpIni.getBool("FocusOnStop", m_focusOnStop);
     
 }
 
@@ -474,7 +476,8 @@ void Settings::saveGlobalConfig()
     }
     tmpIni.setInt("ProgramConsole/BackspaceKey", m_progConBackspaceKey);
     tmpIni.setInt("ProgramConsole/DelKey", m_progConDelKey);
- 
+    tmpIni.setBool("FocusOnStop",m_focusOnStop);
+
     if(tmpIni.save(globalConfigFilename))
         infoMsg("Failed to save '%s'", stringToCStr(globalConfigFilename));
 
