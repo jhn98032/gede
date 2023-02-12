@@ -13,6 +13,7 @@
 #include <QDirIterator>
 #include <QMessageBox>
 #include <QScrollBar>
+#include <QFileInfo>
 
 #include <assert.h>
 
@@ -713,11 +714,20 @@ void MainWindow::insertSourceFiles()
 
         if(!ignore)
         {
-            FileInfo info;
-            info.m_name = source->m_name;
-            info.m_fullName = source->m_fullName;
             
-            m_sourceFiles.push_back(info);
+            // File exist?
+            if(!QFileInfo(source->m_fullName).exists())
+            {
+                debugMsg("File '%s' does not exist", qPrintable(source->m_fullName));
+            }
+            else    
+            {
+                FileInfo info;
+                info.m_name = source->m_name;
+                info.m_fullName = source->m_fullName;
+                
+                m_sourceFiles.push_back(info);
+            }
         }
     }
 
@@ -1118,6 +1128,8 @@ CodeViewTab* MainWindow::findTab(QString filename)
  */
 CodeViewTab* MainWindow::open(QString filename)
 {
+    debugMsg("%s(%s)", __func__, qPrintable(filename));
+  
     if(filename.isEmpty())
         return NULL;
 
@@ -1241,7 +1253,9 @@ void MainWindow::updateCurrentLine(QString filename, int lineno)
     m_currentFile = filename;
     m_currentLine = lineno;
 
-    if(!filename.isEmpty())
+    if(filename.isEmpty())
+        warnMsg("No filename information available");
+    else
     {
         currentCodeViewTab = open(filename);
     }
