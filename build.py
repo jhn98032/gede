@@ -14,6 +14,7 @@ AUTODETECT=3
 
 #-----------------------------#
 # Configuration section
+g_parallel_builds = 4
 g_dest_path = "/usr/local"
 g_verbose = False
 g_exeName = "gede"
@@ -112,6 +113,7 @@ def dump_usage():
     print("      --use-qt4         Use qt4")
     print("      --use-qt5         Use qt5")
     print("      --build-all       Build test programs also")
+    print("      --parallel-builds=NUM   Number of parallel jobs to run in parallel")
     print("")
     return 1
 
@@ -236,6 +238,8 @@ if __name__ == "__main__":
                 g_qtVersionToUse = FORCE_QT4
             elif arg == "--use-qt5":
                 g_qtVersionToUse = FORCE_QT5
+            elif arg.startswith("--parallel-builds="):
+                g_parallel_builds = int(arg[18:])
             else:
                 exit(dump_usage())
 
@@ -269,7 +273,7 @@ if __name__ == "__main__":
                         print("Cleaning up in " + srcdir + " (please wait)")
                         run_make(["clean"])
                 print("Compiling in " + srcdir + " (please wait)")
-                if run_make(["-j4"]):
+                if run_make(["-j%d" % (g_parallel_builds)]):
                     exit(1)
                 os.chdir(olddir)
                 
