@@ -479,7 +479,7 @@ void SyntaxHighlighterBasic::colorize(QString text)
             case STRING:
             {
                 field->m_text += c;
-                if(!isEscaped && c == '"')
+                if(c == '"')
                 {
                     field = NULL;
                     state = IDLE;
