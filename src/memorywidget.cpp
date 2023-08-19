@@ -36,7 +36,11 @@ MemoryWidget::MemoryWidget(QWidget *parent)
  ,m_inf(0)
 {
     m_addrCharWidth = 0;
+#if __APPLE__
+    m_font = QFont("Monospace", 12);
+#else
     m_font = QFont("Monospace", 10);
+#endif
     m_fontInfo = new QFontMetrics(m_font);
 
 

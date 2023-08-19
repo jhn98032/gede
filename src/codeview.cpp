@@ -30,7 +30,11 @@ CodeView::CodeView()
     ,m_cfg(0)
     ,m_infoWindow(&m_font)
 {
+#if __APPLE__
+    m_font = QFont("Monospace", 11);
+#else
     m_font = QFont("Monospace", 8);
+#endif
     m_fontInfo = new QFontMetrics(m_font);
     m_cursorY = 0;
 

@@ -98,7 +98,11 @@ QList<ProcessInfo> getProcessListByUser(int ownerUid)
                          ProcessInfo prc;
                          prc.uid = buf.st_uid;
                          prc.pid = pid;
+#if __APPLE__
+                         prc.mtime.setTime_t(buf.st_mtime);
+#else
                          prc.mtime.setTime_t(buf.st_mtim.tv_sec);
+#endif			 
                          prc.m_exePath = procDirPath + "/exe";
                          QFile f(prc.m_exePath);
                          prc.m_exePath = f.symLinkTarget();

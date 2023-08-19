@@ -57,17 +57,21 @@ Settings::Settings()
 void Settings::loadDefaultsGui()
 {
     m_maxTabs = 15;
-    
+#if __APPLE__
+    const int fontsize = 11;
+#else
+    const int fontsize = 8;
+#endif
     m_fontFamily = "Monospace";
-    m_fontSize = 8;
+    m_fontSize = fontsize;
     m_memoryFontFamily = "Monospace";
-    m_memoryFontSize = 8;
+    m_memoryFontSize = fontsize;
     m_outputFontFamily = "Monospace";
-    m_outputFontSize = 8;
+    m_outputFontSize = fontsize;
     m_gdbOutputFontFamily = "Monospace";
-    m_gdbOutputFontSize = 8;
+    m_gdbOutputFontSize = fontsize;
     m_gedeOutputFontFamily = "Monospace";
-    m_gedeOutputFontSize = 8;
+    m_gedeOutputFontSize = fontsize;
 
 
     m_clrBackground = Qt::black;
