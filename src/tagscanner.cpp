@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include <QProcess>
 #include <QDebug>
+#include <QFileInfo>
 
 #include "config.h"
 #include "log.h"
@@ -209,6 +210,13 @@ int TagScanner::scan(QString filepath, QList<Tag> *taglist)
 
     if(!g_ctagsExist)
         return 0;
+
+    // Only scan if file exists
+    if (!QFileInfo(filepath).exists())
+    {
+        warnMsg("Unable to scan '%s'. File not found!", qPrintable(filepath));
+        return -1;
+    }
 
     QString etagsCmd;
     etagsCmd = ETAGS_ARGS;

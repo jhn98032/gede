@@ -1,12 +1,16 @@
 /*
- * Copyright (C) 2014-2017 Johan Henriksson.
+ * Copyright (C) 2014-2023 Johan Henriksson.
  * All rights reserved.
  *
  * This software may be modified and distributed under the terms
  * of the BSD license.  See the LICENSE file for details.
  */
 
+
+//#define ENABLE_DEBUGMSG
+
 #include "util.h"
+#include "log.h"
 
 #include <assert.h>
 #include <QString>
@@ -360,6 +364,90 @@ QByteArray fileToContent(QString filename)
     }
     return cnt;
 }
+
+
+/**
+* @brief Joins a QStringList into a string.
+*/
+QString joingStringList(QStringList arguments, char separator)
+{
+      
+    QString str;
+    for(int i = 0;i < arguments.size();i++)
+    {
+        QString curArg = arguments[i];
+        if(i != 0)
+            str += separator;
+        if(curArg.contains(separator))
+            str += "\"" + curArg + "\"";
+        else
+            str += curArg;
+            
+    }
+
+    return str;
+}
+
+/**
+* @brief Splits a possible escaped string to a list of strings.
+*/
+QStringList splitString(QString str, char separator)
+{ 
+    QStringList list;
+    enum { START, ESC_WORD, WORD } state = START;
+    QString curWord;
+    for(int i = 0;i < str.length();i++)
+    {
+        QChar c = str[i];
+        switch(state)
+        {
+            case START:
+            {
+                if(c == '"')
+                {
+                    state = ESC_WORD;
+                    curWord = "";
+                }
+                else if(c != separator)
+                {
+                    state = WORD;
+                    curWord = c;
+                }
+            };break;
+            case WORD:
+            {
+                if(c == separator || (i+1) == str.length())
+                {
+                    list.append(curWord);
+                    state = START;
+                }
+                else
+                    curWord += c;
+            };break;
+            case ESC_WORD:
+            {
+                if(c == '"' || (i+1) == str.length())
+                {
+                    list.append(curWord);
+                    state = START;
+                }
+                else
+                    curWord += c;
+            };break;
+            default:;break;
+        }
+    }
+    if(state != START)
+        list.append(curWord);
+
+    for(int j = 0;j < list.size();j++)
+    {
+        debugMsg("%d:>%s<", j, qPrintable(list[j]));
+    }
+    
+    return list;
+}
+
 
 #ifdef NEVER
 void testFuncs()

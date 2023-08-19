@@ -25,9 +25,9 @@ public:
     OpenDialog(QWidget *parent);
 
     void setProgram(QString program);
-    void setArguments(QString program);
+    void setArguments(QStringList program);
     QString getProgram();
-    QString getArguments();
+    QStringList getArguments();
 
     QString getCoreDumpFile();
     

@@ -427,9 +427,7 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
     QString commandStr;
     if(argumentList.size() > 0)
     {
-        commandStr = "-exec-arguments ";
-        for(int i = 0;i < argumentList.size();i++)
-            commandStr += " " + argumentList[i];
+        commandStr = "-exec-arguments " + joingStringList(argumentList);
         com.command(NULL, commandStr);
     }
     

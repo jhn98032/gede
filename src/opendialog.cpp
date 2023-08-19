@@ -122,9 +122,10 @@ void OpenDialog::setRunningPid(int pid)
     return m_ui.lineEdit_pid->setText(QString::number(pid));
 }
 
-QString OpenDialog::getArguments()
+QStringList OpenDialog::getArguments()
 {
-    return m_ui.lineEdit_arguments->text();
+    QString str = m_ui.lineEdit_arguments->text();
+    return splitString(str);
 }
     
 
@@ -152,9 +153,10 @@ QStringList OpenDialog::getInitCommands()
     return m_ui.plainTextEdit_initCommands->toPlainText().split("\n");
 }    
 
-void OpenDialog::setArguments(QString arguments)
+void OpenDialog::setArguments(QStringList arguments)
 {
-    m_ui.lineEdit_arguments->setText(arguments);
+    QString str = joingStringList(arguments);
+    m_ui.lineEdit_arguments->setText(str);
 
 }
 
@@ -313,7 +315,7 @@ void OpenDialog::saveConfig(Settings *cfg)
     OpenDialog &dlg = *this;
     cfg->m_coreDumpFile = dlg.getCoreDumpFile();
     cfg->setProgramPath(dlg.getProgram());
-    cfg->m_argumentList = dlg.getArguments().split(' ');
+    cfg->m_argumentList = dlg.getArguments();
     cfg->m_connectionMode = dlg.getMode();
     cfg->m_tcpPort = dlg.getTcpRemotePort();
     cfg->m_download = dlg.getDownload();
@@ -364,8 +366,21 @@ void OpenDialog::loadConfig(Settings &cfg)
 
     dlg.setRunningPid(cfg.m_runningPid);
 
-    // Fill in the paths
+    dlg.setProgram(cfg.getProgramPath());
+
+    QStringList defList;
+    dlg.setArguments(cfg.m_argumentList);
+    dlg.setInitialBreakpoint(cfg.m_initialBreakpoint);
+
     QString currentProjDir = m_ui.comboBox_projDir->currentText();
+ 
+#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
+    m_ui.comboBox_projDir->setCurrentText(currentProjDir);
+#else
+    m_ui.comboBox_projDir->setEditText(currentProjDir);
+#endif
+
+    // Fill in the paths
     if(dlg.m_ui.comboBox_projDir->count() == 0)
     {
     
@@ -384,17 +399,6 @@ void OpenDialog::loadConfig(Settings &cfg)
             }
         }
     }
-    dlg.setProgram(cfg.getProgramPath());
-
-    QStringList defList;
-    dlg.setArguments(cfg.m_argumentList.join(" "));
-    dlg.setInitialBreakpoint(cfg.m_initialBreakpoint);
-
-#if QT_VERSION >= QT_VERSION_CHECK(5,0,0)
-    m_ui.comboBox_projDir->setCurrentText(currentProjDir);
-#else
-    m_ui.comboBox_projDir->setEditText(currentProjDir);
-#endif
 
 
 }

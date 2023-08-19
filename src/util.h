@@ -39,6 +39,9 @@ bool exeExists(QString name, bool checkCurrentDir = false);
 
 QByteArray fileToContent(QString filename);
 
+QStringList splitString(QString str, char separator = ' ');
+QString joingStringList(QStringList arguments, char separator = ' ');
+
 
 
 #endif // FILE__UTIL_H
