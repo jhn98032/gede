@@ -21,7 +21,7 @@ g_exeName = "gede"
 g_qtVersionToUse = FORCE_QT5
 g_qmakeQt4 = ""
 g_qmakeQt5 = ""
-g_allSrcDirs = ["./src",
+g_otherSrcDirs = [
             "./tests/tagtest",
             "./tests/highlightertest",
             "./tests/ini"
@@ -67,6 +67,7 @@ def detectQmakeQtVer(qmakeExe):
         
 # Run the make command
 def run_make(a_list):
+    global g_verbose
     if g_verbose:
         errcode = subprocess.call(['make'] + a_list)
     else:
@@ -80,13 +81,16 @@ def run_make(a_list):
 # Remove a file
 def removeFile(filename):
     try:
+        global g_verbose
+        if g_verbose:
+            print("rm " + filename)
         os.remove(filename)
     except OSError:
         pass
 
 # Do a cleanup
 def doClean():
-    for p in g_allSrcDirs:
+    for p in g_otherSrcDirs + g_mainSrcDir:
         print("Cleaning up in %s" % (p))
         oldP = os.getcwd()
         os.chdir(p)
@@ -252,7 +256,7 @@ if __name__ == "__main__":
             
             olddir = os.getcwd()
             if do_buildAll:
-                srcDirList = g_allSrcDirs
+                srcDirList = g_mainSrcDir + g_otherSrcDirs 
             else:
                 srcDirList = g_mainSrcDir
             for srcdir in srcDirList:
