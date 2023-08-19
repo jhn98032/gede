@@ -279,7 +279,7 @@ QString OpenDialog::getTcpRemoteHost()
 void OpenDialog::setTcpRemotePort(int port)
 {
     QString portStr;
-    portStr.sprintf("%d", port);
+    portStr = QString::asprintf("%d", port);
     m_ui.lineEdit_tcpPort->setText(portStr);
 }
 
@@ -347,6 +347,9 @@ void OpenDialog::setDownload(bool enable)
 void OpenDialog::loadConfig(Settings &cfg)
 {
     OpenDialog &dlg = *this;
+
+    debugMsg("%s()", __func__);
+ 
     dlg.setMode(cfg.m_connectionMode);
 
     dlg.setTcpRemotePort(cfg.m_tcpPort);
@@ -412,6 +415,7 @@ QString OpenDialog::getInitialBreakpoint()
 */
 void OpenDialog::forceProjectConfig(QString customProjectConfig)
 {
+    debugMsg("%s(filename:%s)", __func__, qPrintable(customProjectConfig));
     m_customProjectConfig = customProjectConfig;
 }
 

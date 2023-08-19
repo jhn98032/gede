@@ -11,6 +11,8 @@
 #include <assert.h>
 #include <QScrollBar>
 #include <QFile>
+#include <algorithm>
+
 
 #include "config.h"
 #include "util.h"
@@ -45,9 +47,9 @@ void CodeViewTab::fillInFunctions(QList<Tag> tagList)
 {
     m_ui.comboBox_funcList->clear();
     if(m_cfg->m_tagSortByName)
-        qSort(tagList.begin(),tagList.end(), compareTagsByName);
+        std::sort(tagList.begin(),tagList.end(), compareTagsByName);
     else
-        qSort(tagList.begin(),tagList.end(), compareTagsByLineNo);
+        std::sort(tagList.begin(),tagList.end(), compareTagsByLineNo);
     for(int tagIdx = 0;tagIdx < tagList.size();tagIdx++)
     {
         Tag &tag = tagList[tagIdx];
@@ -56,7 +58,7 @@ void CodeViewTab::fillInFunctions(QList<Tag> tagList)
             QString text;
             if(m_cfg->m_tagShowLineNumbers)
             {
-                text.sprintf("L%d: ", tag.getLineNo());
+                text = QString::asprintf("L%d: ", tag.getLineNo());
                 text = text.leftJustified(6, ' ');
             }
             text += tag.getLongName();

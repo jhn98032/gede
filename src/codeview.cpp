@@ -116,7 +116,7 @@ void CodeView::onTimerTimeout()
         for(j = 0;j < cols.size() && foundPos == -1;j++)
         {
             TextField *field = cols[j];            
-            int w = m_fontInfo->width(field->m_text);
+            int w = m_fontInfo->horizontalAdvance(field->m_text);
             if(x <= mousePos.x() && mousePos.x() <= x+w)
             {
                 foundField = field;
@@ -291,8 +291,8 @@ void CodeView::paintEvent ( QPaintEvent * event )
                 TextField *field = cols[j];            
                 fullRowText += field->m_text;
             }
-            int selPosX = x + m_fontInfo->width(fullRowText.left(m_incSearchStartPosColumn));
-            int selPosWidth = m_fontInfo->width(fullRowText.mid(m_incSearchStartPosColumn, m_incSearchText.length()));
+            int selPosX = x + m_fontInfo->horizontalAdvance(fullRowText.left(m_incSearchStartPosColumn));
+            int selPosWidth = m_fontInfo->horizontalAdvance(fullRowText.mid(m_incSearchStartPosColumn, m_incSearchText.length()));
             QRect rect2(selPosX, y, selPosWidth, rowHeight);
             painter.fillRect(rect2, m_cfg->m_clrSelection);
         
@@ -306,7 +306,7 @@ void CodeView::paintEvent ( QPaintEvent * event )
             painter.setPen(field->m_color);
             painter.drawText(x, fontY, field->m_text);
 
-            x += m_fontInfo->width(field->m_text);
+            x += m_fontInfo->horizontalAdvance(field->m_text);
 
         }
     }
@@ -372,7 +372,7 @@ void CodeView::mousePressEvent( QMouseEvent * event )
             for(j = 0;j < cols.size() && foundPos == -1;j++)
             {
                 TextField *field = cols[j];            
-                int w = m_fontInfo->width(field->m_text);
+                int w = m_fontInfo->horizontalAdvance(field->m_text);
                 if(x <= event->pos().x() && event->pos().x() <= x+w)
                 {
                     foundPos = j;

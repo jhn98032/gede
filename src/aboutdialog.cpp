@@ -24,7 +24,7 @@ AboutDialog::AboutDialog(QWidget *parent, Settings *cfg)
 
     //
     QString verStr;
-    verStr.sprintf("Version: v%d.%d.%d", GD_MAJOR, GD_MINOR, GD_PATCH);
+    verStr = QString::asprintf("Version: v%d.%d.%d", GD_MAJOR, GD_MINOR, GD_PATCH);
     m_ui.label_version->setText(verStr);
 
     //
@@ -36,7 +36,7 @@ AboutDialog::AboutDialog(QWidget *parent, Settings *cfg)
 
 
     QString qtVersionStr;
-    qtVersionStr.sprintf("Qt: %s (compiled) / %s (running)", QT_VERSION_STR, qVersion());
+    qtVersionStr = QString::asprintf("Qt: %s (compiled) / %s (running)", QT_VERSION_STR, qVersion());
     m_ui.label_qtVersion->setText(qtVersionStr);
 
     

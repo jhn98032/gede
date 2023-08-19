@@ -45,7 +45,7 @@ ProcessListWidgetItem::ProcessListWidgetItem( const ProcessInfo &prc)
     setText(COLUMN_UID, QString::number(prc.uid));
     int secs = prc.mtime.secsTo(QDateTime::currentDateTime());
     QString dtStr;
-    dtStr.sprintf("%02d:%02d", secs/3600, (secs/60)%60);
+    dtStr = QString::asprintf("%02d:%02d", secs/3600, (secs/60)%60);
     setText(COLUMN_TIME, dtStr);
     setText(COLUMN_CMDLINE, prc.getCmdline());
         

@@ -48,7 +48,7 @@ void VariableInfoWindow::show(QString expr)
     QFontMetrics m_fontInfo(*m_font);
     int textHeight = m_fontInfo.lineSpacing()+1;
 
-    int w = 10 + m_fontInfo.width(m_text)+10;
+    int w = 10 + m_fontInfo.horizontalAdvance(m_text)+10;
     int h = 5 + textHeight + 5;
 
     resize(w,h);

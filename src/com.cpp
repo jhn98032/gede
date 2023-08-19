@@ -654,7 +654,7 @@ int GdbCom::parseValue(TreeNode *item)
 
             do
             {
-                name.sprintf("%d", idx++);
+                name = QString::asprintf("%d", idx++);
                 TreeNode *node = new TreeNode(name);
                 item->addChild(node); 
                 rc = parseValue(node);
@@ -823,7 +823,7 @@ void GdbCom::writeLogEntry(QString logText)
     struct timeval tv;
     gettimeofday(&tv, NULL);
     QString timeStr;
-    timeStr.sprintf("%02d.%03d", (int)(tv.tv_sec%100), (int)(tv.tv_usec/1000));
+    timeStr = QString::asprintf("%02d.%03d", (int)(tv.tv_sec%100), (int)(tv.tv_usec/1000));
     
     QString fullText = timeStr + "|" + logText;
     
@@ -1092,24 +1092,22 @@ GdbResult GdbCom::command(Tree *resultData, QString text)
  */
 int GdbCom::init(QString gdbPath, bool enableDebugLog)
 {
-    QString commandLine;
-
     enableLog(enableDebugLog);
 
-        
-    commandLine.sprintf("%s --interpreter=mi2", stringToCStr(gdbPath));
+    QStringList gdbArgs;
+    gdbArgs.append("--interpreter=mi2");
 
     if(m_enableLog)
     {
         QString logStr;
-        logStr = "# Gdb commandline: '" + commandLine + "'\n";
+        logStr = "# Gdb commandline: '" + gdbPath + " " + gdbArgs.join(' ') + "'\n";
         writeLogEntry(logStr);
     }
 
     // Make sure that gdb understands that we can handle color output
     setenv("TERM", "xterm",1);
 
-    m_process.start(commandLine);
+    m_process.start(gdbPath, gdbArgs);
     m_process.waitForStarted(6000);
 
     if(m_process.state() == QProcess::NotRunning)
@@ -1124,7 +1122,11 @@ int GdbCom::init(QString gdbPath, bool enableDebugLog)
 
 int GdbCom::getPid()
 {
+#if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
+    return m_process.processId();
+#else
     return m_process.pid();
+#endif
 }
 
 
@@ -1233,7 +1235,7 @@ void GdbCom::enableLog(bool enable)
             QDateTime now = QDateTime::currentDateTime();
             logStr = "# Created: " + now.toString("yyyy-MM-dd hh:mm:ss") + "\n";
             writeLogEntry(logStr);
-            logStr.sprintf("# Gede version: %d.%d.%d \n", GD_MAJOR,GD_MINOR,GD_PATCH);
+            logStr = QString::asprintf("# Gede version: %d.%d.%d \n", GD_MAJOR,GD_MINOR,GD_PATCH);
             writeLogEntry(logStr);
 
             QString distroDesc;

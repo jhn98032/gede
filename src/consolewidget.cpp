@@ -97,7 +97,7 @@ QString printable(QString str)
         else
         {
             QString codeStr;
-            codeStr.sprintf("<0x%x>", (int)c.unicode());
+            codeStr = QString::asprintf("<0x%x>", (int)c.unicode());
             line += codeStr;
         }
     }
@@ -189,7 +189,7 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
     if(m_cursorMode == BLINK_ON || m_cursorMode == STEADY)
     {
         QRect r;
-        int charWidth = m_fontInfo->width(" ");
+        int charWidth = m_fontInfo->horizontalAdvance(" ");
         r.setX(charWidth*m_cursorX+5);
         r.setY(rowHeight*((m_cursorY+m_origoY)-m_dispOrigoY));
         r.setWidth(charWidth);
@@ -231,9 +231,9 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
                 QString rightText = blk.text.mid(cutIdx+1);
                 painter.drawText(x, fontY, leftText);
                 painter.setPen(getBgColor(blk.m_bgColor));
-                painter.drawText(x+m_fontInfo->width(leftText), fontY, QString(cutLetter));
+                painter.drawText(x+m_fontInfo->horizontalAdvance(leftText), fontY, QString(cutLetter));
                 painter.setPen(getFgColor(blk.m_fgColor));
-                painter.drawText(x+m_fontInfo->width(leftText + cutLetter), fontY, rightText);
+                painter.drawText(x+m_fontInfo->horizontalAdvance(leftText + cutLetter), fontY, rightText);
 
             }
             else
@@ -241,7 +241,7 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
                 //debugMsg("drawing '%s' at %d:%d", qPrintable(blk.text), x, fontY);
                 painter.drawText(x, fontY, blk.text);
             }
-            x += m_fontInfo->width(blk.text);
+            x += m_fontInfo->horizontalAdvance(blk.text);
             curCharIdx += blk.text.size();
         }
         
@@ -587,7 +587,7 @@ void ConsoleWidget::decodeCSI(QChar c)
             if(m_ansiParamStr == "6")
             {
                 QString resp;
-                resp.sprintf(ANSI_CSI "%d;%dR", m_cursorY+1, m_cursorX+1);
+                resp = QString::asprintf(ANSI_CSI "%d;%dR", m_cursorY+1, m_cursorX+1);
                 Core &core = Core::getInstance();
                 core.writeTargetStdin(resp);
                 debugMsg("Sending cursor position to target 'CSI%s'", qPrintable(resp.mid(2)));

@@ -121,7 +121,7 @@ QString AdaTagScanner::Token::toDesc()
     };
         
     QString str;
-    str.sprintf("[L%d;%s>%s<]", tok->m_lineNr, qPrintable(typeStr), qPrintable(tok->text));
+    str = QString::asprintf("[L%d;%s>%s<]", tok->m_lineNr, qPrintable(typeStr), qPrintable(tok->text));
     return str;
 }
 

@@ -98,7 +98,7 @@ void TagScanner::checkForCtags()
     {
         QString msg;
 
-        msg.sprintf("Failed to start program '%s/%s'\n", ETAGS_CMD1, ETAGS_CMD2);
+        msg = QString::asprintf("Failed to start program '%s/%s'\n", ETAGS_CMD1, ETAGS_CMD2);
         msg += "ctags can be installed on ubuntu/debian using command:\n";
         msg +=  "\n";
         msg += " apt-get install exuberant-ctags";
@@ -124,7 +124,7 @@ void TagScanner::checkForCtags()
         {
             QString msg;
 
-            msg.sprintf("Failed to start program '%s'\n", qPrintable(g_ctagsCmd));
+            msg = QString::asprintf("Failed to start program '%s'\n", qPrintable(g_ctagsCmd));
         
             QMessageBox::warning(NULL,
                         "Failed to start ctags",
@@ -216,7 +216,7 @@ int TagScanner::scan(QString filepath, QList<Tag> *taglist)
     etagsCmd += filepath;
     QString name = g_ctagsCmd;
     QStringList argList;
-    argList = etagsCmd.split(' ',  QString::SkipEmptyParts);
+    argList = etagsCmd.split(' ',  Qt::SkipEmptyParts);
 
     QByteArray stdoutContent;
     QByteArray stderrContent;
@@ -230,7 +230,7 @@ int TagScanner::scan(QString filepath, QList<Tag> *taglist)
     QString all = stderrContent;
     if(!all.isEmpty())
     {
-        QStringList outputList = all.split('\n', QString::SkipEmptyParts);
+        QStringList outputList = all.split('\n', Qt::SkipEmptyParts);
         for(int r = 0;r < outputList.size();r++)
         {
             QString text = outputList[r];

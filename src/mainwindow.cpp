@@ -1212,7 +1212,7 @@ CodeViewTab* MainWindow::open(QString filename)
     QString windowTitle;
     QString filenamePart, folderPathPart;
     dividePath(filename, &filenamePart, &folderPathPart);
-    windowTitle.sprintf("%s - %s",  stringToCStr(filenamePart), stringToCStr(folderPathPart));
+    windowTitle = QString::asprintf("%s - %s",  stringToCStr(filenamePart), stringToCStr(folderPathPart));
     setWindowTitle(windowTitle);
 
     m_locator.setCurrentFile(filename);
@@ -1484,7 +1484,7 @@ void MainWindow::ICore_onBreakpointsChanged()
         QStringList nameList;
         QString name;
         nameList.append(getFilenamePart(bk->m_fullname));
-        name.sprintf("%d", bk->m_lineNo);
+        name = QString::asprintf("%d", bk->m_lineNo);
         nameList.append(name);
         nameList.append(bk->m_funcName);
         nameList.append(longLongToHexString(bk->m_addr));
@@ -1698,7 +1698,7 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList tex
                         QStringList defList;
                         defList.push_back(fileInfo.m_fullName);
                         QString lineNoStr;
-                        lineNoStr.sprintf("%d", tagInfo.getLineNo());
+                        lineNoStr = QString::asprintf("%d", tagInfo.getLineNo());
                         defList.push_back(lineNoStr);
 
                         if(!tagInfo.isFunc())
@@ -1706,7 +1706,7 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList tex
                             
                         // Add to popupmenu
                         QString menuEntryText;
-                        menuEntryText.sprintf("Show definition of '%s' L%d", stringToCStr(tagInfo.getLongName()), tagInfo.getLineNo());
+                        menuEntryText = QString::asprintf("Show definition of '%s' L%d", stringToCStr(tagInfo.getLongName()), tagInfo.getLineNo());
                         menuEntryText.replace("&", "&&");
                         QAction *action = new QAction(menuEntryText, &m_popupMenu);
                         action->setData(defList);
@@ -1736,7 +1736,7 @@ void MainWindow::ICodeView_onContextMenu(QPoint pos, int lineNo, QStringList tex
     // Add 'toggle breakpoint'
     QString title;
     m_popupMenu.addSeparator();
-    title.sprintf("Toggle breakpoint at L%d", lineNo);
+    title = QString::asprintf("Toggle breakpoint at L%d", lineNo);
     action = m_popupMenu.addAction(title);
     action->setData(lineNo);
     connect(action, SIGNAL(triggered()), this, SLOT(onCodeViewContextMenuToggleBreakpoint()));
@@ -1964,7 +1964,7 @@ void MainWindow::onSettings()
         {
             //
             QString msgText;
-            msgText.sprintf("Style will be changed after gede has been restarted.");
+            msgText = QString::asprintf("Style will be changed after gede has been restarted.");
             QString title = "Style changed";
             QMessageBox::warning(this, title, msgText);
    
@@ -1980,7 +1980,7 @@ void MainWindow::ICore_onSignalReceived(QString signalName)
     {
         //
         QString msgText;
-        msgText.sprintf("Program received signal %s.", stringToCStr(signalName));
+        msgText = QString::asprintf("Program received signal %s.", stringToCStr(signalName));
         QString title = "Signal received";
         QMessageBox::warning(this, title, msgText);
     }
@@ -2046,18 +2046,18 @@ void MainWindow::setStatusLine(Settings &cfg)
             argumentText = argumentText.left(50);
             argumentText += "...";
         }
-        statusText.sprintf("[%s] [%s]", stringToCStr(cfg.getProgramPath()), stringToCStr(argumentText));
+        statusText = QString::asprintf("[%s] [%s]", stringToCStr(cfg.getProgramPath()), stringToCStr(argumentText));
     }
     else if(cfg.m_connectionMode == MODE_COREDUMP)
     {
-        statusText.sprintf("[%s] [%s]", stringToCStr(cfg.getProgramPath()), stringToCStr(cfg.m_coreDumpFile));
+        statusText = QString::asprintf("[%s] [%s]", stringToCStr(cfg.getProgramPath()), stringToCStr(cfg.m_coreDumpFile));
     }
     else if(cfg.m_connectionMode == MODE_PID)
     {
-        statusText.sprintf("[%s] [PID:%d]", stringToCStr(cfg.getProgramPath()), cfg.m_runningPid);
+        statusText = QString::asprintf("[%s] [PID:%d]", stringToCStr(cfg.getProgramPath()), cfg.m_runningPid);
     }
     else
-        statusText.sprintf("[%s] [%s:%d]", stringToCStr(cfg.getProgramPath()), stringToCStr(cfg.m_tcpHost), (int)cfg.m_tcpPort);
+        statusText = QString::asprintf("[%s] [%s:%d]", stringToCStr(cfg.getProgramPath()), stringToCStr(cfg.m_tcpHost), (int)cfg.m_tcpPort);
     w.m_statusLineWidget.setText(statusText);
 }
 

@@ -136,7 +136,7 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
     QPainter painter(this);
     const int ascent = m_fontInfo->ascent();
     const int rowHeight = getRowHeight();
-    const int charWidth = m_fontInfo->width("H");
+    const int charWidth = m_fontInfo->horizontalAdvance("H");
     QString text;
     int HEADER_HEIGHT = getHeaderHeight();
     int x;
@@ -195,7 +195,7 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
     painter.drawLine(0, HEADER_HEIGHT, width(), HEADER_HEIGHT);
     
     // Draw header
-    text.sprintf("Address");
+    text = QString::asprintf("Address");
     x = PAD_ADDR_LEFT;
     painter.drawText(x, rowHeight, text);
     x = fieldHexX + PAD_HEX_LEFT;
@@ -203,7 +203,7 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
     {
         if((off%8) == 0 && off != 0)
             x += PAD_HEX_MIDDLE;
-        text.sprintf("%x", off);
+        text = QString::asprintf("%x", off);
         painter.drawText(x, rowHeight, text);
         x += (charWidth*2)+PAD_INTER_HEX;
     }
@@ -220,7 +220,7 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
     x = fieldAsciiX + PAD_ASCII_LEFT;
     for(int off = 0;off < BYTES_PER_ROW;off++)
     {
-        text.sprintf("%x", off);
+        text = QString::asprintf("%x", off);
         painter.drawText(x, rowHeight, text);
         x += charWidth;
     }
@@ -278,7 +278,7 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
                 
             }
             
-            text.sprintf("%02x", d);
+            text = QString::asprintf("%02x", d);
             painter.drawText(x, y, text);
             }
         
@@ -329,7 +329,7 @@ void MemoryWidget::paintEvent ( QPaintEvent * event )
 quint64 MemoryWidget::getAddrAtPos(QPoint pos)
 {
     const int rowHeight = getRowHeight();
-    const int charWidth = m_fontInfo->width("H");
+    const int charWidth = m_fontInfo->horizontalAdvance("H");
     quint64 addr;
     const int field_hex_width = PAD_HEX_LEFT + PAD_HEX_MIDDLE + BYTES_PER_ROW*(PAD_INTER_HEX+charWidth*2) + PAD_HEX_RIGHT;
     const int field_address_width = PAD_ADDR_LEFT+(charWidth*m_addrCharWidth)+PAD_ADDR_RIGHT;
@@ -445,7 +445,7 @@ void MemoryWidget::onCopy()
             unsigned int j;
             
             // Display address
-            subText.sprintf("0x%08llx | ", (unsigned long long)addr);
+            subText = QString::asprintf("0x%08llx | ", (unsigned long long)addr);
             contentStr += subText;
 
             // Display data as hex
@@ -454,7 +454,7 @@ void MemoryWidget::onCopy()
                 if(selectionFirst <= addr+j && addr+j <= selectionLast) 
                 {
                     quint8 b = (unsigned char)content[(int)(addr+j-selectionFirst)];
-                    subText.sprintf("%02x ", b);
+                    subText = QString::asprintf("%02x ", b);
                 }
                 else
                     subText = "   ";
@@ -470,7 +470,7 @@ void MemoryWidget::onCopy()
                 if(selectionFirst <= addr+j && addr+j <= selectionLast) 
                 {
                     quint8 b = content[(int)(addr+j-selectionFirst)];
-                    subText.sprintf("%c", byteToChar(b));
+                    subText = QString::asprintf("%c", byteToChar(b));
                 }
                 else
                     subText = " ";

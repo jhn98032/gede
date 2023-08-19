@@ -802,7 +802,7 @@ void WatchVarCtl::deleteSelected()
     }
 
     // Loop through the items
-    QSet<QTreeWidgetItem *> itemSet = items.toSet();
+    QSet<QTreeWidgetItem *> itemSet(items.begin(), items.end());
     QSet<QTreeWidgetItem *>::const_iterator setItr = itemSet.constBegin();
     for (;setItr != itemSet.constEnd();++setItr)
     {
@@ -852,6 +852,7 @@ void WatchVarCtl::ICore_onWatchVarDeleted(VarWatch &watch)
     // Find the watch item
     QStringList watchIdParts = watch.getWatchId().split('.');
     VarWatch *rootWatch = core.getVarWatchInfo(watchIdParts[0]);
+    Q_UNUSED(rootWatch);
     assert(rootWatch != NULL);
     // Do we own this watch?
     if(!m_watchVarDispInfo.contains(watchIdParts[0]))

@@ -100,7 +100,7 @@ void MemoryDialog::setConfig(Settings *cfg)
 
 void MemoryDialog::wheelEvent(QWheelEvent *event)
 {
-    int dy = -event->delta()/32;
+    int dy = -event->angleDelta().y()/32;
     int oldPos = m_ui.verticalScrollBar->value();
     m_ui.verticalScrollBar->setValue(oldPos+dy);
 }

@@ -99,7 +99,7 @@ void TreeNode::removeAll()
 void TreeNode::dump(int parentCnt)
 {
     QString text;
-    text.sprintf("+- %s='%s'",
+    text = QString::asprintf("+- %s='%s'",
             stringToCStr(m_name), stringToCStr(m_data));
 
     for(int i = 0;i < parentCnt;i++)

@@ -135,9 +135,9 @@ QString CoreVar::getData(DispFormat fmt) const
             QChar c = m_data.toInt();
             char clat = c.toLatin1();
             if(isprint(clat))
-                valueText.sprintf("%d '%c'", (int)m_data.toInt(), clat);
+                valueText = QString::asprintf("%d '%c'", (int)m_data.toInt(), clat);
             else
-                valueText.sprintf("%d ' '", (int)m_data.toInt());
+                valueText = QString::asprintf("%d ' '", (int)m_data.toInt());
         }
         else if(fmt == FMT_BIN)
         {
@@ -146,7 +146,7 @@ QString CoreVar::getData(DispFormat fmt) const
             qlonglong val = m_data.toULongLong();
             do
             {
-                subText.sprintf("%d", (int)(val & 0x1));
+                subText = QString::asprintf("%d", (int)(val & 0x1));
                 reverseText = subText + reverseText;
                 val = val>>1;
             }
@@ -163,7 +163,7 @@ QString CoreVar::getData(DispFormat fmt) const
         else if(fmt == FMT_HEX)
         {
             QString text;
-            text.sprintf("%llx", m_data.toLongLong());
+            text = QString::asprintf("%llx", m_data.toLongLong());
 
             // Prefix the string with suitable number of zeroes
             while(text.length()%4 != 0 && text.length() > 4)
@@ -604,7 +604,7 @@ int Core::gdbGetMemory(quint64 addr, size_t count, QByteArray *data)
 
     int rc = 0;
     QString cmdStr;
-    cmdStr.sprintf("-data-read-memory-bytes 0x%llx %u" , (long long)addr, (unsigned int)count);
+    cmdStr = QString::asprintf("-data-read-memory-bytes 0x%llx %u" , (long long)addr, (unsigned int)count);
     
     rc = com.command(&resultData, cmdStr);
 
@@ -1102,7 +1102,7 @@ int Core::gdbAddVarWatch(QString varName, VarWatch** watchPtr)
 {
     int rc = 0;
     QString watchId;
-    watchId.sprintf("w%d", m_varWatchLastId++);
+    watchId = QString::asprintf("w%d", m_varWatchLastId++);
     VarWatch *w = new VarWatch(watchId,varName);
     rc = priv_gdbVarWatchCreate(varName, watchId, w);
     if(rc)

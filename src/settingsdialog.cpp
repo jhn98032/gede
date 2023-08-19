@@ -68,19 +68,19 @@ void SettingsDialog::onButtonBoxClicked(QAbstractButton* button)
 void SettingsDialog::updateGui()
 {
     QString labelText;
-    labelText.sprintf("%s  %d", stringToCStr(m_settingsFontFamily), m_settingsFontSize);
+    labelText = QString::asprintf("%s  %d", stringToCStr(m_settingsFontFamily), m_settingsFontSize);
     m_ui.pushButton_selectFont->setText(labelText);
 
-    labelText.sprintf("%s  %d", stringToCStr(m_settingsMemoryFontFamily), m_settingsMemoryFontSize);
+    labelText = QString::asprintf("%s  %d", stringToCStr(m_settingsMemoryFontFamily), m_settingsMemoryFontSize);
     m_ui.pushButton_selectMemoryFont->setText(labelText);
 
-    labelText.sprintf("%s  %d", stringToCStr(m_settingsOutputFontFamily), m_settingsOutputFontSize);
+    labelText = QString::asprintf("%s  %d", stringToCStr(m_settingsOutputFontFamily), m_settingsOutputFontSize);
     m_ui.pushButton_selectOutputFont->setText(labelText);
 
-    labelText.sprintf("%s  %d", stringToCStr(m_settingsGdbOutputFontFamily), m_settingsGdbOutputFontSize);
+    labelText = QString::asprintf("%s  %d", stringToCStr(m_settingsGdbOutputFontFamily), m_settingsGdbOutputFontSize);
     m_ui.pushButton_selectGdbOutputFont->setText(labelText);
 
-    labelText.sprintf("%s  %d", stringToCStr(m_settingsGedeOutputFontFamily), m_settingsGedeOutputFontSize);
+    labelText = QString::asprintf("%s  %d", stringToCStr(m_settingsGedeOutputFontFamily), m_settingsGedeOutputFontSize);
     m_ui.pushButton_selectGedeOutputFont->setText(labelText);
 
 }    
