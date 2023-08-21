@@ -33,7 +33,7 @@ with open("src/version.h", "r") as f:
     if minor != "" and major != "" and patch != "":
         tagName = ("rel-%s.%s.%s" % (major, minor, patch))
         print("Tagging with '%s'" % (tagName))
-        os.system("git tag %s" % (tagName))
+        os.system("git tag -a -m \"%s\" %s" % (tagName, tagName))
         print("Push tag with command:")
         print("  git push origin %s" % (tagName))
 
