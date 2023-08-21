@@ -46,6 +46,11 @@ public:
     bool getDownload();
     void setDownload(bool enable);
 
+    int getSerialBaudRate();
+    QString getSerialPort();
+    void setSerialPort(QString port);
+    void setSerialBaudRate(int baud);
+
     
     void setMode(ConnectionMode mode);
     ConnectionMode getMode();
@@ -71,6 +76,7 @@ private:
 private slots:
     void onConnectionTypeLocal(bool checked);
     void onConnectionTypeTcp(bool checked);
+    void onConnectionTypeSerial(bool checked);
     void onConnectionTypeCoreDump(bool checked);
     void onConnectionTypePid(bool checked);
     

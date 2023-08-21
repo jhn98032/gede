@@ -47,7 +47,8 @@
 // Max number of last used programs
 #define MAX_LAST_USED_PROGRAMS 10
 
-
+// Baud rates
+#define BAUDRATE_LIST   {1200,2400,4800,9600,19200,38400,57600,115200}
 
 #endif // FILE__CONFIG_H
 

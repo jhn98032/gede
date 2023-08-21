@@ -19,8 +19,8 @@ enum ConnectionMode
     MODE_LOCAL = 0,  //!< Local program
     MODE_COREDUMP,   //!< Core dump file
     MODE_TCP,        //!< TCP/IP connection to a gdbserver
-    MODE_PID         //!< Connect to a running process
-    
+    MODE_PID,        //!< Connect to a running process
+    MODE_SERIAL      //!< Serial port connection to a gdbserver    
 };
 
 class SettingsBreakpoint
@@ -85,6 +85,8 @@ class Settings
         QString m_gdbPath;
         QString m_coreDumpFile;
         bool m_download;
+        QString m_serialPort;
+        int m_serialBaudRate;
 
         QString m_fontFamily;
         int m_fontSize;

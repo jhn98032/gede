@@ -124,7 +124,8 @@ int main(int argc, char *argv[])
         }
         else if(strcmp(curArg, "--args") == 0)
         {
-            cfg.m_connectionMode = MODE_LOCAL;
+            if(i+1+1 < argc)
+                cfg.m_connectionMode = MODE_LOCAL;
             cfg.m_argumentList.clear();
             for(int u = i+1;u < argc;u++)
             {
@@ -200,6 +201,8 @@ int main(int argc, char *argv[])
 
     if(cfg.m_connectionMode == MODE_LOCAL)
         rc = core.initLocal(&cfg, cfg.m_gdbPath, cfg.getProgramPath(), cfg.m_argumentList);
+    else if(cfg.m_connectionMode == MODE_SERIAL)
+        rc = core.initSerial(&cfg, cfg.m_gdbPath, cfg.getProgramPath(), cfg.m_serialPort, cfg.m_serialBaudRate);
     else if(cfg.m_connectionMode == MODE_COREDUMP)
         rc = core.initCoreDump(&cfg, cfg.m_gdbPath, cfg.getProgramPath(), cfg.m_coreDumpFile);
     else if(cfg.m_connectionMode == MODE_PID)

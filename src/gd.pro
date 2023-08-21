@@ -5,6 +5,7 @@ lessThan(QT_MAJOR_VERSION, 5) {
 else {
     QT += gui core widgets
 }
+QT += serialport
 
 
 TEMPLATE = app

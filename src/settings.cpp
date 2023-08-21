@@ -279,12 +279,16 @@ void Settings::loadProjectConfig(QString filepath)
     m_download = tmpIni.getBool("Download", true);
     switch(tmpIni.getInt("Mode", MODE_LOCAL))
     {
-        default:
+        default: assert(0);break;
         case MODE_LOCAL: m_connectionMode = MODE_LOCAL;break;
         case MODE_TCP: m_connectionMode = MODE_TCP;break;
+        case MODE_SERIAL: m_connectionMode = MODE_SERIAL;break;
         case MODE_COREDUMP: m_connectionMode = MODE_COREDUMP;break;
         case MODE_PID: m_connectionMode = MODE_PID;break;
     }
+
+    m_serialBaudRate = tmpIni.getInt("SerialBaudRate", 115200);
+    m_serialPort = tmpIni.getString("SerialPort", "");
     m_tcpPort = tmpIni.getInt("TcpPort", 2000);
     m_tcpHost = tmpIni.getString("TcpHost", "localhost");
     m_initCommands = tmpIni.getStringList("InitCommands", m_initCommands);
@@ -352,6 +356,8 @@ void Settings::saveProjectConfig()
     tmpIni.setBool("Download", m_download);
     tmpIni.setInt("TcpPort", m_tcpPort);
     tmpIni.setString("TcpHost", m_tcpHost);
+    tmpIni.setInt("SerialBaudRate", m_serialBaudRate);
+    tmpIni.setString("SerialPort", m_serialPort);
     tmpIni.setInt("Mode", (int)m_connectionMode);
     tmpIni.setString("LastProgram", m_lastProgram);
     tmpIni.setStringList("InitCommands", m_initCommands);

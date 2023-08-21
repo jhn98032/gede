@@ -549,6 +549,57 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
     return 0;
 }
 
+
+
+int Core::initSerial(Settings *cfg, QString gdbPath, QString programPath, QString serialPort, int baudRate)
+{
+    GdbCom& com = GdbCom::getInstance();
+    Tree resultData;
+
+    m_isRemote = true;
+
+
+    if(com.init(gdbPath, cfg->m_enableDebugLog))
+    {
+        critMsg("Failed to start gdb ('%s')", stringToCStr(gdbPath));
+        return -1;
+    }
+
+    com.commandF(&resultData, "set serial baud %d", baudRate); 
+
+    com.commandF(&resultData, "-target-select extended-remote %s", stringToCStr(serialPort)); 
+
+
+    if(!programPath.isEmpty())
+    {
+        com.commandF(&resultData, "-file-symbol-file %s", stringToCStr(programPath));
+
+    }
+
+    runInitCommands(cfg);
+
+    if(!programPath.isEmpty())
+    {
+      com.commandF(&resultData, "-file-exec-file %s", stringToCStr(programPath));
+
+        if(cfg->m_download)
+            com.commandF(&resultData, "-target-download");
+    }
+    
+    // Get memory depth (32 or 64)
+    detectMemoryDepth();
+
+    if(gdbSetBreakpointAtFunc(cfg->m_initialBreakpoint))
+    {
+        warnMsg("Failed to set breakpoint at %s", stringToCStr(cfg->m_initialBreakpoint));
+    }
+
+    gdbGetFiles();
+
+    
+    return 0;
+}
+
 /**
  * @brief Writes to stdin of the program being debugged.
  */

@@ -13,6 +13,7 @@
 #include "util.h"
 #include "processlistdialog.h"
 
+#include <QSerialPortInfo>
 #include <QFileDialog>
 #include <QDir>
 #include <QtGlobal>
@@ -37,6 +38,7 @@ OpenDialog::OpenDialog(QWidget *parent)
     connect(m_ui.radioButton_runningProgram, SIGNAL(toggled(bool)), SLOT(onConnectionTypePid(bool)));
     connect(m_ui.radioButton_localProgram, SIGNAL(toggled(bool)), SLOT(onConnectionTypeLocal(bool)));
     connect(m_ui.radioButton_gdbServerTcp, SIGNAL(toggled(bool)), SLOT(onConnectionTypeTcp(bool)));
+    connect(m_ui.radioButton_gdbServerSerial, SIGNAL(toggled(bool)), SLOT(onConnectionTypeSerial(bool)));
     connect(m_ui.radioButton_openCoreDump, SIGNAL(toggled(bool)), SLOT(onConnectionTypeCoreDump(bool)));
 
     connect(m_ui.comboBox_projDir, SIGNAL(currentIndexChanged(int)), SLOT(onProjDirComboChanged(int)));
@@ -47,6 +49,30 @@ OpenDialog::OpenDialog(QWidget *parent)
 #if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
     m_ui.plainTextEdit_initCommands->setPlaceholderText("Example: \"set substitute-path '/src' '/src2' # a comment\"");
 #endif
+
+    // Add serial ports
+    QList<QSerialPortInfo> portList = QSerialPortInfo::availablePorts();
+    int selectIdx = -1;
+    for(QSerialPortInfo &port : portList)
+    {
+        QString text = port.portName() + ": " + port.description();
+        m_ui.comboBox_serialPort->addItem(text, QVariant(port.systemLocation()));
+        if(text.startsWith("ttyUSB") || text.startsWith("ttyACM"))
+            selectIdx = m_ui.comboBox_serialPort->count()-1;
+    }
+    if(selectIdx != -1)
+    {
+        m_ui.comboBox_serialPort->setCurrentIndex(selectIdx);
+    }
+
+
+    // Add baudrates
+    const int baudRates[] = BAUDRATE_LIST;
+    for(int idx = 0;idx < (int)(sizeof(baudRates)/sizeof(baudRates[0]));idx++)
+    {
+        int baudRate = baudRates[idx];
+        m_ui.comboBox_baudRate->addItem(QString::asprintf("%d", baudRate), QVariant(baudRate));
+    }
 }
 
 
@@ -54,10 +80,12 @@ void OpenDialog::setMode(ConnectionMode mode)
 {
     m_ui.radioButton_localProgram->setChecked(false);
     m_ui.radioButton_gdbServerTcp->setChecked(false);
+    m_ui.radioButton_gdbServerSerial->setChecked(false);
     m_ui.radioButton_openCoreDump->setChecked(false);
     m_ui.radioButton_runningProgram->setChecked(false);
     onConnectionTypeLocal(false);
     onConnectionTypeTcp(false);
+    onConnectionTypeSerial(false);
     onConnectionTypeCoreDump(false);
     onConnectionTypePid(false);
     
@@ -65,6 +93,11 @@ void OpenDialog::setMode(ConnectionMode mode)
     {
         m_ui.radioButton_gdbServerTcp->setChecked(true);
         onConnectionTypeTcp(true);        
+    }
+    else if(mode == MODE_SERIAL)
+    {
+        m_ui.radioButton_gdbServerSerial->setChecked(true);
+        onConnectionTypeSerial(true);        
     }
     else if(mode == MODE_COREDUMP)
     {
@@ -88,6 +121,8 @@ ConnectionMode OpenDialog::getMode()
 {
     if(m_ui.radioButton_gdbServerTcp->isChecked())    
         return MODE_TCP;
+    else if(m_ui.radioButton_gdbServerSerial->isChecked())    
+        return MODE_SERIAL;
     else if(m_ui.radioButton_openCoreDump->isChecked())    
         return MODE_COREDUMP;
     else if(m_ui.radioButton_runningProgram->isChecked())    
@@ -247,6 +282,13 @@ void OpenDialog::onConnectionTypeTcp(bool checked)
     
 }
 
+void OpenDialog::onConnectionTypeSerial(bool checked)
+{
+    m_ui.comboBox_baudRate->setEnabled(checked);
+    m_ui.comboBox_serialPort->setEnabled(checked);
+    m_ui.checkBox_download->setEnabled(checked);
+    
+}
 void OpenDialog::onConnectionTypePid(bool checked)
 {
     m_ui.pushButton_selectFile->setEnabled(checked);
@@ -334,7 +376,21 @@ void OpenDialog::saveConfig(Settings *cfg)
     
     cfg->m_projDir = getProjectDir();
 
+    cfg->m_serialBaudRate = getSerialBaudRate();
+    cfg->m_serialPort = getSerialPort();
+    
 }
+
+QString OpenDialog::getSerialPort()
+{
+    return m_ui.comboBox_serialPort->currentData().toString();
+}
+
+int OpenDialog::getSerialBaudRate()
+{
+    return m_ui.comboBox_baudRate->currentData().toInt();
+}
+
 
 bool OpenDialog::getDownload()
 {
@@ -400,6 +456,30 @@ void OpenDialog::loadConfig(Settings &cfg)
         }
     }
 
+
+    setSerialPort(cfg.m_serialPort);
+    setSerialBaudRate(cfg.m_serialBaudRate);
+    
+}
+
+
+void OpenDialog::setSerialPort(QString serialPort)
+{
+    int portIdx = -1;
+    for(int idx = 0; idx < m_ui.comboBox_serialPort->count(); idx++)
+    {
+        if(m_ui.comboBox_serialPort->itemData(idx).toString() == serialPort)
+            portIdx = idx;
+    }
+    if(portIdx != -1)
+        m_ui.comboBox_serialPort->setCurrentIndex(portIdx);
+}
+
+
+
+void OpenDialog::setSerialBaudRate(int baudRate)
+{
+    m_ui.comboBox_baudRate->setCurrentText(QString::number(baudRate));
 
 }
 
