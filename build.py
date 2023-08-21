@@ -6,6 +6,7 @@ import sys
 import os
 import subprocess
 import shutil
+from sys import platform
 
 
 FORCE_QT4=1
@@ -284,6 +285,8 @@ if __name__ == "__main__":
         if do_install:
             os.chdir("src")
             print("Installing to '%s'" % (g_dest_path) )
+
+            # Create destination path
             try:
                 os.makedirs(g_dest_path + "/bin")
             except:
@@ -291,9 +294,15 @@ if __name__ == "__main__":
             if not os.path.isdir(g_dest_path + "/bin"):
                 print("Failed to create dir")
                 exit(1)
+
+            # Copy to destination path
             try:
-                shutil.copyfile(g_exeName, g_dest_path + "/bin/" + g_exeName)
-                os.chmod(g_dest_path + "/bin/" + g_exeName, 0o775);
+                if platform == "darwin":
+                    shutil.copy("src/%s.app/Contents/MacOS/%s" % (g_exeName,g_exeName), g_dest_path + "/bin")
+                    shutil.copytree("src/%s.app" % (g_exeName), "/Application/%s.app" % (g_exeName))
+                else:
+                    shutil.copyfile(g_exeName, g_dest_path + "/bin/" + g_exeName)
+                    os.chmod(g_dest_path + "/bin/" + g_exeName, 0o775);
             except:
                 print("Failed to install files to " + g_dest_path)
                 raise
