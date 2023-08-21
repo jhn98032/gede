@@ -37,7 +37,11 @@ On FreeBSD:
     # pkg install qt5
     # pkg install gcc
 
+On macOS (use homebrew):
 
+    # brew install universal-ctags
+    # brew install qt@5
+    # brew link --force qt@5
 
 Building
 ========
