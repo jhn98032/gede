@@ -20,7 +20,7 @@ On Debian/Ubuntu/Mint:
     # sudo apt-get install g++
     # sudo apt-get install exuberant-ctags
     # sudo apt-get install python
-    # sudo apt-get install qt5-qmake qtbase5-dev
+    # sudo apt-get install qt5-qmake qtbase5-dev libqt5serialport5
 
 On Redhat/Centos:
 
@@ -28,13 +28,14 @@ On Redhat/Centos:
     # sudo yum install gcc
     # sudo yum install gcc-c++
     # sudo yum install ctags
-    # sudo yum install qt5-designer qt5-devel
+    # sudo yum install qt5-designer qt5-devel qt5-qtserialport
 
 On FreeBSD:
 
     # pkg install gdb
     # pkg install universal-ctags-g20180225
     # pkg install qt5
+    # pkg install qt5-qtserialport
     # pkg install gcc
 
 On macOS (use homebrew):
