@@ -20,7 +20,7 @@ On Debian/Ubuntu/Mint:
     # sudo apt-get install g++
     # sudo apt-get install exuberant-ctags
     # sudo apt-get install python
-    # sudo apt-get install qt5-qmake qtbase5-dev libqt5serialport5
+    # sudo apt-get install qt5-qmake qtbase5-dev libqt5serialport5-dev
 
 On Redhat/Centos:
 
