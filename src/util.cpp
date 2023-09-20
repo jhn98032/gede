@@ -350,7 +350,9 @@ bool exeExists(QString name, bool checkCurrentDir)
 }
 
 
-
+/**
+* @brief Reads the content of a file to a QByteArray.
+*/
 QByteArray fileToContent(QString filename)
 {
     QByteArray cnt;
@@ -416,23 +418,27 @@ QStringList splitString(QString str, char separator)
             };break;
             case WORD:
             {
-                if(c == separator || (i+1) == str.length())
+                if(c == separator)
                 {
                     list.append(curWord);
                     state = START;
                 }
                 else
+                {
                     curWord += c;
+                }
             };break;
             case ESC_WORD:
             {
-                if(c == '"' || (i+1) == str.length())
+                if(c == '"')
                 {
                     list.append(curWord);
                     state = START;
                 }
                 else
+                {
                     curWord += c;
+                }
             };break;
             default:;break;
         }
