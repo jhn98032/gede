@@ -298,8 +298,8 @@ if __name__ == "__main__":
             # Copy to destination path
             try:
                 if platform == "darwin":
-                    shutil.copy("src/%s.app/Contents/MacOS/%s" % (g_exeName,g_exeName), g_dest_path + "/bin")
-                    shutil.copytree("src/%s.app" % (g_exeName), "/Application/%s.app" % (g_exeName))
+                    shutil.copy("%s.app/Contents/MacOS/%s" % (g_exeName,g_exeName), g_dest_path + "/bin")
+                    shutil.copytree("%s.app" % (g_exeName), "/Applications/%s.app" % (g_exeName), dirs_exist_ok=True)
                 else:
                     shutil.copyfile(g_exeName, g_dest_path + "/bin/" + g_exeName)
                     os.chmod(g_dest_path + "/bin/" + g_exeName, 0o775);
