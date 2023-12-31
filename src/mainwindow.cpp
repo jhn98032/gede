@@ -2014,7 +2014,7 @@ void MainWindow::ICore_onStateChanged(TargetState state)
     m_ui.actionContinue->setEnabled(isStopped);
     m_ui.actionRestart->setEnabled(!isRunning);
 
-    m_ui.varWidget->setEnabled(isStopped);
+    m_ui.varWidget->setEnabled(!isRunning);
 
     
     if(state == TARGET_STARTING || state == TARGET_RUNNING)
