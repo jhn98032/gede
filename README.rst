@@ -29,23 +29,33 @@ On Debian/Ubuntu/Mint:
 On Redhat/Centos:
 
     # sudo yum install gdb
+
     # sudo yum install gcc
+
     # sudo yum install gcc-c++
+
     # sudo yum install ctags
+
     # sudo yum install qt5-designer qt5-devel qt5-qtserialport
 
 On FreeBSD:
 
     # pkg install gdb
+
     # pkg install universal-ctags-g20180225
+
     # pkg install qt5
+
     # pkg install qt5-qtserialport
+
     # pkg install gcc
 
 On macOS (use homebrew):
 
     # brew install universal-ctags
+
     # brew install qt@5
+
     # brew link --force qt@5
 
 Building
