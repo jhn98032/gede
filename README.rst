@@ -17,9 +17,13 @@ Make sure that you have all dependencies installed.
 On Debian/Ubuntu/Mint:
 
     # sudo apt-get install gdb
+
     # sudo apt-get install g++
+
     # sudo apt-get install exuberant-ctags
+
     # sudo apt-get install python
+
     # sudo apt-get install qt5-qmake qtbase5-dev libqt5serialport5-dev
 
 On Redhat/Centos:
