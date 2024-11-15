@@ -166,6 +166,8 @@ public slots:
     void onCodeViewTab_closeOtherTabs();
     void onCodeViewContextMenuJumpToLocation();
 
+    void onUserGdbCommandEntered();
+
     void onViewStack();
     void onViewBreakpoints();
     void onViewThreads();

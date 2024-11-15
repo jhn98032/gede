@@ -256,6 +256,8 @@ public:
     void gdbRun();
     bool gdbGetFiles();
 
+    void gdbManualCommand(QString cmd);
+
     int getMemoryDepth();
 
     int changeWatchVariable(QString variable, QString newValue);

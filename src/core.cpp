@@ -679,6 +679,18 @@ int Core::gdbGetMemory(quint64 addr, size_t count, QByteArray *data)
 
 
 /**
+* @brief Executes a custom GDB command entered by the user.
+*/
+void Core::gdbManualCommand(QString cmd)
+{
+    GdbCom &com = GdbCom::getInstance();
+    Tree res;
+    com.command(&res, cmd);
+}
+
+
+
+/**
 * @brief Asks GDB for a list of source files.
 * @return true if any files was added or removed.
 */

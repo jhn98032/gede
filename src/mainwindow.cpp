@@ -232,6 +232,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this, SIGNAL(newErrorMsg(QString)), SLOT(onNewErrorMsg(QString)));
     connect(this, SIGNAL(newCritMsg(QString)), SLOT(onNewCritMsg(QString)));
 
+    connect(m_ui.gdbPrompt, &QLineEdit::returnPressed, this, &MainWindow::onUserGdbCommandEntered);
+
     loggerRegister(this);
 
 }
@@ -309,7 +311,7 @@ void MainWindow::showWidgets()
     if(m_cfg.m_viewWindowGedeOutput)
         m_ui.tabWidget_2->insertTab(0, m_ui.gedeOutputWidget, "Gede Output");
     if(m_cfg.m_viewWindowGdbOutput)
-        m_ui.tabWidget_2->insertTab(0, m_ui.logView, "GDB Output");
+        m_ui.tabWidget_2->insertTab(0, m_ui.tab_4, "GDB Output");
     selectionIdx = m_ui.tabWidget_2->indexOf(currentSelection);
     if(selectionIdx != -1)
         m_ui.tabWidget_2->setCurrentIndex(selectionIdx);
@@ -364,6 +366,21 @@ void MainWindow::onDefaultViewSetup()
     
 }
 
+
+void MainWindow::onUserGdbCommandEntered()
+{
+    // Get the command to execute
+    QString cmd = m_ui.gdbPrompt->displayText();
+    m_ui.gdbPrompt->clear();
+
+    // Add it to the log
+    m_ui.logView->appendPlainText(cmd);
+
+    // Execute it
+    Core &core = Core::getInstance();
+    core.gdbManualCommand(cmd);
+
+}
 
 void MainWindow::onViewStack()
 {
