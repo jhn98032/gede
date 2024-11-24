@@ -1,4 +1,4 @@
 #!/bin/sh
-cd "$(dirname "$0")"
-exec ./bin/gede   "$@"
+APPDIR="$(dirname "$(readlink -f "$0")")"
+exec "$APPDIR/bin/gede"   "$@"
 
