@@ -1,6 +1,7 @@
 [Desktop Entry]
 Name=Gede
 Exec=gede
+Icon=gede_icon.png
 Type=Application
 Categories=Utility;Development;
 
