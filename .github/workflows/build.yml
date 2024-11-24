@@ -15,3 +15,20 @@ jobs:
     - uses: actions/checkout@v4
     - name: make
       run: make
+
+    # Set up Qt
+    - name: Install Qt
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y qt5-default qttools5-dev-tools
+
+    # Install ctags
+    - name: Install ctags
+      run: |
+        sudo apt-get install -y ctags
+
+    # Build
+    - name: Build
+      run: |
+        make
+
