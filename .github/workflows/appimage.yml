@@ -1,0 +1,48 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # Step 1: Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    # Step 2: Install dependencies
+    - name: Install build tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential qt5-default qttools5-dev-tools wget ctags
+
+    # Step 3: Download appimagetool
+    - name: Download appimagetool
+      run: |
+        wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+        chmod +x appimagetool-x86_64.AppImage
+
+    # Step 4: Build the project
+    - name: Build project
+      run: |
+        ./build.py --prefix=$(pwd)/AppDir
+
+    # Step 5: Prepare AppDir
+    - name: Prepare AppDir
+      run: |
+        cp gede.desktop   AppDir/
+        chmod +x AppDir/bin/gede
+        
+    # Step 6: Build AppImage
+    - name: Build AppImage
+      run: |
+        ./appimagetool-x86_64.AppImage AppDir
+
+
