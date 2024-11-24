@@ -177,7 +177,7 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
 {
     int rowHeight = getRowHeight();
     QPainter painter(this);
-
+    const int leftMargin = 5;
 
 
     if(m_cfg)
@@ -189,11 +189,27 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
     if(m_cursorMode == BLINK_ON || m_cursorMode == STEADY)
     {
         QRect r;
-        int charWidth = m_fontInfo->horizontalAdvance(" ");
-        r.setX(charWidth*m_cursorX+5);
+
+        // Get the line where the cursor is
+        QString line;
+        if(m_cursorY < m_lines.size())
+        {
+            for(Block blk : m_lines[m_cursorY])
+                line += blk.text;
+        }
+        if(line.length() <= m_cursorX)
+            line += QString(m_cursorX-line.length(), ' ');
+
+        // Set the x and y position of the cursor
+        r.setX(m_fontInfo->horizontalAdvance(line.left(m_cursorX))+leftMargin);
         r.setY(rowHeight*((m_cursorY+m_origoY)-m_dispOrigoY));
-        r.setWidth(charWidth);
+
+        // Set height and width of cursor
+        int cursorWidth = m_fontInfo->horizontalAdvance(" ");
+        r.setWidth(cursorWidth);
         r.setHeight(rowHeight);
+
+        // Draw the cursor
         if(m_cfg)
         {
             if(hasFocus())
@@ -213,7 +229,7 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
         Line &line = m_lines[rowIdx];
 
         int y = rowHeight*(rowIdx-m_dispOrigoY);
-        int x = 5;
+        int x = leftMargin;
         int curCharIdx = 0;
         
         // Draw line number
@@ -223,15 +239,23 @@ void ConsoleWidget::paintEvent ( QPaintEvent * event )
         {
             Block &blk = line[blockIdx];
             painter.setPen(getFgColor(blk.m_fgColor));
+
+            // Cursor in the middle of the block of text?
             if((m_cursorY+m_origoY) == rowIdx && curCharIdx <= m_cursorX && m_cursorX < curCharIdx+blk.text.size())
             {
                 int cutIdx = m_cursorX-curCharIdx;
                 QString leftText = blk.text.left(cutIdx);
                 QChar cutLetter = blk.text[cutIdx];
                 QString rightText = blk.text.mid(cutIdx+1);
+
+                // Draw left part
                 painter.drawText(x, fontY, leftText);
+                
+                // Draw character in cursor
                 painter.setPen(getBgColor(blk.m_bgColor));
                 painter.drawText(x+m_fontInfo->horizontalAdvance(leftText), fontY, QString(cutLetter));
+
+                // Draw right part
                 painter.setPen(getFgColor(blk.m_fgColor));
                 painter.drawText(x+m_fontInfo->horizontalAdvance(leftText + cutLetter), fontY, rightText);
 
