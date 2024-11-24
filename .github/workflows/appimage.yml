@@ -59,4 +59,11 @@ jobs:
       run: |
         ./appimagetool-x86_64.AppImage AppDir
 
+    # Upload AppImage as an artifact
+    - name: Upload AppImage
+      uses: actions/upload-artifact@v3
+      with:
+        name: Gede-${{ github.ref_name }}.AppImage
+        path: Gede-*.AppImage
+
 
