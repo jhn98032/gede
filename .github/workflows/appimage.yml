@@ -21,7 +21,7 @@ jobs:
     - name: Install build tools
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential wget
+        sudo apt-get install -y build-essential wget libfuse2t64
 
     # Set up Qt
     - name: Install Qt
