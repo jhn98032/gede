@@ -50,8 +50,6 @@ jobs:
     - name: Prepare AppDir
       run: |
         mkdir -p AppDir/
-        cp gede_icon.png AppDir/
-        cp gede.desktop   AppDir/
         chmod +x AppDir/bin/gede
         
     # Build AppImage
