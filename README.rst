@@ -1,11 +1,17 @@
 Gede
 ----
 
+Gede is a graphical frontend (GUI) to GDB written in C++ and using the Qt5 toolkit.
+Gede can be compiled and run on (all?) Linux distributions, FreeBSD and macOS.
+Gede supports debugging programs written in Ada, FreeBasic, C++, C, Rust, Fortran and Go.
+
 Gede was written by Johan Henriksson.
 See LICENSE file for license information.
 
 The icons used are from the NetBeans project and licensed under the
 terms of the NetBeans License Agreement.
+
+For more information see https://gede.dexar.se.
 
 Dependencies
 ============
