@@ -67,7 +67,7 @@ jobs:
         name: Release ${{ github.ref_name }}  # Name of the release
         body: |
           ### Changelog
-          - Add details about this release here.
+          - 
         artifacts: Gede-x86_64.AppImage     
         token: ${{ secrets.GITHUB_TOKEN }} 
 
