@@ -64,7 +64,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         # Optional. Default is 'artifact'
-        name: Gede-${{ github.ref_name }}.AppImage
+        #name: Gede-${{ github.ref_name }}.AppImage
         # A file, directory or wildcard pattern that describes what to upload
         path: Gede-x86_64.AppImage
         
