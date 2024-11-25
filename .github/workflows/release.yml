@@ -59,16 +59,16 @@ jobs:
         ./appimagetool-x86_64.AppImage AppDir
 
 
-  # Create a release and upload the artifact
-      - name: Create GitHub Release
-        uses: ncipollo/release-action@v1
-        with:
-          tag: ${{ github.ref_name }}           # The tag that triggered the workflow
-          name: Release ${{ github.ref_name }}  # Name of the release
-          body: |
-            ### Changelog
-            - Add details about this release here.
-          artifacts: Gede-x86_64.AppImage     
-          token: ${{ secrets.GITHUB_TOKEN }} 
+    # Create a release and upload the artifact
+    - name: Create GitHub Release
+      uses: ncipollo/release-action@v1
+      with:
+        tag: ${{ github.ref_name }}           # The tag that triggered the workflow
+        name: Release ${{ github.ref_name }}  # Name of the release
+        body: |
+          ### Changelog
+          - Add details about this release here.
+        artifacts: Gede-x86_64.AppImage     
+        token: ${{ secrets.GITHUB_TOKEN }} 
 
           
