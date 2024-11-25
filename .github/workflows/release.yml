@@ -1,0 +1,74 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 't*'  # Trigger the workflow when a tag like v1.0.0 is pushed
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # Checkout the repository
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    #  Install dependencies
+    - name: Install build tools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential wget libfuse2
+
+    # Set up Qt
+    - name: Install Qt
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y qt5-qmake qtbase5-dev libqt5serialport5-dev
+
+    # Install ctags
+    - name: Install ctags
+      run: |
+        sudo apt-get install -y exuberant-ctags
+
+
+    # Download appimagetool
+    - name: Download appimagetool
+      run: |
+        wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+        chmod +x appimagetool-x86_64.AppImage
+
+    # Build the project
+    - name: Build project
+      run: |
+        ./build.py --prefix=$(pwd)/AppDir install
+
+    # Prepare AppDir
+    - name: Prepare AppDir
+      run: |
+        mkdir -p AppDir/
+        cp gede_icon.png AppDir/
+        cp gede.desktop   AppDir/
+        chmod +x AppDir/bin/gede
+        
+    # Build AppImage
+    - name: Build AppImage
+      run: |
+        ./appimagetool-x86_64.AppImage AppDir
+
+
+  # Create a release and upload the artifact
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ github.ref_name }}           # The tag that triggered the workflow
+          name: Release ${{ github.ref_name }}  # Name of the release
+          body: |
+            ### Changelog
+            - Add details about this release here.
+          artifacts: Gede-x86_64.AppImage     
+          token: ${{ secrets.GITHUB_TOKEN }} 
+
+          
