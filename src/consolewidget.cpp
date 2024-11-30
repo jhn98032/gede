@@ -22,8 +22,8 @@
 #include "core.h"
 
 
-#define ASCII_ESC           0x1B
-#define ASCII_BELL          0x7
+#define ASCII_ESC           ((char)0x1B)
+#define ASCII_BELL          ((char)0x7)
 #define ASCII_BACKSPACE     '\b'
 #define ANSI_CSI           "\033["
 
@@ -80,7 +80,7 @@ QString printable(QString str)
     for(int i = 0;i < str.size();i++)
     {
         QChar c = str[i];
-        if(0x21 <= c &&  c <= 0x7e)
+        if(0x21 <= c.toLatin1() &&  c.toLatin1() <= 0x7e)
             line += c;
         else if(c == '\t')
             line += "\\t";
@@ -92,7 +92,7 @@ QString printable(QString str)
             line += "\\b";
         else if(c == ' ')
             line += " ";
-        else if(c == ASCII_ESC)
+        else if(c.toLatin1() == ASCII_ESC)
             line += "<ESC>";
         else
         {
@@ -704,7 +704,7 @@ void ConsoleWidget::appendLog ( QString text )
                 };break;
                 case ST_CSI_PARAM:
                 {
-                    if(0x30 <= c && c <= 0x3F)
+                    if(0x30 <= (int)c.toLatin1() && (int)c.toLatin1() <= 0x3F)
                     {
                         m_ansiParamStr += c;
                     }
@@ -716,7 +716,7 @@ void ConsoleWidget::appendLog ( QString text )
                 };break;
                 case ST_CSI_INTER:
                 {
-                    if(0x20 <= c && c <= 0x2F)
+                    if(0x20 <= (int)c.toLatin1() && (int)c.toLatin1() <= 0x2F)
                     {
                         m_ansiInter += c;
                     }

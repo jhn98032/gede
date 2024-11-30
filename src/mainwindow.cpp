@@ -2250,8 +2250,12 @@ void MainWindow::onFuncFilter_textChanged(const QString &text)
         QString item = list[i].trimmed();
         if(!item.isEmpty())
         {
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+            QRegularExpression rx(QRegularExpression::wildcardToRegularExpression(item));
+#else
             QRegExp rx(item);
             rx.setPatternSyntax(QRegExp::Wildcard);
+#endif
             m_funcFilterText.append(rx);
         }
     }
@@ -2296,8 +2300,12 @@ void MainWindow::onClassFilter_textChanged(const QString &text)
         QString item = list[i].trimmed();
         if(!item.isEmpty())
         {
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+            QRegularExpression rx(QRegularExpression::wildcardToRegularExpression(item));
+#else
             QRegExp rx(item);
             rx.setPatternSyntax(QRegExp::Wildcard);
+#endif
             m_classFilterText.append(rx);
         }
     }
@@ -2369,9 +2377,15 @@ void MainWindow::fillInClassList()
         // Does the filter match the name?
         for(int j = 0;j < m_classFilterText.size() && isMatch == true;j++)
         {
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+            QRegularExpression &rx = m_classFilterText[j];
+            if(!rx.match(className).hasMatch())
+                isMatch = false;
+#else
             QRegExp &rx = m_classFilterText[j];
             if(rx.indexIn(className) == -1)
                 isMatch = false;
+#endif
         }
 
         if(isMatch)
@@ -2434,9 +2448,15 @@ void MainWindow::fillInFuncList()
             QString name = tag.getLongName();
             for(int j = 0;j < m_funcFilterText.size() && isMatch == true;j++)
             {
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+                QRegularExpression &rx = m_funcFilterText[j];
+                if(!rx.match(name).hasMatch())
+                    isMatch = false;
+#else
                 QRegExp &rx = m_funcFilterText[j];
                 if(rx.indexIn(name) == -1)
                     isMatch = false;
+#endif
             }
 
             // Add the item if it matches

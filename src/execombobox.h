@@ -18,7 +18,11 @@ class ExeComboBox : public QComboBox
     ExeComboBox(QWidget *parent = NULL);
     virtual ~ExeComboBox();
 
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+    void setFilter(QRegularExpression filter) { m_filter = filter; };
+#else
     void setFilter(QRegExp filter) { m_filter = filter; };
+#endif
 
     void setSearchAreas(int areas) { m_areas = areas; };
 
@@ -27,7 +31,11 @@ private:
     void showPopup();
     
 private:
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+    QRegularExpression m_filter;
+#else
     QRegExp m_filter;
+#endif
     int m_areas;
 };
 

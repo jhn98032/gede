@@ -44,7 +44,11 @@ OpenDialog::OpenDialog(QWidget *parent)
     connect(m_ui.comboBox_projDir, SIGNAL(currentIndexChanged(int)), SLOT(onProjDirComboChanged(int)));
 
     m_ui.comboBox_gdbCommand->setSearchAreas(ExeComboBox::UseEnvPath);
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+    m_ui.comboBox_gdbCommand->setFilter(QRegularExpression("gdb(?!tui|server)"));
+#else
     m_ui.comboBox_gdbCommand->setFilter(QRegExp("gdb(?!tui|server)"));
+#endif
 
 #if QT_VERSION >= QT_VERSION_CHECK(5,3,0)
     m_ui.plainTextEdit_initCommands->setPlaceholderText("Example: \"set substitute-path '/src' '/src2' # a comment\"");

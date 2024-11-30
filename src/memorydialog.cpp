@@ -12,6 +12,10 @@
 #include "core.h"
 #include "util.h"
 
+#if QT_VERSION >= QT_VERSION_CHECK(5,8,0)
+#include <QRegularExpression>
+#endif
+
 #define SCROLL_ADDR_RANGE   0x10000ULL
 
 QByteArray MemoryDialog::getMemory(quint64 startAddress, int count)
@@ -54,7 +58,11 @@ quint64 MemoryDialog::inputTextToAddress(QString text)
     // Starts with a '0x...' or '0X..'?
     if(text.startsWith("x") || text.startsWith("X"))
         text = "0" + text;
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+    else if(text.lastIndexOf(QRegularExpression("[a-zA-Z]+")) != -1)
+#else
     else if(text.lastIndexOf(QRegExp("[a-zA-Z]+")) != -1)
+#endif
     {
         text = "0x" + text;
     }

@@ -132,10 +132,9 @@ QString CoreVar::getData(DispFormat fmt) const
     {
         if(fmt == FMT_CHAR)
         {
-            QChar c = m_data.toInt();
-            char clat = c.toLatin1();
-            if(isprint(clat))
-                valueText = QString::asprintf("%d '%c'", (int)m_data.toInt(), clat);
+            QChar c = m_data.toChar();
+            if(c.isPrint())
+                valueText = QString::asprintf("%d '%c'", (int)m_data.toInt(), c.toLatin1());
             else
                 valueText = QString::asprintf("%d ' '", (int)m_data.toInt());
         }

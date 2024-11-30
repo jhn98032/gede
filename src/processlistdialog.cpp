@@ -101,7 +101,11 @@ QList<ProcessInfo> getProcessListByUser(int ownerUid)
 #if __APPLE__
                          prc.mtime.setTime_t(buf.st_mtime);
 #else
+#if QT_VERSION >= QT_VERSION_CHECK(5,8,0)
+                         prc.mtime.setSecsSinceEpoch(buf.st_mtim.tv_sec);
+#else
                          prc.mtime.setTime_t(buf.st_mtim.tv_sec);
+#endif
 #endif			 
                          prc.m_exePath = procDirPath + "/exe";
                          QFile f(prc.m_exePath);

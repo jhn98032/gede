@@ -13,7 +13,12 @@
 #include <QApplication>
 #include <QMap>
 #include <QLabel>
+
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+#include <QRegularExpression>
+#else  
 #include <QRegExp>
+#endif
 
 #include "consolewidget.h"
 #include "ui_mainwindow.h"
@@ -218,8 +223,13 @@ private:
     int m_currentLine; //!< The linenumber (first=1) which the program counter points to.
     QList<StackFrameEntry> m_stackFrameList;
     QMenu m_popupMenu;
+#if QT_VERSION >= QT_VERSION_CHECK(6,0,0)
+    QVector<QRegularExpression> m_funcFilterText; //!< Filter for the function list.
+    QVector<QRegularExpression> m_classFilterText; //!< Filter for the class list.
+#else
     QVector<QRegExp> m_funcFilterText; //!< Filter for the function list.
     QVector<QRegExp> m_classFilterText; //!< Filter for the class list.
+#endif
 
     
     Settings m_cfg;

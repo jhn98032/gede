@@ -11,7 +11,8 @@ from sys import platform
 
 FORCE_QT4=1
 FORCE_QT5=2
-AUTODETECT=3
+FORCE_QT6=3
+AUTODETECT=4
 
 #-----------------------------#
 # Configuration section
@@ -22,6 +23,7 @@ g_exeName = "gede"
 g_qtVersionToUse = FORCE_QT5
 g_qmakeQt4 = ""
 g_qmakeQt5 = ""
+g_qmakeQt6 = ""
 g_otherSrcDirs = [
             "./tests/tagtest",
             "./tests/highlightertest",
@@ -117,6 +119,7 @@ def dump_usage():
     print("      --verbose         Verbose output.")
     print("      --use-qt4         Use qt4")
     print("      --use-qt5         Use qt5")
+    print("      --use-qt6         Use qt6")
     print("      --build-all       Build test programs also")
     print("      --parallel-builds=NUM   Number of parallel jobs to run in parallel")
     print("")
@@ -159,7 +162,7 @@ def getQtVersion(qmakeExe):
             verStr = out.strip()
             print(verStr)
     except Exception as e:
-        print("Error occured: " + str(e))
+        print("Error occured when started qmake: " + str(e))
         raise
     return verStr
 
@@ -169,6 +172,7 @@ def detectQt():
     """
     global g_qmakeQt4
     global g_qmakeQt5
+    global g_qmakeQt6
     sys.stdout.write("Detecting Qt version... ")
     qtVerList = []
     if exeExist("qmake-qt4"):
@@ -177,9 +181,15 @@ def detectQt():
     if exeExist("qmake-qt5"):
         qtVerList += ["Qt5 (qmake-qt5)"]
         g_qmakeQt5 = "qmake-qt5";
+    if exeExist("qmake6"):
+        qtVerList += ["Qt6 (qmake6)"]
+        g_qmakeQt6 = "qmake6";
     if exeExist("qmake"):
         ver = detectQmakeQtVer("qmake")[0]
-        if ver == "5":
+        if ver == "6":
+            g_qmakeQt6 = "qmake";
+            qtVerList += ["Qt6 (qmake)"]
+        elif ver == "5":
             g_qmakeQt5 = "qmake";
             qtVerList += ["Qt5 (qmake)"]
         elif ver == "4":
@@ -189,7 +199,7 @@ def detectQt():
             g_qmakeQt5 = "qmake";
             qtVerList += ["Qt? (qmake)"]
     sys.stdout.write(", ".join(qtVerList) + "\n")
-    if (not g_qmakeQt4) and (not g_qmakeQt5):
+    if (not g_qmakeQt4) and (not g_qmakeQt5) and (not g_qmakeQt6):
         print("No Qt found");
 
     # Which version to use?
@@ -202,6 +212,12 @@ def detectQt():
         os.environ["QT_SELECT"] = "qt5"
         if g_qmakeQt5:
             qmakeName = g_qmakeQt5;
+    elif g_qtVersionToUse == FORCE_QT6:
+        os.environ["QT_SELECT"] = "qt6"
+        if g_qmakeQt6:
+            qmakeName = g_qmakeQt6;
+    elif g_qmakeQt6:
+        qmakeName = g_qmakeQt6;
     elif g_qmakeQt5:
         qmakeName = g_qmakeQt5;
     elif g_qmakeQt4:
@@ -243,6 +259,8 @@ if __name__ == "__main__":
                 g_qtVersionToUse = FORCE_QT4
             elif arg == "--use-qt5":
                 g_qtVersionToUse = FORCE_QT5
+            elif arg == "--use-qt6":
+                g_qtVersionToUse = FORCE_QT6
             elif arg.startswith("--parallel-builds="):
                 g_parallel_builds = int(arg[18:])
             else:
