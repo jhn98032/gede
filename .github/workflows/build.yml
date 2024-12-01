@@ -13,8 +13,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: make
-      run: make
 
     # Set up Qt
     - name: Install Qt
@@ -31,6 +29,5 @@ jobs:
     - name: Build project
       run: |
         chmod a+x ./build.py
-        ./build.py --prefix=$(pwd)/AppDir install
-
-
+        make
+        
