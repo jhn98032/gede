@@ -44,7 +44,6 @@ jobs:
     # Build the project
     - name: Build project
       run: |
-        chmod a+x ./build.py
         ./build.py --prefix=$(pwd)/AppDir install
 
     # Prepare AppDir
