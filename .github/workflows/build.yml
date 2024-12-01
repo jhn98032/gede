@@ -30,5 +30,6 @@ jobs:
     # Build
     - name: Build
       run: |
-        python3 ./build.py --build-all
+        chmod a+x ./build.py
+        ./build.py --build-all
 
