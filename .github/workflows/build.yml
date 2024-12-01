@@ -28,6 +28,5 @@ jobs:
     # Build the project
     - name: Build project
       run: |
-        chmod a+x ./build.py
         make
         
