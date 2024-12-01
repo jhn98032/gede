@@ -44,7 +44,7 @@ jobs:
     # Build the project
     - name: Build project
       run: |
-        ./build.py --prefix=$(pwd)/AppDir install
+        python3 ./build.py --prefix=$(pwd)/AppDir install
 
     # Prepare AppDir
     - name: Prepare AppDir
