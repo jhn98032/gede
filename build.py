@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Written by Johan Henriksson. Copyright (C) 2014-2021.
+# Written by Johan Henriksson. Copyright (C) 2014-2024.
 #
 import sys
 import os
@@ -208,14 +208,20 @@ def detectQt():
         os.environ["QT_SELECT"] = "qt4"
         if g_qmakeQt4:
             qmakeName = g_qmakeQt4;
+        else:
+            raise RuntimeError("Failed to find qt4 qmake")
     elif g_qtVersionToUse == FORCE_QT5:
         os.environ["QT_SELECT"] = "qt5"
         if g_qmakeQt5:
             qmakeName = g_qmakeQt5;
+        else:
+            raise RuntimeError("Failed to find qt4 qmake")
     elif g_qtVersionToUse == FORCE_QT6:
         os.environ["QT_SELECT"] = "qt6"
         if g_qmakeQt6:
             qmakeName = g_qmakeQt6;
+        else:
+            raise RuntimeError("Failed to find qt6 qmake")
     elif g_qmakeQt6:
         qmakeName = g_qmakeQt6;
     elif g_qmakeQt5:
@@ -328,6 +334,8 @@ if __name__ == "__main__":
             print("")
             print(g_exeName + " has been installed to " + g_dest_path + "/bin")
 
+    except RuntimeError as e:
+        print("Runtime error: {0}".format(str(e)))
     except IOError as e:
         print("I/O error({0}): {1}".format(e.errno, e.strerror))
     except SystemExit as e:
