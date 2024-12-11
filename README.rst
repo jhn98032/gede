@@ -21,7 +21,7 @@ For more information see https://gede.dexar.se.
 Dependencies
 ============
 
-Gede depends on Qt5 and exuberant-ctags.
+Gede depends on Qt5 or Qt6 and exuberant-ctags.
 
 Make sure that you have all dependencies installed.
 
