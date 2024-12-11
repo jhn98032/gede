@@ -7,5 +7,5 @@ install:
 
 clean:
 	./build.py clean
-
+	chmod a+x *.py
 
