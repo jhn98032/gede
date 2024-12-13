@@ -29,5 +29,8 @@ jobs:
     - name: Build project
       run: |
         make
-        ./build.py --build-all
+        ./build.py clean
+        ./build.py --use-qt6 --verbose --build-all
+        ./build.py clean
+        ./build.py --use-qt5 --verbose --build-all
         
