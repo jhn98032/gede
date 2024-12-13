@@ -336,8 +336,10 @@ if __name__ == "__main__":
 
     except RuntimeError as e:
         print("Runtime error: {0}".format(str(e)))
+        raise e
     except IOError as e:
         print("I/O error({0}): {1}".format(e.errno, e.strerror))
+        raise e
     except SystemExit as e:
         pass
         raise e
