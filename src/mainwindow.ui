@@ -700,10 +700,10 @@
      <normaloff>:/images/res/step_over.png</normaloff>:/images/res/step_over.png</iconset>
    </property>
    <property name="text">
-    <string>Next</string>
+    <string>Next (F5)</string>
    </property>
    <property name="shortcut">
-    <string>F6</string>
+    <string>F5</string>
    </property>
   </action>
   <action name="actionStep_In">
@@ -712,10 +712,10 @@
      <normaloff>:/images/res/step_into.png</normaloff>:/images/res/step_into.png</iconset>
    </property>
    <property name="text">
-    <string>Step In</string>
+    <string>Step In (F6)</string>
    </property>
    <property name="shortcut">
-    <string>F5</string>
+    <string>F6</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -729,10 +729,10 @@
      <normaloff>:/images/res/stop.png</normaloff>:/images/res/stop.png</iconset>
    </property>
    <property name="text">
-    <string>Stop</string>
+    <string>Stop (F4)</string>
    </property>
    <property name="shortcut">
-    <string>Ctrl+F2</string>
+    <string>F4</string>
    </property>
   </action>
   <action name="actionContinue">
@@ -741,7 +741,7 @@
      <normaloff>:/images/res/continue.png</normaloff>:/images/res/continue.png</iconset>
    </property>
    <property name="text">
-    <string>Continue</string>
+    <string>Continue (F8)</string>
    </property>
    <property name="shortcut">
     <string>F8</string>
@@ -753,10 +753,10 @@
      <normaloff>:/images/res/restart.png</normaloff>:/images/res/restart.png</iconset>
    </property>
    <property name="text">
-    <string>Restart</string>
+    <string>Restart (F3)</string>
    </property>
    <property name="shortcut">
-    <string>F11</string>
+    <string>F3</string>
    </property>
   </action>
   <action name="actionSettings">
@@ -770,7 +770,7 @@
      <normaloff>:/images/res/step_out.png</normaloff>:/images/res/step_out.png</iconset>
    </property>
    <property name="text">
-    <string>Step Out</string>
+    <string>Step Out (F7)</string>
    </property>
    <property name="shortcut">
     <string>F7</string>
