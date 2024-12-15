@@ -850,7 +850,7 @@ void GdbCom::readTokens()
 
             if(!row.isEmpty())
             {
-                debugMsg("row:%s", stringToCStr(row));
+                debugMsg("row:'%s'", stringToCStr(row));
      
                 if(m_enableLog)
                 {
@@ -1227,7 +1227,7 @@ void GdbCom::enableLog(bool enable)
     {
         if(m_logFile.open(QIODevice::Truncate | QIODevice::WriteOnly | QIODevice::Text))
         {
-            infoMsg("Created %s", (const char*)GDB_LOG_FILE);
+            infoMsg("Created '%s'", (const char*)GDB_LOG_FILE);
 
             m_enableLog = true;
 
