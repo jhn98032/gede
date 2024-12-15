@@ -18,6 +18,14 @@ terms of the NetBeans License Agreement.
 
 For more information see https://gede.dexar.se.
 
+Appimage
+========
+An Appimage is supplied with each release.
+To use it:
+
+  chmod a+x Gede-x86_64.AppImage
+  ./Gede-x86_64.AppImage
+
 Dependencies
 ============
 
