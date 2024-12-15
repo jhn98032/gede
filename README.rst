@@ -23,8 +23,9 @@ Appimage
 An Appimage is supplied with each release.
 To use it:
 
-  chmod a+x Gede-x86_64.AppImage
-  ./Gede-x86_64.AppImage
+  # chmod a+x Gede-x86_64.AppImage
+
+  # ./Gede-x86_64.AppImage
 
 Dependencies
 ============
