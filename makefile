@@ -1,6 +1,6 @@
 
 all:
-	./build.py --verbose
+	./build.py
 
 install:
 	./build.py install

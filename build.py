@@ -69,9 +69,8 @@ def detectQmakeQtVer(qmakeExe):
     
         
 # Run the make command
-def run_make(a_list):
-    global g_verbose
-    if g_verbose:
+def run_make(a_list, verbose = False):
+    if verbose:
         errcode = subprocess.call(['make'] + a_list)
     else:
         p = subprocess.Popen(['make'] + a_list, stdout=subprocess.PIPE, universal_newlines=True)
@@ -98,7 +97,7 @@ def doClean():
         oldP = os.getcwd()
         os.chdir(p)
         if os.path.exists("Makefile"):
-            if run_make(["clean"]):
+            if run_make(["clean"], False):
                 exit(1)
         else:
             os.system("rm -f *.o")
@@ -289,21 +288,24 @@ if __name__ == "__main__":
                 if not os.path.exists("Makefile"):
                     [qmakeName, qtVer] = detectQt();
                     if not qmakeName:
-                        exit(1)
+                        raise RuntimeError("Unable to find qmake")
                     if verifyVersion(qtVer, MIN_QT_VER):
-                        print("Unable to find Qt >=" + MIN_QT_VER)
-                        exit(1)
+                        raise RuntimeError("Unable to find Qt >=" + MIN_QT_VER)
                     else:
                 
                         print("Generating makefile")
                         sys.stdout.flush()
-                        if subprocess.call([qmakeName]):
-                            exit(1)
+                        if g_verbose:
+                            qmakeCallCmds = [qmakeName]
+                        else:
+                            qmakeCallCmds = [qmakeName, "CONFIG+=silent"]
+                        if subprocess.call(qmakeCallCmds):
+                            raise RuntimeError("Running qmake failed")
                         print("Cleaning up in " + srcdir + " (please wait)")
-                        run_make(["clean"])
+                        run_make(["clean"], g_verbose)
                 print("Compiling in " + srcdir + " (please wait)")
-                if run_make(["-j%d" % (g_parallel_builds)]):
-                    exit(1)
+                if run_make(["-j%d" % (g_parallel_builds)], True):
+                    raise RuntimeError("Make failed")
                 os.chdir(olddir)
                 
         if do_install:
@@ -316,8 +318,7 @@ if __name__ == "__main__":
             except:
                 pass
             if not os.path.isdir(g_dest_path + "/bin"):
-                print("Failed to create dir")
-                exit(1)
+                raise RuntimeError("Failed to create dir")
 
             # Copy to destination path
             try:
@@ -328,18 +329,17 @@ if __name__ == "__main__":
                     shutil.copyfile(g_exeName, g_dest_path + "/bin/" + g_exeName)
                     os.chmod(g_dest_path + "/bin/" + g_exeName, 0o775);
             except:
-                print("Failed to install files to " + g_dest_path)
-                raise
+                raise RuntimeError("Failed to install files to " + g_dest_path)
 
             print("")
             print(g_exeName + " has been installed to " + g_dest_path + "/bin")
 
     except RuntimeError as e:
         print("Runtime error: {0}".format(str(e)))
-        raise e
+        exit(1)
     except IOError as e:
-        print("I/O error({0}): {1}".format(e.errno, e.strerror))
-        raise e
+        print("I/O error({0}): {1}".format(e.errno, str(e)))
+        exit(1)
     except SystemExit as e:
         pass
         raise e
