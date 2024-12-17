@@ -488,8 +488,10 @@ void OpenDialog::setSerialPort(QString serialPort)
 
 void OpenDialog::setSerialBaudRate(int baudRate)
 {
-    m_ui.comboBox_baudRate->setCurrentText(QString::number(baudRate));
-
+    int idx = m_ui.comboBox_baudRate->findData(QVariant(baudRate));
+    if(idx < 0)
+        idx = 0;
+    m_ui.comboBox_baudRate->setCurrentIndex(idx);
 }
 
 
