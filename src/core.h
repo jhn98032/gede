@@ -254,6 +254,7 @@ public:
     void gdbStepOut();
     void gdbContinue();
     void gdbRun();
+    void gdbReload(QString progpath);
     bool gdbGetFiles();
 
     void gdbManualCommand(QString cmd);
