@@ -516,22 +516,26 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
         return -1;
     }
 
-    com.commandF(&resultData, "-target-select extended-remote %s:%d", stringToCStr(tcpHost), tcpPort); 
-
     if(!programPath.isEmpty())
     {
         com.commandF(&resultData, "-file-symbol-file %s", stringToCStr(programPath));
 
     }
 
-    runInitCommands(cfg);
-
     if(!programPath.isEmpty())
     {
       com.commandF(&resultData, "-file-exec-file %s", stringToCStr(programPath));
 
-        if(cfg->m_download)
-            com.commandF(&resultData, "-target-download");
+    }
+
+    com.commandF(&resultData, "-target-select extended-remote %s:%d", stringToCStr(tcpHost), tcpPort); 
+
+    runInitCommands(cfg);
+
+    if(!programPath.isEmpty())
+    {
+      if(cfg->m_download)
+	com.commandF(&resultData, "-target-download");
     }
     
     // Get memory depth (32 or 64)
@@ -566,23 +570,25 @@ int Core::initSerial(Settings *cfg, QString gdbPath, QString programPath, QStrin
 
     com.commandF(&resultData, "set serial baud %d", baudRate); 
 
-    com.commandF(&resultData, "-target-select extended-remote %s", stringToCStr(serialPort)); 
-
-
     if(!programPath.isEmpty())
     {
         com.commandF(&resultData, "-file-symbol-file %s", stringToCStr(programPath));
 
     }
 
+    if(!programPath.isEmpty())
+    {
+      com.commandF(&resultData, "-file-exec-file %s", stringToCStr(programPath));
+    }
+    
+    com.commandF(&resultData, "-target-select extended-remote %s", stringToCStr(serialPort)); 
+
     runInitCommands(cfg);
 
     if(!programPath.isEmpty())
     {
-      com.commandF(&resultData, "-file-exec-file %s", stringToCStr(programPath));
-
-        if(cfg->m_download)
-            com.commandF(&resultData, "-target-download");
+      if(cfg->m_download)
+	com.commandF(&resultData, "-target-download");
     }
     
     // Get memory depth (32 or 64)
