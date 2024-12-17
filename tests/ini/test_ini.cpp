@@ -69,7 +69,7 @@ int main(int argc,char *argv[])
     Q_UNUSED(argc);
     Q_UNUSED(argv);
 
-    printf("Running tests\n");
+    printf("Running INI tests\n");
 
     writeInit();
     
@@ -77,7 +77,7 @@ int main(int argc,char *argv[])
     readIni();
 
     unlink(TEST_INI_FILENAME);
-    printf("All tests done\n");
+    printf("All INI tests done\n");
     
     return 0;
 }

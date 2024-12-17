@@ -14,7 +14,7 @@ g_qtVersionToUse = FORCE_QT5
 g_qmakeQt4 = ""
 g_qmakeQt5 = ""
 g_qmakeQt6 = ""
-g_otherSrcDirs = [
+g_testDirs = [
             "./tests/tagtest",
             "./tests/highlightertest",
             "./tests/ini"

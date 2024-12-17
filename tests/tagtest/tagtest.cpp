@@ -36,7 +36,10 @@ int main(int argc, char *argv[])
 
     QList<Tag> taglist;
     if(scanner.scan(filename, &taglist))
+    {
         errorMsg("Failed to scan"); 
+        return 1;
+    }
 
     scanner.dump(taglist);
 

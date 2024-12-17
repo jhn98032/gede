@@ -18,7 +18,7 @@ int dumpUsage()
     printf("Usage: ./hltest SOURCE_FILE.c\n");
     printf("Description:\n");
     printf("  Dumps syntax highlight info for a source file\n");
-    return 1;
+    return 0;
 }
 
 

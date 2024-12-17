@@ -6,6 +6,7 @@ import sys
 import os
 import subprocess
 import shutil
+import glob
 from sys import platform
 
 
@@ -51,17 +52,21 @@ def detectQmakeQtVer(qmakeExe):
     return verStr
     
         
-# Run the make command
-def run_make(a_list, verbose = False):
+# Run a command
+def run_program(program_name, a_list, verbose = False):
     if verbose:
-        errcode = subprocess.call(['make'] + a_list)
+        errcode = subprocess.call([program_name] + a_list)
     else:
-        p = subprocess.Popen(['make'] + a_list, stdout=subprocess.PIPE, universal_newlines=True)
+        p = subprocess.Popen([program_name] + a_list, stdout=subprocess.PIPE, universal_newlines=True)
         out, err = p.communicate()
         errcode = p.returncode
         if err:
             print(err)
     return errcode
+
+# Run make
+def run_make(a_list, verbose = False):
+    return run_program("make", a_list, verbose)
 
 # Remove a file
 def removeFile(filename):
@@ -261,7 +266,7 @@ if __name__ == "__main__":
             
             olddir = os.getcwd()
             if do_buildAll:
-                srcDirList = buildcfg.g_mainSrcDir + buildcfg.g_otherSrcDirs 
+                srcDirList = buildcfg.g_mainSrcDir + buildcfg.g_testDirs 
             else:
                 srcDirList = buildcfg.g_mainSrcDir
             for srcdir in srcDirList:
@@ -288,7 +293,27 @@ if __name__ == "__main__":
                 if run_make(["-j%d" % (buildcfg.g_parallel_builds)], True):
                     raise RuntimeError("Make failed")
                 os.chdir(olddir)
-                
+
+            if do_buildAll:
+                # Loop through all tests
+                for srcdir in buildcfg.g_testDirs:
+                    this_dir = os.getcwd()
+                    os.chdir(srcdir)
+
+                    # Get exe name
+                    exe_name = "./" + os.path.basename(srcdir)
+                    if not os.path.exists(exe_name):
+                        pro_files = glob.glob("*.pro")
+                        if pro_files:
+                            exe_name, _ = os.path.splitext(pro_files[0])
+
+                    # Execute tests
+                    if os.path.exists(exe_name):
+                        print("Executing '%s'" % (exe_name))
+                        if run_program("./" + exe_name,[], buildcfg.g_verbose):
+                            raise RuntimeError("Test %s failed" % (exe_name))
+                    os.chdir(this_dir)
+            
         if do_install:
             os.chdir("src")
             print("Installing to '%s'" % (buildcfg.g_dest_path) )
