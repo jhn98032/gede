@@ -30,7 +30,10 @@ g_otherSrcDirs = [
             "./tests/ini"
             ]
 g_mainSrcDir = ["./src" ]
-g_requiredPrograms = ["make", "gcc", "ctags" ]
+if platform == "darwin":
+    g_requiredPrograms = ["make", "clang", "ctags" ]
+else:
+    g_requiredPrograms = ["make", "gcc", "ctags" ]
 MIN_QT_VER = "4.0.0"
 #-----------------------------#
 
