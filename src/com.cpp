@@ -19,7 +19,7 @@
 #include "util.h"
 #include "config.h"
 #include "version.h"
-
+#include "detectdistro.h"
 
 
 const char* GdbCom::asyncClassToString(GdbComListener::AsyncClass ac)

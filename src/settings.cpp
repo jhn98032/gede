@@ -16,6 +16,8 @@
 #include "log.h"
 #include "ini.h"
 #include "config.h"
+#include "detectdistro.h"
+
 #include <assert.h>
 
 
@@ -164,6 +166,7 @@ void Settings::loadGlobalConfig()
     Ini tmpIni;
     if(tmpIni.appendLoad(globalConfigFilename))
         infoMsg("Failed to load global ini '%s'. File will be created.", stringToCStr(globalConfigFilename));
+    infoMsg("Loading %s", qPrintable(globalConfigFilename));
 
     m_globalProjConfig = tmpIni.getBool("General/GlobalProjConfig", false);
     

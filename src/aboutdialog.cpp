@@ -13,6 +13,7 @@
 #include "version.h"
 #include "util.h"
 #include "log.h"
+#include "detectdistro.h"
 
 
 

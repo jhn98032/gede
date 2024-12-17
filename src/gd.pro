@@ -30,8 +30,8 @@ HEADERS+=com.h
 SOURCES+=log.cpp
 HEADERS+=log.h
 
-SOURCES+=qtutil.cpp util.cpp
-HEADERS+=qtutil.h util.h
+SOURCES+=qtutil.cpp util.cpp detectdistro.cpp
+HEADERS+=qtutil.h util.h detectdistro.h
 
 SOURCES+=tree.cpp
 HEADERS+=tree.h
