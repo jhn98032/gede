@@ -60,6 +60,9 @@ OpenDialog::OpenDialog(QWidget *parent)
     for(QSerialPortInfo &port : portList)
     {
         QString text = port.portName() + ": " + port.description();
+#if __APPLE__
+       if (text.startsWith("tty.")) continue;
+#endif
         m_ui.comboBox_serialPort->addItem(text, QVariant(port.systemLocation()));
         if(text.startsWith("ttyUSB") || text.startsWith("ttyACM"))
             selectIdx = m_ui.comboBox_serialPort->count()-1;
