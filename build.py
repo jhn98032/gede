@@ -14,28 +14,8 @@ FORCE_QT5=2
 FORCE_QT6=3
 AUTODETECT=4
 
-#-----------------------------#
-# Configuration section
-g_parallel_builds = 4
-g_dest_path = "/usr/local"
-g_verbose = False
-g_exeName = "gede"
-g_qtVersionToUse = FORCE_QT5
-g_qmakeQt4 = ""
-g_qmakeQt5 = ""
-g_qmakeQt6 = ""
-g_otherSrcDirs = [
-            "./tests/tagtest",
-            "./tests/highlightertest",
-            "./tests/ini"
-            ]
-g_mainSrcDir = ["./src" ]
-if platform == "darwin":
-    g_requiredPrograms = ["make", "clang", "ctags" ]
-else:
-    g_requiredPrograms = ["make", "gcc", "ctags" ]
-MIN_QT_VER = "4.0.0"
-#-----------------------------#
+import buildcfg
+
 
 
 # Check if Qt version is new enough.
@@ -86,8 +66,7 @@ def run_make(a_list, verbose = False):
 # Remove a file
 def removeFile(filename):
     try:
-        global g_verbose
-        if g_verbose:
+        if buildcfg.g_verbose:
             print("rm " + filename)
         os.remove(filename)
     except OSError:
@@ -95,7 +74,7 @@ def removeFile(filename):
 
 # Do a cleanup
 def doClean():
-    for p in g_otherSrcDirs + g_mainSrcDir:
+    for p in buildcfg.g_otherSrcDirs + buildcfg.g_mainSrcDir:
         print("Cleaning up in %s" % (p))
         oldP = os.getcwd()
         os.chdir(p)
@@ -104,7 +83,7 @@ def doClean():
                 exit(1)
         else:
             os.system("rm -f *.o")
-        removeFile(g_exeName)
+        removeFile(buildcfg.g_exeName)
         removeFile("Makefile")
         removeFile(".qmake.stash")
         if platform == "darwin" and os.path.exists(g_exeName + ".app"):
@@ -119,7 +98,7 @@ def dump_usage():
     print("      install    Installs the program")
     print("      clean      Cleans the source directory")
     print("where OPTIONS are:")
-    print("      --prefix=DESTDIR  The path to install to (default is %s)." % (g_dest_path))
+    print("      --prefix=DESTDIR  The path to install to (default is %s)." % (buildcfg.g_dest_path))
     print("      --verbose         Verbose output.")
     print("      --use-qt4         Use qt4")
     print("      --use-qt5         Use qt5")
@@ -174,64 +153,61 @@ def detectQt():
     """ @brief Detects the Qt version installed in the system.
         @return The name of the qmake executable. 
     """
-    global g_qmakeQt4
-    global g_qmakeQt5
-    global g_qmakeQt6
     sys.stdout.write("Detecting Qt version... ")
     qtVerList = []
     if exeExist("qmake-qt4"):
         qtVerList += ["Qt4 (qmake-qt4)"]
-        g_qmakeQt4 = "qmake-qt4";
+        buildcfg.g_qmakeQt4 = "qmake-qt4";
     if exeExist("qmake-qt5"):
         qtVerList += ["Qt5 (qmake-qt5)"]
-        g_qmakeQt5 = "qmake-qt5";
+        buildcfg.g_qmakeQt5 = "qmake-qt5";
     if exeExist("qmake6"):
         qtVerList += ["Qt6 (qmake6)"]
-        g_qmakeQt6 = "qmake6";
+        buildcfg.g_qmakeQt6 = "qmake6";
     if exeExist("qmake"):
         ver = detectQmakeQtVer("qmake")[0]
         if ver == "6":
-            g_qmakeQt6 = "qmake";
+            buildcfg.g_qmakeQt6 = "qmake";
             qtVerList += ["Qt6 (qmake)"]
         elif ver == "5":
-            g_qmakeQt5 = "qmake";
+            buildcfg.g_qmakeQt5 = "qmake";
             qtVerList += ["Qt5 (qmake)"]
         elif ver == "4":
-            g_qmakeQt4 = "qmake";
+            buildcfg.g_qmakeQt4 = "qmake";
             qtVerList += ["Qt4 (qmake)"]
         else:
-            g_qmakeQt5 = "qmake";
+            buildcfg.g_qmakeQt5 = "qmake";
             qtVerList += ["Qt? (qmake)"]
     sys.stdout.write(", ".join(qtVerList) + "\n")
-    if (not g_qmakeQt4) and (not g_qmakeQt5) and (not g_qmakeQt6):
+    if (not buildcfg.g_qmakeQt4) and (not buildcfg.g_qmakeQt5) and (not buildcfg.g_qmakeQt6):
         print("No Qt found");
 
     # Which version to use?
     qmakeName = ""
-    if g_qtVersionToUse == FORCE_QT4:
+    if buildcfg.g_qtVersionToUse == FORCE_QT4:
         os.environ["QT_SELECT"] = "qt4"
-        if g_qmakeQt4:
-            qmakeName = g_qmakeQt4;
+        if buildcfg.g_qmakeQt4:
+            qmakeName = buildcfg.g_qmakeQt4;
         else:
             raise RuntimeError("Failed to find qt4 qmake")
-    elif g_qtVersionToUse == FORCE_QT5:
+    elif buildcfg.g_qtVersionToUse == FORCE_QT5:
         os.environ["QT_SELECT"] = "qt5"
-        if g_qmakeQt5:
-            qmakeName = g_qmakeQt5;
+        if buildcfg.g_qmakeQt5:
+            qmakeName = buildcfg.g_qmakeQt5;
         else:
             raise RuntimeError("Failed to find qt4 qmake")
-    elif g_qtVersionToUse == FORCE_QT6:
+    elif buildcfg.g_qtVersionToUse == FORCE_QT6:
         os.environ["QT_SELECT"] = "qt6"
-        if g_qmakeQt6:
-            qmakeName = g_qmakeQt6;
+        if buildcfg.g_qmakeQt6:
+            qmakeName = buildcfg.g_qmakeQt6;
         else:
             raise RuntimeError("Failed to find qt6 qmake")
-    elif g_qmakeQt6:
-        qmakeName = g_qmakeQt6;
-    elif g_qmakeQt5:
-        qmakeName = g_qmakeQt5;
-    elif g_qmakeQt4:
-        qmakeName = g_qmakeQt4;
+    elif buildcfg.g_qmakeQt6:
+        qmakeName = buildcfg.g_qmakeQt6;
+    elif buildcfg.g_qmakeQt5:
+        qmakeName = buildcfg.g_qmakeQt5;
+    elif buildcfg.g_qmakeQt4:
+        qmakeName = buildcfg.g_qmakeQt4;
     if qmakeName:
         print("Using '" + qmakeName + "'")
     else:
@@ -260,84 +236,84 @@ if __name__ == "__main__":
             elif arg == "--help" or arg == "help":
                 exit( dump_usage())
             elif arg == "--verbose":
-                g_verbose = True
+                buildcfg.g_verbose = True
             elif arg == "--build-all":
                 do_buildAll = True
             elif arg.find("--prefix=") == 0:
-                g_dest_path = arg[9:]
+                buildcfg.g_dest_path = arg[9:]
             elif arg == "--use-qt4":
-                g_qtVersionToUse = FORCE_QT4
+                buildcfg.g_qtVersionToUse = FORCE_QT4
             elif arg == "--use-qt5":
-                g_qtVersionToUse = FORCE_QT5
+                buildcfg.g_qtVersionToUse = FORCE_QT5
             elif arg == "--use-qt6":
-                g_qtVersionToUse = FORCE_QT6
+                buildcfg.g_qtVersionToUse = FORCE_QT6
             elif arg.startswith("--parallel-builds="):
-                g_parallel_builds = int(arg[18:])
+                buildcfg.g_parallel_builds = int(arg[18:])
             else:
                 exit(dump_usage())
 
         if do_clean:
             doClean();
         if do_build:
-            for reqPrg in g_requiredPrograms:
+            for reqPrg in buildcfg.g_requiredPrograms:
                 ensureExist(reqPrg)
             sys.stdout.flush()
             
             olddir = os.getcwd()
             if do_buildAll:
-                srcDirList = g_mainSrcDir + g_otherSrcDirs 
+                srcDirList = buildcfg.g_mainSrcDir + buildcfg.g_otherSrcDirs 
             else:
-                srcDirList = g_mainSrcDir
+                srcDirList = buildcfg.g_mainSrcDir
             for srcdir in srcDirList:
                 os.chdir(srcdir)
                 if not os.path.exists("Makefile"):
                     [qmakeName, qtVer] = detectQt();
                     if not qmakeName:
                         raise RuntimeError("Unable to find qmake")
-                    if verifyVersion(qtVer, MIN_QT_VER):
+                    if verifyVersion(qtVer, buildcfg.MIN_QT_VER):
                         raise RuntimeError("Unable to find Qt >=" + MIN_QT_VER)
                     else:
                 
                         print("Generating makefile")
                         sys.stdout.flush()
-                        if g_verbose:
+                        if buildcfg.g_verbose:
                             qmakeCallCmds = [qmakeName]
                         else:
                             qmakeCallCmds = [qmakeName, "CONFIG+=silent"]
                         if subprocess.call(qmakeCallCmds):
                             raise RuntimeError("Running qmake failed")
                         print("Cleaning up in " + srcdir + " (please wait)")
-                        run_make(["clean"], g_verbose)
+                        run_make(["clean"], True)
                 print("Compiling in " + srcdir + " (please wait)")
-                if run_make(["-j%d" % (g_parallel_builds)], True):
+                if run_make(["-j%d" % (buildcfg.g_parallel_builds)], True):
                     raise RuntimeError("Make failed")
                 os.chdir(olddir)
                 
         if do_install:
             os.chdir("src")
-            print("Installing to '%s'" % (g_dest_path) )
+            print("Installing to '%s'" % (buildcfg.g_dest_path) )
 
             # Create destination path
             try:
-                os.makedirs(g_dest_path + "/bin")
+                os.makedirs(buildcfg.g_dest_path + "/bin")
             except:
                 pass
-            if not os.path.isdir(g_dest_path + "/bin"):
+            if not os.path.isdir(buildcfg.g_dest_path + "/bin"):
                 raise RuntimeError("Failed to create dir")
 
             # Copy to destination path
             try:
                 if platform == "darwin":
-                    shutil.copy("%s.app/Contents/MacOS/%s" % (g_exeName,g_exeName), g_dest_path + "/bin")
-                    shutil.copytree("%s.app" % (g_exeName), "/Applications/%s.app" % (g_exeName), dirs_exist_ok=True)
+                    shutil.copy("%s.app/Contents/MacOS/%s" % (buildcfg.g_exeName,buildcfg.g_exeName), buildcfg.g_dest_path + "/bin")
+                    shutil.copytree("%s.app" % (buildcfg.g_exeName), "/Applications/%s.app" % (buildcfg.g_exeName), dirs_exist_ok=True)
                 else:
-                    shutil.copyfile(g_exeName, g_dest_path + "/bin/" + g_exeName)
-                    os.chmod(g_dest_path + "/bin/" + g_exeName, 0o775);
+                    shutil.copyfile(buildcfg.g_exeName, buildcfg.g_dest_path + "/bin/" + buildcfg.g_exeName)
+                    os.chmod(buildcfg.g_dest_path + "/bin/" + buildcfg.g_exeName, 0o775);
             except:
-                raise RuntimeError("Failed to install files to " + g_dest_path)
+                raise RuntimeError("Failed to install files to " + buildcfg.g_dest_path)
 
             print("")
-            print(g_exeName + " has been installed to " + g_dest_path + "/bin")
+            print(buildcfg.g_exeName + " has been installed to " + buildcfg.g_dest_path + "/bin")
 
     except RuntimeError as e:
         print("Runtime error: {0}".format(str(e)))
