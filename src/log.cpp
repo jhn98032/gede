@@ -91,13 +91,13 @@ void debugMsg_(const char *filename, int lineNo, const char *fmt, ...)
     QMutexLocker locker(&g_mutex);
 
     va_start(ap, fmt);
-    
+
     vsnprintf(buffer, sizeof(buffer), fmt, ap);
 
 
     va_end(ap);
 
-    printf("%2d.%03d| DEBUG | %s:%d| %s\n",
+    printf("%2d.%03d| DEBUG | %s:%3d| %s\n",
         curTime.second()%100, curTime.msec(),
         filename, lineNo, buffer);
 }
