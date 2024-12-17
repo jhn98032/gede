@@ -79,7 +79,7 @@ def removeFile(filename):
 
 # Do a cleanup
 def doClean():
-    for p in buildcfg.g_otherSrcDirs + buildcfg.g_mainSrcDir:
+    for p in buildcfg.g_testDirs + buildcfg.g_mainSrcDir:
         print("Cleaning up in %s" % (p))
         oldP = os.getcwd()
         os.chdir(p)
