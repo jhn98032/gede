@@ -22,7 +22,7 @@
 // etags command and argument to use to get list of tags
 #define ETAGS_CMD1     "ctags"    // Used on Linux
 #define ETAGS_CMD2     "exctags"  // Used on freebsd
-#define ETAGS_ARGS    " -f - --excmd=number --fields=+nmsSk"
+#define ETAGS_ARGS    " -f - --excmd=number --fields=+nmsSk --langmap=c++:+.ino"
 
 
 // Max number of recently used goto locations to save
