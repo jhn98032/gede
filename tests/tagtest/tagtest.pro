@@ -14,9 +14,8 @@ HEADERS+=../../src/tagscanner.h
 
 SOURCES+=../../src/log.cpp
 HEADERS+=../../src/log.h
-SOURCES+=../../src/util.cpp
-HEADERS+=../../src/util.h
-
+SOURCES+=../../src/util.cpp ../../src/detectdistro.cpp
+HEADERS+=../../src/util.h  ../../src/detectdistro.h
 
 SOURCES += ../../src/rusttagscanner.cpp
 HEADERS += ../../src/rusttagscanner.h
