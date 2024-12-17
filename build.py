@@ -104,6 +104,8 @@ def doClean():
         removeFile(g_exeName)
         removeFile("Makefile")
         removeFile(".qmake.stash")
+        if platform == "darwin" and os.path.exists(g_exeName + ".app"):
+            shutil.rmtree(g_exeName + ".app")
         os.chdir(oldP)
 
 
