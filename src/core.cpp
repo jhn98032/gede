@@ -852,6 +852,67 @@ void Core::gdbRun()
     }
 }
 
+/**
+ * @brief Asks gdb to reload (a probably modified binary) and run it.
+ * This command is only active when we are in remote mode, download has been activated and an
+ * executable has been specified.
+ */
+void Core::gdbReload(QString progpath)
+{
+    GdbCom& com = GdbCom::getInstance();
+    Tree resultData;
+    ICore::TargetState oldState;
+    GdbResult rc;
+
+    if(m_targetState == ICore::TARGET_STARTING || m_targetState == ICore::TARGET_RUNNING)
+    {
+        if(m_inf)
+            m_inf->ICore_onMessage("Program is currently running");
+        return;
+    }
+
+    //
+
+    rc = com.commandF(&resultData, "-file-symbol-file %s", stringToCStr(progpath));
+    if (rc != GDB_ERROR)
+      rc = com.commandF(&resultData, "-file-exec-file %s", stringToCStr(progpath));
+    if (rc != GDB_ERROR)
+      rc = com.command(&resultData, "-environment-directory -r");
+    if (rc != GDB_ERROR)
+      rc = com.command(&resultData, "-target-download");
+    if (rc == GDB_ERROR) return;
+
+    if(m_ptsListener)
+        delete m_ptsListener;
+    m_ptsListener = new QSocketNotifier(m_ptsFd, QSocketNotifier::Read);
+    connect(m_ptsListener, SIGNAL(activated(int)), this, SLOT(onGdbOutput(int)));
+
+    m_pid = 0;
+    oldState = m_targetState;
+    m_targetState = ICore::TARGET_STARTING;
+    rc = com.commandF(&resultData, "-exec-run");
+    if(rc == GDB_ERROR)
+        m_targetState = oldState;
+
+    // Loop through all source files
+    for(int i = 0;i < m_sourceFiles.size();i++)
+      {
+	SourceFile *sourceFile = m_sourceFiles[i];
+	
+	if(QFileInfo(sourceFile->m_fullName).exists())
+	  {
+	    // Has the file being modified?
+	    QDateTime modTime = QFileInfo(sourceFile->m_fullName).lastModified();
+	    if(sourceFile->m_modTime <  modTime)
+	      {
+		m_inf->ICore_onSourceFileChanged(sourceFile->m_fullName);
+	      }
+	  }
+      }
+
+    // Get all source files
+    gdbGetFiles();
+}
 
 /**
  * @brief  Resumes the execution until a breakpoint is encountered, or until the program exits.

@@ -157,6 +157,7 @@ public slots:
     void onStop();
     void onBreakpointsWidgetItemDoubleClicked(QTreeWidgetItem * item,int column);
     void onRestart();
+    void onReload();
     void onContinue();
     void onCodeViewContextMenuAddWatch();
     void onCodeViewContextMenuOpenFile();
