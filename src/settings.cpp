@@ -10,8 +10,9 @@
 #include "settings.h"
 
 #include <QDir>
+#ifdef QT_WIDGETS_LIB
 #include <QStyleFactory>
-
+#endif
 #include "util.h"
 #include "log.h"
 #include "ini.h"
@@ -186,6 +187,7 @@ void Settings::loadGlobalConfig()
 
     m_showLineNo = tmpIni.getBool("Gui/ShowLineNo", m_showLineNo);
     m_guiStyleName = tmpIni.getString("Gui/Style", m_guiStyleName);
+#ifdef QT_WIDGETS_LIB
     // Verify that the style name is valid
     QStyleFactory sf;
     QStringList styleList = sf.keys();
@@ -194,7 +196,7 @@ void Settings::loadGlobalConfig()
         warnMsg("Invalid style name '%s'", stringToCStr(m_guiStyleName));
         m_guiStyleName = "";
     }
-       
+#endif
     m_fontFamily = tmpIni.getString("Gui/CodeFont", m_fontFamily);
     m_fontSize = tmpIni.getInt("Gui/CodeFontSize", m_fontSize);
     m_memoryFontFamily = tmpIni.getString("Gui/MemoryFont", m_memoryFontFamily);

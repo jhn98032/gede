@@ -12,7 +12,6 @@
 #include <QTime>
 #include <QMutex>
 #include <QMutexLocker>
-#include <QMessageBox>
 
 namespace gedelog
 {

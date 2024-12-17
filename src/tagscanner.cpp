@@ -8,7 +8,9 @@
 
 #include "tagscanner.h"
 
+#ifdef QT_WIDGETS_LIB
 #include <QMessageBox>
+#endif
 #include <QProcess>
 #include <QDebug>
 #include <QFileInfo>
@@ -103,11 +105,13 @@ void TagScanner::checkForCtags()
         msg += "ctags can be installed on ubuntu/debian using command:\n";
         msg +=  "\n";
         msg += " apt-get install exuberant-ctags";
-
+#ifdef QT_WIDGETS_LIB
         QMessageBox::warning(NULL,
                     "Failed to start ctags",
                     msg);
-
+#else
+        printf(qPrintable(msg + "\n"));
+#endif
     }
     else
     {
@@ -126,10 +130,14 @@ void TagScanner::checkForCtags()
             QString msg;
 
             msg = QString::asprintf("Failed to start program '%s'\n", qPrintable(g_ctagsCmd));
-        
+#ifdef QT_WIDGETS_LIB
             QMessageBox::warning(NULL,
                         "Failed to start ctags",
                         msg);
+#else
+            printf(qPrintable(msg + "\n"));
+#endif
+
             g_ctagsExist = false;
         }
         else

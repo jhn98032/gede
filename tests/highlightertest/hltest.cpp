@@ -6,11 +6,8 @@
 #include "log.h"
 #include "util.h"
 
+#include <QCoreApplication>
 #include <QtGlobal>
-#if QT_VERSION < 0x050000
-#include <QtGui/QApplication>
-#endif
-#include <QApplication>
 #include <QFile>
 
 int dumpUsage()
@@ -24,7 +21,7 @@ int dumpUsage()
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc,argv);
+    QCoreApplication app(argc,argv);
     QString inputFilename;
     
     // Parse arguments

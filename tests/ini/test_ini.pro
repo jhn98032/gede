@@ -1,20 +1,15 @@
 
 
 
-lessThan(QT_MAJOR_VERSION, 5) {
-    QT += gui core
-}
-else {
-    QT += gui core widgets
-}
+QT +=  core
 
 TEMPLATE = app
 
 SOURCES += test_ini.cpp
 
 
-SOURCES+=../../src/settings.cpp ../../src/ini.cpp
-HEADERS+=../../src/settings.h ../../src/ini.h
+SOURCES+=../../src/ini.cpp
+HEADERS+=../../src/ini.h
 
 SOURCES+=../../src/log.cpp
 HEADERS+=../../src/log.h

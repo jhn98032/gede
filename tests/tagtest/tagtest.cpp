@@ -3,11 +3,7 @@
 #include "log.h"
 
 #include <QtGlobal>
-#if QT_VERSION < 0x050000
-#include <QtGui/QApplication>
-#endif
-#include <QApplication>
-
+#include <QCoreApplication>
 int dummy;
 
     
@@ -21,7 +17,7 @@ int main(int argc, char *argv[])
 {
     Settings cfg;
     QString filename = "tagtest.cpp";
-    QApplication app(argc,argv);
+    QCoreApplication app(argc,argv);
     TagScanner scanner;
 
     for(int i = 1;i < argc;i++)
