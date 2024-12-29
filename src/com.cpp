@@ -112,11 +112,21 @@ GdbCom::GdbCom()
 
 GdbCom::~GdbCom()
 {
+    disconnectGdb();
+}
+
+
+/**
+ * @brief Disconnect from the gdb server.
+ */
+void GdbCom::disconnectGdb()
+{
     disconnect(&m_process, SIGNAL(stateChanged (QProcess::ProcessState)), this, SLOT(onGdbStateChanged(QProcess::ProcessState)));
-    
+
     // Send the command to gdb to exit cleanly
     QString text = "-gdb-exit\n";
     m_process.write((const char*)text.toLatin1());
+
 
     if(!m_process.waitForFinished(1000))
     {

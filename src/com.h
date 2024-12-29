@@ -175,6 +175,7 @@ class GdbCom : public QObject
 
         static GdbCom& getInstance();
         int init(QString gdbPath, bool enableDebugLog);
+        void disconnectGdb();
 
         void setListener(GdbComListener *listener) { m_listener = listener; };
 
