@@ -239,6 +239,7 @@ Core::Core()
     ,m_scanSources(false)
     ,m_ptsListener(NULL)
     ,m_memDepth(32)
+    ,m_connectionMode(MODE_LOCAL)
 {
     
     GdbCom& com = GdbCom::getInstance();
@@ -322,6 +323,7 @@ int Core::initPid(Settings *cfg, QString gdbPath, QString programPath, int pid)
     int rc = 0;
 
     m_isRemote = false;
+    m_connectionMode = MODE_PID;
 
     if(com.init(gdbPath, cfg->m_enableDebugLog))
     {
@@ -398,6 +400,7 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
     int rc = 0;
 
     m_isRemote = false;
+    m_connectionMode = MODE_LOCAL;
 
     if(com.init(gdbPath, cfg->m_enableDebugLog))
     {
@@ -457,7 +460,7 @@ int Core::initCoreDump(Settings *cfg, QString gdbPath, QString programPath, QStr
     int rc = 0;
 
     m_isRemote = false;
-
+    m_connectionMode = MODE_COREDUMP;
 
     if(com.init(gdbPath, cfg->m_enableDebugLog))
     {
@@ -503,13 +506,23 @@ int Core::initCoreDump(Settings *cfg, QString gdbPath, QString programPath, QStr
 
     
 
+/**
+ * @brief Connects (using TCP/IP) to a gdbserver.
+ * @param cfg           Settings to use.
+ * @param gdbPath       Path to the gdb program to use to connect to the gdbserver
+ * @param programPath   Path to program to use for symbol information.
+ * @param tcpHost       Host address of gdbserver to connect to.
+ * @param tcpPort       Port used by gdbserver server.
+ * @return 0 on success.
+ */
 int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QString tcpHost, int tcpPort)
 {
     GdbCom& com = GdbCom::getInstance();
     Tree resultData;
 
     m_isRemote = true;
-    
+    m_connectionMode = MODE_TCP;
+
     if(com.init(gdbPath, cfg->m_enableDebugLog))
     {
         critMsg("Failed to start gdb ('%s')", stringToCStr(gdbPath));
@@ -560,7 +573,7 @@ int Core::initSerial(Settings *cfg, QString gdbPath, QString programPath, QStrin
     Tree resultData;
 
     m_isRemote = true;
-
+    m_connectionMode = MODE_SERIAL;
 
     if(com.init(gdbPath, cfg->m_enableDebugLog))
     {
@@ -858,6 +871,102 @@ void Core::gdbRun()
     }
 }
 
+/**
+ * @brief Asks gdb to reload the (probably modified binary) that is being debugged.
+ * @return 0 on success.
+ */
+int Core::gdbReload(Settings &cfg)
+{
+    GdbCom& com = GdbCom::getInstance();
+    int rc = 0;
+
+    if(m_targetState == ICore::TARGET_STARTING || m_targetState == ICore::TARGET_RUNNING)
+    {
+        if(m_inf)
+            m_inf->ICore_onMessage("Program is currently running");
+        return -1;
+    }
+
+
+    if(m_connectionMode == MODE_TCP)
+    {
+        Tree resultData;
+        ICore::TargetState oldState;
+        GdbResult rc;
+        QString progpath = cfg.getProgramPath();
+
+
+        //
+
+        rc = com.commandF(&resultData, "-file-symbol-file %s", stringToCStr(progpath));
+        if (rc != GDB_ERROR)
+            rc = com.commandF(&resultData, "-file-exec-file %s", stringToCStr(progpath));
+        if (rc != GDB_ERROR)
+            rc = com.command(&resultData, "-environment-directory -r");
+        if (rc != GDB_ERROR)
+            rc = com.command(&resultData, "-target-download");
+        if (rc == GDB_ERROR)
+            return rc;
+
+        if(m_ptsListener)
+            delete m_ptsListener;
+        m_ptsListener = new QSocketNotifier(m_ptsFd, QSocketNotifier::Read);
+        connect(m_ptsListener, SIGNAL(activated(int)), this, SLOT(onGdbOutput(int)));
+
+        m_pid = 0;
+        oldState = m_targetState;
+        m_targetState = ICore::TARGET_STARTING;
+        rc = com.commandF(&resultData, "-exec-run");
+        if(rc == GDB_ERROR)
+            m_targetState = oldState;
+
+
+        if(rc)
+            return rc;
+
+        // Loop through all source files
+        for(int i = 0;i < m_sourceFiles.size();i++)
+        {
+            SourceFile *sourceFile = m_sourceFiles[i];
+
+            if(QFileInfo(sourceFile->m_fullName).exists())
+            {
+                // Has the file being modified?
+                QDateTime modTime = QFileInfo(sourceFile->m_fullName).lastModified();
+                if(sourceFile->m_modTime <  modTime)
+                {
+                    m_inf->ICore_onSourceFileChanged(sourceFile->m_fullName);
+                }
+            }
+        }
+
+        // Get all source files
+        gdbGetFiles();
+    }
+    else
+    {
+        com.disconnectGdb();
+
+        if(m_connectionMode == MODE_LOCAL)
+        {
+            rc = initLocal(&cfg, cfg.m_gdbPath, cfg.getProgramPath(), cfg.m_argumentList);
+        }
+        else if(m_connectionMode == MODE_SERIAL)
+            rc = initSerial(&cfg, cfg.m_gdbPath, cfg.getProgramPath(), cfg.m_serialPort, cfg.m_serialBaudRate);
+        else if(m_connectionMode == MODE_COREDUMP)
+            rc = initCoreDump(&cfg, cfg.m_gdbPath, cfg.getProgramPath(), cfg.m_coreDumpFile);
+        else if(m_connectionMode == MODE_PID)
+            rc = initPid(&cfg, cfg.m_gdbPath, cfg.getProgramPath(), cfg.m_runningPid);
+    }
+
+    if(rc == 0 && (cfg.m_connectionMode == MODE_LOCAL ||
+                   cfg.m_connectionMode == MODE_TCP ||
+                   cfg.m_connectionMode == MODE_SERIAL))
+        gdbRun();
+
+
+    return rc;
+}
 
 /**
  * @brief  Resumes the execution until a breakpoint is encountered, or until the program exits.

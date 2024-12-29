@@ -254,6 +254,7 @@ public:
     void gdbStepOut();
     void gdbContinue();
     void gdbRun();
+    int gdbReload(Settings &cfg);
     bool gdbGetFiles();
 
     void gdbManualCommand(QString cmd);
@@ -324,6 +325,7 @@ private:
 
     QStringList m_localVars;
     int m_memDepth; //!< The memory depth. (Either 64 or 32).
+    ConnectionMode m_connectionMode; // The debug mode (tcpip, local, coredump)
 };
 
 
