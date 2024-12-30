@@ -878,7 +878,7 @@ void Core::gdbRun()
 
 
 /**
- * @brief Asks gdb to reload and rerun the (probably modified binary) that is being debugged.
+ * @brief Asks gdb to reload and restart the (probably modified binary) that is being debugged.
  * @return 0 on success.
  */
 int Core::gdbReload(Settings &cfg)
@@ -893,6 +893,21 @@ int Core::gdbReload(Settings &cfg)
         return -1;
     }
 
+    // Check if any source files has been modified
+    for(int i = 0;i < m_sourceFiles.size();i++)
+    {
+        SourceFile *sourceFile = m_sourceFiles[i];
+
+        if(QFileInfo(sourceFile->m_fullName).exists())
+        {
+            // Has the file being modified?
+            QDateTime modTime = QFileInfo(sourceFile->m_fullName).lastModified();
+            if(sourceFile->m_modTime <  modTime)
+            {
+                m_inf->ICore_onSourceFileChanged(sourceFile->m_fullName);
+            }
+        }
+    }
 
     if(m_connectionMode == MODE_TCP)
     {
@@ -927,24 +942,6 @@ int Core::gdbReload(Settings &cfg)
             m_targetState = oldState;
 
 
-        if(rc)
-            return rc;
-
-        // Loop through all source files
-        for(int i = 0;i < m_sourceFiles.size();i++)
-        {
-            SourceFile *sourceFile = m_sourceFiles[i];
-
-            if(QFileInfo(sourceFile->m_fullName).exists())
-            {
-                // Has the file being modified?
-                QDateTime modTime = QFileInfo(sourceFile->m_fullName).lastModified();
-                if(sourceFile->m_modTime <  modTime)
-                {
-                    m_inf->ICore_onSourceFileChanged(sourceFile->m_fullName);
-                }
-            }
-        }
 
         // Get all source files
         gdbGetFiles();
