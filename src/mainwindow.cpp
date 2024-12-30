@@ -1396,7 +1396,8 @@ void MainWindow::onRestart()
     {
         // Ask the user what to do
         QMessageBox msgBox;
-        msgBox.setText("The program has been modified.");
+        msgBox.setWindowTitle("Program has been modified");
+        msgBox.setText("The program has been modified since last run.");
         msgBox.setInformativeText("Do you want to reload it?");
         msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
         msgBox.setDefaultButton(QMessageBox::Yes);
