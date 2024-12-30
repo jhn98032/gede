@@ -110,7 +110,7 @@ void TagScanner::checkForCtags()
                     "Failed to start ctags",
                     msg);
 #else
-        printf(qPrintable(msg + "\n"));
+        printf("%s\n", qPrintable(msg));
 #endif
     }
     else
@@ -135,7 +135,7 @@ void TagScanner::checkForCtags()
                         "Failed to start ctags",
                         msg);
 #else
-            printf(qPrintable(msg + "\n"));
+            printf("%s\n", qPrintable(msg));
 #endif
 
             g_ctagsExist = false;
