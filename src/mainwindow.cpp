@@ -142,7 +142,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_ui.actionStep_In, SIGNAL(triggered()), SLOT(onStepIn()));
     connect(m_ui.actionStep_Out, SIGNAL(triggered()), SLOT(onStepOut()));
     connect(m_ui.actionRestart, SIGNAL(triggered()), SLOT(onRestart()));
-    connect(m_ui.actionReload, SIGNAL(triggered()), SLOT(onReload()));
     connect(m_ui.actionContinue, SIGNAL(triggered()), SLOT(onContinue()));
 
     connect(m_ui.actionViewStack, SIGNAL(triggered()), SLOT(onViewStack()));
@@ -1391,16 +1390,26 @@ void MainWindow::onRestart()
 
     m_ui.targetOutputView->clearAll();
 
-    core.gdbRun();
-}
-
-void MainWindow::onReload()
-{
-    Core &core = Core::getInstance();
-
-    m_ui.targetOutputView->clearAll();
-
-    core.gdbReload(m_cfg);
+    // Was the program modified since last time?
+    QDateTime modTime = QFileInfo(m_cfg.getProgramPath()).lastModified();
+    if(modTime > core.getTimeStarted())
+    {
+        // Ask the user what to do
+        QMessageBox msgBox;
+        msgBox.setText("The program has been modified.");
+        msgBox.setInformativeText("Do you want to reload it?");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        msgBox.setDefaultButton(QMessageBox::Yes);
+        int ret = msgBox.exec();
+        if(ret == QMessageBox::Yes)
+        {
+            core.gdbReload(m_cfg);
+        }
+        else
+            core.gdbRun();
+    }
+    else
+        core.gdbRun();
 }
 
 
@@ -2040,7 +2049,6 @@ void MainWindow::ICore_onStateChanged(TargetState state)
     m_ui.actionStop->setEnabled(isRunning);
     m_ui.actionContinue->setEnabled(isStopped);
     m_ui.actionRestart->setEnabled(!isRunning);
-    m_ui.actionReload->setEnabled(!isRunning && m_cfg.m_download && !(m_cfg.getProgramPath().isEmpty()));
 
     m_ui.varWidget->setEnabled(!isRunning);
 

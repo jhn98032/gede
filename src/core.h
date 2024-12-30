@@ -227,7 +227,7 @@ public:
     
     void setListener(ICore *inf) { m_inf = inf; };
 
-    
+    QDateTime getTimeStarted();
 private:
     
      void onNotifyAsyncOut(Tree &tree, AsyncClass ac);
@@ -326,6 +326,7 @@ private:
     QStringList m_localVars;
     int m_memDepth; //!< The memory depth. (Either 64 or 32).
     ConnectionMode m_connectionMode; // The debug mode (tcpip, local, coredump)
+    QDateTime m_lastRunTime; //!<  The time init function was called and gdb was started.
 };
 
 

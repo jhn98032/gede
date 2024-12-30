@@ -324,6 +324,7 @@ int Core::initPid(Settings *cfg, QString gdbPath, QString programPath, int pid)
 
     m_isRemote = false;
     m_connectionMode = MODE_PID;
+    m_lastRunTime = QDateTime::currentDateTime();
 
     if(com.init(gdbPath, cfg->m_enableDebugLog))
     {
@@ -401,6 +402,7 @@ int Core::initLocal(Settings *cfg, QString gdbPath, QString programPath, QString
 
     m_isRemote = false;
     m_connectionMode = MODE_LOCAL;
+    m_lastRunTime = QDateTime::currentDateTime();
 
     if(com.init(gdbPath, cfg->m_enableDebugLog))
     {
@@ -461,6 +463,7 @@ int Core::initCoreDump(Settings *cfg, QString gdbPath, QString programPath, QStr
 
     m_isRemote = false;
     m_connectionMode = MODE_COREDUMP;
+    m_lastRunTime = QDateTime::currentDateTime();
 
     if(com.init(gdbPath, cfg->m_enableDebugLog))
     {
@@ -522,6 +525,7 @@ int Core::initRemote(Settings *cfg, QString gdbPath, QString programPath, QStrin
 
     m_isRemote = true;
     m_connectionMode = MODE_TCP;
+    m_lastRunTime = QDateTime::currentDateTime();
 
     if(com.init(gdbPath, cfg->m_enableDebugLog))
     {
@@ -574,6 +578,7 @@ int Core::initSerial(Settings *cfg, QString gdbPath, QString programPath, QStrin
 
     m_isRemote = true;
     m_connectionMode = MODE_SERIAL;
+    m_lastRunTime = QDateTime::currentDateTime();
 
     if(com.init(gdbPath, cfg->m_enableDebugLog))
     {
@@ -871,8 +876,9 @@ void Core::gdbRun()
     }
 }
 
+
 /**
- * @brief Asks gdb to reload the (probably modified binary) that is being debugged.
+ * @brief Asks gdb to reload and rerun the (probably modified binary) that is being debugged.
  * @return 0 on success.
  */
 int Core::gdbReload(Settings &cfg)
@@ -2225,4 +2231,13 @@ bool Core::isRunning()
 
 
 
-    
+/**
+ * @brief Returns the time when GDB was last initiated.
+ */
+QDateTime Core::getTimeStarted()
+{
+    return m_lastRunTime;
+}
+
+
+

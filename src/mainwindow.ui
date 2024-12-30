@@ -609,7 +609,6 @@
     <property name="title">
      <string>Execution</string>
     </property>
-    <addaction name="actionReload"/>
     <addaction name="actionRestart"/>
     <addaction name="actionStop"/>
     <addaction name="separator"/>
@@ -675,7 +674,6 @@
    </attribute>
    <addaction name="actionQuit"/>
    <addaction name="separator"/>
-   <addaction name="actionReload"/>
    <addaction name="actionRestart"/>
    <addaction name="actionStop"/>
    <addaction name="separator"/>
@@ -735,18 +733,6 @@
    </property>
    <property name="shortcut">
     <string>F4</string>
-   </property>
-  </action>
-    <action name="actionReload">
-   <property name="icon">
-    <iconset resource="resource.qrc">
-     <normaloff>:/images/res/down.png</normaloff>:/images/res/down.png</iconset>
-   </property>
-   <property name="text">
-    <string>Reload</string>
-   </property>
-   <property name="shortcut">
-    <string>F12</string>
    </property>
   </action>
   <action name="actionContinue">

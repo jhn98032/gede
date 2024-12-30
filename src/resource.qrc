@@ -10,6 +10,5 @@
     <file>res/file.png</file>
     <file>res/folder.png</file>
     <file>res/step_out.png</file>
-    <file>res/down.png</file>
  </qresource>
 </RCC>
