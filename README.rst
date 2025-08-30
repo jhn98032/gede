@@ -42,7 +42,7 @@ On Debian/Ubuntu/Mint:
 
     # sudo apt-get install exuberant-ctags
 
-    # sudo apt-get install python
+    # sudo apt-get install python3
 
     # sudo apt-get install qt5-qmake qtbase5-dev libqt5serialport5-dev
 
@@ -83,8 +83,11 @@ Building
 
 Extract:
 
-    # tar -xvJf gede-x.y.z.tar.xz
+    # tar -xvJf gede-X.Y.Z.tar.xz
 
+or
+
+    # tar -xvzf gede-X.Y.Z.tar.gz
 
 Compile and install (to /usr/local/bin):
 
