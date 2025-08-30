@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 #
 # Written by Johan Henriksson. Copyright (C) 2014-2024.
+# Copyright (C) 1.6.2025 by benny.lyons@gmx.net
 #
 import sys
 import os
@@ -66,7 +67,10 @@ def run_program(program_name, a_list, verbose = False):
 
 # Run make
 def run_make(a_list, verbose = False):
-    return run_program("make", a_list, verbose)
+    if platform[:3] == 'sun':
+        return run_program("gmake", a_list, verbose)
+    else:
+        return run_program("make", a_list, verbose)
 
 # Remove a file
 def removeFile(filename):
