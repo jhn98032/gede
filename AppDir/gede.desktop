@@ -3,7 +3,7 @@ Version=1.0
 Name=Gede
 Comment=GUI for the GNU/GDB debugger
 Exec=gede
-Icon=gede_icon.png
 Icon=gede_icon
 Type=Application
-Categories=Programming;C/C++;Utility;Development;
+Categories=Utility;Development;
+
