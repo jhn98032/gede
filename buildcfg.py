@@ -2,7 +2,7 @@
 # Written by Johan Henriksson. Copyright (C) 2024.
 #
 from sys import platform
-from build import FORCE_QT5,AUTODETECT
+from build import FORCE_QT5,FORCE_QT6,AUTODETECT
 
 #-----------------------------#
 # Configuration section
