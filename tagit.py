@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-# Written by Johan Henriksson. Copyright (C) 2014-2021.
+# Will read version.h and create a git tag
 #
 import sys
 import os
