@@ -25,7 +25,7 @@ AboutDialog::AboutDialog(QWidget *parent, Settings *cfg)
 
     //
     QString verStr;
-    verStr = QString::asprintf("Version: v%d.%d.%d", GD_MAJOR, GD_MINOR, GD_PATCH);
+    verStr = QString::asprintf("Version: v%d.%d.%d", APP_MAJOR, APP_MINOR, APP_PATCH);
     m_ui.label_version->setText(verStr);
 
     //

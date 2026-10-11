@@ -54,7 +54,7 @@ static int dumpUsage()
 
 static int dumpVersion()
 {
-    printf("gede %d.%d.%d\n", GD_MAJOR, GD_MINOR, GD_PATCH);
+    printf("gede %d.%d.%d\n", APP_MAJOR, APP_MINOR, APP_PATCH);
     
     return -1;  
 }

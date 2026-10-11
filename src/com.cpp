@@ -1245,7 +1245,7 @@ void GdbCom::enableLog(bool enable)
             QDateTime now = QDateTime::currentDateTime();
             logStr = "# Created: " + now.toString("yyyy-MM-dd hh:mm:ss") + "\n";
             writeLogEntry(logStr);
-            logStr = QString::asprintf("# Gede version: %d.%d.%d \n", GD_MAJOR,GD_MINOR,GD_PATCH);
+            logStr = QString::asprintf("# Gede version: %d.%d.%d \n", APP_MAJOR,APP_MINOR,APP_PATCH);
             writeLogEntry(logStr);
 
             QString distroDesc;
