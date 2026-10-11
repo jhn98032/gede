@@ -30,7 +30,6 @@ jobs:
           libzip-dev \
           doxygen \
           graphviz \
-          libsigrok-dev \
           libgl1-mesa-dev \
           exuberant-ctags \
           wget
