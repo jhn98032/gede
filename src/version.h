@@ -11,7 +11,7 @@
 
 #define APP_MAJOR 2
 #define APP_MINOR 22
-#define APP_PATCH 1
+#define APP_PATCH 2
 
 
 #endif // FILE__VERSION_H
