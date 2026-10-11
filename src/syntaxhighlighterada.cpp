@@ -88,7 +88,7 @@ SyntaxHighlighterAda::~SyntaxHighlighterAda()
 
 /**
  * @brief Checks if a character is a special character.
- * @return Returns true if the character is a special character (Eg: '\t').
+ * @return Returns true if the character is a special character (Eg: '\\t').
 */
 bool SyntaxHighlighterAda::isSpecialChar(char c) const
 {

@@ -92,7 +92,7 @@ SyntaxHighlighterBasic::~SyntaxHighlighterBasic()
 
 /**
  * @brief Checks if a character is a special character.
- * @return Returns true if the character is a special character (Eg: '\t').
+ * @return Returns true if the character is a special character (Eg: '\\t').
 */
 bool SyntaxHighlighterBasic::isSpecialChar(char c) const
 {

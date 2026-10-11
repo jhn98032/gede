@@ -192,9 +192,7 @@ class ICore
 
     /**
      * @brief Called when a new child item has been added for a watched item.
-     * @param watchId    The watchId of the new child.
-     * @param name       The name of the child.
-     * @param valueString  The value of the child.
+     * @param watch    The watch of the new child.
      */
     virtual void ICore_onWatchVarChildAdded(VarWatch &watch) = 0;
     

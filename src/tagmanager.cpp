@@ -235,7 +235,7 @@ void TagManager::getTags(QString filePath, QList<Tag> *tagList)
 /**
  * @brief Lookup tags with a specific name.
  * @param name       The name of the tag (Eg: "main" or "Class::myFunc").
- * @return tagList   The found tags.
+ * @param tagList   The found tags.
  */
 void TagManager::lookupTag(QString name, QList<Tag> *tagList)
 {
