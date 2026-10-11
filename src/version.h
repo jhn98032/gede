@@ -10,8 +10,8 @@
 #define FILE__VERSION_H
 
 #define APP_MAJOR 2
-#define APP_MINOR 22
-#define APP_PATCH 2
+#define APP_MINOR 23
+#define APP_PATCH 1
 
 
 #endif // FILE__VERSION_H
