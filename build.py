@@ -204,7 +204,7 @@ def detectQt():
         if buildcfg.g_qmakeQt5:
             qmakeName = buildcfg.g_qmakeQt5;
         else:
-            raise RuntimeError("Failed to find qt4 qmake")
+            raise RuntimeError("Failed to find qt5 qmake")
     elif buildcfg.g_qtVersionToUse == FORCE_QT6:
         os.environ["QT_SELECT"] = "qt6"
         if buildcfg.g_qmakeQt6:

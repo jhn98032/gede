@@ -93,6 +93,16 @@ Compile and install (to /usr/local/bin):
 
     # sudo make install
 
+or
+
+    # build.py help
+
+    # build.py 
+
+Configure build:
+
+    buildcfg.py
+
 Gede can now be launched:
 
     # gede

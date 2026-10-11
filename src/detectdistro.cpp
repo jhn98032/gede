@@ -5,6 +5,14 @@
 #include <QMap>
 #include <QProcess>
 
+#include <sys/stat.h>
+
+/**
+  * @brief Check if we are on OpenIndiana/Illumos
+  */
+bool isOpenIndiana(void);
+
+
 
 /**
   * @brief Tries to detect the distro the system is running on.
@@ -69,13 +77,35 @@ void detectDistro(DistroType *type, QString *distroDesc)
 
     }
 
+    // OpenIndiana/Illumos
+    if (isOpenIndiana())
+    {
+        if(type)
+            *type = DISTRO_OI;
+
+	QFile file3("/etc/release");
+	if(file3.open(QIODevice::ReadOnly))
+	{
+	    distroName = file3.readLine().trimmed();
+	}
+    }
+    
+
 
     // Detect x64/x86 
     QString versionStr;
     QProcess process;
-    process.start("uname", 
-        QStringList("-m"),
-        QIODevice::ReadOnly | QIODevice::Text);
+    
+    if (isOpenIndiana())
+        process.start("uname", 
+            QStringList("-v"),
+            QIODevice::ReadOnly | QIODevice::Text);
+    else
+	process.start("uname", 
+            QStringList("-m"),
+            QIODevice::ReadOnly | QIODevice::Text);
+
+    
     if(!process.waitForFinished(2000))
     {
     }
@@ -95,3 +125,28 @@ void detectDistro(DistroType *type, QString *distroDesc)
 
 
 
+bool isOpenIndiana(void)
+{
+
+    bool ret = false;
+    const char* oiInfos = "/etc/release";
+    struct stat fileExist;
+
+    if (stat(oiInfos, &fileExist) < 0)
+	    return false;
+
+    QFile file(oiInfos);
+    if(file.open(QIODevice::ReadOnly))
+    {
+        QString line = file.readLine().trimmed();
+            if(line.contains("OpenIndiana"))
+                ret = true;
+            else
+                ret = false;
+    } else
+    {
+	    ret = false;
+    }
+
+    return ret;
+}

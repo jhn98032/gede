@@ -1,6 +1,7 @@
 #
 # Written by Johan Henriksson. Copyright (C) 2024.
-#
+# Copyright (C) 2025 mebenn benny.lyons@gmx.net
+
 from sys import platform
 from build import FORCE_QT5,FORCE_QT6,AUTODETECT
 
@@ -22,6 +23,9 @@ g_testDirs = [
 g_mainSrcDir = ["./src" ]
 if platform == "darwin":
     g_requiredPrograms = ["make", "clang", "ctags" ]
+elif platform[:3] == "sun":
+    # OpenIndiana/Illumos
+    g_requiredPrograms = ["gmake", "gcc", "ctags" ]
 else:
     g_requiredPrograms = ["make", "gcc", "ctags" ]
 MIN_QT_VER = "4.0.0"

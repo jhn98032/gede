@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2014-2021 Johan Henriksson.
+ * Copyright (C) 2025 mebenn benny.lyons@gmx.net
  * All rights reserved.
  *
  * This software may be modified and distributed under the terms
@@ -10,7 +11,7 @@
 #define FILE__VERSION_H
 
 #define GD_MAJOR 2
-#define GD_MINOR 22
+#define GD_MINOR 23
 #define GD_PATCH 1
 
 
